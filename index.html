@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Piscina de juegos | Galería online</title>
+    <meta
+      name="description"
+      content="Piscina de juegos: galería online con minijuegos educativos, históricos y divertidos."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">P</div>
+          <div>
+            <p class="brand-name">Piscina de juegos</p>
+            <span class="brand-tag">Online</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Navegación principal">
+          <a href="#catalogo">Catálogo</a>
+          <a href="#destacados">Destacados</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <button class="nav-button" type="button">Entrar</button>
+      </header>
+
+      <main>
+        <section class="hero" id="destacados">
+          <div class="hero-copy">
+            <span class="eyebrow">Juegos para aprender y jugar</span>
+            <h1>Tu galería de juegos online con historia, estrategia y cultura.</h1>
+            <p>
+              Aquí tienes una colección de minijuegos y experiencias interactivas
+              pensadas para divertirte mientras aprendes. Explora por categoría,
+              busca por nombre y prueba cualquiera en segundos.
+            </p>
+
+            <div class="hero-actions">
+              <a class="primary-button" href="#catalogo">Explorar juegos</a>
+              <button id="featuredPlayButton" class="secondary-button" type="button">
+                Jugar destacado
+              </button>
+            </div>
+
+            <ul class="stats-list" aria-label="Estadísticas">
+              <li><strong id="statGames">0</strong><span>Juegos</span></li>
+              <li><strong id="statCategories">0</strong><span>Categorías</span></li>
+              <li><strong id="statCollection">Colección</strong><span>Curada</span></li>
+            </ul>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-badge">Juego destacado</div>
+            <div id="featuredArt" class="featured-art"></div>
+            <div class="featured-content">
+              <div>
+                <p class="featured-label">Título</p>
+                <h2 id="featuredTitle">Piscina de juegos</h2>
+              </div>
+              <div class="featured-meta">
+                <span id="featuredCategory">Categoría</span>
+              </div>
+              <p id="featuredDescription">Descripción del juego destacado.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="catalog" id="catalogo">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Catálogo</span>
+              <h2>Descubre tus próximos juegos</h2>
+            </div>
+            <span id="resultsCount" class="results-count">0 juegos</span>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-box" aria-label="Buscar juegos">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10.5 3a7.5 7.5 0 015.86 12.84l4.5 4.5 1.41-1.41-4.5-4.5A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"/>
+              </svg>
+              <input id="searchInput" type="search" placeholder="Buscar por nombre o categoría" />
+            </label>
+
+            <div class="filter-group" id="filterGroup" aria-label="Filtro por categoría">
+              <button class="filter-chip active" type="button" data-category="Todos">Todos</button>
+              <button class="filter-chip" type="button" data-category="Historia">Historia</button>
+              <button class="filter-chip" type="button" data-category="Educativo">Educativo</button>
+              <button class="filter-chip" type="button" data-category="Arcade">Arcade</button>
+              <button class="filter-chip" type="button" data-category="Estratégia">Estratégia</button>
+            </div>
+          </div>
+
+          <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="faq" id="faq">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">FAQ</span>
+              <h2>Cómo funciona</h2>
+            </div>
+          </div>
+
+          <div class="faqs">
+            <article>
+              <h3>¿Se pueden jugar desde aquí?</h3>
+              <p>Sí. Cada juego se abre en una nueva ventana o vista previa para probarlo directamente.</p>
+            </article>
+            <article>
+              <h3>¿Puedo añadir nuevos juegos?</h3>
+              <p>Claro. Solo tienes que añadir su nombre, categoría, descripción y la URL del archivo HTML.</p>
+            </article>
+            <article>
+              <h3>¿Es responsive?</h3>
+              <p>La galería está pensada para móvil, tablet y escritorio con una experiencia clara y visual.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="gameModal" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="close-button" aria-label="Cerrar">×</button>
+        <div class="modal-preview-wrap">
+          <iframe id="previewFrame" title="Vista previa del juego" loading="lazy"></iframe>
+        </div>
+        <div class="modal-content">
+          <div class="modal-header-row">
+            <div>
+              <p class="modal-kicker">Juego</p>
+              <h3 id="modalTitle">Título</h3>
+            </div>
+          </div>
+          <div id="modalTags" class="modal-tags"></div>
+          <p id="modalDescription"></p>
+          <div class="modal-footer">
+            <div class="meta-box">
+              <span>Modo</span>
+              <strong id="modalMode">Online</strong>
+            </div>
+            <div class="meta-box">
+              <span>Duración</span>
+              <strong id="modalDuration">Corta</strong>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <a id="modalPlayLink" class="primary-button modal-button" href="#" target="_blank" rel="noreferrer">
+              Jugar ahora
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
