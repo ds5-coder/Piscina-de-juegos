@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0b2434"/>
+      <stop offset="100%" stop-color="#54d2a2"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" fill="url(#bg)"/>
+  <circle cx="170" cy="122" r="64" fill="#d6f7ff" opacity="0.5"/>
+  <path d="M100 270C160 190 200 170 260 190C342 220 326 270 420 250V330H100Z" fill="#e7fff8" opacity="0.15"/>
+  <circle cx="170" cy="122" r="46" fill="#f5fafc"/>
+  <path d="M170 160V205M145 180H195" stroke="#3b4f67" stroke-width="12" stroke-linecap="round"/>
+  <path d="M120 240Q170 200 220 240" stroke="#f5fafc" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M380 110H520" stroke="#dff8eb" stroke-width="10" stroke-linecap="round"/>
+  <path d="M380 175H500" stroke="#dff8eb" stroke-width="10" stroke-linecap="round"/>
+  <path d="M380 240H530" stroke="#dff8eb" stroke-width="10" stroke-linecap="round"/>
+  <text x="300" y="90" fill="#f4fff9" font-size="28" font-family="Arial" font-weight="700" text-anchor="middle">Sócrates</text>
+</svg>

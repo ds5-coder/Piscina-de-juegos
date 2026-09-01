@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1">
+      <stop offset="0%" stop-color="#2c1e1a"/>
+      <stop offset="100%" stop-color="#ff9e67"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" fill="url(#bg)"/>
+  <rect x="90" y="200" width="380" height="30" rx="8" fill="#f4cab8" opacity="0.75"/>
+  <rect x="150" y="150" width="120" height="58" rx="12" fill="#f9f1f0"/>
+  <rect x="292" y="120" width="90" height="90" rx="10" fill="#e8e7ff"/>
+  <circle cx="225" cy="228" r="35" fill="#f8d08a"/>
+  <circle cx="332" cy="228" r="35" fill="#f8d08a"/>
+  <path d="M178 200V150M290 200V120M360 200V120" stroke="#fefefe" stroke-width="10" stroke-linecap="round"/>
+  <path d="M90 260H470" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+  <text x="42" y="78" fill="#fff4e9" font-size="24" font-family="Arial" font-weight="700">Industrial</text>
+</svg>
