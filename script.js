@@ -4,7 +4,7 @@ const games = [
     title: "1789: Diario de la Revolución",
     category: "Historia",
     mode: "Narrativo",
-    duration: "8 min",
+    duration: "3 min",
     description:
       "Un relato interactivo sobre la Revolución Francesa en el que cada decisión cambia el rumbo del personaje.",
     longDescription:
@@ -34,7 +34,7 @@ const games = [
     title: "Revolución Industrial",
     category: "Estratégia",
     mode: "Quiz",
-    duration: "6 min",
+    duration: "3 min",
     description:
       "Coloca la máquina en el lugar correcto y responde a preguntas clave sobre la industrialización europea.",
     longDescription:
@@ -49,7 +49,7 @@ const games = [
     title: "Napoleón vs Wellington",
     category: "Arcade",
     mode: "2 jugadores",
-    duration: "7 min",
+    duration: "3 min",
     description:
       "Un duelo arcade de preguntas con puntuación, turnos y explosividad visual inspirada en la historia militar.",
     longDescription:
@@ -64,7 +64,7 @@ const games = [
     title: "Revolución Rusa: tanda de penaltis",
     category: "Historia",
     mode: "Quiz",
-    duration: "5 min",
+    duration: "3 min",
     description:
       "Comparte respuestas históricas con los bolcheviques y mencheviques en una tanda de penaltis cargada de preguntas.",
     longDescription:
@@ -110,7 +110,6 @@ const featuredCategory = document.getElementById("featuredCategory");
 const featuredRating = document.getElementById("featuredRating");
 const featuredDescription = document.getElementById("featuredDescription");
 const featuredArt = document.getElementById("featuredArt");
-const featuredPlayButton = document.getElementById("featuredPlayButton");
 
 const modal = document.getElementById("gameModal");
 const modalTitle = document.getElementById("modalTitle");
@@ -135,7 +134,6 @@ function renderFeaturedGame() {
   featuredArt.style.backgroundSize = "cover";
   featuredArt.style.backgroundPosition = "center";
   featuredArt.style.backgroundRepeat = "no-repeat";
-  featuredPlayButton.dataset.gameId = featured.id;
 }
 
 function getVisibleGames() {
@@ -254,13 +252,6 @@ gamesGrid.addEventListener("click", (event) => {
   }
 });
 
-featuredPlayButton.addEventListener("click", () => {
-  const featured = games.find((game) => game.id === Number(featuredPlayButton.dataset.gameId));
-  if (featured) {
-    window.open(featured.playUrl, "_blank", "noopener,noreferrer");
-  }
-});
-
 document.querySelector(".close-button").addEventListener("click", closeModal);
 document.querySelector(".modal-backdrop").addEventListener("click", closeModal);
 document.addEventListener("keydown", (event) => {
@@ -279,7 +270,6 @@ function applyLanguage() {
   document.querySelector(".hero h1").textContent = t.heroTitle;
   document.querySelector(".hero-copy > p").textContent = t.heroText;
   document.querySelector(".hero-actions .primary-button").textContent = t.explore;
-  featuredPlayButton.textContent = t.featuredPlay;
   document.querySelector(".stats-list li:nth-child(1) span").textContent = t.games;
   document.querySelector(".stats-list li:nth-child(2) span").textContent = t.categories;
   document.querySelector(".stats-list li:nth-child(3) strong").textContent = t.collection;
