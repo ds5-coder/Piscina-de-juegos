@@ -13,7 +13,7 @@ const games = [
     image: "assets/game-covers/Captura de pantalla 2026-09-01 190518.png",
     previewUrl: "games/diario_revolucion_francesa.html",
     playUrl: "games/diario_revolucion_francesa.html"
-  }
+  },
   {
     id: 2,
     title: "En diálogo con Sócrates",
