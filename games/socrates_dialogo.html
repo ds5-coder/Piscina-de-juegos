@@ -891,7 +891,7 @@ function buildLocalVerdict(dialogue, answer, attemptNumber, hintsGiven) {
   if (isCorrect) {
     return {
       correct: true,
-      reply: successReplies[Math.floor(Math.random() * successReplies.length)],
+      reply: successReplies[(attemptNumber - 1) % successReplies.length],
       hint: null,
       mood: "satisfecho",
     };
@@ -910,14 +910,35 @@ function buildLocalVerdict(dialogue, answer, attemptNumber, hintsGiven) {
     "decepcionado",
   ];
 
-  const fallbackReply = {
-    simposio: "Yo tampoco lo veo tan claro del todo, {{name}}. Piensa si Eros no es más bien un deseo que apunta a la belleza, al bien y, en último término, a lo que permanece. ¿No es eso lo que a una persona le falta y por eso anhela?",
-    lisis: "Yo tampoco lo doy por resuelto, {{name}}. Si la amistad fuera solo parecido o utilidad, no sería más que conveniencia. ¿No parece más bien que lo amamos es aquello que nos parece bueno y valioso en común?",
-    laques: "Yo tampoco lo doy por resuelto, {{name}}. Si el valor fuera solo quedarse firme sin pensar, sería temeridad; y si fuera solo miedo, no sería valentía. ¿No será que el valor exige discernimiento sobre lo que de verdad conviene?",
-    apologia: "Yo tampoco lo doy por resuelto, {{name}}. Si el sabio es quien cree saberlo todo, entonces no es sabio; pero si sabe que no sabe, ¿no está empezando a acercarse a la verdad?",
-    criton: "Yo tampoco lo doy por resuelto, {{name}}. Si hiciéramos mal para pagar el mal, ¿no estaríamos cayendo en la misma injusticia que pretendemos escapar? Piensa en la ciudad y en las leyes que te hicieron quien eres.",
-  }[dialogue.id] || "Yo tampoco lo veo del todo claro, {{name}}. Piensa si no hay una idea más profunda detrás de la primera respuesta.";
+  const fallbackReplies = {
+    simposio: [
+      "Aún no me convences, {{name}}. ¿No será Eros el deseo de aquello bello y bueno que todavía nos falta?",
+      "Tu respuesta abre otra duda, {{name}}. Si amamos algo, ¿no es porque lo juzgamos valioso y queremos conservarlo?",
+      "Miremos el asunto desde otro ángulo, {{name}}: ¿puede el amor limitarse al cuerpo, o busca también una belleza que permanezca?",
+    ],
+    lisis: [
+      "Aún no lo daría por resuelto, {{name}}. ¿Puede una amistad reducirse al parecido o a la utilidad?",
+      "Pensemos juntos, {{name}}: cuando termina la conveniencia, ¿qué podría mantener unidos a dos amigos?",
+      "Tu respuesta me hace preguntar algo más, {{name}}: ¿no buscamos en el amigo un bien que podamos compartir?",
+    ],
+    laques: [
+      "Todavía tengo dudas, {{name}}. ¿Es valiente quien resiste sin saber si debe hacerlo?",
+      "Considera el juicio, {{name}}: ¿cómo distinguir la valentía de una simple temeridad?",
+      "No basta con no huir, {{name}}. ¿No hace falta conocer qué merece ser afrontado y qué debe evitarse?",
+    ],
+    apologia: [
+      "Aún no lo veo claro, {{name}}. ¿Es sabio quien presume saber, o quien reconoce lo que ignora?",
+      "Déjame preguntarte de nuevo, {{name}}: ¿qué diferencia hay entre saber algo y creer que se sabe?",
+      "Tal vez la sabiduría empiece con una confesión, {{name}}. ¿Qué puede aprender quien nunca admite sus límites?",
+    ],
+    criton: [
+      "Todavía debemos examinarlo, {{name}}. ¿Puede ser justo devolver una injusticia con otra?",
+      "Piensa en las consecuencias, {{name}}: si escapamos rompiendo el pacto, ¿qué daño hacemos a las leyes?",
+      "Te pregunto una vez más, {{name}}: ¿es preferible salvar el cuerpo si para ello dañamos la justicia?",
+    ],
+  }[dialogue.id] || ["Aún no lo veo claro, {{name}}. ¿Qué idea más profunda se esconde detrás de tu respuesta?"];
 
+  const fallbackReply = fallbackReplies[(attemptNumber - 1) % fallbackReplies.length];
   const finalReply = fallbackReply.replace("{{name}}", "amigo");
 
   return {
