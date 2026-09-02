@@ -58,7 +58,7 @@ const games = [
     image: "assets/game-covers/Captura de pantalla 2026-09-01 190527.png",
     previewUrl: "games/napoleon_tenis_2p.html",
     playUrl: "games/napoleon_tenis_2p.html"
-  }
+  },
   {
     id: 5,
     title: "Revolución Rusa: tanda de penaltis",
@@ -70,7 +70,7 @@ const games = [
     longDescription:
       "Un minijuego de historia y rapidez mental donde cada respuesta correcta suma goles para tu equipo y cada error deja al rival con ventaja.",
     gradient: "linear-gradient(135deg, rgba(207,58,58,0.9), rgba(20,103,180,0.88))",
-    image: "assets/game-covers/industrial.svg",
+    image: "assets/game-covers/ChatGPT Image 2 sept 2026, 17_54_44.png",
     previewUrl: "games/revolucion_rusa_penaltis.html",
     playUrl: "games/revolucion_rusa_penaltis.html"
   }
