@@ -371,7 +371,7 @@ const SPOTS = [
 
 const START = {x: W/2, y: 70, angle: Math.PI/2};
 
-const CAR_LEN = 30, CAR_W = 16;
+const CAR_LEN = 46, CAR_W = 24;
 const MAX_SPEED = 3.0;
 const MAX_REV = 2.0;
 const ACCEL = 0.11;
@@ -687,21 +687,22 @@ function draw(){
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // placa con la respuesta: EL PUESTO ES DIRECTAMENTE LA RESPUESTA, sin letras A/B/C
+    // placa con la respuesta: superpuesta abajo, dentro del propio puesto
     ctx.font = '700 15px Rubik, sans-serif';
     const lines = wordWrap(ans ? ans.text : '', sw-16, '700 15px Rubik, sans-serif');
     const lineH = 20;
-    const boxH = Math.max(64, lines.length*lineH + 20);
-    ctx.fillStyle = 'rgba(20,22,27,.72)';
-    ctx.fillRect(s.x0-4, 36, sw+8, boxH);
-    ctx.strokeStyle = 'rgba(234,179,95,.6)';
+    const boxH = Math.min(sh-14, Math.max(64, lines.length*lineH + 20));
+    const boxY = s.y1 - boxH - 6;
+    ctx.fillStyle = 'rgba(20,22,27,.78)';
+    ctx.fillRect(s.x0+4, boxY, sw-8, boxH);
+    ctx.strokeStyle = 'rgba(234,179,95,.75)';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(s.x0-4, 36, sw+8, boxH);
+    ctx.strokeRect(s.x0+4, boxY, sw-8, boxH);
 
     if(ans){
       ctx.fillStyle = '#f4ead9';
       ctx.textAlign = 'center';
-      const startY = 36 + boxH/2 - (lines.length-1)*(lineH/2) + 5;
+      const startY = boxY + boxH/2 - (lines.length-1)*(lineH/2) + 5;
       lines.forEach((line, li)=>{
         ctx.fillText(line, s.x0+sw/2, startY + li*lineH);
       });
@@ -745,7 +746,8 @@ function drawGear(x,y,r,color){
 }
 
 function drawCar(){
-  // Obrero de fábrica visto desde arriba, con las piernas animadas al caminar.
+  // Obrero de fábrica visto desde arriba, empujando una carretilla,
+  // con las piernas animadas al caminar y la rueda girando.
   const moving = Math.abs(car.speed) > 0.05;
   const legSwing = moving ? Math.sin(walkPhase) * 6 : 0;
 
@@ -753,16 +755,60 @@ function drawCar(){
   ctx.translate(car.x, car.y);
   ctx.rotate(car.angle);
 
-  // sombra
+  const bodyFront = CAR_LEN/2 - 12; // hasta donde llega el cuerpo del obrero
+  const barrowFar = bodyFront + 24;  // borde delantero de la caja de la carretilla
+  const wheelX = barrowFar + 6;
+
+  // sombra (cubre también la carretilla)
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   ctx.beginPath();
-  ctx.ellipse(0, 2, CAR_LEN/2, CAR_W/2, 0, 0, Math.PI*2);
+  ctx.ellipse(8, 2, CAR_LEN/2+16, CAR_W/2+2, 0, 0, Math.PI*2);
   ctx.fill();
 
+  // --- carretilla, por delante del obrero ---
+  // mangos
+  ctx.strokeStyle = '#6b4a2a';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  ctx.moveTo(bodyFront-2, -4); ctx.lineTo(barrowFar-6, -CAR_W*0.42);
+  ctx.moveTo(bodyFront-2, 4); ctx.lineTo(barrowFar-6, CAR_W*0.42);
+  ctx.stroke();
+
+  // caja de la carretilla (vista desde arriba)
+  ctx.fillStyle = '#8a97a3';
+  ctx.beginPath();
+  ctx.moveTo(bodyFront, -CAR_W*0.3);
+  ctx.lineTo(barrowFar, -CAR_W*0.48);
+  ctx.lineTo(barrowFar, CAR_W*0.48);
+  ctx.lineTo(bodyFront, CAR_W*0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#241804'; ctx.lineWidth = 1.4; ctx.stroke();
+
+  // carga adentro (piezas, carbón)
+  ctx.fillStyle = '#4d5967';
+  [[-3,-5],[3,3],[7,-4]].forEach(([dx,dy])=>{
+    ctx.beginPath(); ctx.arc(barrowFar-9+dx, dy, 3.4, 0, Math.PI*2); ctx.fill();
+  });
+
+  // rueda delantera, gira al caminar
+  ctx.save();
+  ctx.translate(wheelX, 0);
+  ctx.rotate(walkPhase*2.2);
+  ctx.fillStyle = '#241804';
+  ctx.beginPath(); ctx.arc(0,0,7.5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#aeb7bf'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-6,0); ctx.lineTo(6,0);
+  ctx.moveTo(0,-6); ctx.lineTo(0,6);
+  ctx.stroke();
+  ctx.restore();
+
+  // --- obrero ---
   // piernas (rectángulos que se alternan al caminar)
   ctx.fillStyle = '#3a3f47';
-  ctx.fillRect(-CAR_LEN/2+2+legSwing/3, -CAR_W/2+2, 10, 5);
-  ctx.fillRect(-CAR_LEN/2+2-legSwing/3, CAR_W/2-7, 10, 5);
+  ctx.fillRect(-CAR_LEN/2+3+legSwing/3, -CAR_W/2+3, 14, 7);
+  ctx.fillRect(-CAR_LEN/2+3-legSwing/3, CAR_W/2-10, 14, 7);
 
   // torso (overol de trabajo)
   const grad = ctx.createLinearGradient(0,-CAR_W/2,0,CAR_W/2);
@@ -770,32 +816,41 @@ function drawCar(){
   grad.addColorStop(1, '#4d5967');
   ctx.fillStyle = grad;
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(-CAR_LEN/2+6, -CAR_W/2+1, CAR_LEN-14, CAR_W-2, 5) : ctx.rect(-CAR_LEN/2+6, -CAR_W/2+1, CAR_LEN-14, CAR_W-2);
+  ctx.roundRect ? ctx.roundRect(-CAR_LEN/2+9, -CAR_W/2+2, CAR_LEN-30, CAR_W-4, 6) : ctx.rect(-CAR_LEN/2+9, -CAR_W/2+2, CAR_LEN-30, CAR_W-4);
   ctx.fill();
   ctx.strokeStyle = '#241804';
-  ctx.lineWidth = 1.2;
+  ctx.lineWidth = 1.6;
   ctx.stroke();
 
   // tirantes del overol
   ctx.strokeStyle = '#eab35f';
-  ctx.lineWidth = 1.4;
+  ctx.lineWidth = 1.8;
   ctx.beginPath();
-  ctx.moveTo(-CAR_LEN/2+9, -CAR_W/2+2); ctx.lineTo(CAR_LEN/2-12, -1);
-  ctx.moveTo(-CAR_LEN/2+9, CAR_W/2-2); ctx.lineTo(CAR_LEN/2-12, 1);
+  ctx.moveTo(-CAR_LEN/2+13, -CAR_W/2+3); ctx.lineTo(bodyFront-8, -2);
+  ctx.moveTo(-CAR_LEN/2+13, CAR_W/2-3); ctx.lineTo(bodyFront-8, 2);
+  ctx.stroke();
+
+  // brazos sosteniendo los mangos de la carretilla
+  ctx.strokeStyle = '#e0b28c';
+  ctx.lineWidth = 3.4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(bodyFront-10, -CAR_W*0.22); ctx.lineTo(bodyFront-2, -4);
+  ctx.moveTo(bodyFront-10, CAR_W*0.22); ctx.lineTo(bodyFront-2, 4);
   ctx.stroke();
 
   // cabeza con gorra de fábrica (adelante = +x)
   ctx.beginPath();
-  ctx.arc(CAR_LEN/2-6, 0, 6.5, 0, Math.PI*2);
+  ctx.arc(bodyFront-16, 0, 9.5, 0, Math.PI*2);
   ctx.fillStyle = '#e0b28c';
   ctx.fill();
   ctx.fillStyle = '#2a2f36';
   ctx.beginPath();
-  ctx.arc(CAR_LEN/2-6, 0, 6.5, -Math.PI*0.65, Math.PI*0.65);
+  ctx.arc(bodyFront-16, 0, 9.5, -Math.PI*0.65, Math.PI*0.65);
   ctx.fill();
   // visera de la gorra apuntando hacia adelante
   ctx.fillStyle = '#2a2f36';
-  ctx.fillRect(CAR_LEN/2-2, -3, 6, 6);
+  ctx.fillRect(bodyFront-13, -4.5, 9, 9);
 
   ctx.restore();
 }
@@ -833,6 +888,5 @@ restartBtn.addEventListener('click', ()=>{
   loadQuestion();
 });
 </script>
-<script src="../language.js"></script>
 </body>
 </html>

@@ -175,6 +175,7 @@
     </div>
   </div>
 
+  <!-- START SCREEN -->
   <div class="startscreen" id="startScreen">
     <h2>⚽ TANDA DE PENALTIS</h2>
     <p class="qpanel">Dos equipos locales: los <b style="color:#ff8a75">Bolcheviques (rojo)</b> y los <b style="color:#7db8f2">Mencheviques (azul)</b>, alternándose para responder preguntas sobre la Revolución Rusa.</p>
@@ -184,6 +185,7 @@
     <div class="center"><button class="bigbtn show" id="startBtn">EMPEZAR ▶</button></div>
   </div>
 
+  <!-- GAME SCREEN -->
   <div class="hidden" id="gameScreen">
     <div class="turnbadge" id="turnBadge">TURNO DE...</div>
     <div class="qpanel" id="questionText">Cargando pregunta...</div>
@@ -198,6 +200,7 @@
     </div>
   </div>
 
+  <!-- END SCREEN -->
   <div class="hidden endscreen" id="endScreen">
     <h2>⚽ ¡TANDA TERMINADA!</h2>
     <p id="endDetail"></p>
@@ -206,6 +209,10 @@
 </div>
 
 <script>
+/* =========================================================
+   BASE DE PREGUNTAS — REVOLUCIÓN RUSA
+   opts[0] es siempre la respuesta correcta (se baraja al mostrarla)
+   ========================================================= */
 const QUESTIONS = [
   {q:"¿A qué dinastía pertenecía el zar Nicolás II?", opts:["Romanov","Habsburgo","Borbón"]},
   {q:"¿En qué año fue coronado Nicolás II en Moscú?", opts:["1896","1905","1917"]},
@@ -259,35 +266,95 @@ const QUESTIONS = [
   {q:"¿En qué año se confirmó, con el hallazgo de sus restos, que Anastasia también fue ejecutada junto a su familia?", opts:["2007","1991","1918"]},
 ];
 
+/* =========================================================
+   MÚSICA — melodía original en 8-bit, dinámica y bailable,
+   con la energía y el groove tipo disco de "Rasputin" de
+   Boney M. (bajo pulsante, percusión marcada, escala menor
+   armónica con aire eslavo), pero SIN reproducir su melodía
+   real (está protegida por derechos de autor). Sintetizada
+   en el navegador con la Web Audio API, sin archivos externos.
+   ========================================================= */
 let musicCtx = null;
 let musicGain = null;
 let musicMuted = false;
 let musicTimer = null;
 let musicStep = 0;
+let noiseBuffer = null;
 
-const MUSIC_BASS = [110,110,130.81,110, 123.47,110,130.81,146.83];
-const MUSIC_LEAD = [null,440,null,523.25, null,466.16,null,392.00];
+// La menor armónica (110, 123.47, 130.81, 146.83, 164.81, 174.61, 207.65)
+// bajo pulsante tipo "cuatro por compás" con un caminito melódico, 16 pasos (2 compases)
+const MUSIC_BASS = [
+  110,110,110,110,  130.81,110,110,110,
+  123.47,123.47,123.47,123.47,  130.81,146.83,164.81,110,
+];
+const MUSIC_LEAD = [
+  220,220,261.63,293.66,  246.94,246.94,220,261.63,
+  293.66,293.66,329.63,293.66,  261.63,261.63,246.94,220,
+];
+// acento tipo "caja/palmas" en los tiempos 2 y 4, hi-hat en cada paso,
+// y bombo bien marcado en cada tiempo (1-2-3-4), como un disco de verdad
+const SNARE_STEPS = new Set([4,12]);
+const KICK_STEPS = new Set([0,4,8,12]);
 
 function ensureMusic(){
   if(!musicCtx){
     const AC = window.AudioContext || window.webkitAudioContext;
     musicCtx = new AC();
     musicGain = musicCtx.createGain();
-    musicGain.gain.value = musicMuted ? 0 : 0.1;
+    musicGain.gain.value = musicMuted ? 0 : 0.11;
     musicGain.connect(musicCtx.destination);
   }
   return musicCtx;
 }
 
+function getNoiseBuffer(){
+  if(!noiseBuffer){
+    const size = musicCtx.sampleRate * 0.25;
+    noiseBuffer = musicCtx.createBuffer(1, size, musicCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for(let i=0;i<size;i++) data[i] = Math.random()*2-1;
+  }
+  return noiseBuffer;
+}
+
+function playPercussion(dur, vol, highpassFreq){
+  const src = musicCtx.createBufferSource();
+  src.buffer = getNoiseBuffer();
+  const filter = musicCtx.createBiquadFilter();
+  filter.type = "highpass";
+  filter.frequency.value = highpassFreq;
+  const g = musicCtx.createGain();
+  const t = musicCtx.currentTime;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  src.connect(filter).connect(g).connect(musicGain);
+  src.start(t);
+  src.stop(t+dur+0.02);
+}
+
+function playKick(vol){
+  const t = musicCtx.currentTime;
+  const osc = musicCtx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(150, t);
+  osc.frequency.exponentialRampToValueAtTime(42, t+0.13);
+  const g = musicCtx.createGain();
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+0.16);
+  osc.connect(g).connect(musicGain);
+  osc.start(t);
+  osc.stop(t+0.18);
+}
+
 function playMusicNote(freq, dur, type, vol){
-  if(!freq || !musicCtx) return;
+  if(!freq) return;
   const t = musicCtx.currentTime;
   const osc = musicCtx.createOscillator();
   osc.type = type;
   osc.frequency.value = freq;
   const g = musicCtx.createGain();
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t+0.015);
+  g.gain.exponentialRampToValueAtTime(vol, t+0.012);
   g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
   osc.connect(g).connect(musicGain);
   osc.start(t);
@@ -295,9 +362,18 @@ function playMusicNote(freq, dur, type, vol){
 }
 
 function musicTick(){
-  playMusicNote(MUSIC_BASS[musicStep % MUSIC_BASS.length], 0.17, "square", 0.55);
-  const lead = MUSIC_LEAD[musicStep % MUSIC_LEAD.length];
-  if(lead) playMusicNote(lead, 0.22, "triangle", 0.32);
+  const step = musicStep % 16;
+  // bombo "cuatro por compás", el corazón del groove disco
+  if(KICK_STEPS.has(step)) playKick(0.75);
+  // bajo pulsante, protagonista, tipo disco
+  playMusicNote(MUSIC_BASS[step], 0.15, "square", 0.55);
+  // hi-hat en cada paso, para que se sienta el groove todo el tiempo
+  playPercussion(0.06, 0.05, 6000);
+  // acento de caja marcado en los tiempos 2 y 4
+  if(SNARE_STEPS.has(step)) playPercussion(0.16, 0.22, 1800);
+  // melodía con aire eslavo por encima, ahora más presente
+  const lead = MUSIC_LEAD[step];
+  if(lead) playMusicNote(lead, 0.22, "triangle", 0.3);
   musicStep++;
 }
 
@@ -305,13 +381,13 @@ function startMusic(){
   ensureMusic();
   if(musicCtx.state === "suspended") musicCtx.resume();
   if(musicTimer) return;
-  const stepMs = 60000 / 136 / 2;
+  const stepMs = 60000 / 150 / 2; // corcheas a 150 bpm, bien enérgico y bailable
   musicTimer = setInterval(musicTick, stepMs);
 }
 
 function toggleMusicMute(){
   musicMuted = !musicMuted;
-  if(musicGain) musicGain.gain.value = musicMuted ? 0 : 0.1;
+  if(musicGain) musicGain.gain.value = musicMuted ? 0 : 0.11;
   const btn = document.getElementById('musicMuteBtn');
   if(btn) btn.textContent = musicMuted ? "🔇" : "🔊";
 }
@@ -326,11 +402,17 @@ function shuffle(arr){
   return a;
 }
 
+/* =========================================================
+   EQUIPOS
+   ========================================================= */
 const TEAMS = {
   red:  { name:"BOLCHEVIQUES", color:"#c2402b", dark:"#7a2015" },
   blue: { name:"MENCHEVIQUES", color:"#0d5eaf", dark:"#0a3d73" },
 };
 
+/* =========================================================
+   ESTADO
+   ========================================================= */
 let deck = [];
 let qi = 0;
 let score = { red:0, blue:0 };
@@ -351,28 +433,29 @@ const ZONES = [
 ];
 const SPOT = { x:380, y:400 };
 const BALL_R = 13;
+const STRIKER_SCALE = 1.4;
 const KEEPER_SCALE = 1.8;
 
 let ball = { x:SPOT.x, y:SPOT.y };
 let keeper = { x:380, y:234, jump:0 };
 let striker = { x: SPOT.x - 60, y: SPOT.y };
 
-let phase = "aiming";
+let phase = "aiming"; // aiming | kicking | result | celebration
 let animStart = 0;
 let animDuration = 550;
 let ballFrom = {x:SPOT.x,y:SPOT.y}, ballTo = {x:SPOT.x,y:SPOT.y}, ballCtrl = {x:SPOT.x,y:SPOT.y};
 let keeperFrom = 380, keeperTo = 380;
 let diveJumpMax = 22;
-let resultType = null;
+let resultType = null; // 'goal' | 'save'
 let resultZoneIndex = -1;
-let shotStyle = "preciso";
-let strikerReaction = null;
+let shotStyle = "preciso"; // fuerte | vaselina | preciso
+let strikerReaction = null; // {kind:'celebrate'|'sad', styleIdx, }
 let keeperReaction = null;
 let reactionStart = 0;
-let kickResults = { red:[], blue:[] };
+let kickResults = { red:[], blue:[] }; // 'goal' | 'save' por cada penalti tirado
 let strikerHair = "moreno";
 let keeperHair = "rubio";
-let recentCorrectZones = [];
+let recentCorrectZones = []; // evita que la respuesta correcta se repita muchas veces seguidas en la misma zona
 let winnerTeam = null;
 let fireworks = [];
 let celebrationStart = 0;
@@ -457,6 +540,9 @@ function pickZoneAnswers(opts){
   return shuffled;
 }
 
+/* =========================================================
+   CARGA DE PREGUNTAS
+   ========================================================= */
 function loadQuestion(){
   answered = false;
   phase = "aiming";
@@ -487,6 +573,9 @@ function loadQuestion(){
   keeperHair = randomHair();
 }
 
+/* =========================================================
+   INTERACCIÓN
+   ========================================================= */
 function getCanvasPos(e){
   const rect = canvas.getBoundingClientRect();
   const scaleX = W / rect.width;
@@ -522,6 +611,7 @@ function kickTo(idx){
   keeperFrom = keeper.x;
 
   if(resultType === "save"){
+    // el arquero llega a esa zona y la pelota se queda afuera de la portería
     keeperTo = ZONES[idx].targetX;
     shotStyle = ["fuerte","preciso"][Math.floor(Math.random()*2)];
     const s = SHOT_STYLES[shotStyle];
@@ -541,6 +631,7 @@ function kickTo(idx){
     const s = SHOT_STYLES[shotStyle];
     animDuration = s.duration;
 
+    // el gol puede caer en cualquier altura dentro de la red de esa zona, siempre distinto
     const z = ZONES[idx];
     const zoneW = z.x1 - z.x0;
     const goalYMin = GOAL.yTop + 16;
@@ -570,14 +661,14 @@ function finishKick(){
     scoreBlueEl.textContent = score.blue;
     feedback.className = 'feedback ok';
     feedback.textContent = "¡GOOOOL! ⚽ " + picked.text;
-    strikerReaction = { kind:"celebrate", styleIdx: Math.floor(Math.random()*4) };
-    keeperReaction  = { kind:"sad", styleIdx: Math.floor(Math.random()*3) };
+    strikerReaction = { kind:"celebrate", styleIdx: Math.floor(Math.random()*CELEBRATE_STYLES.length) };
+    keeperReaction  = { kind:"sad",       styleIdx: Math.floor(Math.random()*SAD_STYLES.length) };
   } else {
     const correctOne = zoneAnswers.find(z=>z.correct);
     feedback.className = 'feedback bad';
     feedback.textContent = "¡ATAJADA! (" + picked.text + "). La correcta era: " + correctOne.text;
-    keeperReaction  = { kind:"celebrate", styleIdx: Math.floor(Math.random()*4) };
-    strikerReaction = { kind:"sad", styleIdx: Math.floor(Math.random()*3) };
+    keeperReaction  = { kind:"celebrate", styleIdx: Math.floor(Math.random()*CELEBRATE_STYLES.length) };
+    strikerReaction = { kind:"sad",       styleIdx: Math.floor(Math.random()*SAD_STYLES.length) };
   }
   reactionStart = performance.now();
 
@@ -609,7 +700,7 @@ function startCelebration(){
   dolls = [140, 280, 480, 620].map((x,i)=>({
     x, y: 380,
     color: wt.color, dark: wt.dark,
-    styleIdx: Math.floor(Math.random()*4),
+    styleIdx: Math.floor(Math.random()*CELEBRATE_STYLES.length),
     hair: randomHair(),
     offset: i*180,
   }));
@@ -649,7 +740,11 @@ function showEndScreen(){
   document.getElementById('endDetail').textContent = `${modeText} ${resultText}`;
 }
 
+/* =========================================================
+   DIBUJO
+   ========================================================= */
 function drawGoal(){
+  // red de la portería
   ctx.fillStyle = "rgba(255,255,255,.06)";
   ctx.fillRect(GOAL.x0, GOAL.yTop, GOAL.x1-GOAL.x0, GOAL.yLine-GOAL.yTop);
   ctx.strokeStyle = "rgba(255,255,255,.35)";
@@ -660,6 +755,7 @@ function drawGoal(){
   for(let y=GOAL.yTop; y<=GOAL.yLine; y+=16){
     ctx.beginPath(); ctx.moveTo(GOAL.x0,y); ctx.lineTo(GOAL.x1,y); ctx.stroke();
   }
+  // postes y travesaño
   ctx.fillStyle = "#f4ead9";
   ctx.strokeStyle = "#161616";
   ctx.lineWidth = 3;
@@ -669,6 +765,8 @@ function drawGoal(){
   ctx.strokeRect(GOAL.x1-2, GOAL.yTop-10, 10, GOAL.yLine-GOAL.yTop+10);
   ctx.fillRect(GOAL.x0-8, GOAL.yTop-14, GOAL.x1-GOAL.x0+16, 10);
   ctx.strokeRect(GOAL.x0-8, GOAL.yTop-14, GOAL.x1-GOAL.x0+16, 10);
+
+  // divisores de zona (líneas punteadas, decorativas)
   ctx.setLineDash([6,6]);
   ctx.strokeStyle = "rgba(255,255,255,.25)";
   ctx.lineWidth = 2;
@@ -710,6 +808,8 @@ function drawZonesAndPlacards(){
     ctx.strokeRect(boxX, boxY, boxW, boxH);
 
     if(ans){
+      // ajustamos el tamaño de letra para que el texto entre siempre
+      // completo dentro del recuadro, sin salirse
       const padding = 10;
       const fit = fitTextInBox(ans.text, boxW - padding, boxH - 8, 16, 9);
       ctx.fillStyle = "#f4ead9";
@@ -738,17 +838,20 @@ function randomHair(){
 }
 
 function drawHair(style){
-  if(!style || style === "calvo") return;
+  if(!style || style === "calvo") return; // sin pelo
   ctx.fillStyle = HAIR_COLORS[style] || HAIR_COLORS.moreno;
   if(style === "rizado"){
+    // mechones rizados, varios círculos sobre la cabeza
     const spots = [[-6.5,-30],[-2.5,-32.5],[2,-32.8],[6,-30.5],[0,-33.5],[-4,-27.5],[4,-27.5]];
     spots.forEach(([dx,dy])=>{
       ctx.beginPath(); ctx.arc(dx,dy,3,0,Math.PI*2); ctx.fill();
     });
   } else {
+    // pelo liso: gorro sobre la parte superior de la cabeza
     ctx.beginPath();
     ctx.arc(0,-25,9.4,Math.PI*1.02,Math.PI*1.98);
     ctx.fill();
+    // pequeño flequillo
     ctx.fillRect(-6,-28,12,4);
   }
 }
@@ -757,19 +860,25 @@ function drawFace(mood){
   const ex = 3.2, ey = -25.5;
   ctx.lineCap = "round";
   if(mood === "sad"){
+    // ojos apretados de la desesperación
     ctx.strokeStyle = "#161616"; ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.moveTo(-ex-2,ey-1.2); ctx.lineTo(-ex+2,ey+1.2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(ex-2,ey+1.2); ctx.lineTo(ex+2,ey-1.2); ctx.stroke();
+    // boca de angustia
     ctx.beginPath(); ctx.arc(0,-16.5,3.2,Math.PI+0.3,Math.PI*2-0.3); ctx.stroke();
+    // lágrimas
     ctx.fillStyle = "#4aa3e0";
     ctx.beginPath(); ctx.ellipse(-ex,ey+3.4,1.1,2,0,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(ex,ey+3.4,1.1,2,0,0,Math.PI*2); ctx.fill();
   } else if(mood === "celebrate"){
+    // ojos felices
     ctx.strokeStyle = "#161616"; ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.arc(-ex,ey,1.7,Math.PI,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(ex,ey,1.7,Math.PI,Math.PI*2); ctx.stroke();
+    // sonrisa grande
     ctx.beginPath(); ctx.arc(0,-19,3.8,0.15,Math.PI-0.15); ctx.stroke();
   } else {
+    // cara neutra
     ctx.fillStyle = "#161616";
     ctx.fillRect(-ex-1,ey-1,2,2);
     ctx.fillRect(ex-1,ey-1,2,2);
@@ -798,6 +907,8 @@ function drawPlayer(x,y,color,dark,opts){
   } else if(reaction && reaction.kind === "sad"){
     const style = SAD_STYLES[reaction.styleIdx % SAD_STYLES.length];
     const t = reaction.t;
+    // las tres variantes desesperan con las manos en la cara; solo cambia el
+    // temblor / si además se hunden de rodillas
     armAngle = 2.7;
     if(style === "facepalm"){ bodyOffsetY = 2; bodyRotate = Math.sin(t/300)*0.03; }
     else if(style === "facepalm_shake"){ bodyRotate = Math.sin(t/90)*0.14; bodyOffsetY = 1; }
@@ -810,15 +921,19 @@ function drawPlayer(x,y,color,dark,opts){
   ctx.translate(0, bodyOffsetY);
   ctx.rotate(bodyRotate);
 
+  // sombra
   ctx.fillStyle = "rgba(0,0,0,.3)";
   ctx.beginPath(); ctx.ellipse(0,26,16,5,0,0,Math.PI*2); ctx.fill();
 
+  // piernas
   ctx.fillStyle = "#e8caa0";
   if(kneel){
     ctx.fillRect(-legSplit,14,7,12);
     ctx.fillRect(legSplit-7,14,7,12);
   } else if(kick){
+    // pierna de apoyo
     ctx.fillRect(-9,8,7,20);
+    // pierna que patea, rotando desde la cadera
     ctx.save();
     ctx.translate(6,8);
     ctx.rotate(-kick.swing);
@@ -829,15 +944,18 @@ function drawPlayer(x,y,color,dark,opts){
     ctx.fillRect(2,8,7,20);
   }
 
+  // shorts
   ctx.fillStyle = "#f4ead9";
   ctx.fillRect(-10,4,20,10);
 
+  // camiseta
   ctx.fillStyle = color;
   ctx.fillRect(-12,-16,24,22);
   ctx.strokeStyle = "#161616";
   ctx.lineWidth = 2;
   ctx.strokeRect(-12,-16,24,22);
 
+  // brazos (rotan desde el hombro; ángulo 0 = colgando, negativo = hacia arriba)
   ctx.fillStyle = color;
   ctx.save();
   ctx.translate(-12,-14);
@@ -850,6 +968,7 @@ function drawPlayer(x,y,color,dark,opts){
   ctx.fillRect(0,0,6,16);
   ctx.restore();
 
+  // cabeza
   ctx.fillStyle = "#e8caa0";
   ctx.beginPath(); ctx.arc(0,-24,9,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle = "#161616"; ctx.lineWidth = 1.5; ctx.stroke();
@@ -867,9 +986,10 @@ function drawKeeper(reactionElapsed){
   const defendingTeam = currentShooter === "red" ? "blue" : "red";
   const dt = TEAMS[defendingTeam];
   const reaction = ((phase === "result" || phase === "celebration") && keeperReaction)
-    ? { ...keeperReaction, t: reactionElapsed }
+    ? { kind:keeperReaction.kind, styleIdx:keeperReaction.styleIdx, t:reactionElapsed }
     : null;
   drawPlayer(0,0,dt.color,dt.dark,{ reaction, hair:keeperHair });
+  // guantes
   ctx.fillStyle = "#f4ead9";
   ctx.fillRect(-20,-16,7,7);
   ctx.fillRect(13,-16,7,7);
@@ -921,35 +1041,45 @@ function drawFirework(fx, age){
   const p = age / life;
   const n = 12;
   for(let i=0;i<n;i++){
-    const a = (Math.PI * 2 * i) / n;
-    const r = 12 + (1 - p) * 36;
-    const x = fx.x + Math.cos(a) * r;
-    const y = fx.y + Math.sin(a) * r;
-    ctx.beginPath(); ctx.arc(x, y, 2.8, 0, Math.PI * 2); ctx.fillStyle = fx.color; ctx.fill();
+    const ang = (i/n) * Math.PI * 2;
+    const dist = p * 70;
+    const px = fx.x + Math.cos(ang)*dist;
+    const py = fx.y + Math.sin(ang)*dist + p*p*40; // leve caída
+    ctx.globalAlpha = Math.max(0, 1 - p);
+    ctx.fillStyle = fx.color;
+    ctx.fillRect(px-2.5, py-2.5, 5, 5);
   }
+  ctx.globalAlpha = 1;
 }
 
 function drawCelebrationScene(now){
   const elapsed = now - celebrationStart;
   const wt = TEAMS[winnerTeam];
+
+  // fuegos artificiales
   if(now - lastFireworkSpawn > 420){
+    lastFireworkSpawn = now;
+    const colors = ["#eab35f", wt.color, "#f4ead9"];
     fireworks.push({
-      x: 80 + Math.random() * (W - 160),
-      y: 80 + Math.random() * 120,
-      color: Math.random() > 0.5 ? '#ffd45d' : '#ff7a59',
+      x: 100 + Math.random()*(W-200),
+      y: 90 + Math.random()*130,
+      color: colors[Math.floor(Math.random()*colors.length)],
       born: now,
     });
-    lastFireworkSpawn = now;
+    if(fireworks.length > 14) fireworks.shift();
   }
   fireworks.forEach(fx => drawFirework(fx, now - fx.born));
 
+  // muñecos festejando
   dolls.forEach(d => {
-    const t = (now + d.offset) / 280;
-    const bob = Math.sin(t) * 8;
-    const teamColor = d.color;
-    drawPlayer(d.x, d.y + bob, teamColor, d.dark, { hair: d.hair, reaction: { kind: "celebrate", styleIdx: d.styleIdx, t: now - celebrationStart } });
+    drawPlayer(d.x, d.y, d.color, d.dark, {
+      scale: 1.3,
+      hair: d.hair,
+      reaction: { kind:"celebrate", styleIdx:d.styleIdx, t: elapsed + d.offset },
+    });
   });
 
+  // nombre del equipo ganador
   ctx.save();
   ctx.textAlign = "center";
   ctx.font = "bold 22px 'Press Start 2P', monospace";
@@ -967,28 +1097,31 @@ function drawCelebrationScene(now){
 function draw(now){
   ctx.clearRect(0,0,W,H);
 
+  // cielo/gradas
   const sky = ctx.createLinearGradient(0,0,0,60);
   sky.addColorStop(0,"#3a0f0c");
   sky.addColorStop(1,"#5c1712");
   ctx.fillStyle = sky;
   ctx.fillRect(0,0,W,60);
   for(let i=0;i<30;i++){
-    ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,.05)" : "rgba(255,255,255,.08)";
-    ctx.fillRect(20 + i * 22, 8 + (i % 3) * 6, 8, 8);
+    ctx.fillStyle = i%2===0 ? "#7a1f16" : "#5c1712";
+    ctx.fillRect(i*26, 4, 22, 16);
   }
 
+  // césped
   const stripeW = 40;
   for(let x=0,i=0; x<W; x+=stripeW,i++){
-    const color = i % 2 === 0 ? "#2a7d34" : "#236f2a";
-    ctx.fillStyle = color;
-    ctx.fillRect(x, 60, stripeW, H - 60);
+    ctx.fillStyle = i%2===0 ? "#2e8b3d" : "#279235";
+    ctx.fillRect(x, 60, stripeW, H-60);
   }
 
+  // área y línea de meta
   ctx.strokeStyle = "rgba(255,255,255,.6)";
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(GOAL.x0-8, GOAL.yLine); ctx.lineTo(GOAL.x1+8, GOAL.yLine); ctx.stroke();
   ctx.strokeRect(80, GOAL.yLine, 600, 120);
 
+  // punto de penalti
   ctx.fillStyle = "#fff";
   ctx.beginPath(); ctx.arc(SPOT.x, SPOT.y, 4, 0, Math.PI*2); ctx.fill();
   ctx.strokeStyle = "rgba(255,255,255,.6)";
@@ -1000,14 +1133,15 @@ function draw(now){
   const reactionElapsed = now - reactionStart;
   const showReaction = (phase === "result" || phase === "celebration");
 
-  const swing = phase === 'kicking' ? Math.sin((now - animStart) / 100) * 0.8 : 0;
+  const kickInfo = (phase === "kicking")
+    ? { swing: Math.sin(Math.min((now-animStart)/animDuration,1) * Math.PI) * 1.3 }
+    : null;
 
-  const strikerTeam = t;
-  drawPlayer(striker.x, striker.y, strikerTeam.color, strikerTeam.dark, {
-    scale: 1.28,
-    kick: phase === "kicking" ? { swing } : null,
+  drawPlayer(striker.x, striker.y, t.color, t.dark, {
+    scale: STRIKER_SCALE,
+    kick: kickInfo,
     hair: strikerHair,
-    reaction: showReaction && strikerReaction ? { ...strikerReaction, t: reactionElapsed } : null,
+    reaction: showReaction && strikerReaction ? { kind:strikerReaction.kind, styleIdx:strikerReaction.styleIdx, t:reactionElapsed } : null,
   });
   drawKeeper(reactionElapsed);
   drawZonesAndPlacards();
@@ -1021,6 +1155,9 @@ function draw(now){
   }
 }
 
+/* =========================================================
+   LOOP PRINCIPAL
+   ========================================================= */
 function easeOutQuad(t){ return 1 - (1-t)*(1-t); }
 
 function bezierPoint(p0,p1,p2,t){
@@ -1033,16 +1170,14 @@ function bezierPoint(p0,p1,p2,t){
 
 function tick(now){
   if(phase === "kicking"){
-    const elapsed = now - animStart;
-    const p = Math.min(elapsed / animDuration, 1);
-    const eased = easeOutQuad(p);
-    const point = bezierPoint(ballFrom, ballCtrl, ballTo, eased);
-    ball.x = point.x;
-    ball.y = point.y;
-    keeper.x = keeperFrom + (keeperTo - keeperFrom) * eased;
-    keeper.jump = Math.sin((p * Math.PI)) * diveJumpMax;
-    striker.x = SPOT.x - 60 + Math.sin(p * Math.PI * 1.5) * 12;
-    if(p >= 1){
+    const t = Math.min((now - animStart) / animDuration, 1);
+    const e = easeOutQuad(t);
+    const pos = bezierPoint(ballFrom, ballCtrl, ballTo, e);
+    ball.x = pos.x;
+    ball.y = pos.y;
+    keeper.x = keeperFrom + (keeperTo - keeperFrom) * e;
+    keeper.jump = Math.sin(Math.min(t*1.4,1) * Math.PI) * diveJumpMax;
+    if(t >= 1){
       finishKick();
     }
   }
@@ -1051,6 +1186,9 @@ function tick(now){
 }
 requestAnimationFrame(tick);
 
+/* =========================================================
+   BOTONES DE INICIO / FIN
+   ========================================================= */
 startBtn.addEventListener('click', ()=>{
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
@@ -1079,6 +1217,5 @@ restartBtn.addEventListener('click', ()=>{
   loadQuestion();
 });
 </script>
-<script src="../language.js"></script>
 </body>
 </html>

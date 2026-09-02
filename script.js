@@ -77,8 +77,8 @@ const games = [
 ];
 
 const translations = {
-  es: { nav: ["Catálogo", "Destacados", "FAQ", "Contacto"], enter: "Entrar", eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por categoría, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", featuredPlay: "Jugar destacado", games: "Juegos", categories: "Categorías", collection: "Colección", curated: "Curada", featured: "Juego destacado", title: "Título", catalog: "Catálogo", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o categoría", all: "Todos", faqTitle: "Cómo funciona", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", details: "Detalles", play: "Jugar", language: "Cambiar idioma" },
-  en: { nav: ["Catalog", "Featured", "FAQ", "Contact"], enter: "Sign in", eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by category, search by name, and try any game in seconds.", explore: "Explore games", featuredPlay: "Play featured", games: "Games", categories: "Categories", collection: "Collection", curated: "Curated", featured: "Featured game", title: "Title", catalog: "Catalog", discover: "Discover your next games", search: "Search by name or category", all: "All", faqTitle: "How it works", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", details: "Details", play: "Play", language: "Change language", mode: "Mode", duration: "Duration", now: "Play now" }
+  es: { nav: ["Catálogo", "Destacados", "Contacto"], enter: "Entrar", eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por categoría, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Categorías", collection: "Colección", curated: "Curada", featured: "Juego destacado", title: "Título", catalog: "Catálogo", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o categoría", all: "Todos", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", details: "Detalles", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", suggestionSent: "Se abrirá tu aplicación de correo para enviar la sugerencia." },
+  en: { nav: ["Catalog", "Featured", "Contact"], enter: "Sign in", eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by category, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Categories", collection: "Collection", curated: "Curated", featured: "Featured game", title: "Title", catalog: "Catalog", discover: "Discover your next games", search: "Search by name or category", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", details: "Details", play: "Play", language: "Change language", mode: "Mode", duration: "Duration", now: "Play now", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", suggestionSent: "Your email app will open to send the suggestion." }
 };
 
 const gameTranslations = {
@@ -284,6 +284,7 @@ function applyLanguage() {
   document.querySelector(".contact-label").textContent = t.idea;
   document.querySelector(".contact-card h3").textContent = t.suggestions;
   document.querySelector(".contact-card .primary-button").textContent = t.send;
+  document.getElementById("suggestionText").placeholder = t.suggestionPlaceholder;
   document.querySelector(".modal-kicker").textContent = language === "en" ? "Game" : "Juego";
   document.querySelectorAll(".meta-box span")[0].textContent = t.mode || "Modo";
   document.querySelectorAll(".meta-box span")[1].textContent = t.duration || "Duración";
@@ -297,6 +298,13 @@ languageToggle.addEventListener("click", () => {
   language = language === "es" ? "en" : "es";
   localStorage.setItem("piscina-language", language);
   applyLanguage();
+});
+
+document.getElementById("suggestionSubmit").addEventListener("click", () => {
+  const suggestion = document.getElementById("suggestionText").value.trim();
+  if (!suggestion) return;
+  const subject = translations[language].suggestionSubject;
+  window.location.href = `mailto:pcm1719@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(suggestion)}`;
 });
 
 applyLanguage();

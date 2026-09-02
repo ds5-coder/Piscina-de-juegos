@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -22,25 +22,7 @@
         <div class="brand-wrap">
           <img
             class="brand-mark"
-            src="data:image/svg+xml;utf8,
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'>
-              <defs>
-                <linearGradient id='g1' x1='0' x2='1'>
-                  <stop offset='0%' stop-color='%237b68ff'/>
-                  <stop offset='100%' stop-color='%234ac8ff'/>
-                </linearGradient>
-              </defs>
-              <rect width='120' height='120' rx='24' fill='%230d1424'/>
-              <rect x='18' y='60' width='84' height='26' rx='12' fill='%2358d3ff' opacity='0.9'/>
-              <ellipse cx='60' cy='56' rx='44' ry='18' fill='%2396f2ff' opacity='0.25'/>
-              <path d='M28 64h64c6 0 10 4 10 10v18H18V74c0-6 4-10 10-10z' fill='url(%23g1)' opacity='0.9'/>
-              <rect x='31' y='17' width='20' height='28' rx='4' fill='%23f5f2ff'/>
-              <rect x='48' y='17' width='20' height='28' rx='4' fill='%23ffd36e'/>
-              <rect x='65' y='17' width='20' height='28' rx='4' fill='%23f5f2ff'/>
-              <path d='M34 25h12v12H34zM51 25h12v12H51zM68 25h12v12H68z' fill='%237b68ff' opacity='0.7'/>
-              <circle cx='88' cy='34' r='10' fill='%23ffd36e'/>
-              <path d='M88 22v24M76 34h24' stroke='%237b68ff' stroke-width='4' stroke-linecap='round'/>
-            </svg>"
+            src="assets/ChatGPT Image 2 sept 2026, 19_41_04.png"
             alt="Logo Piscina de juegos"
           />
           <div>
@@ -146,13 +128,10 @@
             <p>
               Si quieres proponer un juego nuevo, una mejora o un tema que te gustaría ver.
             </p>
-            <a
-              class="primary-button"
-              href="mailto:pcm1719@gmail.com?subject=Sugerencia%20para%20Piscina%20de%20juegos"
-              target="_self"
-            >
+            <textarea id="suggestionText" class="suggestion-input" rows="4" placeholder="Escribe tu sugerencia aquí..."></textarea>
+            <button id="suggestionSubmit" class="primary-button" type="button">
               Enviar sugerencia
-            </a>
+            </button>
           </div>
         </section>
       </main>

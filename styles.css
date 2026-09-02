@@ -190,11 +190,6 @@ button {
   gap: 26px;
   margin-top: 40px;
   align-items: center;
-  padding: 22px;
-  border-radius: 30px;
-  background:
-    linear-gradient(90deg, rgba(10, 16, 32, 0.94), rgba(10, 16, 32, 0.58)),
-    url("assets/ChatGPT Image 2 sept 2026, 19_41_04.png") center / cover;
 }
 
 .hero-copy,
@@ -210,17 +205,6 @@ button {
 .hero-copy {
   padding: clamp(24px, 4vw, 40px);
   border-radius: var(--radius-lg);
-}
-
-.hero-copy h1,
-.section-head h2,
-.featured-content h2,
-.game-card h3,
-.modal-content h3,
-.contact-card h3,
-.faqs h3 {
-  font-family: "Playfair Display", serif;
-  letter-spacing: 0;
 }
 
 .eyebrow {
@@ -270,8 +254,8 @@ button {
   min-width: 120px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(239, 179, 109, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .stats-list strong {
@@ -634,6 +618,22 @@ button {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.suggestion-input {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px;
+  resize: vertical;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.suggestion-input::placeholder {
+  color: var(--muted);
 }
 
 .modal {
