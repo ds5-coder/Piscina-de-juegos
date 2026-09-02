@@ -10,10 +10,10 @@ const games = [
     longDescription:
       "Un juego de decisiones histórico-literario donde el jugador vive la Revolución Francesa desde la perspectiva de un ciudadano con varias opciones y consecuencias reales.",
     gradient: "linear-gradient(135deg, rgba(124,92,255,0.96), rgba(0,209,255,0.8))",
-    image: "assets/game-covers/Captura de pantalla 2026-09-01 190527.png",
+    image: "assets/game-covers/Captura de pantalla 2026-09-01 190518.png",
     previewUrl: "games/diario_revolucion_francesa.html",
     playUrl: "games/diario_revolucion_francesa.html"
-  },
+  }
   {
     id: 2,
     title: "En diálogo con Sócrates",
@@ -25,7 +25,7 @@ const games = [
     longDescription:
       "Una experiencia educativa rica en preguntas, diálogo y pensamiento crítico inspirada en la tradición socrática y en la filosofía griega.",
     gradient: "linear-gradient(135deg, rgba(10,190,255,0.85), rgba(58,236,174,0.8))",
-    image: "assets/game-covers/Captura de pantalla 2026-09-01 190537.png",
+    image: "assets/game-covers/ChatGPT Image 31 ago 2026, 21_05_50.png",
     previewUrl: "games/socrates_dialogo.html",
     playUrl: "games/socrates_dialogo.html"
   },
@@ -40,7 +40,7 @@ const games = [
     longDescription:
       "Un juego tipo tren y estación que mezcla velocidad, observación y conocimiento histórico para repasar la Revolución Industrial y sus impactos.",
     gradient: "linear-gradient(135deg, rgba(255,130,102,0.9), rgba(255,192,78,0.85))",
-    image: "assets/game-covers/ChatGPT Image 31 ago 2026, 21_05_50.png",
+    image: "assets/game-covers/Captura de pantalla 2026-09-01 190537.png",
     previewUrl: "games/revolucion_industrial_estacionar.html",
     playUrl: "games/revolucion_industrial_estacionar.html"
   },
@@ -55,10 +55,10 @@ const games = [
     longDescription:
       "Reta a tu rival en una competicion de preguntas sobre Napoleón, Waterloo y la historia del Imperio francés.",
     gradient: "linear-gradient(135deg, rgba(255,104,116,0.92), rgba(124,92,255,0.82))",
-    image: "assets/game-covers/Captura de pantalla 2026-09-01 190518.png",
+    image: "assets/game-covers/Captura de pantalla 2026-09-01 190527.png",
     previewUrl: "games/napoleon_tenis_2p.html",
     playUrl: "games/napoleon_tenis_2p.html"
-  },
+  }
   {
     id: 5,
     title: "Revolución Rusa: tanda de penaltis",
