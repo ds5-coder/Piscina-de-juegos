@@ -76,6 +76,25 @@ const games = [
   }
 ];
 
+const translations = {
+  es: { nav: ["Catálogo", "Destacados", "FAQ", "Contacto"], enter: "Entrar", eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por categoría, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", featuredPlay: "Jugar destacado", games: "Juegos", categories: "Categorías", collection: "Colección", curated: "Curada", featured: "Juego destacado", title: "Título", catalog: "Catálogo", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o categoría", all: "Todos", faqTitle: "Cómo funciona", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", details: "Detalles", play: "Jugar", language: "Cambiar idioma" },
+  en: { nav: ["Catalog", "Featured", "FAQ", "Contact"], enter: "Sign in", eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by category, search by name, and try any game in seconds.", explore: "Explore games", featuredPlay: "Play featured", games: "Games", categories: "Categories", collection: "Collection", curated: "Curated", featured: "Featured game", title: "Title", catalog: "Catalog", discover: "Discover your next games", search: "Search by name or category", all: "All", faqTitle: "How it works", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", details: "Details", play: "Play", language: "Change language", mode: "Mode", duration: "Duration", now: "Play now" }
+};
+
+const gameTranslations = {
+  en: {
+    1: { title: "1789: Diary of the Revolution", description: "An interactive story about the French Revolution where every decision changes the character's path.", longDescription: "An historical interactive story in which you experience the French Revolution as a citizen facing meaningful choices." },
+    2: { title: "A Dialogue with Socrates", description: "A philosophical dialogue with Socrates inviting you to reflect on truth, doubt, and reason.", longDescription: "An educational experience of questions, dialogue, and critical thinking inspired by Greek philosophy." },
+    3: { title: "Industrial Revolution", description: "Place the machine correctly and answer key questions about European industrialization.", longDescription: "A train-and-station game mixing speed, observation, and historical knowledge." },
+    4: { title: "Napoleon vs Wellington", description: "An arcade quiz duel with scores, turns, and visual energy inspired by military history.", longDescription: "Challenge your rival with questions about Napoleon, Waterloo, and the French Empire." },
+    5: { title: "Russian Revolution: Penalty Shootout", description: "Answer historical questions for the Bolsheviks and Mensheviks in an exciting penalty shootout.", longDescription: "A history and quick-thinking mini-game where correct answers score goals for your team." }
+  }
+};
+
+function gameText(game, field) {
+  return gameTranslations[language]?.[game.id]?.[field] || game[field];
+}
+
 const state = {
   category: "Todos",
   query: "",
@@ -104,12 +123,14 @@ const previewFrame = document.getElementById("previewFrame");
 
 const statsGames = document.getElementById("statGames");
 const statsCategories = document.getElementById("statCategories");
+const languageToggle = document.getElementById("languageToggle");
+let language = localStorage.getItem("piscina-language") || "es";
 
 function renderFeaturedGame() {
   const featured = games[0];
-  featuredTitle.textContent = featured.title;
+  featuredTitle.textContent = gameText(featured, "title");
   featuredCategory.textContent = featured.category;
-  featuredDescription.textContent = featured.description;
+  featuredDescription.textContent = gameText(featured, "description");
   featuredArt.style.backgroundImage = `url('${featured.image}')`;
   featuredArt.style.backgroundSize = "cover";
   featuredArt.style.backgroundPosition = "center";
@@ -123,9 +144,9 @@ function getVisibleGames() {
     const matchesCategory = state.category === "Todos" || game.category === state.category;
     const matchesSearch =
       !query ||
-      game.title.toLowerCase().includes(query) ||
+      gameText(game, "title").toLowerCase().includes(query) ||
       game.category.toLowerCase().includes(query) ||
-      game.description.toLowerCase().includes(query);
+      gameText(game, "description").toLowerCase().includes(query);
 
     return matchesCategory && matchesSearch;
   });
@@ -133,15 +154,16 @@ function getVisibleGames() {
 
 function renderGames() {
   const visibleGames = getVisibleGames();
-  resultsCount.textContent = `${visibleGames.length} juego${visibleGames.length === 1 ? "" : "s"}`;
+  const gameWord = language === "en" ? "game" : "juego";
+  resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
   statsGames.textContent = String(games.length);
   statsCategories.textContent = String(new Set(games.map((game) => game.category)).size);
 
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>No encontramos juegos</h3>
-        <p>Prueba con otra búsqueda o cambia la categoría.</p>
+        <h3>${translations[language].noGames || (language === "en" ? "No games found" : "No encontramos juegos")}</h3>
+        <p>${language === "en" ? "Try another search or change the category." : "Prueba con otra búsqueda o cambia la categoría."}</p>
       </div>
     `;
     return;
@@ -153,18 +175,18 @@ function renderGames() {
         <article class="game-card">
           <div class="game-visual" style="background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
           <div class="game-top-row">
-            <h3>${game.title}</h3>
+            <h3>${gameText(game, "title")}</h3>
             <span class="game-badge">${game.category}</span>
           </div>
           <div class="game-meta">
             <span>${game.mode}</span>
           </div>
-          <p>${game.description}</p>
+          <p>${gameText(game, "description")}</p>
           <div class="game-bottom-row">
             <span class="game-badge">${game.duration}</span>
             <div class="game-actions">
-              <button class="details-button" type="button" data-action="details" data-id="${game.id}">Detalles</button>
-              <button class="play-button" type="button" data-action="play" data-id="${game.id}">Jugar</button>
+              <button class="details-button" type="button" data-action="details" data-id="${game.id}">${language === "en" ? "Details" : "Detalles"}</button>
+              <button class="play-button" type="button" data-action="play" data-id="${game.id}">${language === "en" ? "Play" : "Jugar"}</button>
             </div>
           </div>
         </article>
@@ -175,8 +197,8 @@ function renderGames() {
 
 function openModal(game) {
   state.selectedGame = game;
-  modalTitle.textContent = game.title;
-  modalDescription.textContent = game.longDescription;
+  modalTitle.textContent = gameText(game, "title");
+  modalDescription.textContent = gameText(game, "longDescription");
   modalMode.textContent = game.mode;
   modalDuration.textContent = game.duration;
   modalPlayLink.href = game.playUrl;
@@ -247,5 +269,45 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-renderFeaturedGame();
-renderGames();
+function applyLanguage() {
+  const t = translations[language];
+  document.documentElement.lang = language;
+  document.title = language === "en" ? "Game pool | Online gallery" : "Piscina de juegos | Galería online";
+  document.querySelectorAll(".main-nav a").forEach((link, index) => { link.textContent = t.nav[index]; });
+  document.querySelector(".nav-button").textContent = t.enter;
+  document.querySelector(".hero .eyebrow").textContent = t.eyebrow;
+  document.querySelector(".hero h1").textContent = t.heroTitle;
+  document.querySelector(".hero-copy > p").textContent = t.heroText;
+  document.querySelector(".hero-actions .primary-button").textContent = t.explore;
+  featuredPlayButton.textContent = t.featuredPlay;
+  document.querySelector(".stats-list li:nth-child(1) span").textContent = t.games;
+  document.querySelector(".stats-list li:nth-child(2) span").textContent = t.categories;
+  document.querySelector(".stats-list li:nth-child(3) strong").textContent = t.collection;
+  document.querySelector(".stats-list li:nth-child(3) span").textContent = t.curated;
+  document.querySelector(".card-badge").textContent = t.featured;
+  document.querySelector(".featured-label").textContent = t.title;
+  document.querySelector(".catalog .eyebrow").textContent = t.catalog;
+  document.querySelector(".catalog h2").textContent = t.discover;
+  searchInput.placeholder = t.search;
+  document.querySelector('[data-category="Todos"]').textContent = t.all;
+  document.querySelector(".faq h2").textContent = t.faqTitle;
+  document.querySelector(".contact h2").textContent = t.contactTitle;
+  document.querySelector(".contact-label").textContent = t.idea;
+  document.querySelector(".contact-card h3").textContent = t.suggestions;
+  document.querySelector(".contact-card .primary-button").textContent = t.send;
+  document.querySelector(".modal-kicker").textContent = language === "en" ? "Game" : "Juego";
+  document.querySelectorAll(".meta-box span")[0].textContent = t.mode || "Modo";
+  document.querySelectorAll(".meta-box span")[1].textContent = t.duration || "Duración";
+  modalPlayLink.textContent = t.now || "Jugar ahora";
+  languageToggle.innerHTML = language === "es" ? "<span aria-hidden=\"true\">🇬🇧</span><span>EN</span>" : "<span aria-hidden=\"true\">🇪🇸</span><span>ES</span>";
+  renderFeaturedGame();
+  renderGames();
+}
+
+languageToggle.addEventListener("click", () => {
+  language = language === "es" ? "en" : "es";
+  localStorage.setItem("piscina-language", language);
+  applyLanguage();
+});
+
+applyLanguage();

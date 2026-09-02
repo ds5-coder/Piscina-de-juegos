@@ -113,6 +113,31 @@ button {
   color: var(--text);
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.62rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.language-toggle:hover,
+.language-toggle:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--primary-2);
+}
+
 .nav-button,
 .primary-button,
 .secondary-button,
