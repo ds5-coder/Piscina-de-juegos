@@ -300,11 +300,36 @@ languageToggle.addEventListener("click", () => {
   applyLanguage();
 });
 
-document.getElementById("suggestionSubmit").addEventListener("click", () => {
+document.getElementById("suggestionSubmit").addEventListener("click", async () => {
   const suggestion = document.getElementById("suggestionText").value.trim();
-  if (!suggestion) return;
-  const subject = translations[language].suggestionSubject;
-  window.location.href = `mailto:pcm1719@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(suggestion)}`;
+  const suggestionInput = document.getElementById("suggestionText");
+  const suggestionButton = document.getElementById("suggestionSubmit");
+  const suggestionStatus = document.getElementById("suggestionStatus");
+  if (!suggestion) {
+    suggestionStatus.textContent = language === "en" ? "Write a suggestion first." : "Escribe primero una sugerencia.";
+    suggestionInput.focus();
+    return;
+  }
+
+  suggestionButton.disabled = true;
+  suggestionStatus.textContent = language === "en" ? "Sending..." : "Enviando...";
+  try {
+    const response = await fetch("https://formspree.io/f/mdeozerk", {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: new URLSearchParams({
+        message: suggestion,
+        _subject: translations[language].suggestionSubject,
+      }),
+    });
+    if (!response.ok) throw new Error("Formspree request failed");
+    suggestionInput.value = "";
+    suggestionStatus.textContent = language === "en" ? "Thanks, your suggestion was sent." : "Gracias, tu sugerencia se ha enviado.";
+  } catch (error) {
+    suggestionStatus.textContent = language === "en" ? "Could not send the suggestion. Try again." : "No se ha podido enviar la sugerencia. Inténtalo de nuevo.";
+  } finally {
+    suggestionButton.disabled = false;
+  }
 });
 
 applyLanguage();
