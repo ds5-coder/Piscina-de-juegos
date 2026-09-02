@@ -1436,7 +1436,7 @@ function ChapterScreen({ dialogue, playerName, playerGender, onExit }) {
       setAttempts(nextAttempt);
 
       if (verdict.correct) {
-        setStatus("won");
+        setStatus("playing");
       } else {
         if (verdict.hint) setHints((h) => [...h, verdict.hint]);
         if (nextAttempt >= 10) {
