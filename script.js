@@ -233,14 +233,11 @@ function applyLanguage() {
   document.documentElement.lang = language;
   document.title = language === "en" ? "Game pool | Online gallery" : "Piscina de juegos | Galería online";
   document.querySelectorAll(".main-nav a").forEach((link, index) => { link.textContent = t.nav[index]; });
-  document.querySelector(".hero .eyebrow").textContent = t.eyebrow;
   document.querySelector(".hero h1").textContent = t.heroTitle;
   document.querySelector(".hero-copy > p").textContent = t.heroText;
   document.querySelector(".hero-actions .primary-button").textContent = t.explore;
   document.querySelector(".stats-list li:nth-child(1) span").textContent = t.games;
   document.querySelector(".stats-list li:nth-child(2) span").textContent = t.categories;
-  document.querySelector(".stats-list li:nth-child(3) strong").textContent = t.collection;
-  document.querySelector(".stats-list li:nth-child(3) span").textContent = t.curated;
   document.querySelector(".card-badge").textContent = t.featured;
   document.querySelector(".catalog .eyebrow").textContent = t.catalog;
   document.querySelector(".catalog h2").textContent = t.discover;
