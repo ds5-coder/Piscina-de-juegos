@@ -68,18 +68,21 @@ button {
   border-radius: 20px;
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 42px rgba(3, 8, 18, 0.3);
+  flex-direction: column;
+  text-align: center;
 }
 
 .brand-wrap {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-direction: column;
 }
 
 .brand-mark {
   display: block;
-  width: 52px;
-  height: 52px;
+  width: 150px;
+  height: 150px;
   border-radius: 15px;
   object-fit: cover;
   box-shadow: var(--shadow);
@@ -88,6 +91,7 @@ button {
 
 .brand-name {
   margin: 0;
+  font-size: clamp(2rem, 5vw, 3.6rem);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -117,6 +121,9 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: absolute;
+  top: 18px;
+  right: 22px;
 }
 
 .language-toggle {
@@ -447,6 +454,35 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
   margin-top: 28px;
+}
+
+.collection-block {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  position: relative;
+  padding-top: 54px;
+}
+
+.collection-title {
+  grid-column: 1 / -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--text);
+}
+
+.subcollection-title {
+  grid-column: 1 / -1;
+  position: absolute;
+  top: 28px;
+  left: 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .game-card {
@@ -814,6 +850,10 @@ button {
 
   .games-grid,
   .faqs {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-block {
     grid-template-columns: 1fr;
   }
 

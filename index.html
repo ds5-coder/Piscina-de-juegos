@@ -25,10 +25,7 @@
             src="assets/ChatGPT Image 2 sept 2026, 19_41_04.png"
             alt="Logo Piscina de juegos"
           />
-          <div>
-            <p class="brand-name">Piscina de juegos</p>
-            <span class="brand-tag">Online</span>
-          </div>
+          <p class="brand-name">Piscina de juegos</p>
         </div>
 
         <nav class="main-nav" aria-label="Navegación principal">
@@ -41,7 +38,6 @@
           <button id="languageToggle" class="language-toggle" type="button" aria-label="Cambiar idioma">
             <span aria-hidden="true">🇬🇧</span><span id="languageLabel">EN</span>
           </button>
-          <button class="nav-button" type="button">Entrar</button>
         </div>
       </header>
 
@@ -62,19 +58,16 @@
 
             <ul class="stats-list" aria-label="Estadísticas">
               <li><strong id="statGames">0</strong><span>Juegos</span></li>
-              <li><strong id="statCategories">0</strong><span>Categorías</span></li>
+              <li><strong id="statCategories">0</strong><span>Colecciones</span></li>
               <li><strong id="statCollection">Colección</strong><span>Curada</span></li>
             </ul>
           </div>
 
           <div class="hero-card">
-            <div class="card-badge">Juego destacado</div>
+            <div class="card-badge">Portada</div>
             <div id="featuredArt" class="featured-art"></div>
             <div class="featured-content">
-              <div>
-                <p class="featured-label">Título</p>
-                <h2 id="featuredTitle">Piscina de juegos</h2>
-              </div>
+              <h2 id="featuredTitle">Piscina de juegos</h2>
               <div class="featured-meta">
                 <span id="featuredCategory">Categoría</span>
               </div>
@@ -101,11 +94,11 @@
             </label>
 
             <div class="filter-group" id="filterGroup" aria-label="Filtro por categoría">
-              <button class="filter-chip active" type="button" data-category="Todos">Todos</button>
-              <button class="filter-chip" type="button" data-category="Historia">Historia</button>
-              <button class="filter-chip" type="button" data-category="Educativo">Educativo</button>
-              <button class="filter-chip" type="button" data-category="Arcade">Arcade</button>
-              <button class="filter-chip" type="button" data-category="Estratégia">Estratégia</button>
+              <button class="filter-chip active" type="button" data-category="Todos">Todas</button>
+              <button class="filter-chip" type="button" data-category="Revolución Francesa">Revolución Francesa</button>
+              <button class="filter-chip" type="button" data-category="Revolución Industrial">Revolución Industrial</button>
+              <button class="filter-chip" type="button" data-category="Filosofía">Filosofía</button>
+              <button class="filter-chip" type="button" data-category="Revolución Rusa">Revolución Rusa</button>
             </div>
           </div>
 
@@ -136,41 +129,6 @@
           </div>
         </section>
       </main>
-    </div>
-
-    <div id="gameModal" class="modal" aria-hidden="true">
-      <div class="modal-backdrop" data-close="true"></div>
-      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <button type="button" class="close-button" aria-label="Cerrar">×</button>
-        <div class="modal-preview-wrap">
-          <iframe id="previewFrame" title="Vista previa del juego" loading="lazy"></iframe>
-        </div>
-        <div class="modal-content">
-          <div class="modal-header-row">
-            <div>
-              <p class="modal-kicker">Juego</p>
-              <h3 id="modalTitle">Título</h3>
-            </div>
-          </div>
-          <div id="modalTags" class="modal-tags"></div>
-          <p id="modalDescription"></p>
-          <div class="modal-footer">
-            <div class="meta-box">
-              <span>Modo</span>
-              <strong id="modalMode">Online</strong>
-            </div>
-            <div class="meta-box">
-              <span>Duración</span>
-              <strong id="modalDuration">Corta</strong>
-            </div>
-          </div>
-          <div class="modal-actions">
-            <a id="modalPlayLink" class="primary-button modal-button" href="#" target="_blank" rel="noreferrer">
-              Jugar ahora
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
 
     <script src="script.js"></script>
