@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Piscina de juegos | Galería online</title>
+    <meta
+      name="description"
+      content="Piscina de juegos: galería online con minijuegos educativos, históricos y divertidos."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <img
+            class="brand-mark"
+            src="data:image/svg+xml;utf8,
+            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'>
+              <defs>
+                <linearGradient id='g1' x1='0' x2='1'>
+                  <stop offset='0%' stop-color='%237b68ff'/>
+                  <stop offset='100%' stop-color='%234ac8ff'/>
+                </linearGradient>
+              </defs>
+              <rect width='120' height='120' rx='24' fill='%230d1424'/>
+              <rect x='18' y='60' width='84' height='26' rx='12' fill='%2358d3ff' opacity='0.9'/>
+              <ellipse cx='60' cy='56' rx='44' ry='18' fill='%2396f2ff' opacity='0.25'/>
+              <path d='M28 64h64c6 0 10 4 10 10v18H18V74c0-6 4-10 10-10z' fill='url(%23g1)' opacity='0.9'/>
+              <rect x='31' y='17' width='20' height='28' rx='4' fill='%23f5f2ff'/>
+              <rect x='48' y='17' width='20' height='28' rx='4' fill='%23ffd36e'/>
+              <rect x='65' y='17' width='20' height='28' rx='4' fill='%23f5f2ff'/>
+              <path d='M34 25h12v12H34zM51 25h12v12H51zM68 25h12v12H68z' fill='%237b68ff' opacity='0.7'/>
+              <circle cx='88' cy='34' r='10' fill='%23ffd36e'/>
+              <path d='M88 22v24M76 34h24' stroke='%237b68ff' stroke-width='4' stroke-linecap='round'/>
+            </svg>"
+            alt="Logo Piscina de juegos"
+          />
+          <div>
+            <p class="brand-name">Piscina de juegos</p>
+            <span class="brand-tag">Online</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Navegación principal">
+          <a href="#catalogo">Catálogo</a>
+          <a href="#destacados">Destacados</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+
+        <button class="nav-button" type="button">Entrar</button>
+      </header>
+
+      <main>
+        <section class="hero" id="destacados">
+          <div class="hero-copy">
+            <span class="eyebrow">Juegos para aprender y jugar</span>
+            <h1>Tu galería de juegos online con historia, estrategia y cultura.</h1>
+            <p>
+              Aquí tienes una colección de minijuegos y experiencias interactivas
+              pensadas para divertirte mientras aprendes. Explora por categoría,
+              busca por nombre y prueba cualquiera en segundos.
+            </p>
+
+            <div class="hero-actions">
+              <a class="primary-button" href="#catalogo">Explorar juegos</a>
+              <button id="featuredPlayButton" class="secondary-button" type="button">
+                Jugar destacado
+              </button>
+            </div>
+
+            <ul class="stats-list" aria-label="Estadísticas">
+              <li><strong id="statGames">0</strong><span>Juegos</span></li>
+              <li><strong id="statCategories">0</strong><span>Categorías</span></li>
+              <li><strong id="statCollection">Colección</strong><span>Curada</span></li>
+            </ul>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-badge">Juego destacado</div>
+            <div id="featuredArt" class="featured-art"></div>
+            <div class="featured-content">
+              <div>
+                <p class="featured-label">Título</p>
+                <h2 id="featuredTitle">Piscina de juegos</h2>
+              </div>
+              <div class="featured-meta">
+                <span id="featuredCategory">Categoría</span>
+              </div>
+              <p id="featuredDescription">Descripción del juego destacado.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="catalog" id="catalogo">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Catálogo</span>
+              <h2>Descubre tus próximos juegos</h2>
+            </div>
+            <span id="resultsCount" class="results-count">0 juegos</span>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-box" aria-label="Buscar juegos">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10.5 3a7.5 7.5 0 015.86 12.84l4.5 4.5 1.41-1.41-4.5-4.5A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"/>
+              </svg>
+              <input id="searchInput" type="search" placeholder="Buscar por nombre o categoría" />
+            </label>
+
+            <div class="filter-group" id="filterGroup" aria-label="Filtro por categoría">
+              <button class="filter-chip active" type="button" data-category="Todos">Todos</button>
+              <button class="filter-chip" type="button" data-category="Historia">Historia</button>
+              <button class="filter-chip" type="button" data-category="Educativo">Educativo</button>
+              <button class="filter-chip" type="button" data-category="Arcade">Arcade</button>
+              <button class="filter-chip" type="button" data-category="Estratégia">Estratégia</button>
+            </div>
+          </div>
+
+          <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="faq" id="faq">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">FAQ</span>
+              <h2>Cómo funciona</h2>
+            </div>
+          </div>
+
+          <div class="faqs">
+            <article>
+              <h3>¿Se pueden jugar desde aquí?</h3>
+              <p>Sí. Cada juego se abre en una nueva ventana o vista previa para probarlo directamente.</p>
+            </article>
+            <article>
+              <h3>¿Es responsive?</h3>
+              <p>La galería está pensada para móvil, tablet y escritorio con una experiencia clara y visual.</p>
+            </article>
+            <article>
+              <h3>¿Cómo puedo sugerir ideas?</h3>
+              <p>Puedes enviarnos tus propuestas desde la sección de contacto.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="contact" id="contacto">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">Contacto</span>
+              <h2>Sugerencias privadas</h2>
+            </div>
+          </div>
+
+          <div class="contact-card">
+            <div>
+              <p class="contact-label">¿Tienes una idea?</p>
+              <h3>¡Sugerencias!</h3>
+            </div>
+            <p>
+              Si quieres proponer un juego nuevo, una mejora o un tema que te gustaría ver.
+            </p>
+            <a
+              class="primary-button"
+              href="mailto:pcm1719@gmail.com?subject=Sugerencia%20para%20Piscina%20de%20juegos"
+              target="_self"
+            >
+              Enviar sugerencia
+            </a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="gameModal" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button type="button" class="close-button" aria-label="Cerrar">×</button>
+        <div class="modal-preview-wrap">
+          <iframe id="previewFrame" title="Vista previa del juego" loading="lazy"></iframe>
+        </div>
+        <div class="modal-content">
+          <div class="modal-header-row">
+            <div>
+              <p class="modal-kicker">Juego</p>
+              <h3 id="modalTitle">Título</h3>
+            </div>
+          </div>
+          <div id="modalTags" class="modal-tags"></div>
+          <p id="modalDescription"></p>
+          <div class="modal-footer">
+            <div class="meta-box">
+              <span>Modo</span>
+              <strong id="modalMode">Online</strong>
+            </div>
+            <div class="meta-box">
+              <span>Duración</span>
+              <strong id="modalDuration">Corta</strong>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <a id="modalPlayLink" class="primary-button modal-button" href="#" target="_blank" rel="noreferrer">
+              Jugar ahora
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
