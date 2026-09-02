@@ -1,7 +1,7 @@
 const games = [
   {
     id: 1,
-    title: "1789: Diario de la Revolución",
+    title: "1789: CAMINO A LA BASTILLA",
     category: "Historia",
     mode: "Narrativo",
     duration: "3 min",
@@ -83,7 +83,7 @@ const translations = {
 
 const gameTranslations = {
   en: {
-    1: { title: "1789: Diary of the Revolution", description: "An interactive story about the French Revolution where every decision changes the character's path.", longDescription: "An historical interactive story in which you experience the French Revolution as a citizen facing meaningful choices." },
+    1: { title: "1789: ROAD TO THE BASTILLE", description: "An interactive story about the French Revolution where every decision changes the character's path.", longDescription: "An historical interactive story in which you experience the French Revolution as a citizen facing meaningful choices." },
     2: { title: "A Dialogue with Socrates", description: "A philosophical dialogue with Socrates inviting you to reflect on truth, doubt, and reason.", longDescription: "An educational experience of questions, dialogue, and critical thinking inspired by Greek philosophy." },
     3: { title: "Industrial Revolution", description: "Place the machine correctly and answer key questions about European industrialization.", longDescription: "A train-and-station game mixing speed, observation, and historical knowledge." },
     4: { title: "Napoleon vs Wellington", description: "An arcade quiz duel with scores, turns, and visual energy inspired by military history.", longDescription: "Challenge your rival with questions about Napoleon, Waterloo, and the French Empire." },
