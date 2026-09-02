@@ -164,7 +164,8 @@ function renderGames() {
     return;
   }
 
-  const collectionLabels = [...new Set(visibleGames.map((game) => game.collection))];
+  const collectionLabels = [...new Set(visibleGames.map((game) => game.collection))]
+    .sort((first, second) => first.localeCompare(second, "es"));
   const collectionNames = language === "en" ? {
     "Revolución Francesa": "French Revolution",
     "Revolución Industrial": "Industrial Revolution",
