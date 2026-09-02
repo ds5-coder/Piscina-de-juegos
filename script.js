@@ -280,7 +280,6 @@ function applyLanguage() {
   document.querySelector(".catalog h2").textContent = t.discover;
   searchInput.placeholder = t.search;
   document.querySelector('[data-category="Todos"]').textContent = t.all;
-  document.querySelector(".faq h2").textContent = t.faqTitle;
   document.querySelector(".contact h2").textContent = t.contactTitle;
   document.querySelector(".contact-label").textContent = t.idea;
   document.querySelector(".contact-card h3").textContent = t.suggestions;
