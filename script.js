@@ -11,8 +11,8 @@ const games = [
       "Un juego de decisiones histórico-literario donde el jugador vive la Revolución Francesa desde la perspectiva de un ciudadano con varias opciones y consecuencias reales.",
     gradient: "linear-gradient(135deg, rgba(124,92,255,0.96), rgba(0,209,255,0.8))",
     image: "assets/game-covers/revol fran.png",
-    previewUrl: "games/diario_revolucion_francesa.html",
-    playUrl: "games/diario_revolucion_francesa.html"
+    previewUrl: "games/bastilla_1789.html",
+    playUrl: "games/bastilla_1789.html"
   },
   {
     id: 2,

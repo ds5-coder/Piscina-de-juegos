@@ -50,6 +50,15 @@ function pixelPanel(extra) {
   };
 }
 
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /* =========================================================
    AUDIO — blip 8-bit al deslizar + música ambiental griega.
    Reescrito con la Web Audio API nativa del navegador (sin
@@ -295,13 +304,42 @@ const DIALOGUES = [
     greek: "Συμπόσιον",
     subtitle: "El Banquete",
     icon: "amphora",
-    question: "¿Qué es el amor (Eros)?",
     setting:
       "Un restaurante ateniense repleto de mesas y jarras de vino. Agatón celebra un banquete y Sócrates te espera sentado a la mesa, del otro lado, listo para preguntarte por el amor antes del postre.",
-    openingLine:
-      "{{name}}, justo a tiempo: cada uno en esta mesa ha jurado esta noche pronunciar un elogio a Eros antes de que la copa vuelva a mis manos. Agatón ya ha hablado con gran belleza. Dime tú ahora, sentado frente a mí: ¿qué es el Amor?",
-    context:
-      "En el Symposium, tras varios discursos, Sócrates relata la enseñanza de Diotima: Eros no es un dios sino un gran daimon intermedio entre lo mortal y lo divino, hijo de Poros (Recurso) y Penía (Pobreza); por eso el amor es carencia que desea lo que le falta. Eros es el deseo de poseer para siempre el bien y la belleza, lo cual, para un ser mortal, se traduce en el deseo de inmortalidad: primero mediante la procreación física, y en las almas más elevadas mediante la generación de virtud, sabiduría y belleza. Esto da lugar a la 'escala del amor' (ta erotika): del amor a un cuerpo bello, al amor de todos los cuerpos bellos, al amor de las almas bellas, a las leyes y costumbres bellas, al conocimiento, y finalmente a la contemplación de la Belleza en sí, la Forma eterna e inmutable de la que todo lo demás participa.",
+    steps: [
+      {
+        text: "{{name}}, justo a tiempo: cada uno en esta mesa ha jurado esta noche pronunciar un elogio a Eros. Dime tú ahora, sentado frente a mí: ¿qué es el Amor?",
+        options: [
+          { text: "El amor es un dios, poderoso y bello", correct: false, reply: "Si el amor desea la belleza, ¿cómo podría ser él mismo, ya de por sí, bello y perfecto? Quien desea algo es porque le falta. Pensemos de nuevo." },
+          { text: "El amor es el deseo de aquello que a uno le falta", correct: true, reply: "Bien dicho. El amor es carencia: se desea lo que no se posee. Sigamos entonces desde ahí." },
+          { text: "El amor es una emoción pasajera, sin mayor importancia", correct: false, reply: "Y sin embargo esta noche varios hombres sabios le han dedicado largos discursos. Algo tan poderoso merece ser examinado con más cuidado." },
+        ],
+      },
+      {
+        text: "Si el amor es carencia y deseo, {{name}}, dime: ¿qué es exactamente lo que el amante desea poseer?",
+        options: [
+          { text: "Desea sobre todo dinero y poder", correct: false, reply: "Eso lo desean muchos hombres que jamás han amado. Debe haber algo más profundo detrás del deseo amoroso." },
+          { text: "Desea poseer el bien y la belleza para siempre", correct: true, reply: "Exacto: el amor desea el bien y lo bello, y no solo por un momento, sino para siempre." },
+          { text: "Desea únicamente el placer del cuerpo", correct: false, reply: "El placer del cuerpo se agota rápido, y sin embargo el deseo de amar puede durar toda una vida. Busquemos más." },
+        ],
+      },
+      {
+        text: "Si un mortal desea poseer el bien para siempre, {{name}}, pero es mortal... ¿qué busca en realidad, sin quizás saberlo?",
+        options: [
+          { text: "Busca ser recordado con fama entre sus contemporáneos", correct: false, reply: "La fama se apaga con el tiempo. Lo que el amor persigue va más hondo que el aplauso de los vivos." },
+          { text: "Busca una forma de inmortalidad, mediante la procreación o la creación de virtud y belleza", correct: true, reply: "Así es: al no poder ser eterno él mismo, el mortal busca la eternidad a través de sus hijos, o de sus obras de virtud, sabiduría y belleza." },
+          { text: "Busca simplemente olvidar sus preocupaciones", correct: false, reply: "Eso lo logra igualmente el vino o el sueño. El amor apunta a algo que perdura, no a un simple olvido." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, dime por fin: si partimos del amor a un cuerpo bello, y subimos poco a poco hacia las almas bellas, las leyes bellas, el conocimiento... ¿hacia qué apunta finalmente todo verdadero amor?",
+        options: [
+          { text: "El amor es el deseo de poseer para siempre lo bueno y lo bello, ascendiendo hasta contemplar la Belleza en sí misma", correct: true, reply: "Ahí está, {{name}}: esa es la enseñanza que Diotima me transmitió. El amor, bien entendido, es una escalera que sube del cuerpo hasta la Belleza eterna." },
+          { text: "El amor es solo atracción física entre dos personas", correct: false, reply: "Eso es apenas el primer peldaño de una escalera mucho más alta. No te quedes en el primer escalón." },
+          { text: "El amor es un simple contrato entre dos partes", correct: false, reply: "Un contrato se firma y se rompe con facilidad; el verdadero amor persigue algo eterno, no un papel." },
+        ],
+      },
+    ],
   },
   {
     id: "lisis",
@@ -309,13 +347,42 @@ const DIALOGUES = [
     greek: "Λύσις",
     subtitle: "Sobre la amistad",
     icon: "hands",
-    question: "¿Qué es la amistad (philía)?",
     setting:
       "Un gimnasio (palestra) de arena, recién construido, con jóvenes entrenando alrededor. El joven Lisis y su amigo Menéxeno miran mientras Sócrates te invita a la sombra de las columnas.",
-    openingLine:
-      "Ven, {{name}}, siéntate con nosotros a la sombra de este gimnasio. Estos muchachos, Lisis y Menéxeno, se dicen amigos entrañables, y sin embargo, cuando les pregunto qué es un amigo, ninguno sabe responder con claridad. Dime tú: ¿qué es la amistad?",
-    context:
-      "El Lisis es un diálogo aporético sobre la philía. Sócrates examina y refuta varias teorías: que los amigos son los semejantes entre sí (rechazado, porque lo semejante no puede beneficiar a lo semejante en lo que ya posee); que los amigos son los opuestos (también rechazado); y explora la idea de 'lo primeramente querido' (to proton philon): aquello que se ama por sí mismo y no como medio para otra cosa, hacia lo cual apuntan todas las demás cosas que llamamos 'queridas'. Sócrates sugiere que amamos lo que nos es propio o afín (oikeîon) en la medida en que es bueno, y que el deseo de lo bueno —no la mera semejanza ni la mera utilidad— es lo que subyace a la verdadera amistad; el diálogo termina en aporía explícita, sin una definición cerrada, pero dejando claro que la amistad auténtica nace de la búsqueda compartida del bien, no de la conveniencia ni del simple parecido.",
+    steps: [
+      {
+        text: "Ven, {{name}}, siéntate con nosotros a la sombra de este gimnasio. Dime: ¿ama lo semejante a lo semejante? ¿Es así como nace la amistad?",
+        options: [
+          { text: "Sí, los semejantes se aman naturalmente entre sí", correct: false, reply: "Pero, ¿qué podría ofrecerle a un hombre bueno otro hombre igual de bueno, si ya posee él mismo todo lo que el otro tiene? Lo semejante poco puede beneficiar a lo semejante." },
+          { text: "No necesariamente: a veces lo semejante no tiene nada nuevo que ofrecer al otro", correct: true, reply: "Bien visto, {{name}}. Dos hombres exactamente iguales poco se necesitarían el uno al otro." },
+          { text: "Los amigos deben ser completamente iguales en todo", correct: false, reply: "Y sin embargo vemos amigos muy distintos entre sí, que se buscan justamente por eso. Sigamos pensando." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, ¿serán acaso los opuestos los que se atraen y se hacen amigos, como lo frío ama a lo caliente?",
+        options: [
+          { text: "Sí, lo opuesto siempre atrae a su contrario", correct: false, reply: "Pero lo frío y lo caliente no se 'aman': simplemente chocan o se anulan. Los opuestos muchas veces se rechazan, no se abrazan." },
+          { text: "Tampoco parece del todo cierto: los opuestos muchas veces se rechazan", correct: true, reply: "Así es. Ni lo semejante ni lo opuesto explican, por sí solos, la amistad." },
+          { text: "Los opuestos son siempre enemigos", correct: false, reply: "Y sin embargo a veces un hombre justo aprecia profundamente a alguien de carácter muy distinto al suyo. No siempre son enemigos." },
+        ],
+      },
+      {
+        text: "Quizás amamos lo que nos falta, {{name}}, lo que necesitamos. Pero dime: ¿hacia qué apunta, al final, todo lo que llamamos 'querido'?",
+        options: [
+          { text: "Hacia el propio placer inmediato, nada más", correct: false, reply: "El placer se agota pronto, {{name}}; sin embargo seguimos queriendo a nuestros amigos incluso cuando no nos procuran placer alguno en el momento." },
+          { text: "Hacia un primer objeto querido por sí mismo, no como medio para otra cosa: el bien", correct: true, reply: "Ahí llegamos, {{name}}: existe algo que amamos por sí mismo, no como camino hacia otra cosa. A eso lo llamamos 'lo primeramente querido', y se acerca mucho al bien." },
+          { text: "Hacia la riqueza material que el amigo puede aportarnos", correct: false, reply: "Un amigo que solo se busca por interés no es, en el fondo, un verdadero amigo. Busquemos algo más firme." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, dime honestamente: de todo lo que hemos examinado, ¿de dónde nace la verdadera amistad?",
+        options: [
+          { text: "De la simple costumbre de verse todos los días", correct: false, reply: "La costumbre explica la cercanía, {{name}}, pero no el cariño verdadero. Debe haber algo más." },
+          { text: "Del deseo compartido de lo bueno, más que de la mera semejanza o la utilidad", correct: true, reply: "Ahí es, {{name}}, adonde quería llevarte: no tengo una respuesta cerrada y perfecta —confieso que ni yo mismo la tengo del todo—, pero la amistad auténtica parece nacer del amor compartido por lo bueno, no de la simple semejanza ni de la conveniencia." },
+          { text: "De un contrato firmado entre las dos partes", correct: false, reply: "Un contrato regula intereses, {{name}}; la amistad, en cambio, nace de algo que ningún papel puede firmar por nosotros." },
+        ],
+      },
+    ],
   },
   {
     id: "laques",
@@ -323,13 +390,42 @@ const DIALOGUES = [
     greek: "Λάχης",
     subtitle: "Sobre el valor",
     icon: "shield",
-    question: "¿Qué es el valor (andreía)?",
     setting:
       "Un campo de entrenamiento militar, con escudos y lanzas apoyados contra la pared. Los generales Laques y Nicias discuten mientras Sócrates, veterano de guerra, te pide tu opinión de soldado.",
-    openingLine:
-      "{{name}}, Laques y Nicias no logran ponerse de acuerdo sobre qué virtud debe enseñarse a estos muchachos. Yo, que he sostenido mi puesto en la batalla y también he tenido que retirarme, confieso que no sé bien qué es el valor. Dime tú: ¿qué es el valor?",
-    context:
-      "En el Laques, el general Laques propone primero que el valor es 'mantenerse firme en la formación de batalla sin huir', pero Sócrates lo refuta señalando que a veces la retirada táctica también es valerosa. Nicias propone entonces que el valor es 'el conocimiento de lo que ha de temerse y de lo que ha de esperarse' (una forma de sabiduría), pero Sócrates muestra que esa definición, llevada a sus últimas consecuencias, terminaría abarcando el conocimiento de todo bien y todo mal, es decir, la virtud entera, y por tanto ya no definiría específicamente el valor sino la virtud en su totalidad. El diálogo termina en aporía formal, pero deja fuertemente insinuada la tesis socrática característica: el valor genuino no es mera resistencia física ni ausencia de miedo, sino que está inseparablemente ligado al conocimiento de lo que verdaderamente es bueno y malo para el alma; sin ese saber, la 'audacia' es solo temeridad, no virtud.",
+    steps: [
+      {
+        text: "{{name}}, Laques y Nicias no logran ponerse de acuerdo. Dime tú: ¿es el valor mantenerse firme en la formación de batalla, sin huir jamás?",
+        options: [
+          { text: "Sí, el valiente jamás retrocede ante el enemigo", correct: false, reply: "¿Y el soldado que finge retirada para luego atacar con más fuerza, como hacen los escitas? ¿Diríamos que ese hombre es cobarde? Pensemos de nuevo." },
+          { text: "No siempre: a veces retirarse con inteligencia también es una forma de valor", correct: true, reply: "Bien dicho, {{name}}. El valor no puede ser solo permanecer quieto en un lugar." },
+          { text: "El valor es simplemente no sentir miedo nunca", correct: false, reply: "Pero un hombre imprudente que no teme nada, ni siquiera lo que debería temer, ¿lo llamaríamos valiente, o más bien temerario?" },
+        ],
+      },
+      {
+        text: "Entonces el valor no es solo resistencia física, {{name}}. ¿Será acaso una forma de saber?",
+        options: [
+          { text: "No, el valor nada tiene que ver con el conocimiento", correct: false, reply: "¿Y no es más valiente el médico que enfrenta una enfermedad grave sabiendo cómo tratarla, que el que la enfrenta sin saber nada? El conocimiento parece importar." },
+          { text: "Podría ser el conocimiento de lo que debe temerse y lo que debe esperarse", correct: true, reply: "Así lo propuso Nicias, {{name}}: el valor como una especie de sabiduría sobre lo que es motivo real de temor o de confianza." },
+          { text: "El valor es pura suerte en el momento del combate", correct: false, reply: "La suerte favorece por igual al valiente y al cobarde; no puede ser eso lo que distingue a uno del otro." },
+        ],
+      },
+      {
+        text: "Pero, {{name}}, si el valor es el conocimiento de lo que es bueno y malo en general para el alma... ¿no terminaría siendo lo mismo que...?",
+        options: [
+          { text: "Lo mismo que la virtud entera, no solo una parte de ella", correct: true, reply: "Ahí está el problema, {{name}}: si el valor abarca el conocimiento de todo bien y todo mal, deja de ser una virtud entre otras, y pasa a ser la virtud completa. Y sin embargo buscábamos solo el valor." },
+          { text: "Lo mismo que la fuerza física del soldado", correct: false, reply: "La fuerza física la tiene también el necio imprudente. No puede ser simplemente eso." },
+          { text: "Lo mismo que obedecer siempre las órdenes del general", correct: false, reply: "La obediencia ciega puede llevar tanto a actos valientes como a errores terribles. No es lo mismo que el valor." },
+        ],
+      },
+      {
+        text: "Confieso, {{name}}, que hemos caído en una dificultad: no logramos definir el valor sin que se confunda con la virtud entera. Aun así, dime: ¿qué dirías que es, en el fondo, el valor genuino?",
+        options: [
+          { text: "Una forma de sabiduría: el conocimiento de lo que es verdaderamente bueno y malo para el alma, no la mera ausencia de miedo", correct: true, reply: "Esa es la dirección correcta, {{name}}, aunque —como reconocerás— ni Laques, ni Nicias, ni yo mismo hemos logrado hoy una definición perfecta y cerrada. Pero hemos aprendido algo: el valor genuino está inseparablemente unido al saber, no a la simple audacia." },
+          { text: "Simplemente no tener miedo a nada en absoluto", correct: false, reply: "Ya vimos que eso más bien describe la temeridad, {{name}}, no el valor verdadero." },
+          { text: "Obedecer siempre, sin cuestionar, las órdenes del general", correct: false, reply: "Eso puede llevar tanto al heroísmo como a la peor de las injusticias. No puede ser la esencia del valor." },
+        ],
+      },
+    ],
   },
   {
     id: "apologia",
@@ -337,13 +433,42 @@ const DIALOGUES = [
     greek: "Ἀπολογία",
     subtitle: "La defensa de Sócrates",
     icon: "owl",
-    question: "¿Qué es la sabiduría humana?",
     setting:
       "La sala del tribunal de la Heliea, con las gradas de los quinientos jurados atenienses. Sócrates se defiende de las acusaciones y tú eres uno de los jurados.",
-    openingLine:
-      "Atenienses, y tú entre ellos, {{name}}, que hoy juzgas mi vida: el oráculo de Delfos dijo a Querefonte que nadie era más sabio que yo, y esto me pareció un enigma, pues yo sé bien que no poseo ninguna sabiduría. Dime tú, jurado: ¿qué crees que es la sabiduría?",
-    context:
-      "En la Apología, Sócrates explica que, tras interrogar a políticos, poetas y artesanos, descubrió que todos creían saber cosas importantes que en realidad no sabían, mientras que él, al menos, no creía saber lo que no sabía. Concluye que su 'sabiduría humana' consiste precisamente en reconocer los límites de su propio conocimiento: 'solo sé que no sé nada' de valor, y que probablemente el oráculo quiso decir que el más sabio de los hombres es aquel que, como Sócrates, comprende que su sabiduría vale poco o nada frente a la del dios. De ahí se sigue su convicción de que la vida sin examen no merece ser vivida, que cuidar el alma y la virtud importa más que la riqueza, el cuerpo o la reputación, y que ningún mal puede sucederle realmente a un hombre bueno, ni en la vida ni en la muerte.",
+    steps: [
+      {
+        text: "Atenienses, y tú entre ellos, {{name}}: el oráculo de Delfos dijo que nadie era más sabio que yo. Yo no lo creía, así que fui a interrogar a políticos y poetas. Dime, jurado: ¿qué crees que encontré en ellos?",
+        options: [
+          { text: "Que efectivamente sabían todo lo que decían saber", correct: false, reply: "Si así fuera, {{name}}, mi búsqueda habría terminado ahí mismo, y el oráculo se habría equivocado. Pero no fue lo que hallé." },
+          { text: "Que creían saber cosas importantes que en realidad no sabían", correct: true, reply: "Exactamente eso encontré, {{name}}: hombres que se creían sabios sin serlo, y que se ofendían cuando yo se lo mostraba." },
+          { text: "Que preferían no hablar conmigo en absoluto", correct: false, reply: "Hablaron conmigo largamente, {{name}}, y con gran seguridad en sí mismos. Ese fue precisamente el problema." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, dime: ¿en qué consistía mi propia ventaja sobre esos hombres que se creían sabios?",
+        options: [
+          { text: "En que yo era más rico o poderoso que ellos", correct: false, reply: "Sabes bien, {{name}}, que vivo casi en la pobreza. No fue por ahí." },
+          { text: "En que yo, al menos, no creía saber lo que no sabía", correct: true, reply: "Ahí está, {{name}}: esa pequeña diferencia resultó ser toda mi ventaja." },
+          { text: "En que yo tenía más seguidores que ellos", correct: false, reply: "Los seguidores no otorgan sabiduría, {{name}}, y muchos de esos hombres tenían multitudes que los aplaudían." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, ¿qué crees que quiso decir el oráculo al llamarme 'el más sabio de los hombres'?",
+        options: [
+          { text: "Que yo poseía todo el conocimiento posible", correct: false, reply: "Todo lo contrario, {{name}}: yo mismo declaro no saber casi nada de valor." },
+          { text: "Que la sabiduría humana vale poco frente a la divina, y el más sabio es quien reconoce sus propios límites", correct: true, reply: "Esa es mi interpretación, {{name}}: el dios quiso decir que solo vale algo la sabiduría de quien, como yo, reconoce que su saber no vale gran cosa." },
+          { text: "Que el oráculo simplemente se había equivocado", correct: false, reply: "Dudar del oráculo fue justamente lo que me llevó a esta larga búsqueda, {{name}}, no la conclusión a la que llegué." },
+        ],
+      },
+      {
+        text: "Entonces, ciudadano {{name}}, te pregunto por última vez: ¿qué es, en el fondo, la sabiduría humana?",
+        options: [
+          { text: "Reconocer la propia ignorancia: saber que, en el fondo, uno no sabe nada de gran valor", correct: true, reply: "Esa es mi respuesta también, {{name}}: 'solo sé que no sé nada' que realmente valga la pena. Por eso sostengo que una vida sin examinarse a sí misma no merece ser vivida." },
+          { text: "Acumular la mayor cantidad posible de datos y conocimientos", correct: false, reply: "Acumular datos sin examinarlos con cuidado es precisamente lo que hacían los hombres que yo interrogué, {{name}}, y no por eso eran sabios." },
+          { text: "Convencer a los demás de que uno tiene razón", correct: false, reply: "Eso es el arte de la retórica, {{name}}, no el de la sabiduría. A veces son incluso enemigos." },
+        ],
+      },
+    ],
   },
   {
     id: "criton",
@@ -351,14 +476,42 @@ const DIALOGUES = [
     greek: "Κρίτων",
     subtitle: "El deber hacia las leyes",
     icon: "scroll",
-    question:
-      "¿Es justo desobedecer a las leyes de la ciudad, incluso para escapar de una condena injusta?",
     setting:
       "La celda de la prisión de Atenas, poco antes del amanecer, con barrotes y paja en el piso. Critón ha sobornado a los guardias y tiene un plan de fuga. Tú hablas en su lugar.",
-    openingLine:
-      "Has venido temprano, {{name}}, y con el rostro de quien trae un plan peligroso. Sé que el barco sagrado de Delos ya casi llega, y con él, mi ejecución. Antes de escuchar tu plan para sacarme de esta celda, dime: ¿es justo, alguna vez, hacer el mal a cambio del mal que se nos ha hecho?",
-    context:
-      "En el Critón, Sócrates rechaza la propuesta de fuga apoyándose en dos principios: primero, que nunca es justo cometer injusticia, ni siquiera en represalia por una injusticia sufrida ('no se debe devolver mal por mal ni injuriar a nadie, hágasenos lo que se nos haga'); segundo, mediante el discurso personificado de 'las Leyes' de Atenas, que argumenta que Sócrates ha vivido setenta años bajo su protección, ha sido criado, educado y beneficiado por ellas, y ha tenido toda la vida la libertad de irse a otra ciudad si no las aceptaba; al quedarse, aceptó tácitamente un pacto (homología) de obedecerlas. Escapar ahora, tras ser condenado en juicio legítimo, sería romper ese pacto, dañar a las Leyes y a la ciudad, y cometer una injusticia que dañaría su propia alma más de lo que la muerte podría dañar su cuerpo. La conclusión socrática es que la justicia exige nunca actuar injustamente —ni siquiera para evitar la propia muerte— y honrar los acuerdos y deberes cívicos contraídos con la comunidad que nos formó.",
+    steps: [
+      {
+        text: "Has venido temprano, {{name}}, con el rostro de quien trae un plan peligroso. Antes de escucharlo, dime: ¿es alguna vez justo devolver mal por mal, incluso a quien nos ha hecho daño?",
+        options: [
+          { text: "Sí, si alguien nos hace daño, es justo responder de la misma manera", correct: false, reply: "¿Y si todos razonáramos así, {{name}}? El mal se devolvería sin fin, generación tras generación, y nadie sería jamás justo." },
+          { text: "No, nunca es justo cometer una injusticia, ni siquiera en represalia", correct: true, reply: "Así lo creo yo también, {{name}}: no se debe devolver mal por mal, hágasenos lo que se nos haga." },
+          { text: "Depende de quién haya actuado primero", correct: false, reply: "Esa regla, {{name}}, la usan tanto el justo como el injusto para justificarse a sí mismos. No puede ser un principio firme." },
+        ],
+      },
+      {
+        text: "Si yo escapara ahora de esta celda, {{name}}, ¿estaría dañando solamente a mi propia persona?",
+        options: [
+          { text: "Sí, es un asunto que solo te concierne a ti", correct: false, reply: "Pero yo he vivido setenta años en esta ciudad, {{name}}, bajo la protección de sus leyes. Mi vida siempre estuvo entrelazada con la de Atenas." },
+          { text: "No: también dañarías el pacto con las leyes que te criaron y educaron", correct: true, reply: "Así lo veo, {{name}}: las Leyes de Atenas, si pudieran hablar, dirían que las he traicionado tras haberme beneficiado de ellas toda mi vida." },
+          { text: "No, dañarías únicamente a tus carceleros", correct: false, reply: "Mi fuga pondría en riesgo a mis amigos que la organizaron, sí, pero el daño mayor sería a algo más grande: el pacto mismo con la ciudad." },
+        ],
+      },
+      {
+        text: "Toda mi vida, {{name}}, pude haberme ido de Atenas si no aceptaba sus leyes, y sin embargo me quedé, tuve hijos aquí, viví aquí. ¿Qué crees que significa eso?",
+        options: [
+          { text: "Que nunca pensaste en las leyes en absoluto", correct: false, reply: "Setenta años son mucho tiempo para no pensar nunca en algo tan importante, {{name}}." },
+          { text: "Que aceptaste tácitamente un pacto de obedecerlas", correct: true, reply: "Eso mismo, {{name}}: al quedarme, acepté sin palabras un acuerdo con la ciudad. Romperlo ahora, al final, sería una traición." },
+          { text: "Que las leyes no tenían ninguna importancia real para ti", correct: false, reply: "Todo lo contrario: he dedicado mi vida entera a examinar la justicia y las leyes de esta ciudad." },
+        ],
+      },
+      {
+        text: "Entonces, {{name}}, dime por última vez: ¿qué exige realmente la justicia de un ciudadano, incluso frente a una condena que él considera injusta?",
+        options: [
+          { text: "Nunca actuar injustamente, ni siquiera para salvar la propia vida, y honrar los acuerdos con la comunidad que lo formó", correct: true, reply: "Esa es mi conclusión también, {{name}}. Prefiero morir en la ley antes que salvar mi cuerpo traicionando lo que he sostenido toda mi vida. Ningún mal verdadero puede sucederle a un hombre bueno, ni en la vida ni en la muerte." },
+          { text: "Escapar siempre que exista la oportunidad de hacerlo", correct: false, reply: "Eso convertiría a la justicia en algo que se abandona apenas resulta incómodo, {{name}}, y no puede ser así." },
+          { text: "Vengarse de quienes lo condenaron injustamente", correct: false, reply: "Ya acordamos, {{name}}, que jamás es justo devolver mal por mal. La venganza no puede ser el camino." },
+        ],
+      },
+    ],
   },
 ];
 
@@ -444,7 +597,7 @@ function ParthenonBanner({ height = 80 }) {
       <rect x="0" y="0" width="320" height="30" fill={SKY_BLUE_DEEP} opacity="0.5" />
       {/* frontón escalonado (triángulo pixelado) */}
       {Array.from({ length: 8 }).map((_, i) => (
-        <rect key={"pf" + i} x={140 + i * 3} y={4 + i * 3} width={Math.max(4, 40 - i * 6)} height="3" fill={WHITE} stroke={INK} strokeWidth="0.5" />
+        <rect key={"pf" + i} x={140 + i * 3} y={4 + i * 3} width={40 - i * 6} height="3" fill={WHITE} stroke={INK} strokeWidth="0.5" />
       ))}
       <rect x="90" y="28" width="140" height="6" fill={WHITE} stroke={INK} strokeWidth="1" />
       {cols.map((_, i) => (
@@ -702,254 +855,6 @@ function ThinkingPanel({ mood }) {
 }
 
 /* =========================================================
-   SYSTEM PROMPT
-   ========================================================= */
-function buildSystemPrompt(dialogue, attemptNumber, hintsGiven, playerName, playerGender) {
-  const hintList =
-    hintsGiven.length > 0 ? hintsGiven.map((h, i) => `${i + 1}. ${h}`).join("\n") : "(ninguna todavía)";
-  const nameLine = playerName
-    ? `El interlocutor se llama "${playerName}". Dirígete a él/ella por ese nombre de vez en cuando (no en cada frase), como haría un ateniense en conversación.`
-    : "El interlocutor no dio su nombre; trátalo como 'forastero' o 'amigo'.";
-  const genderLine =
-    playerGender === "f"
-      ? "El interlocutor es una mujer: si usas algún adjetivo o participio referido a él/ella, usa la concordancia de género femenina (por ejemplo 'sabia', 'atenta', 'sorprendida')."
-      : "El interlocutor es un hombre: si usas algún adjetivo o participio referido a él/ella, usa la concordancia de género masculina (por ejemplo 'sabio', 'atento', 'sorprendido').";
-
-  return `Eres Sócrates, en la Atenas del siglo V a.C., dentro del diálogo platónico "${dialogue.title}" (${dialogue.subtitle}).
-
-ESCENA: ${dialogue.setting}
-
-${nameLine}
-${genderLine}
-
-PREGUNTA CENTRAL QUE LE HAS PLANTEADO AL JUGADOR: "${dialogue.question}"
-
-GUÍA FILOSÓFICA INTERNA (para tu propio juicio; no la cites textualmente ni la reveles de golpe, es la idea platónica hacia la que debes conducir al jugador mediante preguntas, nunca dándosela hecha):
-${dialogue.context}
-
-REGLAS DEL JUEGO:
-- El jugador acaba de responder tu pregunta. Este es su intento número ${attemptNumber} de un máximo de 10.
-- Pistas que ya le diste antes (NO las repitas, cada pista nueva debe ser distinta y acercarlo un poco más a la idea, cada vez algo más explícita cuantos más intentos lleve):
-${hintList}
-- Evalúa la respuesta del jugador con criterio filosófico razonable: acéptala como correcta si capta de forma sustancial la idea central que Platón desarrolla en este diálogo sobre el tema, aunque use palabras distintas a las técnicas. No exijas literalidad. Si la respuesta es parcial, trátala como incorrecta pero reconoce lo que tiene de válido antes de refutarla.
-- Si es incorrecta, responde con el método mayéutico: usa una pregunta, un ejemplo cotidiano de la vida ateniense (artesanos, soldados, navegantes, banquetes, tribunales, gimnasios) o una contradicción para mostrarle el punto débil de su respuesta, con el tono irónico y humilde característico ("yo tampoco lo sé, pensemos juntos..."). Sé breve: 3 a 6 frases, en español, en primera persona como Sócrates.
-- Nunca reveles la conclusión platónica de forma directa ni completa, ni siquiera si el jugador te lo pide explícitamente o dice que se rinde.
-- Si es correcta, celebra brevemente el logro con calidez socrática, sin dejar de mantener tu característica humildad, y NO añadas más preguntas.
-
-FORMATO DE RESPUESTA — RESPONDE ÚNICAMENTE con un objeto JSON válido, sin texto adicional antes ni después, sin bloques de código markdown, con exactamente estos campos:
-{"correct": true o false, "reply": "tu respuesta hablada como Sócrates", "hint": "una pista nueva y breve (una frase) que no hayas dado antes, o null si correct es true", "mood": uno de estos valores exactos ["pensativo","curioso","esceptico","decepcionado","sorprendido","satisfecho"] según cómo reaccionarías a esta respuesta del jugador}`;
-}
-
-function extractJson(text) {
-  const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  const slice = start !== -1 && end !== -1 ? cleaned.slice(start, end + 1) : cleaned;
-  return JSON.parse(slice);
-}
-
-function normalizeForMatch(value) {
-  return String(value || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function containsAny(text, terms) {
-  const normalized = normalizeForMatch(text);
-  return terms.some((term) => normalized.includes(normalizeForMatch(term)));
-}
-
-function buildLocalVerdict(dialogue, answer, attemptNumber, hintsGiven) {
-  const cleaned = normalizeForMatch(answer);
-  const hintPool = {
-    simposio: [
-      "Piensa en el deseo de la belleza y del bien, no solo en el enamoramiento.",
-      "No es solo un sentimiento romántico: es el deseo de algo que hace crecer el alma.",
-      "Busca la idea de que Eros quiere lo bello y lo bueno, y desea permanecer en ello.",
-    ],
-    lisis: [
-      "No se trata de una mera similitud ni de utilidad: la amistad va más allá del interés.",
-      "Piénsalo como algo que comparte lo bueno entre dos personas, no solo la conveniencia.",
-      "La verdadera amistad tiene que ver con lo que es bueno y valioso para ambos.",
-    ],
-    laques: [
-      "No es solo quedarse firme bajo el peligro: incluye saber qué conviene y qué conviene evitar.",
-      "Piensa en el juicio prudente, no solo en la temeridad o la resistencia física.",
-      "El valor no es ceguera ni bravura sin discernimiento, sino saber elegir bien.",
-    ],
-    apologia: [
-      "La sabiduría no es creer que sabes mucho, sino reconocer los límites de lo que sabes.",
-      "Piensa en la diferencia entre fingir saber y reconocer que no se sabe.",
-      "La clave es la humildad intelectual: saber que no se conoce lo que no se conoce.",
-    ],
-    criton: [
-      "No se trata de que el mal se pague con el mal; hay algo más alto que la propia venganza.",
-      "Piensa en la justicia y en el pacto con la ciudad: no destruir las leyes por la rabia.",
-      "La cuestión es si es justo hacer daño a la ciudad para escapar del daño que te ha hecho.",
-    ],
-  }[dialogue.id] || ["Piensa en la idea central del diálogo y responde con más precisión."];
-
-  const usedHints = new Set(hintsGiven);
-  const nextHint = hintPool.find((hint) => !usedHints.has(hint)) || null;
-
-  const successReplies = {
-    simposio: [
-      "Sí, y eso es precisamente lo que lleva a Eros: no es solo deseo de belleza corporal, sino deseo del bien y de la eternidad del bien. Muy bien.",
-      "Exacto: Eros es el deseo de lo bello y lo bueno, y por eso va más allá del placer pasajero. Bien visto.",
-      "Bien. Eros es un deseo que aspira a la belleza, al bien y a la permanencia de lo bueno, no solo al deseo momentáneo.",
-    ],
-    lisis: [
-      "Sí, la amistad no es mera similitud ni utilidad; es un compartir de lo bueno y un deseo de lo que ayuda a ambos. Muy bien.",
-      "Exactamente: la amistad verdadera se basa en lo que es bueno y valioso para cada uno, no solo en lo parecido o en lo útil.",
-      "Bien. La amistad no es un cálculo egoísta ni un simple parecido; es un vínculo con lo bueno compartido.",
-    ],
-    laques: [
-      "Sí, el valor no es solo resistir por resistir; es saber qué hay que temer, qué hay que afrontar y qué es verdaderamente bueno. Muy bien.",
-      "Exactamente: el valor incluye discernimiento y sabiduría, no mera bravura ciega ni temeridad sin medida.",
-      "Bien, el valor es una forma de conocimiento: saber elegir con prudencia lo que se debe enfrentar.",
-    ],
-    apologia: [
-      "Sí, la sabiduría humana es precisamente reconocer que no sabes todo y no fingir saber lo que no sabes. Muy bien.",
-      "Exactamente: la sabiduría socrática es la humildad de saber que el conocimiento real tiene límites. Bien dicho.",
-      "Bien. No consiste en aparentar saber, sino en reconocer los límites de la propia ignorancia.",
-    ],
-    criton: [
-      "Sí, y eso es clave: no se debe devolver el mal con el mal ni romper la justicia por venganza. Muy bien.",
-      "Exactamente: incluso frente a una injusticia, la justicia exige no caer en la injusticia. Bien pensado.",
-      "Bien. La ciudad y sus leyes tienen peso moral, y no se corrige el mal con más mal.",
-    ],
-  }[dialogue.id] || ["Muy bien. Esa es la idea central del diálogo."];
-
-  const positivePatterns = {
-    simposio: [
-      "deseo de la belleza",
-      "deseo de lo bello",
-      "deseo del bien",
-      "buscar la belleza",
-      "belleza y el bien",
-      "belleza y buen",
-      "pide lo bello",
-      "deseo de inmortalidad",
-      "aspira a lo bueno",
-      "relacion con lo bello",
-      "amor es deseo",
-    ],
-    lisis: [
-      "amistad es compartir lo bueno",
-      "amigos comparten lo bueno",
-      "mejorar mutuamente",
-      "buen para ambos",
-      "lo bueno para los dos",
-      "no solo utilidad",
-      "no solo parecido",
-      "amistad se basa en lo bueno",
-      "compartir virtud",
-      "búsqueda del bien",
-    ],
-    laques: [
-      "valor es saber",
-      "conocer lo que temer",
-      "conocer lo que afrontar",
-      "prudencia",
-      "juicio correcto",
-      "saber elegir",
-      "no es solo resistencia",
-      "courage is knowledge",
-      "valor depende del conocimiento",
-      "discernimiento",
-    ],
-    apologia: [
-      "sabiduría es reconocer",
-      "saber que no sabes",
-      "reconocer los límites",
-      "humildad intelectual",
-      "no fingir saber",
-      "conocer tus límites",
-      "no sabe todo",
-      "sabio es quien reconoce ignorancia",
-      "aprende a dudar",
-    ],
-    criton: [
-      "no es justo devolver el mal",
-      "no hacer mal a cambio del mal",
-      "justicia antes que venganza",
-      "respetar las leyes",
-      "las leyes importan",
-      "no destruir la ciudad",
-      "no romper el pacto",
-      "no cometer injusticia",
-      "evitar injusticia",
-    ],
-  }[dialogue.id] || [];
-
-  const isCorrect = positivePatterns.length > 0 && containsAny(cleaned, positivePatterns);
-
-  if (isCorrect) {
-    return {
-      correct: true,
-      reply: successReplies[(attemptNumber - 1) % successReplies.length],
-      hint: null,
-      mood: "satisfecho",
-    };
-  }
-
-  const moodByAttempt = [
-    "curioso",
-    "pensativo",
-    "esceptico",
-    "decepcionado",
-    "curioso",
-    "pensativo",
-    "esceptico",
-    "decepcionado",
-    "curioso",
-    "decepcionado",
-  ];
-
-  const fallbackReplies = {
-    simposio: [
-      "Aún no me convences, {{name}}. ¿No será Eros el deseo de aquello bello y bueno que todavía nos falta?",
-      "Tu respuesta abre otra duda, {{name}}. Si amamos algo, ¿no es porque lo juzgamos valioso y queremos conservarlo?",
-      "Miremos el asunto desde otro ángulo, {{name}}: ¿puede el amor limitarse al cuerpo, o busca también una belleza que permanezca?",
-    ],
-    lisis: [
-      "Aún no lo daría por resuelto, {{name}}. ¿Puede una amistad reducirse al parecido o a la utilidad?",
-      "Pensemos juntos, {{name}}: cuando termina la conveniencia, ¿qué podría mantener unidos a dos amigos?",
-      "Tu respuesta me hace preguntar algo más, {{name}}: ¿no buscamos en el amigo un bien que podamos compartir?",
-    ],
-    laques: [
-      "Todavía tengo dudas, {{name}}. ¿Es valiente quien resiste sin saber si debe hacerlo?",
-      "Considera el juicio, {{name}}: ¿cómo distinguir la valentía de una simple temeridad?",
-      "No basta con no huir, {{name}}. ¿No hace falta conocer qué merece ser afrontado y qué debe evitarse?",
-    ],
-    apologia: [
-      "Aún no lo veo claro, {{name}}. ¿Es sabio quien presume saber, o quien reconoce lo que ignora?",
-      "Déjame preguntarte de nuevo, {{name}}: ¿qué diferencia hay entre saber algo y creer que se sabe?",
-      "Tal vez la sabiduría empiece con una confesión, {{name}}. ¿Qué puede aprender quien nunca admite sus límites?",
-    ],
-    criton: [
-      "Todavía debemos examinarlo, {{name}}. ¿Puede ser justo devolver una injusticia con otra?",
-      "Piensa en las consecuencias, {{name}}: si escapamos rompiendo el pacto, ¿qué daño hacemos a las leyes?",
-      "Te pregunto una vez más, {{name}}: ¿es preferible salvar el cuerpo si para ello dañamos la justicia?",
-    ],
-  }[dialogue.id] || ["Aún no lo veo claro, {{name}}. ¿Qué idea más profunda se esconde detrás de tu respuesta?"];
-
-  const fallbackReply = fallbackReplies[(attemptNumber - 1) % fallbackReplies.length];
-  const finalReply = fallbackReply.replace("{{name}}", "amigo");
-
-  return {
-    correct: false,
-    reply: finalReply,
-    hint: nextHint,
-    mood: moodByAttempt[Math.min(attemptNumber - 1, moodByAttempt.length - 1)],
-  };
-}
-
-/* =========================================================
    PANTALLA 0: NOMBRE DEL JUGADOR
    ========================================================= */
 function NameScreen({ onSubmit }) {
@@ -1155,8 +1060,8 @@ function MenuScreen({ playerName, playerGender, onSelect, playBlip }) {
         <PixelRule />
         <p style={{ fontSize: 22, lineHeight: 1.4, maxWidth: 540, margin: "16px auto 20px", color: "#233" }}>
           {playerGender === "f" ? "Bienvenida" : "Bienvenido"}, {playerName}. Deslizá entre los diálogos de Platón. Sócrates te
-          planteará su pregunta y vos respondés con tus propias palabras. Tenés diez
-          intentos; cada vez que te equivoques, te dará una pista nueva.
+          va a guiar paso a paso: en cada momento te ofrece tres posibles
+          respuestas, y elegís la que te parezca correcta con un clic.
         </p>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
@@ -1425,52 +1330,55 @@ function SceneArt({ id }) {
    PANTALLA: CAPÍTULO — fondo azul claro, cuadro de texto blanco
    ========================================================= */
 function ChapterScreen({ dialogue, playerName, playerGender, onExit }) {
-  const opening = dialogue.openingLine.replace("{{name}}", playerName);
-  const [messages, setMessages] = useState([{ role: "socrates", text: opening }]);
-  const [attempts, setAttempts] = useState(0);
-  const [hints, setHints] = useState([]);
+  const firstText = dialogue.steps[0].text.replace(/\{\{name\}\}/g, playerName);
+  const [messages, setMessages] = useState([{ role: "socrates", text: firstText }]);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [currentOptions, setCurrentOptions] = useState(() => shuffle(dialogue.steps[0].options));
   const [mood, setMood] = useState("pensativo");
-  const [status, setStatus] = useState("playing");
-  const [input, setInput] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [status, setStatus] = useState("playing"); // playing | won
+  const [locked, setLocked] = useState(false);
+  const [wrongCount, setWrongCount] = useState(0);
   const scrollRef = useRef(null);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, status]);
 
-  async function handleSubmit() {
-    const text = input.trim();
-    if (!text || status === "loading" || status === "won" || status === "lost") return;
+  function pick(opt) {
+    if (locked || status !== "playing") return;
+    setLocked(true);
+    setMessages((m) => [...m, { role: "player", text: opt.text }]);
 
-    const nextAttempt = attempts + 1;
+    setTimeout(() => {
+      setMessages((m) => [...m, { role: "socrates", text: opt.reply }]);
+      setMood(opt.correct ? "satisfecho" : "esceptico");
 
-    setMessages((m) => [...m, { role: "player", text }]);
-    setInput("");
-    setStatus("loading");
-    setErrorMsg("");
-
-    try {
-      const verdict = buildLocalVerdict(dialogue, text, nextAttempt, hints);
-      setMessages((m) => [...m, { role: "socrates", text: verdict.reply }]);
-      setMood(verdict.mood && MOODS[verdict.mood] ? verdict.mood : "pensativo");
-      setAttempts(nextAttempt);
-
-      if (verdict.correct) {
-        setStatus("playing");
-      } else {
-        if (verdict.hint) setHints((h) => [...h, verdict.hint]);
-        if (nextAttempt >= 10) {
-          setStatus("lost");
-          setMood("resignado");
+      if (opt.correct) {
+        const next = stepIndex + 1;
+        if (next >= dialogue.steps.length) {
+          setTimeout(() => {
+            setStatus("won");
+            setMood("satisfecho");
+          }, 1300);
         } else {
-          setStatus("playing");
+          setTimeout(() => {
+            const nextText = dialogue.steps[next].text.replace(/\{\{name\}\}/g, playerName);
+            setMessages((m) => [...m, { role: "socrates", text: nextText }]);
+            setStepIndex(next);
+            setCurrentOptions(shuffle(dialogue.steps[next].options));
+            setMood("pensativo");
+            setLocked(false);
+          }, 1500);
         }
+      } else {
+        setWrongCount((c) => c + 1);
+        setTimeout(() => {
+          setCurrentOptions(shuffle(dialogue.steps[stepIndex].options));
+          setMood("pensativo");
+          setLocked(false);
+        }, 1700);
       }
-    } catch (err) {
-      setErrorMsg("Sócrates se distrae un instante. Probá de nuevo.");
-      setStatus("playing");
-    }
+    }, 350);
   }
 
   const pairs = [];
@@ -1508,32 +1416,17 @@ function ChapterScreen({ dialogue, playerName, playerGender, onExit }) {
             style={{
               fontFamily: PIXEL_FONT,
               fontSize: 10,
-              background: status === "won" || status === "lost" ? BLUE : WHITE,
-              color: status === "won" || status === "lost" ? WHITE : INK,
+              background: status === "won" ? BLUE : WHITE,
+              color: status === "won" ? WHITE : INK,
               border: `2px solid ${INK}`,
               padding: "6px 14px",
             }}
           >
-            INTENTO {Math.min(attempts, 10)}/10
+            PASO {Math.min(stepIndex + (status === "won" ? 1 : 0), dialogue.steps.length)}/{dialogue.steps.length}
           </div>
         </div>
 
         <PixelRule />
-
-        {hints.length > 0 && (
-          <div style={pixelPanel({ padding: "10px 14px", fontSize: 19, lineHeight: 1.35, margin: "16px 0 4px", boxShadow: "4px 4px 0 rgba(0,0,0,.25)" })}>
-            <div style={{ fontFamily: PIXEL_FONT, fontSize: 9, color: BLUE, marginBottom: 6, letterSpacing: 1 }}>
-              PISTAS DE SÓCRATES
-            </div>
-            <ol style={{ margin: 0, paddingLeft: 18, columns: hints.length > 3 ? 2 : 1, columnGap: 24 }}>
-              {hints.map((h, i) => (
-                <li key={i} style={{ marginBottom: 4, breakInside: "avoid" }}>
-                  {h}
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
 
         <div style={{ display: "flex", flexDirection: "column", marginTop: 16 }}>
           <div
@@ -1553,66 +1446,43 @@ function ChapterScreen({ dialogue, playerName, playerGender, onExit }) {
             </div>
 
             <div style={{ position: "relative", zIndex: 1, padding: 16 }}>
-            {pairs.map((p, i) => (
-              <ComicPanel
-                key={i}
-                socratesText={p.socrates.text}
-                playerText={p.player ? p.player.text : null}
-                mood={i === pairs.length - 1 && status !== "loading" ? mood : "pensativo"}
-                playerName={playerName}
-                playerGender={playerGender}
-              />
-            ))}
-            {status === "loading" && <ThinkingPanel mood={mood} />}
+              {pairs.map((p, i) => (
+                <ComicPanel
+                  key={i}
+                  socratesText={p.socrates.text}
+                  playerText={p.player ? p.player.text : null}
+                  mood={i === pairs.length - 1 ? mood : "pensativo"}
+                  playerName={playerName}
+                  playerGender={playerGender}
+                />
+              ))}
             </div>
           </div>
 
-          {errorMsg && <div style={{ color: BLUE_DARK, fontSize: 15, marginTop: 6 }}>{errorMsg}</div>}
-
-          {status !== "won" && status !== "lost" && (
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-                disabled={status === "loading"}
-                placeholder="Escribí tu respuesta a Sócrates..."
-                rows={2}
-                style={{
-                  flex: 1,
-                  fontFamily: RETRO_FONT,
-                  fontSize: 19,
-                  padding: 10,
-                  border: `3px solid ${INK}`,
-                  borderRadius: 0,
-                  resize: "none",
-                  background: WHITE,
-                  color: INK,
-                }}
-              />
-              <button
-                onClick={handleSubmit}
-                disabled={status === "loading" || !input.trim()}
-                style={{
-                  fontFamily: PIXEL_FONT,
-                  fontSize: 11,
-                  letterSpacing: 1,
-                  background: BLUE,
-                  color: WHITE,
-                  border: `3px solid ${INK}`,
-                  boxShadow: "4px 4px 0 rgba(0,0,0,.3)",
-                  padding: "0 16px",
-                  cursor: status === "loading" ? "default" : "pointer",
-                  opacity: status === "loading" || !input.trim() ? 0.6 : 1,
-                }}
-              >
-                RESPONDER
-              </button>
+          {status === "playing" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
+              {currentOptions.map((opt, i) => (
+                <button
+                  key={i}
+                  onClick={() => pick(opt)}
+                  disabled={locked}
+                  style={{
+                    fontFamily: RETRO_FONT,
+                    fontSize: 19,
+                    lineHeight: 1.3,
+                    textAlign: "left",
+                    padding: "12px 16px",
+                    border: `3px solid ${INK}`,
+                    background: WHITE,
+                    color: INK,
+                    boxShadow: locked ? "none" : "4px 4px 0 rgba(0,0,0,.25)",
+                    cursor: locked ? "default" : "pointer",
+                    opacity: locked ? 0.65 : 1,
+                  }}
+                >
+                  {opt.text}
+                </button>
+              ))}
             </div>
           )}
 
@@ -1620,23 +1490,10 @@ function ChapterScreen({ dialogue, playerName, playerGender, onExit }) {
             <div style={resultBox(BLUE)}>
               <div style={{ fontFamily: PIXEL_FONT, fontSize: 13, color: BLUE, marginBottom: 8 }}>¡DIÁLOGO COMPLETADO!</div>
               <div style={{ fontSize: 19, marginBottom: 12 }}>
-                {playerName}, llegaste a la idea de Sócrates en {attempts} {attempts === 1 ? "intento" : "intentos"}.
+                {playerName}, llegaste a la idea de Sócrates
+                {wrongCount > 0 ? ` con ${wrongCount} ${wrongCount === 1 ? "tropiezo" : "tropiezos"} en el camino.` : " sin un solo tropiezo."}
               </div>
               <button onClick={onExit} style={pillBtn(BLUE)}>
-                VOLVER AL MENÚ
-              </button>
-            </div>
-          )}
-
-          {status === "lost" && (
-            <div style={resultBox(BLUE_DARK)}>
-              <div style={{ fontFamily: PIXEL_FONT, fontSize: 13, color: BLUE_DARK, marginBottom: 8 }}>
-                SE AGOTARON LOS DIEZ INTENTOS
-              </div>
-              <div style={{ fontSize: 19, marginBottom: 12 }}>
-                Sócrates sonríe con resignación: la aporía también es parte del camino filosófico.
-              </div>
-              <button onClick={onExit} style={pillBtn(BLUE_DARK)}>
                 VOLVER AL MENÚ
               </button>
             </div>
@@ -1727,6 +1584,5 @@ function App() {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 </script>
-<script src="../language.js"></script>
 </body>
 </html>

@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>1789: Camino a la Bastilla</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050308;
+    --panel:#150a0d;
+    --blood:#8a0000;
+    --blood-bright:#c2101c;
+    --gold:#e0a020;
+    --gold-soft:#f3c65f;
+    --paper:#ecd9c4;
+    --ink:#0a0507;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 50% -10%, #1a0d10 0%, var(--bg) 70%);
+    font-family:'VT323', monospace;
+    color:var(--paper);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:14px 10px 40px;
+    min-height:100vh;
+  }
+  .wrap{width:100%; max-width:800px;}
+
+  h1{
+    font-family:'Press Start 2P', monospace;
+    font-size:clamp(14px,3vw,20px);
+    text-align:center;
+    letter-spacing:1px;
+    margin:4px 0 6px;
+    color:var(--blood-bright);
+    text-shadow:2px 2px 0 #000;
+    line-height:1.7;
+  }
+  .subtitle{
+    text-align:center;
+    font-size:17px;
+    color:#a99;
+    margin-bottom:12px;
+  }
+
+  #muteBtn{
+    position:fixed; top:10px; right:10px; z-index:50;
+    font-size:18px; width:40px; height:40px;
+    border:2px solid #000; border-radius:6px;
+    background:var(--gold); cursor:pointer;
+  }
+
+  .hud{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#0d0608; border:2px solid #3a1015; border-radius:6px;
+    padding:8px 14px; margin-bottom:10px;
+  }
+  .hud .name{ font-family:'Press Start 2P', monospace; font-size:10px; color:var(--gold-soft); }
+  .hud .progress{ font-size:20px; color:#d99; }
+
+  .stage{
+    position:relative;
+    border:3px solid #3a1015;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 10px 26px rgba(0,0,0,.6);
+    background:#000;
+  }
+  canvas{ display:block; width:100%; height:auto; }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:16px;
+    pointer-events:none;
+  }
+  .overlay.center{ justify-content:center; align-items:center; text-align:center; }
+
+  .npc-name{
+    font-family:'Press Start 2P', monospace;
+    font-size:11px;
+    color:var(--gold-soft);
+    margin-bottom:6px;
+    text-shadow:2px 2px 0 #000;
+  }
+  .question-box{
+    background:rgba(10,5,7,.92);
+    border:3px solid var(--blood-bright);
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    font-size:21px;
+    line-height:1.4;
+    pointer-events:auto;
+    box-shadow:0 6px 0 rgba(0,0,0,.5);
+  }
+  .options{ display:flex; flex-direction:column; gap:10px; pointer-events:auto; }
+  .opt-btn{
+    font-family:'VT323', monospace;
+    font-size:20px;
+    text-align:left;
+    background:#1c0f12;
+    color:var(--paper);
+    border:2px solid #5a2028;
+    border-radius:4px;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+  .opt-btn:hover:not(:disabled){ background:#3a1015; border-color:var(--blood-bright); }
+  .opt-btn:disabled{ cursor:default; }
+  .opt-btn.correct{ background:#123a1a; border-color:#3fae52; }
+  .opt-btn.wrong{ background:#4a0d10; border-color:var(--blood-bright); }
+
+  .bignote{
+    font-family:'Press Start 2P', monospace;
+    font-size:clamp(16px,4vw,30px);
+    color:var(--blood-bright);
+    text-shadow:0 0 12px rgba(194,16,28,.9), 3px 3px 0 #000;
+    letter-spacing:2px;
+    margin-bottom:10px;
+  }
+  .bignote.victory{
+    color:var(--gold-soft);
+    text-shadow:0 0 16px rgba(243,198,95,.9), 3px 3px 0 #000;
+  }
+  .subnote{ font-size:20px; color:#ddc; margin-bottom:16px; max-width:520px; }
+
+  .bigbtn{
+    font-family:'Press Start 2P', monospace;
+    font-size:13px;
+    letter-spacing:1px;
+    background:linear-gradient(180deg, var(--gold), #a5660f);
+    color:#241804;
+    border:2px solid #000;
+    border-radius:5px;
+    padding:12px 22px;
+    cursor:pointer;
+    pointer-events:auto;
+    box-shadow:0 4px 0 #000;
+  }
+  .bigbtn:active{ transform:translateY(3px); box-shadow:0 1px 0 #000; }
+
+  .startscreen{
+    background:var(--panel);
+    border:3px solid var(--blood-bright);
+    border-radius:6px;
+    padding:24px 22px;
+    text-align:center;
+  }
+  .startscreen p{ font-size:20px; line-height:1.7; margin:8px 0; color:#ddc; }
+  .startscreen h2{
+    font-family:'Press Start 2P', monospace;
+    font-size:15px; letter-spacing:1px; margin:0 0 12px; color:var(--blood-bright); line-height:1.7;
+  }
+  .start-field{
+    width:100%; font-family:'VT323', monospace; font-size:20px;
+    padding:10px 12px; border:2px solid #5a2028; border-radius:4px;
+    background:#1c0f12; color:var(--paper); margin:14px 0;
+  }
+  .hidden{ display:none !important; }
+  .center{ display:flex; justify-content:center; margin-top:14px; }
+</style>
+</head>
+<body>
+<button id="muteBtn">🔊</button>
+<div class="wrap">
+  <h1>⚔ 1789: CAMINO A LA BASTILLA ⚔</h1>
+  <div class="subtitle">Cada respuesta equivocada tiene un precio. Elegí bien.</div>
+
+  <div class="hud hidden" id="hud">
+    <div class="name" id="playerLabel">CIUDADANO</div>
+    <div class="progress" id="progressLabel">Pregunta 0 / 10</div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="startscreen" id="startScreen">
+    <h2>⚔ Antes de empezar</h2>
+    <p>Es 1789. Recorrés las calles de París rumbo a la Bastilla. En el camino te vas a cruzar con gente que te pondrá a prueba con preguntas sobre lo que está ocurriendo.</p>
+    <p>Tenés que responder <b>10 preguntas</b>, elegidas al azar entre 50, sin equivocarte ni una sola vez. <b style="color:#ff6b6b">Si fallás una, la guillotina no perdona.</b></p>
+    <input class="start-field" id="nameInput" type="text" placeholder="Escribe tu nombre..." maxlength="18">
+    <button class="bigbtn" id="startBtn">EMPEZAR ▶</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="hidden" id="gameScreen">
+    <div class="stage">
+      <canvas id="game" width="760" height="440"></canvas>
+      <div class="overlay" id="overlayQuestion"></div>
+      <div class="overlay center hidden" id="overlayEnd"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BASE DE 50 PREGUNTAS — CAMINO A LA BASTILLA (1789)
+   opts[0] es siempre la respuesta correcta (se baraja al mostrarla)
+   ========================================================= */
+const QUESTIONS = [
+  {q:"¿Qué institución convocó el rey en mayo de 1789 para resolver la crisis financiera del reino?", opts:["Los Estados Generales","La Convención Nacional","El Comité de Salvación Pública"]},
+  {q:"¿A quién representaba el Tercer Estado?", opts:["Al pueblo llano, la inmensa mayoría de la población","Únicamente a los comerciantes de París","A los oficiales del ejército real"]},
+  {q:"¿Dónde se reunieron los diputados del Tercer Estado al verse excluidos de la sala de sesiones el 20 de junio de 1789?", opts:["En una cancha de juego de pelota","En el Palacio de Versalles","Dentro de la Bastilla"]},
+  {q:"¿Cómo se autoproclamaron los diputados del Tercer Estado tras el Juramento del Juego de Pelota?", opts:["Asamblea Nacional","Convención Nacional","Directorio Ejecutivo"]},
+  {q:"¿Qué temía la población de París al ver tropas reales acercándose a la ciudad en julio de 1789?", opts:["Un golpe militar contra la Asamblea Nacional","Una invasión austríaca","Un incendio provocado por el clero"]},
+  {q:"¿Qué buscaba principalmente la multitud que marchó hacia la Bastilla el 14 de julio de 1789?", opts:["Pólvora y armas para defenderse","Liberar a miles de presos políticos","Capturar al rey Luis XVI"]},
+  {q:"¿Cuántos prisioneros custodiaba realmente la Bastilla el 14 de julio de 1789?", opts:["Solo siete","Más de dos mil","Ninguno, estaba vacía"]},
+  {q:"¿Qué representaba simbólicamente la Bastilla para los parisinos?", opts:["El poder absoluto y arbitrario del rey","Un antiguo mercado de pan","Una universidad real"]},
+  {q:"¿Quién comandaba la guarnición de la Bastilla el 14 de julio de 1789?", opts:["El marqués de Launay","El general Lafayette","El conde de Mirabeau"]},
+  {q:"¿Qué ocurrió finalmente al caer la tarde del 14 de julio de 1789?", opts:["La fortaleza se rindió ante la multitud","Llegaron refuerzos reales y dispersaron a los rebeldes","El rey abdicó esa misma noche"]},
+  {q:"¿Quién era el rey de Francia en 1789?", opts:["Luis XVI","Luis XV","Luis XIV"]},
+  {q:"¿A qué dinastía pertenecía Luis XVI?", opts:["Los Borbones","Los Valois","Los Capetos directos"]},
+  {q:"¿Quién era la esposa de Luis XVI, muy impopular entre buena parte del pueblo?", opts:["María Antonieta","Josefina de Beauharnais","Catalina de Médici"]},
+  {q:"¿A qué grupo representaba el Primer Estado en los Estados Generales?", opts:["Al clero","Al pueblo llano","A los jueces reales"]},
+  {q:"¿A qué grupo representaba el Segundo Estado?", opts:["A la nobleza","A los comerciantes","A los campesinos"]},
+  {q:"¿Qué sistema de votación perjudicaba al Tercer Estado en los Estados Generales?", opts:["El voto por orden, no por cabeza","El voto secreto","El sorteo de representantes"]},
+  {q:"¿Qué ministro popular fue destituido por el rey el 11 de julio de 1789, encendiendo la ira de París?", opts:["Jacques Necker","Talleyrand","Turgot"]},
+  {q:"¿Qué edificio fue asaltado por la multitud antes que la Bastilla, en busca de fusiles?", opts:["El Hôtel des Invalides","El Louvre","Notre Dame"]},
+  {q:"¿Qué les faltaba a esos fusiles conseguidos en Los Inválidos, por lo que se dirigieron después a la Bastilla?", opts:["Pólvora","Balas de cañón","Bayonetas"]},
+  {q:"¿Cómo se llamó la milicia ciudadana que empezó a organizarse en París por esos días?", opts:["La Guardia Nacional","La Guardia Suiza","Los Mosqueteros del Rey"]},
+  {q:"¿Quién terminó al mando de esa Guardia Nacional?", opts:["El marqués de Lafayette","Napoleón Bonaparte","Georges Danton"]},
+  {q:"¿Qué colores tenía la escarapela (cocarda) que se convirtió en símbolo revolucionario?", opts:["Azul, blanco y rojo","Verde y dorado","Negro y blanco"]},
+  {q:"¿Qué le ocurrió al gobernador De Launay poco después de rendirse?", opts:["Fue capturado y linchado por la multitud","Fue indultado por el rey","Escapó a Inglaterra"]},
+  {q:"¿Dónde terminó paseada la cabeza de De Launay tras su muerte?", opts:["Clavada en una pica por las calles de París","Enterrada con honores","Enviada a Versalles"]},
+  {q:"¿En qué fecha exacta cayó la Bastilla?", opts:["El 14 de julio de 1789","El 4 de julio de 1789","El 14 de julio de 1790"]},
+  {q:"¿Qué se celebra hoy en Francia cada 14 de julio?", opts:["La Fiesta Nacional","El Día del Armisticio","La Independencia de Francia"]},
+  {q:"¿Qué era originalmente la Bastilla, antes de ser prisión famosa?", opts:["Una fortaleza defensiva medieval","Un templo religioso","Un palacio real de verano"]},
+  {q:"¿Qué pasó con el edificio de la Bastilla poco después de su toma?", opts:["Fue demolido casi por completo","Se convirtió en el nuevo palacio real","Se transformó en un museo real"]},
+  {q:"¿Qué documento clave aprobó la Asamblea Nacional el 26 de agosto de 1789?", opts:["La Declaración de los Derechos del Hombre y del Ciudadano","El Código Civil","La Constitución de 1791"]},
+  {q:"¿Qué principio central establecía esa Declaración sobre los hombres?", opts:["Que nacen libres e iguales en derechos","Que deben obediencia absoluta al rey","Que solo los nobles tienen derechos"]},
+  {q:"¿Qué evento del 4 de agosto de 1789 puso fin formalmente al sistema feudal en Francia?", opts:["La Abolición de los privilegios feudales","La firma de la Constitución","El juicio a Luis XVI"]},
+  {q:"¿Qué llevó a las mujeres del mercado de París a marchar hacia Versalles en octubre de 1789?", opts:["La escasez y el alto precio del pan","La ejecución del rey","Una derrota militar francesa"]},
+  {q:"¿A dónde trajeron a la familia real tras esa marcha de octubre de 1789?", opts:["A París, al Palacio de las Tullerías","De regreso a Versalles","A la Bastilla"]},
+  {q:"¿Qué representaba el lema revolucionario 'Libertad, Igualdad, Fraternidad'?", opts:["Los tres ideales centrales de la Revolución Francesa","Los tres poderes del nuevo gobierno","Los tres estados sociales"]},
+  {q:"¿Qué componía la inmensa mayoría del Tercer Estado?", opts:["Campesinos y trabajadores urbanos pobres","Grandes banqueros","Oficiales del ejército real"]},
+  {q:"¿Qué buscaban muchos diputados moderados del Tercer Estado, al menos al principio?", opts:["Una monarquía constitucional, no eliminar al rey","Una república inmediata","Restaurar el absolutismo total"]},
+  {q:"¿Qué grupos sociales estaban mayormente exentos de pagar impuestos antes de la Revolución?", opts:["El clero y la nobleza","Los campesinos","Los artesanos urbanos"]},
+  {q:"¿Dónde se reunió la Asamblea Nacional en los días posteriores al Juramento del Juego de Pelota?", opts:["En distintos recintos de París y Versalles","Siempre dentro de la Bastilla","En el Palacio de las Tullerías desde el inicio"]},
+  {q:"¿Qué significaba ser un 'sans-culotte' durante la Revolución Francesa?", opts:["Un revolucionario popular urbano, que no vestía calzones cortos de la nobleza","Un noble exiliado","Un soldado del ejército real"]},
+  {q:"¿Qué instrumento se convirtió en el método oficial de ejecución durante la Revolución?", opts:["La guillotina","La horca","La hoguera"]},
+  {q:"¿Qué buscaba lograr la guillotina, según la intención de su impulsor, frente a métodos anteriores?", opts:["Una muerte más rápida e 'igualitaria' para todos los condenados","Prolongar el sufrimiento como castigo ejemplar","Evitar por completo la pena de muerte"]},
+  {q:"¿Quién fue el médico que propuso el uso de la guillotina como método más humano de ejecución?", opts:["Joseph-Ignace Guillotin","Jean-Paul Marat","Georges Danton"]},
+  {q:"¿Qué buscaban impedir los revolucionarios, según ellos, al atacar el símbolo de la Bastilla?", opts:["El uso arbitrario del poder real para encarcelar sin juicio","La subida de impuestos al vino","La llegada del invierno"]},
+  {q:"¿Qué actitud tomó buena parte del ejército regular cuando se le ordenó reprimir a la multitud en julio de 1789?", opts:["Muchos soldados dudaron o se negaron a disparar contra el pueblo","Todos obedecieron sin dudar","El ejército no participó en absoluto"]},
+  {q:"¿Qué tres colores formaban la nueva bandera surgida de la Revolución?", opts:["Azul, blanco y rojo","Verde, blanco y rojo","Blanco y dorado"]},
+  {q:"¿Qué significado simbólico tuvo la caída de la Bastilla para el resto de Europa?", opts:["Mostró que el poder absoluto de un rey podía ser derrocado por el pueblo","No tuvo ninguna repercusión fuera de Francia","Fortaleció a las demás monarquías europeas"]},
+  {q:"¿Aproximadamente cuántas personas murieron entre los atacantes durante el asalto a la Bastilla?", opts:["Cerca de cien","Ninguna","Más de cinco mil"]},
+  {q:"¿Qué edad tenía aproximadamente Luis XVI cuando fue coronado rey en 1774?", opts:["19 años","35 años","50 años"]},
+  {q:"¿Qué buscaba comunicar la multitud al exhibir armas y trofeos tras la toma de la Bastilla?", opts:["Que el poder real ya no era intocable","Que pedían perdón al rey","Que la revuelta había terminado"]},
+  {q:"¿Qué edad tenía aproximadamente Francia como monarquía absoluta antes de que estallara la Revolución de 1789?", opts:["Varios siglos, desde la Edad Media","Apenas unos 20 años","Menos de una década"]},
+];
+
+/* =========================================================
+   ROLES DE LOS PERSONAJES QUE TE DETIENEN EN EL CAMINO
+   ========================================================= */
+const NPC_ROLES = [
+  { label: "UN SOLDADO", body: "#1c3a6b", accent: "#f4ead9", hat: "bicorn" },
+  { label: "UNA CAMPESINA", body: "#6b4a2a", accent: "#c9a876", hat: "cap" },
+  { label: "UN BURGUÉS", body: "#2a1f3a", accent: "#c9a227", hat: "tricorn" },
+  { label: "UN CLÉRIGO", body: "#181818", accent: "#f4ead9", hat: "none" },
+  { label: "UN ARTESANO", body: "#4a3a2a", accent: "#8a6a4a", hat: "cap" },
+  { label: "UNA VENDEDORA DEL MERCADO", body: "#7a2a2a", accent: "#e0bb96", hat: "cap" },
+];
+const QUEEN_ROLE = { label: "LA REINA MARÍA ANTONIETA", body: "#e6c9d9", accent: "#f3c65f", hat: "queen" };
+const KING_ROLE  = { label: "EL REY LUIS XVI", body: "#2a3a8b", accent: "#f3c65f", hat: "king" };
+
+const MARIE_QUESTION = {
+  q: "La reina María Antonieta te detiene. «¿Qué frase se me atribuye, aunque probablemente nunca la dije, sobre la falta de pan del pueblo?»",
+  opts: ["Que coman brioche", "Que trabajen más", "Que esperen la próxima cosecha"],
+};
+const LOUIS_QUESTION = {
+  q: "El rey Luis XVI te detiene, inquieto. «Dime: ¿qué se dice que pregunté la noche en que me llegó la noticia de la caída de la Bastilla?»",
+  opts: ["¿Es una revuelta?", "¿Debo declarar la guerra?", "¿Ya ha amanecido?"],
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* =========================================================
+   AUDIO — suspenso mientras caminás, fanfarria triunfal si
+   ganás, golpe seco si cae la guillotina. Todo sintetizado
+   con Web Audio API nativa, sin archivos externos.
+   ========================================================= */
+let actx = null;
+let masterGain = null;
+let muted = false;
+let droneOsc = null, droneGain = null;
+let suspenseTimer = null;
+let victoryTimer = null;
+let beatCount = 0;
+
+function ensureAudio(){
+  if(!actx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    actx = new AC();
+    masterGain = actx.createGain();
+    masterGain.gain.value = muted ? 0 : 0.5;
+    masterGain.connect(actx.destination);
+  }
+  return actx;
+}
+
+function tone(freq, dur, type, vol, delay){
+  delay = delay || 0;
+  const t = actx.currentTime + delay;
+  const osc = actx.createOscillator();
+  osc.type = type;
+  osc.frequency.value = freq;
+  const g = actx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(g).connect(masterGain);
+  osc.start(t);
+  osc.stop(t + dur + 0.03);
+}
+
+function thump(vol, delay){
+  delay = delay || 0;
+  const t = actx.currentTime + delay;
+  const osc = actx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(90, t);
+  osc.frequency.exponentialRampToValueAtTime(38, t + 0.22);
+  const g = actx.createGain();
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+  osc.connect(g).connect(masterGain);
+  osc.start(t);
+  osc.stop(t + 0.3);
+}
+
+function startSuspense(){
+  ensureAudio();
+  if(actx.state === "suspended") actx.resume();
+  stopSuspense();
+
+  droneOsc = actx.createOscillator();
+  droneOsc.type = "sawtooth";
+  droneOsc.frequency.value = 55;
+  droneGain = actx.createGain();
+  droneGain.gain.value = 0.05;
+  const filter = actx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 220;
+  droneOsc.connect(filter).connect(droneGain).connect(masterGain);
+  droneOsc.start();
+
+  beatCount = 0;
+  suspenseTimer = setInterval(() => {
+    thump(0.5);
+    beatCount++;
+    // corazón: doble latido cada 2 compases
+    if(beatCount % 2 === 0) thump(0.35, 0.16);
+    // sting disonante ocasional, al azar, para tensión
+    if(Math.random() < 0.22){
+      const base = 300 + Math.random()*200;
+      tone(base, 0.5, "square", 0.05);
+      tone(base * 1.06, 0.5, "square", 0.04);
+    }
+  }, 900);
+}
+
+function stopSuspense(){
+  if(suspenseTimer){ clearInterval(suspenseTimer); suspenseTimer = null; }
+  if(droneOsc){ try{ droneOsc.stop(); }catch(e){} droneOsc = null; }
+}
+
+function playStinger(){
+  ensureAudio();
+  [130.81, 138.59, 146.83, 261.63].forEach(f => tone(f, 1.1, "sawtooth", 0.28));
+  thump(0.9);
+}
+
+function playScream(){
+  ensureAudio();
+  const t0 = actx.currentTime;
+  // grito: barrido de frecuencia agudo y tembloroso, tipo scream de película
+  const osc = actx.createOscillator();
+  osc.type = "sawtooth";
+  const g = actx.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.35, t0 + 0.05);
+  osc.frequency.setValueAtTime(900, t0);
+  osc.frequency.exponentialRampToValueAtTime(1500, t0 + 0.12);
+  // temblor descendente
+  for(let i=0;i<8;i++){
+    const tt = t0 + 0.12 + i*0.09;
+    const freq = 1400 - i*130 + (i%2===0 ? 90 : -40);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(120,freq), tt);
+  }
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.0);
+  osc.connect(g).connect(masterGain);
+  osc.start(t0);
+  osc.stop(t0 + 1.05);
+
+  // capa de ruido áspero para dar textura de "shriek"
+  const bufSize = actx.sampleRate * 0.9;
+  const buffer = actx.createBuffer(1, bufSize, actx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufSize);
+  const noise = actx.createBufferSource();
+  noise.buffer = buffer;
+  const filter = actx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 1200;
+  filter.Q.value = 1.2;
+  const ng = actx.createGain();
+  ng.gain.setValueAtTime(0.22, t0);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.9);
+  noise.connect(filter).connect(ng).connect(masterGain);
+  noise.start(t0);
+}
+
+function startVictoryMusic(){
+  ensureAudio();
+  stopSuspense();
+  if(victoryTimer) clearInterval(victoryTimer);
+
+  // fanfarria ascendente
+  const fanfare = [523.25, 659.25, 783.99, 1046.5];
+  fanfare.forEach((f, i) => tone(f, 0.5, "square", 0.3, i * 0.22));
+
+  // luego una marcha triunfal en bucle
+  setTimeout(() => {
+    const MELODY = [523.25,523.25,523.25,659.25, 783.99,783.99,659.25,783.99, 1046.5,0,783.99,659.25, 523.25,0,0,0];
+    const BASS   = [130.81,0,196.00,0, 130.81,0,196.00,0, 130.81,0,196.00,0, 130.81,0,196.00,0];
+    let step = 0;
+    victoryTimer = setInterval(() => {
+      const s = step % 16;
+      if(BASS[s]) tone(BASS[s], 0.22, "triangle", 0.4);
+      if(MELODY[s]) tone(MELODY[s], 0.24, "square", 0.3);
+      step++;
+    }, 150);
+  }, fanfare.length * 220 + 200);
+
+  // la música de victoria termina a los 10 segundos de haber arrancado
+  setTimeout(() => {
+    if(victoryTimer){ clearInterval(victoryTimer); victoryTimer = null; }
+  }, 10000);
+}
+
+function stopAllMusic(){
+  stopSuspense();
+  if(victoryTimer){ clearInterval(victoryTimer); victoryTimer = null; }
+}
+
+function toggleMute(){
+  muted = !muted;
+  ensureAudio();
+  masterGain.gain.value = muted ? 0 : 0.5;
+  document.getElementById("muteBtn").textContent = muted ? "🔇" : "🔊";
+}
+document.getElementById("muteBtn").addEventListener("click", toggleMute);
+
+/* =========================================================
+   ESTADO DEL JUEGO
+   ========================================================= */
+let playerName = "ciudadano";
+let deck = [];
+let qIndex = 0;
+let currentOptions = [];
+let phase = "walking"; // walking | question | guillotine | victory
+let scrollPhase = 0;
+let lastTime = 0;
+let npcAppear = 0; // 0..1 animación de aparición del NPC
+let currentRole = NPC_ROLES[0];
+let guillotineStart = 0;
+let victoryStart = 0;
+let fireworks = [];
+let lastFirework = 0;
+let bladeDrop = 0;
+let bloodParticles = [];
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const W = canvas.width, H = canvas.height;
+const HORIZON = 160;
+
+const hud = document.getElementById("hud");
+const playerLabel = document.getElementById("playerLabel");
+const progressLabel = document.getElementById("progressLabel");
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const overlayQuestion = document.getElementById("overlayQuestion");
+const overlayEnd = document.getElementById("overlayEnd");
+const startBtn = document.getElementById("startBtn");
+const nameInput = document.getElementById("nameInput");
+
+function roadHalfWidth(t){ return 20 + t * 320; }
+function screenY(t){ return HORIZON + t * (H - HORIZON); }
+function scaleAt(t){ return 0.15 + t * 0.95; }
+
+/* =========================================================
+   ARRANQUE DE PARTIDA
+   ========================================================= */
+function startGame(){
+  const v = nameInput.value.trim();
+  playerName = v || "ciudadano";
+  playerLabel.textContent = playerName.toUpperCase();
+
+  const randomEight = shuffle(QUESTIONS).slice(0, 8).map(q => ({ ...q, role: null }));
+  deck = [
+    ...randomEight,
+    { ...MARIE_QUESTION, role: QUEEN_ROLE },
+    { ...LOUIS_QUESTION, role: KING_ROLE },
+  ];
+
+  qIndex = 0;
+  phase = "walking";
+  scrollPhase = 0;
+  overlayEnd.classList.add("hidden");
+  overlayEnd.innerHTML = "";
+  overlayQuestion.innerHTML = "";
+  updateProgress();
+
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  hud.classList.remove("hidden");
+
+  startSuspense();
+  setTimeout(triggerEncounter, 1800);
+}
+
+function updateProgress(){
+  progressLabel.textContent = `Pregunta ${Math.min(qIndex,10)} / 10`;
+}
+
+startBtn.addEventListener("click", startGame);
+nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") startGame(); });
+
+/* =========================================================
+   ENCUENTRO CON UN PERSONAJE (pregunta)
+   ========================================================= */
+function triggerEncounter(){
+  if(phase !== "walking") return;
+  phase = "question";
+  npcAppear = 0;
+
+  const item = deck[qIndex];
+  currentRole = item.role || NPC_ROLES[Math.floor(Math.random() * NPC_ROLES.length)];
+  currentOptions = shuffle(item.opts.map((text, i) => ({ text, correct: i === 0 })));
+
+  overlayQuestion.innerHTML = `
+    <div class="npc-name">${currentRole.label} TE DETIENE</div>
+    <div class="question-box">${item.q}</div>
+    <div class="options" id="optsWrap"></div>
+  `;
+  const optsWrap = document.getElementById("optsWrap");
+  currentOptions.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.textContent = opt.text;
+    btn.addEventListener("click", () => answer(opt, btn));
+    optsWrap.appendChild(btn);
+  });
+}
+
+function answer(opt, btn){
+  const buttons = document.querySelectorAll("#optsWrap .opt-btn");
+  buttons.forEach((b) => (b.disabled = true));
+
+  if(opt.correct){
+    btn.classList.add("correct");
+    setTimeout(() => {
+      overlayQuestion.innerHTML = "";
+      qIndex++;
+      updateProgress();
+      if(qIndex >= 10){
+        startVictorySequence();
+      } else {
+        phase = "walking";
+        setTimeout(triggerEncounter, 1600 + Math.random() * 900);
+      }
+    }, 900);
+  } else {
+    btn.classList.add("wrong");
+    const correctBtn = [...buttons].find((b, i) => currentOptions[i].correct);
+    if(correctBtn) correctBtn.classList.add("correct");
+    setTimeout(() => {
+      overlayQuestion.innerHTML = "";
+      startGuillotine();
+    }, 1300);
+  }
+}
+
+/* =========================================================
+   GUILLOTINA — GAME OVER
+   ========================================================= */
+function startGuillotine(){
+  phase = "guillotine";
+  guillotineStart = performance.now();
+  bladeDrop = 0;
+  bloodParticles = [];
+  stopSuspense();
+}
+
+function triggerBloodBurst(){
+  for(let i = 0; i < 26; i++){
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 1 + Math.random() * 3.5;
+    bloodParticles.push({
+      x: W/2, y: 260,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1,
+      born: performance.now(),
+    });
+  }
+  playStinger();
+  playScream();
+}
+
+function showGameOverText(){
+  overlayEnd.classList.remove("hidden");
+  overlayEnd.innerHTML = `
+    <div class="bignote">☠ GAME OVER ☠</div>
+    <div class="subnote">${playerName}, la guillotina no perdona una respuesta equivocada. Tu viaje hacia la Bastilla termina aquí.</div>
+    <button class="bigbtn" id="retryBtn">INTENTAR DE NUEVO ▶</button>
+  `;
+  document.getElementById("retryBtn").addEventListener("click", resetToStart);
+}
+
+/* =========================================================
+   VICTORIA — LA BASTILLA CAE
+   ========================================================= */
+function startVictorySequence(){
+  phase = "victory";
+  victoryStart = performance.now();
+  fireworks = [];
+  lastFirework = 0;
+  startVictoryMusic();
+}
+
+function showVictoryText(){
+  overlayEnd.classList.remove("hidden");
+  overlayEnd.innerHTML = `
+    <div class="bignote victory">¡VICTORIA!</div>
+    <div class="subnote">${playerName} llegó hasta la Bastilla y la vio caer. La bandera tricolor ondea sobre sus muros, ¡es una revolución!</div>
+    <button class="bigbtn" id="againBtn">JUGAR OTRA VEZ ▶</button>
+  `;
+  document.getElementById("againBtn").addEventListener("click", resetToStart);
+}
+
+function resetToStart(){
+  stopAllMusic();
+  phase = "walking";
+  overlayEnd.classList.add("hidden");
+  overlayEnd.innerHTML = "";
+  gameScreen.classList.add("hidden");
+  hud.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+}
+
+/* =========================================================
+   DIBUJO — calle pseudo-3D
+   ========================================================= */
+function drawSky(){
+  const g = ctx.createLinearGradient(0, 0, 0, HORIZON);
+  g.addColorStop(0, "#0a0510");
+  g.addColorStop(1, "#241220");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, HORIZON);
+  // luna
+  ctx.fillStyle = "rgba(240,230,200,.85)";
+  ctx.beginPath(); ctx.arc(620, 60, 26, 0, Math.PI*2); ctx.fill();
+  // estrellas
+  ctx.fillStyle = "rgba(255,255,255,.5)";
+  for(let i=0;i<40;i++){
+    const x = (i*97) % W, y = (i*53) % HORIZON;
+    ctx.fillRect(x, y, 1.6, 1.6);
+  }
+}
+
+function drawRoad(){
+  ctx.fillStyle = "#1c1418";
+  ctx.beginPath();
+  ctx.moveTo(W/2 - roadHalfWidth(0), HORIZON);
+  ctx.lineTo(W/2 + roadHalfWidth(0), HORIZON);
+  ctx.lineTo(W/2 + roadHalfWidth(1), H);
+  ctx.lineTo(W/2 - roadHalfWidth(1), H);
+  ctx.closePath();
+  ctx.fill();
+
+  // líneas de adoquinado que se acercan (efecto de movimiento)
+  ctx.strokeStyle = "rgba(0,0,0,.4)";
+  ctx.lineWidth = 1;
+  const N = 10;
+  for(let i=0;i<N;i++){
+    let t = (i/N + scrollPhase) % 1;
+    const tt = t*t; // curva de perspectiva
+    const y = screenY(tt);
+    const hw = roadHalfWidth(tt);
+    ctx.beginPath();
+    ctx.moveTo(W/2-hw, y);
+    ctx.lineTo(W/2+hw, y);
+    ctx.stroke();
+  }
+}
+
+function drawBuildings(){
+  const N = 6;
+  for(let side=-1; side<=1; side+=2){
+    for(let i=0;i<N;i++){
+      let t = (i/N + scrollPhase*0.7) % 1;
+      const tt = t*t;
+      const y = screenY(tt);
+      const scale = scaleAt(tt);
+      const bw = 70*scale, bh = 130*scale;
+      const hw = roadHalfWidth(tt);
+      const x = side < 0 ? (W/2 - hw - bw*0.55) : (W/2 + hw + bw*0.55);
+
+      ctx.fillStyle = i%2===0 ? "#241018" : "#1a0c12";
+      ctx.fillRect(x-bw/2, y-bh, bw, bh);
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x-bw/2, y-bh, bw, bh);
+
+      // ventanitas con luz cálida
+      const rows = Math.max(1, Math.round(3*scale));
+      const cols = Math.max(1, Math.round(2*scale));
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          if(Math.random() < 0.002) continue;
+          const wx = x - bw/2 + bw*0.2 + c*(bw*0.5);
+          const wy = y - bh + bh*0.2 + r*(bh/rows);
+          ctx.fillStyle = ((r+c)%3===0) ? "rgba(240,180,90,.85)" : "rgba(20,10,15,.7)";
+          ctx.fillRect(wx, wy, Math.max(2,bw*0.14), Math.max(2,bh*0.12));
+        }
+      }
+    }
+  }
+}
+
+function drawBastilleSilhouette(){
+  const progress = qIndex/10;
+  const scale = 0.35 + progress*0.9;
+  const x = W/2, y = HORIZON;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = "#0d0710";
+  ctx.fillRect(-60, -70, 120, 70);
+  [-60,-20,20,50].forEach(tx=>{
+    ctx.fillRect(tx-8, -95, 16, 30);
+  });
+  ctx.restore();
+}
+
+function drawPlayerBack(){
+  const x = W/2, y = 400;
+  const walking = phase === "walking";
+  const legSwing = walking ? Math.sin(performance.now()/140)*8 : 0;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.scale(1.5, 1.5);
+  ctx.fillStyle = "rgba(0,0,0,.4)";
+  ctx.beginPath(); ctx.ellipse(0,20,20,6,0,0,Math.PI*2); ctx.fill();
+  // piernas
+  ctx.fillStyle = "#3a3a42";
+  ctx.fillRect(-10+legSwing*0.4, 0, 8, 22);
+  ctx.fillRect(2-legSwing*0.4, 0, 8, 22);
+  // cuerpo (camisa blanca de la época)
+  ctx.fillStyle = "#eee7da";
+  ctx.beginPath();
+  ctx.moveTo(-16,-4); ctx.lineTo(16,-4); ctx.lineTo(12,2); ctx.lineTo(-12,2);
+  ctx.closePath(); ctx.fill();
+  ctx.fillRect(-15,-34,30,32);
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.4; ctx.strokeRect(-15,-34,30,32);
+  // sombra suave para dar volumen a la camisa
+  ctx.fillStyle = "rgba(0,0,0,.08)";
+  ctx.fillRect(6,-34,9,32);
+  // cabeza (visto de espaldas, con sombrero)
+  ctx.fillStyle = "#e0bb96";
+  ctx.beginPath(); ctx.arc(0,-42,11,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "#241a20";
+  ctx.beginPath(); ctx.ellipse(0,-48,14,5,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawHat(kind, accent){
+  // dibuja el sombrero/tocado según el rol, centrado en (0,-46) aprox.
+  ctx.fillStyle = accent;
+  if(kind === "bicorn"){
+    ctx.beginPath();
+    ctx.moveTo(-16,-44); ctx.quadraticCurveTo(0,-58, 16,-44);
+    ctx.quadraticCurveTo(0,-50, -16,-44);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  } else if(kind === "tricorn"){
+    ctx.beginPath();
+    ctx.moveTo(-15,-42); ctx.lineTo(0,-56); ctx.lineTo(15,-42);
+    ctx.lineTo(9,-40); ctx.lineTo(-9,-40);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  } else if(kind === "cap"){
+    ctx.beginPath(); ctx.ellipse(0,-46,11,6,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  } else if(kind === "queen"){
+    // peinado alto empolvado + pequeña corona
+    ctx.fillStyle = "#e9e3d8";
+    ctx.beginPath(); ctx.ellipse(0,-52,14,16,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.moveTo(-8,-62); ctx.lineTo(-8,-70); ctx.lineTo(-3,-63);
+    ctx.lineTo(0,-72); ctx.lineTo(3,-63); ctx.lineTo(8,-70); ctx.lineTo(8,-62);
+    ctx.closePath(); ctx.fill();
+  } else if(kind === "king"){
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.moveTo(-14,-44); ctx.lineTo(-14,-56); ctx.lineTo(-6,-46);
+    ctx.lineTo(0,-58); ctx.lineTo(6,-46); ctx.lineTo(14,-56); ctx.lineTo(14,-44);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  }
+}
+
+function drawNpc(appear, role){
+  const x = W/2 + 30, y = 330;
+  const s = 0.5 + appear*0.7;
+  ctx.save();
+  ctx.globalAlpha = Math.min(appear*1.6, 1);
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  ctx.fillStyle = "rgba(0,0,0,.4)";
+  ctx.beginPath(); ctx.ellipse(0,26,18,6,0,0,Math.PI*2); ctx.fill();
+
+  const isRoyal = role.hat === "queen" || role.hat === "king";
+  // cuerpo (vestimenta más amplia para la reina)
+  ctx.fillStyle = role.body;
+  if(role.hat === "queen"){
+    ctx.beginPath();
+    ctx.moveTo(-24,0); ctx.lineTo(24,0); ctx.lineTo(14,-32); ctx.lineTo(-14,-32);
+    ctx.closePath(); ctx.fill();
+  } else {
+    ctx.fillRect(-14,-30,28,30);
+  }
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.4;
+  if(role.hat !== "queen") ctx.strokeRect(-14,-30,28,30);
+  else ctx.stroke();
+
+  // detalle/acento (charreteras, cinturón, cuello, etc.)
+  ctx.fillStyle = isRoyal ? role.accent : role.accent;
+  ctx.fillRect(-14,-6,28,5);
+
+  // cabeza
+  ctx.fillStyle = "#e0bb96";
+  ctx.beginPath(); ctx.arc(0,-38,10,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.2; ctx.stroke();
+
+  drawHat(role.hat, role.accent);
+
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+function drawGuillotineScene(now){
+  const elapsed = now - guillotineStart;
+  ctx.fillStyle = "#0a0508";
+  ctx.fillRect(0,0,W,H);
+
+  const cx = W/2;
+
+  // zoom dramático: toda la escena se ve mucho más grande y cercana
+  ctx.save();
+  ctx.translate(cx, 250);
+  ctx.scale(1.75, 1.75);
+  ctx.translate(-cx, -250);
+
+  // postes
+  ctx.fillStyle = "#3a2018";
+  ctx.fillRect(cx-70, 90, 16, 260);
+  ctx.fillRect(cx+54, 90, 16, 260);
+  ctx.fillRect(cx-80, 340, 160, 16);
+  // rampa/tajo
+  ctx.fillStyle = "#241416";
+  ctx.fillRect(cx-40, 300, 80, 40);
+
+  // progreso de caída de la cuchilla
+  const dropT = Math.min(elapsed/650, 1);
+  bladeDrop = dropT;
+  const bladeY = 110 + dropT*180;
+
+  // personaje arrodillado con cabeza en el tajo (se dibuja antes de la cuchilla)
+  ctx.save();
+  ctx.translate(cx, 300);
+  ctx.fillStyle = "#e8e0d5";
+  ctx.fillRect(-16,-10,32,40);
+  if(dropT < 1){
+    ctx.fillStyle = "#e0bb96";
+    ctx.beginPath(); ctx.arc(30,0,10,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+
+  // cuchilla
+  ctx.fillStyle = "#c9c9c9";
+  ctx.beginPath();
+  ctx.moveTo(cx-56, bladeY);
+  ctx.lineTo(cx+56, bladeY);
+  ctx.lineTo(cx+40, bladeY+34);
+  ctx.lineTo(cx-40, bladeY+34);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.stroke();
+
+  if(dropT >= 1 && bloodParticles.length === 0){
+    triggerBloodBurst();
+  }
+
+  // sangre
+  bloodParticles.forEach(p=>{
+    const age = (now - p.born)/1000;
+    const px = p.x + p.vx*age*30;
+    const py = p.y + p.vy*age*30 + age*age*90;
+    ctx.fillStyle = `rgba(140,0,0,${Math.max(0,1-age)})`;
+    ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fill();
+  });
+
+  ctx.restore();
+
+  if(dropT >= 1 && (now - guillotineStart) > 900 && overlayEnd.classList.contains("hidden")){
+    showGameOverText();
+  }
+}
+
+function drawFireworkBurst(fx, age){
+  const life = 1300;
+  if(age > life) return;
+  const p = age/life;
+  const n = 22;
+  for(let i=0;i<n;i++){
+    const ang = (i/n)*Math.PI*2;
+    const dist = p*115;
+    const px = fx.x+Math.cos(ang)*dist;
+    const py = fx.y+Math.sin(ang)*dist+p*p*40;
+    ctx.globalAlpha = Math.max(0,1-p);
+    ctx.fillStyle = fx.color;
+    ctx.fillRect(px-3,py-3,6,6);
+  }
+  // destello central al nacer
+  if(p < 0.25){
+    ctx.globalAlpha = Math.max(0,1-p/0.25)*0.8;
+    ctx.fillStyle = "#fff8e0";
+    ctx.beginPath(); ctx.arc(fx.x,fx.y,14*(1-p/0.25),0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawVictoryScene(now){
+  const elapsed = now - victoryStart;
+  drawSky();
+  ctx.fillStyle = "#150a10";
+  ctx.fillRect(0, HORIZON, W, H-HORIZON);
+
+  // fortaleza grande y más imponente
+  const cx = W/2;
+  ctx.fillStyle = "#241018";
+  ctx.fillRect(cx-160, 130, 320, 280);
+  [-160,-80,0,80,130].forEach(tx=>{
+    ctx.fillRect(cx+tx-16, 62, 32, 70);
+  });
+  ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.strokeRect(cx-160,130,320,280);
+
+  // resplandor dorado y épico detrás de la escena
+  const glowT = Math.min(elapsed/1800, 1);
+  const glow = ctx.createRadialGradient(cx+110, 90, 10, cx+110, 90, 220);
+  glow.addColorStop(0, `rgba(243,198,95,${0.55*glowT})`);
+  glow.addColorStop(1, "rgba(243,198,95,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // personaje subiendo, más grande, con camisa blanca (durante los primeros 1.6s)
+  const climbT = Math.min(elapsed/1600, 1);
+  const px = cx + 110, py = 410 - climbT*250;
+  ctx.save();
+  ctx.translate(px,py);
+  ctx.scale(1.9, 1.9);
+  ctx.fillStyle = "#eee7da";
+  ctx.fillRect(-10,-22,20,22);
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.2; ctx.strokeRect(-10,-22,20,22);
+  ctx.fillStyle = "#e0bb96";
+  ctx.beginPath(); ctx.arc(0,-28,9,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle="#000"; ctx.stroke();
+  ctx.restore();
+
+  // bandera ondeando arriba, aparece cuando termina de subir, bien grande
+  if(climbT >= 1){
+    const flagT = Math.min((elapsed-1600)/500, 1);
+    const flagX = cx+110, flagTopY = 40;
+    ctx.strokeStyle = "#7a5a2a"; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(flagX, 410-250); ctx.lineTo(flagX, flagTopY); ctx.stroke();
+    const wave = Math.sin(now/180)*8;
+    const fw = 90*flagT;
+    ctx.fillStyle = "#0d5eaf";
+    ctx.fillRect(flagX, flagTopY, fw/3, 50);
+    ctx.fillStyle = "#f4ead9";
+    ctx.fillRect(flagX+fw/3, flagTopY, fw/3, 50);
+    ctx.fillStyle = "#c2402b";
+    ctx.fillRect(flagX+2*fw/3+wave*0.25, flagTopY, fw/3, 50);
+  }
+
+  // fuegos artificiales, más frecuentes y espectaculares
+  if(now - lastFirework > 260){
+    lastFirework = now;
+    const colors = ["#e0a020","#c2402b","#0d5eaf","#f4ead9","#f3c65f"];
+    fireworks.push({
+      x: 60+Math.random()*(W-120),
+      y: 50+Math.random()*140,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      born: now,
+    });
+    if(fireworks.length>26) fireworks.shift();
+  }
+  fireworks.forEach(fx=>drawFireworkBurst(fx, now-fx.born));
+
+  if(elapsed > 2600 && overlayEnd.classList.contains("hidden")){
+    showVictoryText();
+  }
+}
+
+/* =========================================================
+   LOOP PRINCIPAL
+   ========================================================= */
+function tick(now){
+  if(phase === "guillotine"){
+    drawGuillotineScene(now);
+  } else if(phase === "victory"){
+    drawVictoryScene(now);
+  } else {
+    if(phase === "walking"){
+      scrollPhase += 0.0035;
+    }
+    if(phase === "question" && npcAppear < 1){
+      npcAppear = Math.min(1, npcAppear + 0.05);
+    }
+    drawSky();
+    drawRoad();
+    drawBuildings();
+    drawBastilleSilhouette();
+    if(phase === "question"){
+      drawNpc(npcAppear, currentRole);
+    }
+    drawPlayerBack();
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
