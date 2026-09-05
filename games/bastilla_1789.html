@@ -259,15 +259,15 @@ const QUESTIONS = [
    ROLES DE LOS PERSONAJES QUE TE DETIENEN EN EL CAMINO
    ========================================================= */
 const NPC_ROLES = [
-  { label: "UN SOLDADO", body: "#1c3a6b", accent: "#f4ead9", hat: "bicorn" },
-  { label: "UNA CAMPESINA", body: "#6b4a2a", accent: "#c9a876", hat: "cap" },
-  { label: "UN BURGUÉS", body: "#2a1f3a", accent: "#c9a227", hat: "tricorn" },
-  { label: "UN CLÉRIGO", body: "#181818", accent: "#f4ead9", hat: "none" },
-  { label: "UN ARTESANO", body: "#4a3a2a", accent: "#8a6a4a", hat: "cap" },
-  { label: "UNA VENDEDORA DEL MERCADO", body: "#7a2a2a", accent: "#e0bb96", hat: "cap" },
+  { label: "UN SOLDADO", body: "#1c3a6b", accent: "#f4ead9", hat: "bicorn", prop: "musket" },
+  { label: "UNA CAMPESINA", body: "#7a5a34", accent: "#c9a876", hat: "scarf", prop: "basket" },
+  { label: "UN BURGUÉS", body: "#2a1f3a", accent: "#c9a227", hat: "tricorn", prop: "cane" },
+  { label: "UN CLÉRIGO", body: "#181818", accent: "#f4ead9", hat: "biretta", prop: "cross" },
+  { label: "UN ARTESANO", body: "#5a4228", accent: "#8a6a4a", hat: "cap", prop: "hammer" },
+  { label: "UNA VENDEDORA DEL MERCADO", body: "#7a2a2a", accent: "#e0bb96", hat: "scarf", prop: "basket" },
 ];
-const QUEEN_ROLE = { label: "LA REINA MARÍA ANTONIETA", body: "#e6c9d9", accent: "#f3c65f", hat: "queen" };
-const KING_ROLE  = { label: "EL REY LUIS XVI", body: "#2a3a8b", accent: "#f3c65f", hat: "king" };
+const QUEEN_ROLE = { label: "LA REINA MARÍA ANTONIETA", body: "#e6c9d9", accent: "#f3c65f", hat: "queen", prop: "fan" };
+const KING_ROLE  = { label: "EL REY LUIS XVI", body: "#2a3a8b", accent: "#f3c65f", hat: "king", prop: "sash" };
 
 const MARIE_QUESTION = {
   q: "La reina María Antonieta te detiene. «¿Qué frase se me atribuye, aunque probablemente nunca la dije, sobre la falta de pan del pueblo?»",
@@ -277,6 +277,14 @@ const LOUIS_QUESTION = {
   q: "El rey Luis XVI te detiene, inquieto. «Dime: ¿qué se dice que pregunté la noche en que me llegó la noticia de la caída de la Bastilla?»",
   opts: ["¿Es una revuelta?", "¿Debo declarar la guerra?", "¿Ya ha amanecido?"],
 };
+
+function lighten(hex, amt){
+  const c = hex.replace("#", "");
+  const num = parseInt(c, 16);
+  let r = (num>>16) + amt, g = ((num>>8)&0xff) + amt, b = (num&0xff) + amt;
+  r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
+  return `rgb(${r},${g},${b})`;
+}
 
 function shuffle(arr){
   const a = arr.slice();
@@ -295,7 +303,7 @@ function shuffle(arr){
 let actx = null;
 let masterGain = null;
 let muted = false;
-let droneOsc = null, droneGain = null;
+let droneOsc = null, droneGain = null, droneLfo = null;
 let suspenseTimer = null;
 let victoryTimer = null;
 let beatCount = 0;
@@ -350,31 +358,46 @@ function startSuspense(){
   droneOsc.type = "sawtooth";
   droneOsc.frequency.value = 55;
   droneGain = actx.createGain();
-  droneGain.gain.value = 0.05;
+  droneGain.gain.value = 0.06;
   const filter = actx.createBiquadFilter();
   filter.type = "lowpass";
   filter.frequency.value = 220;
   droneOsc.connect(filter).connect(droneGain).connect(masterGain);
   droneOsc.start();
 
+  // modulación lenta e inquietante de tono, para que el dron "respire" mal
+  droneLfo = actx.createOscillator();
+  droneLfo.type = "sine";
+  droneLfo.frequency.value = 0.11;
+  const lfoGain = actx.createGain();
+  lfoGain.gain.value = 7;
+  droneLfo.connect(lfoGain).connect(droneOsc.frequency);
+  droneLfo.start();
+
   beatCount = 0;
+  // pulso mucho más denso y marcado, como un corazón acelerado por el miedo
   suspenseTimer = setInterval(() => {
-    thump(0.5);
+    const s = beatCount % 4;
+    thump(s === 0 ? 0.6 : 0.28);
+    // tictac nervioso en cada paso
+    tone(1500, 0.03, "square", 0.045);
+    // acento disonante marcado cada dos compases
+    if(s === 2) tone(196, 0.18, "square", 0.09);
     beatCount++;
-    // corazón: doble latido cada 2 compases
-    if(beatCount % 2 === 0) thump(0.35, 0.16);
-    // sting disonante ocasional, al azar, para tensión
-    if(Math.random() < 0.22){
-      const base = 300 + Math.random()*200;
-      tone(base, 0.5, "square", 0.05);
-      tone(base * 1.06, 0.5, "square", 0.04);
+    // sting disonante frecuente, intervalo de segunda menor/tritono, muy inquietante
+    if(Math.random() < 0.38){
+      const base = 240 + Math.random()*260;
+      const interval = Math.random() < 0.5 ? 1.0595 : 1.4142; // 2ª menor o tritono
+      tone(base, 0.35, "square", 0.06);
+      tone(base * interval, 0.35, "square", 0.05);
     }
-  }, 900);
+  }, 460);
 }
 
 function stopSuspense(){
   if(suspenseTimer){ clearInterval(suspenseTimer); suspenseTimer = null; }
   if(droneOsc){ try{ droneOsc.stop(); }catch(e){} droneOsc = null; }
+  if(droneLfo){ try{ droneLfo.stop(); }catch(e){} droneLfo = null; }
 }
 
 function playStinger(){
@@ -482,6 +505,7 @@ let fireworks = [];
 let lastFirework = 0;
 let bladeDrop = 0;
 let bloodParticles = [];
+let rollingHead = null;
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -534,7 +558,7 @@ function startGame(){
 }
 
 function updateProgress(){
-  progressLabel.textContent = `Pregunta ${Math.min(qIndex,10)} / 10`;
+  progressLabel.textContent = `Pregunta ${Math.min(qIndex+1,10)} / 10`;
 }
 
 startBtn.addEventListener("click", startGame);
@@ -552,19 +576,26 @@ function triggerEncounter(){
   currentRole = item.role || NPC_ROLES[Math.floor(Math.random() * NPC_ROLES.length)];
   currentOptions = shuffle(item.opts.map((text, i) => ({ text, correct: i === 0 })));
 
-  overlayQuestion.innerHTML = `
-    <div class="npc-name">${currentRole.label} TE DETIENE</div>
-    <div class="question-box">${item.q}</div>
-    <div class="options" id="optsWrap"></div>
-  `;
-  const optsWrap = document.getElementById("optsWrap");
-  currentOptions.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "opt-btn";
-    btn.textContent = opt.text;
-    btn.addEventListener("click", () => answer(opt, btn));
-    optsWrap.appendChild(btn);
-  });
+  // el personaje aparece y detiene al jugador; la pregunta se muestra
+  // recién después de un segundo de pausa
+  overlayQuestion.innerHTML = `<div class="npc-name">${currentRole.label} TE DETIENE</div>`;
+
+  setTimeout(() => {
+    if(phase !== "question") return;
+    overlayQuestion.innerHTML = `
+      <div class="npc-name">${currentRole.label} TE DETIENE</div>
+      <div class="question-box">${item.q}</div>
+      <div class="options" id="optsWrap"></div>
+    `;
+    const optsWrap = document.getElementById("optsWrap");
+    currentOptions.forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.textContent = opt.text;
+      btn.addEventListener("click", () => answer(opt, btn));
+      optsWrap.appendChild(btn);
+    });
+  }, 1000);
 }
 
 function answer(opt, btn){
@@ -603,6 +634,7 @@ function startGuillotine(){
   guillotineStart = performance.now();
   bladeDrop = 0;
   bloodParticles = [];
+  rollingHead = null;
   stopSuspense();
 }
 
@@ -616,8 +648,49 @@ function triggerBloodBurst(){
       born: performance.now(),
     });
   }
+  rollingHead = {
+    x: W/2,
+    dir: Math.random() < 0.5 ? -1 : 1,
+    born: performance.now(),
+  };
   playStinger();
   playScream();
+}
+
+function drawRollingHead(now){
+  if(!rollingHead) return;
+  const t = Math.min((now - rollingHead.born) / 1000, 2.2);
+  // avanza y frena poco a poco, como una pelota perdiendo impulso
+  const dist = rollingHead.dir * 130 * (1 - Math.pow(1 - Math.min(t/1.8, 1), 2));
+  const hx = rollingHead.x + dist;
+  const bounce = Math.max(0, Math.sin(t * 9)) * Math.max(0, 1 - t/1.4) * 5;
+  const hy = 300 - bounce;
+  const rot = dist * 0.09;
+
+  ctx.save();
+  ctx.translate(hx, hy);
+  ctx.rotate(rot);
+  // sombra
+  ctx.fillStyle = "rgba(0,0,0,.35)";
+  ctx.beginPath(); ctx.ellipse(0, 11, 11, 3.5, 0, 0, Math.PI*2); ctx.fill();
+  // cabeza
+  ctx.fillStyle = "#e0bb96";
+  ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1.3; ctx.stroke();
+  // pelo despeinado
+  ctx.fillStyle = "#241a20";
+  ctx.beginPath(); ctx.ellipse(0, -7, 9, 4.5, 0, Math.PI, Math.PI*2); ctx.fill();
+  // ojos en X, cara cómica
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1.7; ctx.lineCap = "round";
+  [[-4,-2],[4,-2]].forEach(([ex,ey])=>{
+    ctx.beginPath(); ctx.moveTo(ex-2.2,ey-2.2); ctx.lineTo(ex+2.2,ey+2.2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex+2.2,ey-2.2); ctx.lineTo(ex-2.2,ey+2.2); ctx.stroke();
+  });
+  // lengua afuera
+  ctx.fillStyle = "#c2405a";
+  ctx.beginPath(); ctx.ellipse(0, 5, 2.6, 4.2, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 0.8; ctx.stroke();
+  ctx.restore();
 }
 
 function showGameOverText(){
@@ -666,23 +739,50 @@ function resetToStart(){
    ========================================================= */
 function drawSky(){
   const g = ctx.createLinearGradient(0, 0, 0, HORIZON);
-  g.addColorStop(0, "#0a0510");
-  g.addColorStop(1, "#241220");
+  g.addColorStop(0, "#0a0620");
+  g.addColorStop(0.45, "#20123a");
+  g.addColorStop(0.8, "#3a1a3a");
+  g.addColorStop(1, "#5a2438");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, HORIZON);
-  // luna
-  ctx.fillStyle = "rgba(240,230,200,.85)";
+
+  // resplandor cálido en el horizonte, típico de un cielo con más rango de color
+  const horizonGlow = ctx.createLinearGradient(0, HORIZON-60, 0, HORIZON);
+  horizonGlow.addColorStop(0, "rgba(200,90,60,0)");
+  horizonGlow.addColorStop(1, "rgba(200,90,60,.28)");
+  ctx.fillStyle = horizonGlow;
+  ctx.fillRect(0, HORIZON-60, W, 60);
+
+  // luna con halo suave
+  const moonGlow = ctx.createRadialGradient(620,60,4,620,60,50);
+  moonGlow.addColorStop(0, "rgba(250,240,210,.5)");
+  moonGlow.addColorStop(1, "rgba(250,240,210,0)");
+  ctx.fillStyle = moonGlow;
+  ctx.beginPath(); ctx.arc(620,60,50,0,Math.PI*2); ctx.fill();
+  const moonGrad = ctx.createRadialGradient(612,52,4,620,60,26);
+  moonGrad.addColorStop(0, "#fffdf0");
+  moonGrad.addColorStop(1, "#d8c896");
+  ctx.fillStyle = moonGrad;
   ctx.beginPath(); ctx.arc(620, 60, 26, 0, Math.PI*2); ctx.fill();
-  // estrellas
-  ctx.fillStyle = "rgba(255,255,255,.5)";
-  for(let i=0;i<40;i++){
-    const x = (i*97) % W, y = (i*53) % HORIZON;
+  ctx.fillStyle = "rgba(180,160,120,.35)";
+  ctx.beginPath(); ctx.arc(612,50,4.5,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(628,66,3,0,Math.PI*2); ctx.fill();
+
+  // estrellas de brillo variable
+  for(let i=0;i<50;i++){
+    const x = (i*97) % W, y = (i*53) % (HORIZON-10);
+    const tw = 0.35 + Math.abs(Math.sin(performance.now()/900 + i))*0.5;
+    ctx.fillStyle = `rgba(255,255,255,${tw})`;
     ctx.fillRect(x, y, 1.6, 1.6);
   }
 }
 
 function drawRoad(){
-  ctx.fillStyle = "#1c1418";
+  const roadGrad = ctx.createLinearGradient(0, HORIZON, 0, H);
+  roadGrad.addColorStop(0, "#241a24");
+  roadGrad.addColorStop(0.5, "#2e2028");
+  roadGrad.addColorStop(1, "#1a1216");
+  ctx.fillStyle = roadGrad;
   ctx.beginPath();
   ctx.moveTo(W/2 - roadHalfWidth(0), HORIZON);
   ctx.lineTo(W/2 + roadHalfWidth(0), HORIZON);
@@ -691,20 +791,65 @@ function drawRoad(){
   ctx.closePath();
   ctx.fill();
 
-  // líneas de adoquinado que se acercan (efecto de movimiento)
-  ctx.strokeStyle = "rgba(0,0,0,.4)";
-  ctx.lineWidth = 1;
+  // brillo cálido de las ventanas reflejado sutilmente en el empedrado
+  const centerGlow = ctx.createLinearGradient(0, HORIZON, 0, H);
+  centerGlow.addColorStop(0, "rgba(220,140,80,.12)");
+  centerGlow.addColorStop(1, "rgba(220,140,80,0)");
+  ctx.fillStyle = centerGlow;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - roadHalfWidth(0), HORIZON);
+  ctx.lineTo(W/2 + roadHalfWidth(0), HORIZON);
+  ctx.lineTo(W/2 + roadHalfWidth(1), H);
+  ctx.lineTo(W/2 - roadHalfWidth(1), H);
+  ctx.closePath();
+  ctx.fill();
+
+  // líneas de adoquinado que se acercan (efecto de movimiento), con luz y sombra
   const N = 10;
   for(let i=0;i<N;i++){
     let t = (i/N + scrollPhase) % 1;
     const tt = t*t; // curva de perspectiva
     const y = screenY(tt);
     const hw = roadHalfWidth(tt);
+    ctx.strokeStyle = "rgba(0,0,0,.45)";
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(W/2-hw, y);
     ctx.lineTo(W/2+hw, y);
     ctx.stroke();
+    ctx.strokeStyle = "rgba(255,255,255,.05)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W/2-hw, y+1.5);
+    ctx.lineTo(W/2+hw, y+1.5);
+    ctx.stroke();
   }
+
+  // línea central sutil, como el empedrado desgastado por el paso
+  ctx.strokeStyle = "rgba(255,255,255,.04)";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W/2, HORIZON); ctx.lineTo(W/2, H); ctx.stroke();
+
+  // textura de adoquines individuales, más densa cerca del jugador
+  for(let i=0;i<70;i++){
+    const t = ((i*0.114 + scrollPhase*1.3) % 1);
+    const tt = t*t;
+    if(tt < 0.12) continue;
+    const y = screenY(tt);
+    const hw = roadHalfWidth(tt);
+    const lane = ((i*37) % 100) / 100;
+    const x = W/2 - hw + lane*hw*2;
+    const sz = 1.5 + tt*3;
+    ctx.fillStyle = (i%2===0) ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.12)";
+    ctx.fillRect(x-sz/2, y-sz/2, sz, sz*0.6);
+  }
+
+  // niebla atmosférica hacia el horizonte, da sensación de profundidad
+  const fog = ctx.createLinearGradient(0, HORIZON, 0, HORIZON+90);
+  fog.addColorStop(0, "rgba(90,40,60,.35)");
+  fog.addColorStop(1, "rgba(90,40,60,0)");
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, HORIZON, W, 90);
 }
 
 function drawBuildings(){
@@ -719,13 +864,34 @@ function drawBuildings(){
       const hw = roadHalfWidth(tt);
       const x = side < 0 ? (W/2 - hw - bw*0.55) : (W/2 + hw + bw*0.55);
 
-      ctx.fillStyle = i%2===0 ? "#241018" : "#1a0c12";
+      // fachada con degradado (luz de luna de un lado, sombra del otro)
+      const baseA = i%2===0 ? "#2e1a28" : "#241222";
+      const baseB = i%2===0 ? "#160a14" : "#12070f";
+      const grad = ctx.createLinearGradient(x-bw/2, 0, x+bw/2, 0);
+      if(side < 0){ grad.addColorStop(0, baseB); grad.addColorStop(1, baseA); }
+      else { grad.addColorStop(0, baseA); grad.addColorStop(1, baseB); }
+      ctx.fillStyle = grad;
       ctx.fillRect(x-bw/2, y-bh, bw, bh);
       ctx.strokeStyle = "#000";
       ctx.lineWidth = 1;
       ctx.strokeRect(x-bw/2, y-bh, bw, bh);
 
-      // ventanitas con luz cálida
+      // techo con un tono más oscuro y borde
+      ctx.fillStyle = "#0d0610";
+      ctx.fillRect(x-bw/2-2, y-bh-6, bw+4, 8);
+
+      // cornisa clara, detalle típico de más "bits"
+      ctx.fillStyle = "rgba(255,255,255,.06)";
+      ctx.fillRect(x-bw/2, y-bh+3, bw, 2);
+
+      // sombra de contacto donde el edificio toca la calle
+      const contactShadow = ctx.createLinearGradient(0, y-10, 0, y+4);
+      contactShadow.addColorStop(0, "rgba(0,0,0,0)");
+      contactShadow.addColorStop(1, "rgba(0,0,0,.45)");
+      ctx.fillStyle = contactShadow;
+      ctx.fillRect(x-bw/2-4, y-10, bw+8, 14);
+
+      // ventanitas con luz cálida en degradado
       const rows = Math.max(1, Math.round(3*scale));
       const cols = Math.max(1, Math.round(2*scale));
       for(let r=0;r<rows;r++){
@@ -733,8 +899,16 @@ function drawBuildings(){
           if(Math.random() < 0.002) continue;
           const wx = x - bw/2 + bw*0.2 + c*(bw*0.5);
           const wy = y - bh + bh*0.2 + r*(bh/rows);
-          ctx.fillStyle = ((r+c)%3===0) ? "rgba(240,180,90,.85)" : "rgba(20,10,15,.7)";
-          ctx.fillRect(wx, wy, Math.max(2,bw*0.14), Math.max(2,bh*0.12));
+          const ww = Math.max(2,bw*0.14), wh = Math.max(2,bh*0.12);
+          if((r+c)%3===0){
+            const wg = ctx.createRadialGradient(wx+ww/2,wy+wh/2,0.5,wx+ww/2,wy+wh/2,ww);
+            wg.addColorStop(0, "rgba(255,220,140,.95)");
+            wg.addColorStop(1, "rgba(230,150,60,.55)");
+            ctx.fillStyle = wg;
+          } else {
+            ctx.fillStyle = "rgba(10,5,10,.75)";
+          }
+          ctx.fillRect(wx, wy, ww, wh);
         }
       }
     }
@@ -748,11 +922,18 @@ function drawBastilleSilhouette(){
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(scale, scale);
-  ctx.fillStyle = "#0d0710";
+  const grad = ctx.createLinearGradient(-60,-70,60,0);
+  grad.addColorStop(0, "#150a18");
+  grad.addColorStop(0.5, "#0d0710");
+  grad.addColorStop(1, "#050308");
+  ctx.fillStyle = grad;
   ctx.fillRect(-60, -70, 120, 70);
   [-60,-20,20,50].forEach(tx=>{
+    ctx.fillStyle = grad;
     ctx.fillRect(tx-8, -95, 16, 30);
   });
+  ctx.fillStyle = "rgba(220,140,80,.5)";
+  ctx.fillRect(-6,-40,10,10);
   ctx.restore();
 }
 
@@ -765,24 +946,41 @@ function drawPlayerBack(){
   ctx.scale(1.5, 1.5);
   ctx.fillStyle = "rgba(0,0,0,.4)";
   ctx.beginPath(); ctx.ellipse(0,20,20,6,0,0,Math.PI*2); ctx.fill();
-  // piernas
-  ctx.fillStyle = "#3a3a42";
+  // piernas con volumen
+  const legGrad = ctx.createLinearGradient(-10,0,10,0);
+  legGrad.addColorStop(0, "#26262e"); legGrad.addColorStop(0.5, "#42424c"); legGrad.addColorStop(1, "#26262e");
+  ctx.fillStyle = legGrad;
   ctx.fillRect(-10+legSwing*0.4, 0, 8, 22);
   ctx.fillRect(2-legSwing*0.4, 0, 8, 22);
-  // cuerpo (camisa blanca de la época)
-  ctx.fillStyle = "#eee7da";
+  // cuerpo (camisa blanca de la época), con degradado de luz
+  const shirtGrad = ctx.createLinearGradient(-15,-34,15,2);
+  shirtGrad.addColorStop(0, "#fffaf0");
+  shirtGrad.addColorStop(0.55, "#eee7da");
+  shirtGrad.addColorStop(1, "#c9bfa8");
+  ctx.fillStyle = shirtGrad;
   ctx.beginPath();
   ctx.moveTo(-16,-4); ctx.lineTo(16,-4); ctx.lineTo(12,2); ctx.lineTo(-12,2);
   ctx.closePath(); ctx.fill();
   ctx.fillRect(-15,-34,30,32);
   ctx.strokeStyle="#000"; ctx.lineWidth=1.4; ctx.strokeRect(-15,-34,30,32);
-  // sombra suave para dar volumen a la camisa
-  ctx.fillStyle = "rgba(0,0,0,.08)";
-  ctx.fillRect(6,-34,9,32);
-  // cabeza (visto de espaldas, con sombrero)
-  ctx.fillStyle = "#e0bb96";
+  // costura/pliegue central
+  ctx.strokeStyle = "rgba(0,0,0,.12)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,-34); ctx.lineTo(0,2); ctx.stroke();
+  // brillo suave a la izquierda, sombra a la derecha
+  ctx.fillStyle = "rgba(255,255,255,.15)";
+  ctx.fillRect(-15,-34,7,32);
+  ctx.fillStyle = "rgba(0,0,0,.14)";
+  ctx.fillRect(7,-34,8,32);
+  // cabeza (visto de espaldas, con sombrero), con volumen
+  const headGrad = ctx.createRadialGradient(-3,-45,2,0,-42,13);
+  headGrad.addColorStop(0, "#f0cba0");
+  headGrad.addColorStop(1, "#c99a6e");
+  ctx.fillStyle = headGrad;
   ctx.beginPath(); ctx.arc(0,-42,11,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = "#241a20";
+  const hairGrad = ctx.createLinearGradient(-14,-53,14,-43);
+  hairGrad.addColorStop(0, "#342530");
+  hairGrad.addColorStop(1, "#1a1216");
+  ctx.fillStyle = hairGrad;
   ctx.beginPath(); ctx.ellipse(0,-48,14,5,0,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
@@ -802,9 +1000,26 @@ function drawHat(kind, accent){
     ctx.lineTo(9,-40); ctx.lineTo(-9,-40);
     ctx.closePath(); ctx.fill();
     ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+    // peluca empolvada asomando, típica del burgués acomodado
+    ctx.fillStyle = "#e9e3d8";
+    ctx.beginPath(); ctx.ellipse(-11,-36,5,7,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(11,-36,5,7,0,0,Math.PI*2); ctx.fill();
   } else if(kind === "cap"){
     ctx.beginPath(); ctx.ellipse(0,-46,11,6,0,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+  } else if(kind === "scarf"){
+    // pañuelo de campesina/vendedora, anudado
+    ctx.beginPath(); ctx.ellipse(0,-42,12,9,0,Math.PI,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(9,-40); ctx.lineTo(16,-34); ctx.lineTo(10,-33);
+    ctx.closePath(); ctx.fill();
+  } else if(kind === "biretta"){
+    // birrete cuadrado de clérigo
+    ctx.fillStyle = "#181818";
+    ctx.fillRect(-9,-52,18,8);
+    ctx.beginPath(); ctx.ellipse(0,-52,9,3,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = accent;
+    ctx.fillRect(-1.5,-58,3,7);
   } else if(kind === "queen"){
     // peinado alto empolvado + pequeña corona
     ctx.fillStyle = "#e9e3d8";
@@ -825,6 +1040,56 @@ function drawHat(kind, accent){
   }
 }
 
+function drawProp(kind, accent){
+  // dibuja un accesorio distintivo del rol, junto al cuerpo (0,0 = hombro/mano)
+  ctx.strokeStyle = "#000"; ctx.fillStyle = "#5a4a3a";
+  if(kind === "musket"){
+    ctx.save(); ctx.translate(16,-24); ctx.rotate(-0.5);
+    ctx.fillStyle = "#4a3a2a"; ctx.fillRect(-3,-30,6,52);
+    ctx.fillStyle = "#8a8a8a"; ctx.fillRect(-2,-34,4,12);
+    ctx.restore();
+  } else if(kind === "basket"){
+    ctx.save(); ctx.translate(-18,-6);
+    ctx.fillStyle = "#8a6a3a";
+    ctx.beginPath(); ctx.moveTo(-8,0); ctx.lineTo(8,0); ctx.lineTo(6,10); ctx.lineTo(-6,10); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle = "#c2402b"; ctx.beginPath(); ctx.arc(-2,-2,2.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#e0a020"; ctx.beginPath(); ctx.arc(3,-3,2.4,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  } else if(kind === "cane"){
+    ctx.save(); ctx.translate(17,-2);
+    ctx.strokeStyle = "#3a2a1a"; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(0,-24); ctx.lineTo(0,10); ctx.stroke();
+    ctx.fillStyle = accent;
+    ctx.beginPath(); ctx.arc(0,-25,3.2,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  } else if(kind === "cross"){
+    ctx.save(); ctx.translate(0,-14);
+    ctx.fillStyle = "#e0a020";
+    ctx.fillRect(-1.6,-8,3.2,16);
+    ctx.fillRect(-6,-3,12,3.2);
+    ctx.restore();
+  } else if(kind === "hammer"){
+    ctx.save(); ctx.translate(16,-14); ctx.rotate(0.5);
+    ctx.fillStyle = "#6a4a2a"; ctx.fillRect(-2,-4,4,26);
+    ctx.fillStyle = "#4a4a4a"; ctx.fillRect(-8,-12,16,9);
+    ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.strokeRect(-8,-12,16,9);
+    ctx.restore();
+  } else if(kind === "fan"){
+    ctx.save(); ctx.translate(-18,-10); ctx.rotate(-0.3);
+    ctx.fillStyle = accent;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-12,-10); ctx.lineTo(-2,-14); ctx.lineTo(6,-4);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle="#000"; ctx.lineWidth=1; ctx.stroke();
+    ctx.restore();
+  } else if(kind === "sash"){
+    ctx.save();
+    ctx.strokeStyle = accent; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(-13,-30); ctx.lineTo(13,2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function drawNpc(appear, role){
   const x = W/2 + 30, y = 330;
   const s = 0.5 + appear*0.7;
@@ -836,8 +1101,12 @@ function drawNpc(appear, role){
   ctx.beginPath(); ctx.ellipse(0,26,18,6,0,0,Math.PI*2); ctx.fill();
 
   const isRoyal = role.hat === "queen" || role.hat === "king";
-  // cuerpo (vestimenta más amplia para la reina)
-  ctx.fillStyle = role.body;
+  // cuerpo (vestimenta más amplia para la reina), con degradado de tela
+  const bodyGrad = ctx.createLinearGradient(-14,-30,14,0);
+  bodyGrad.addColorStop(0, lighten(role.body, 35));
+  bodyGrad.addColorStop(0.55, role.body);
+  bodyGrad.addColorStop(1, lighten(role.body, -35));
+  ctx.fillStyle = bodyGrad;
   if(role.hat === "queen"){
     ctx.beginPath();
     ctx.moveTo(-24,0); ctx.lineTo(24,0); ctx.lineTo(14,-32); ctx.lineTo(-14,-32);
@@ -849,9 +1118,13 @@ function drawNpc(appear, role){
   if(role.hat !== "queen") ctx.strokeRect(-14,-30,28,30);
   else ctx.stroke();
 
+  if(role.hat === "king") drawProp(role.prop, role.accent);
+
   // detalle/acento (charreteras, cinturón, cuello, etc.)
   ctx.fillStyle = isRoyal ? role.accent : role.accent;
   ctx.fillRect(-14,-6,28,5);
+
+  if(role.prop && role.hat !== "king") drawProp(role.prop, role.accent);
 
   // cabeza
   ctx.fillStyle = "#e0bb96";
@@ -866,10 +1139,15 @@ function drawNpc(appear, role){
 
 function drawGuillotineScene(now){
   const elapsed = now - guillotineStart;
+  const cx = W/2;
   ctx.fillStyle = "#0a0508";
   ctx.fillRect(0,0,W,H);
-
-  const cx = W/2;
+  // ambiente con más rango de color, iluminación de antorchas lejanas
+  const ambient = ctx.createRadialGradient(cx,250,20,cx,250,340);
+  ambient.addColorStop(0, "rgba(120,30,20,.22)");
+  ambient.addColorStop(1, "rgba(10,5,8,0)");
+  ctx.fillStyle = ambient;
+  ctx.fillRect(0,0,W,H);
 
   // zoom dramático: toda la escena se ve mucho más grande y cercana
   ctx.save();
@@ -877,13 +1155,21 @@ function drawGuillotineScene(now){
   ctx.scale(1.75, 1.75);
   ctx.translate(-cx, -250);
 
-  // postes
-  ctx.fillStyle = "#3a2018";
+  // postes de madera, con veta y volumen
+  const postGrad = ctx.createLinearGradient(cx-70,0,cx-54,0);
+  postGrad.addColorStop(0, "#241207"); postGrad.addColorStop(0.5, "#4a2c18"); postGrad.addColorStop(1, "#1c0f08");
+  ctx.fillStyle = postGrad;
   ctx.fillRect(cx-70, 90, 16, 260);
+  const postGrad2 = ctx.createLinearGradient(cx+54,0,cx+70,0);
+  postGrad2.addColorStop(0, "#1c0f08"); postGrad2.addColorStop(0.5, "#4a2c18"); postGrad2.addColorStop(1, "#241207");
+  ctx.fillStyle = postGrad2;
   ctx.fillRect(cx+54, 90, 16, 260);
+  ctx.fillStyle = "#241207";
   ctx.fillRect(cx-80, 340, 160, 16);
   // rampa/tajo
-  ctx.fillStyle = "#241416";
+  const rampGrad = ctx.createLinearGradient(0,300,0,340);
+  rampGrad.addColorStop(0, "#3a1e20"); rampGrad.addColorStop(1, "#1a0d0f");
+  ctx.fillStyle = rampGrad;
   ctx.fillRect(cx-40, 300, 80, 40);
 
   // progreso de caída de la cuchilla
@@ -894,16 +1180,25 @@ function drawGuillotineScene(now){
   // personaje arrodillado con cabeza en el tajo (se dibuja antes de la cuchilla)
   ctx.save();
   ctx.translate(cx, 300);
-  ctx.fillStyle = "#e8e0d5";
+  const shirtGrad2 = ctx.createLinearGradient(-16,-10,16,30);
+  shirtGrad2.addColorStop(0, "#fffaf0"); shirtGrad2.addColorStop(1, "#bdb29a");
+  ctx.fillStyle = shirtGrad2;
   ctx.fillRect(-16,-10,32,40);
   if(dropT < 1){
-    ctx.fillStyle = "#e0bb96";
+    const headGrad2 = ctx.createRadialGradient(27,-3,1,30,0,10);
+    headGrad2.addColorStop(0, "#f0cba0"); headGrad2.addColorStop(1, "#c99a6e");
+    ctx.fillStyle = headGrad2;
     ctx.beginPath(); ctx.arc(30,0,10,0,Math.PI*2); ctx.fill();
   }
   ctx.restore();
 
-  // cuchilla
-  ctx.fillStyle = "#c9c9c9";
+  // cuchilla metálica con reflejo
+  const bladeGrad = ctx.createLinearGradient(cx-56,bladeY,cx+56,bladeY+34);
+  bladeGrad.addColorStop(0, "#e8e8ea");
+  bladeGrad.addColorStop(0.45, "#8a8a92");
+  bladeGrad.addColorStop(0.55, "#c9c9d0");
+  bladeGrad.addColorStop(1, "#5a5a62");
+  ctx.fillStyle = bladeGrad;
   ctx.beginPath();
   ctx.moveTo(cx-56, bladeY);
   ctx.lineTo(cx+56, bladeY);
@@ -925,6 +1220,9 @@ function drawGuillotineScene(now){
     ctx.fillStyle = `rgba(140,0,0,${Math.max(0,1-age)})`;
     ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fill();
   });
+
+  // cabeza rodando por el suelo, con su cara cómica
+  drawRollingHead(now);
 
   ctx.restore();
 
@@ -959,17 +1257,28 @@ function drawFireworkBurst(fx, age){
 function drawVictoryScene(now){
   const elapsed = now - victoryStart;
   drawSky();
-  ctx.fillStyle = "#150a10";
+  const groundGrad = ctx.createLinearGradient(0,HORIZON,0,H);
+  groundGrad.addColorStop(0, "#241030");
+  groundGrad.addColorStop(1, "#0f0714");
+  ctx.fillStyle = groundGrad;
   ctx.fillRect(0, HORIZON, W, H-HORIZON);
 
-  // fortaleza grande y más imponente
+  // fortaleza grande y más imponente, con degradado de piedra
   const cx = W/2;
-  ctx.fillStyle = "#241018";
+  const fortGrad = ctx.createLinearGradient(cx-160,0,cx+160,0);
+  fortGrad.addColorStop(0, "#150a18");
+  fortGrad.addColorStop(0.5, "#2e1626");
+  fortGrad.addColorStop(1, "#150a18");
+  ctx.fillStyle = fortGrad;
   ctx.fillRect(cx-160, 130, 320, 280);
   [-160,-80,0,80,130].forEach(tx=>{
+    ctx.fillStyle = fortGrad;
     ctx.fillRect(cx+tx-16, 62, 32, 70);
   });
   ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.strokeRect(cx-160,130,320,280);
+  // luz de antorchas en la base de la fortaleza
+  ctx.fillStyle = "rgba(240,160,70,.4)";
+  [-120,-40,40,120].forEach(tx=>{ ctx.fillRect(cx+tx-2,340,4,8); });
 
   // resplandor dorado y épico detrás de la escena
   const glowT = Math.min(elapsed/1800, 1);

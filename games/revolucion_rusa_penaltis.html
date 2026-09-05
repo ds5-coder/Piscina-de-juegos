@@ -948,8 +948,11 @@ function drawPlayer(x,y,color,dark,opts){
   ctx.fillStyle = "#f4ead9";
   ctx.fillRect(-10,4,20,10);
 
-  // camiseta
-  ctx.fillStyle = color;
+  // camiseta, con degradado de tela
+  const jerseyGrad = ctx.createLinearGradient(-12,-16,12,6);
+  jerseyGrad.addColorStop(0, color);
+  jerseyGrad.addColorStop(1, dark || color);
+  ctx.fillStyle = jerseyGrad;
   ctx.fillRect(-12,-16,24,22);
   ctx.strokeStyle = "#161616";
   ctx.lineWidth = 2;
@@ -1108,10 +1111,13 @@ function draw(now){
     ctx.fillRect(i*26, 4, 22, 16);
   }
 
-  // césped
+  // césped, con degradado de luz en cada franja
   const stripeW = 40;
   for(let x=0,i=0; x<W; x+=stripeW,i++){
-    ctx.fillStyle = i%2===0 ? "#2e8b3d" : "#279235";
+    const g = ctx.createLinearGradient(x,0,x+stripeW,0);
+    if(i%2===0){ g.addColorStop(0,'#3ea34e'); g.addColorStop(1,'#227530'); }
+    else { g.addColorStop(0,'#379a44'); g.addColorStop(1,'#1e6b29'); }
+    ctx.fillStyle = g;
     ctx.fillRect(x, 60, stripeW, H-60);
   }
 
