@@ -594,7 +594,10 @@ function draw(){
   ctx.clearRect(0,0,W,H);
 
   // ---- piso de fábrica (tablones de madera desgastados) ----
-  ctx.fillStyle = '#5c4a33';
+  const floorGrad = ctx.createLinearGradient(0,0,0,H);
+  floorGrad.addColorStop(0, '#6e5a40');
+  floorGrad.addColorStop(1, '#453626');
+  ctx.fillStyle = floorGrad;
   ctx.fillRect(0,0,W,H);
   ctx.strokeStyle = 'rgba(0,0,0,.18)';
   ctx.lineWidth = 1;
@@ -608,7 +611,10 @@ function draw(){
 
   // ---- pared de ladrillo al fondo con ventanales ----
   const wallH = 62;
-  ctx.fillStyle = '#7a3b2e';
+  const wallGrad = ctx.createLinearGradient(0,0,0,wallH);
+  wallGrad.addColorStop(0, '#9a4c3a');
+  wallGrad.addColorStop(1, '#5c2a20');
+  ctx.fillStyle = wallGrad;
   ctx.fillRect(0,0,W,wallH);
   ctx.strokeStyle = 'rgba(0,0,0,.25)';
   ctx.lineWidth = 1;
