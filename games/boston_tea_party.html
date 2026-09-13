@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>¡Motín del Té! Boston 1773</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0a1a33; --navy2:#132a4d;
+    --red:#b0231c; --red-bright:#e0362b;
+    --cream:#f3e6c8; --gold:#d4a933;
+    --wood:#6b4a2a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 50% -10%, #1c3a5c 0%, var(--navy) 70%);
+    font-family:'Rajdhani', sans-serif;
+    color:var(--cream);
+    display:flex; flex-direction:column; align-items:center;
+    padding:14px 10px 40px; min-height:100vh;
+  }
+  .wrap{ width:100%; max-width:820px; }
+  h1{
+    font-family:'Playfair Display', serif; font-weight:900;
+    font-size:clamp(20px,4vw,30px); text-align:center; margin:6px 0 4px;
+    color:var(--gold); text-shadow:0 2px 10px rgba(0,0,0,.6);
+  }
+  .subtitle{ text-align:center; color:#b7c4da; margin-bottom:12px; font-size:15px; }
+
+  #muteBtn{
+    position:fixed; top:10px; right:10px; z-index:50;
+    font-size:18px; width:42px; height:42px; border:1px solid rgba(212,169,51,.5);
+    border-radius:10px; background:linear-gradient(135deg,var(--gold),#a97a12); cursor:pointer;
+  }
+
+  .hud{
+    display:flex; justify-content:space-between; align-items:center;
+    background:linear-gradient(135deg, rgba(19,42,77,.85), rgba(10,26,51,.9));
+    border:1px solid rgba(212,169,51,.4); border-radius:10px;
+    padding:9px 16px; margin-bottom:10px; font-size:15px;
+  }
+  .hud b{ color:var(--gold); }
+
+  .stage{
+    position:relative; border:2px solid var(--gold); border-radius:10px;
+    overflow:hidden; box-shadow:0 12px 30px rgba(0,0,0,.55); background:#000;
+    min-height:440px;
+  }
+  canvas{ display:block; width:100%; height:auto; cursor:crosshair; }
+
+  .overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:20px;
+    background:rgba(6,12,24,.9);
+  }
+  .overlay.hidden{ display:none; }
+  .overlay h2{ font-family:'Playfair Display', serif; font-size:clamp(20px,4vw,28px); color:var(--gold); margin:0 0 10px; }
+  .overlay p{ font-size:16px; line-height:1.6; color:#dbe3f0; max-width:480px; margin:6px 0; }
+
+  .bigbtn{
+    margin-top:14px; font-weight:700; font-size:16px; letter-spacing:.4px;
+    background:linear-gradient(180deg, var(--red-bright), var(--red)); color:#fff;
+    border:none; border-radius:8px; padding:12px 26px; cursor:pointer;
+    box-shadow:0 5px 0 #7a1712;
+  }
+  .bigbtn:active{ transform:translateY(3px); box-shadow:0 2px 0 #7a1712; }
+</style>
+</head>
+<body>
+<button id="muteBtn">🔊</button>
+<div class="wrap">
+  <h1>🫖 ¡MOTÍN DEL TÉ! BOSTON 1773 🇺🇸</h1>
+  <div class="subtitle">Apuntá a la afirmación verdadera antes de que se te escape</div>
+
+  <div class="hud hidden" id="hud">
+    <div>Ronda: <b id="roundLabel">1</b> / 10</div>
+    <div>Aciertos: <b id="scoreLabel">0</b></div>
+  </div>
+
+  <div class="stage">
+    <canvas id="game" width="760" height="440"></canvas>
+
+    <div class="overlay" id="startScreen">
+      <h2>🎪 El puesto de tiro al té</h2>
+      <p>Vas a ayudar a un Padre Fundador (con muy poca puntería propia) a tirar cajones de té al mar. Van a aparecer dos carteles flotando: uno con una afirmación verdadera sobre la Revolución Americana, y otro con una falsa. Hacé clic sobre la <b>verdadera</b> antes de que se te escapen — a veces se cruzan entre sí.</p>
+      <p>Son 10 rondas al azar sobre 50 posibles. Cada ronda los carteles se mueven más rápido.</p>
+      <button class="bigbtn" id="startBtn">¡A TIRAR TÉ! ▶</button>
+    </div>
+
+    <div class="overlay hidden" id="endScreen">
+      <h2 id="endTitle">Fin del juego</h2>
+      <p id="endBody"></p>
+      <button class="bigbtn" id="restartBtn">JUGAR DE NUEVO ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BASE DE 50 PREGUNTAS — cada una es un par de afirmaciones
+   (correct = verdadera, wrong = falsa) sobre el mismo hecho
+   ========================================================= */
+const QUESTIONS = [
+{correct:"La rebelión de los colonos tuvo un origen fiscal y comercial.", wrong:"La rebelión de los colonos tuvo un origen exclusivamente religioso."},
+{correct:"La Guerra de los Siete Años enfrentó a británicos y franceses entre 1756 y 1763.", wrong:"La Guerra de los Siete Años enfrentó a británicos y españoles entre 1789 y 1795."},
+{correct:"Los colonos protestaban con el lema 'Ningún impuesto sin representación'.", wrong:"Los colonos protestaban con el lema 'Ningún impuesto sin votación'."},
+{correct:"El detonante de la rebelión fue el monopolio del té concedido a la Compañía de las Indias Orientales.", wrong:"El detonante de la rebelión fue un impuesto sobre el papel timbrado."},
+{correct:"Un grupo disfrazado de indios arrojó el té al mar en el puerto de Boston.", wrong:"Un grupo disfrazado de soldados británicos arrojó el té al mar en Nueva York."},
+{correct:"Los barcos con el té se llamaban Dartmouth, Eleanor y Beaver.", wrong:"Los barcos con el té se llamaban Mayflower, Victory y Endeavour."},
+{correct:"Según la Ley del Té, los colonos debían pagar el impuesto si el té se desembarcaba.", wrong:"Según la Ley del Té, el impuesto solo se pagaba si el té se vendía fuera de Boston."},
+{correct:"Los activistas que lideraron la protesta se llamaban los Hijos de la Libertad.", wrong:"Los activistas que lideraron la protesta se llamaban los Guardianes de la Corona."},
+{correct:"El Motín del Té ocurrió el 16 de diciembre de 1773.", wrong:"El Motín del Té ocurrió el 4 de julio de 1773."},
+{correct:"Los manifestantes lanzaron al agua unas 343 cajas de té.", wrong:"Los manifestantes lanzaron al agua unas 50 cajas de té."},
+{correct:"Gran Bretaña respondió con las Leyes Coercitivas de 1774.", wrong:"Gran Bretaña respondió aboliendo todos los impuestos coloniales en 1774."},
+{correct:"Las Leyes Coercitivas cerraron el puerto de Boston.", wrong:"Las Leyes Coercitivas abrieron nuevos puertos libres en Boston."},
+{correct:"Las Leyes Coercitivas permitían alojar tropas británicas en las colonias.", wrong:"Las Leyes Coercitivas prohibían la presencia de tropas británicas."},
+{correct:"Las Leyes Coercitivas radicalizaron a más colonos en vez de apaciguarlos.", wrong:"Las Leyes Coercitivas calmaron por completo las tensiones."},
+{correct:"La primera fase de la guerra de independencia fue entre 1775 y 1777.", wrong:"La primera fase de la guerra de independencia fue entre 1800 y 1805."},
+{correct:"Los milicianos coloniales estaban comandados por George Washington.", wrong:"Los milicianos coloniales estaban comandados por Thomas Jefferson."},
+{correct:"La Declaración de Virginia fue redactada por George Mason.", wrong:"La Declaración de Virginia fue redactada por Benjamin Franklin."},
+{correct:"La Declaración de Independencia se hizo pública el 4 de julio de 1776.", wrong:"La Declaración de Independencia se hizo pública el 14 de julio de 1776."},
+{correct:"La Declaración de Independencia fue redactada principalmente por Thomas Jefferson.", wrong:"La Declaración de Independencia fue redactada principalmente por John Hancock."},
+{correct:"La victoria en la batalla de Saratoga (1777) cambió el curso de la guerra.", wrong:"La derrota en la batalla de Saratoga (1777) obligó a rendirse a los colonos."},
+{correct:"Francia ayudó a la independencia de EE. UU. para debilitar a Gran Bretaña.", wrong:"Francia ayudó a la independencia de EE. UU. para anexionarse las colonias."},
+{correct:"Francia envió dinero, armas, soldados y barcos a los colonos.", wrong:"Francia solo envió alimentos y ropa a los colonos."},
+{correct:"La ayuda francesa aumentó enormemente la deuda del Estado francés.", wrong:"La ayuda francesa fue gratuita y no afectó las finanzas de Francia."},
+{correct:"La crisis financiera francesa fue una de las causas de la Revolución Francesa de 1789.", wrong:"La crisis financiera francesa fortaleció a la monarquía hasta el siglo XX."},
+{correct:"El Marqués de Lafayette fue un aristócrata francés que luchó junto a Washington.", wrong:"El Marqués de Lafayette fue un general británico que luchó contra Washington."},
+{correct:"Lafayette viajó voluntariamente a las Trece Colonias en 1777.", wrong:"Lafayette fue enviado obligatoriamente por el rey de Francia en 1783."},
+{correct:"Lafayette participó también en los primeros años de la Revolución Francesa.", wrong:"Lafayette se retiró de la política para siempre tras la guerra de independencia."},
+{correct:"La flota francesa bloqueó a los británicos durante el sitio de Yorktown en 1781.", wrong:"La flota española bloqueó a los británicos durante el sitio de Yorktown en 1781."},
+{correct:"El sitio de Yorktown terminó con la rendición del ejército británico.", wrong:"El sitio de Yorktown terminó con la rendición del ejército colonial."},
+{correct:"En la segunda fase de la guerra (1778-1782), Francia y España apoyaron a los colonos.", wrong:"En la segunda fase de la guerra (1778-1782), Prusia y Austria apoyaron a los colonos."},
+{correct:"España buscaba recuperar posesiones perdidas, como Gibraltar.", wrong:"España buscaba anexionarse las Trece Colonias."},
+{correct:"Gran Bretaña reconoció la independencia con la Paz de Versalles del 3 de septiembre de 1783.", wrong:"Gran Bretaña reconoció la independencia con el Tratado de Utrecht en 1783."},
+{correct:"John Adams fue partidario de la independencia y llegó a ser el segundo presidente.", wrong:"John Adams se opuso a la independencia y nunca ocupó cargos públicos."},
+{correct:"Thomas Jefferson fue uno de los autores de la Declaración y el tercer presidente.", wrong:"Thomas Jefferson fue el primer presidente de Estados Unidos."},
+{correct:"Benjamin Franklin propuso enmiendas a favor de la libertad y la igualdad.", wrong:"Benjamin Franklin se negó a firmar cualquier documento fundacional."},
+{correct:"John Hancock presidió el Segundo Congreso Continental.", wrong:"John Hancock presidió el primer Parlamento británico."},
+{correct:"George Washington nació en Virginia en 1732.", wrong:"George Washington nació en Massachusetts en 1750."},
+{correct:"Washington destacó en las campañas de la Guerra de los Siete Años.", wrong:"Washington nunca participó en ningún conflicto antes de 1775."},
+{correct:"En 1774 Washington representó a Virginia en el Primer Congreso Continental.", wrong:"En 1774 Washington representó a Nueva York en el Parlamento británico."},
+{correct:"Washington se convirtió en comandante de las tropas coloniales.", wrong:"Washington rechazó todo cargo militar durante la guerra."},
+{correct:"En 1789, Washington fue nombrado primer presidente de Estados Unidos.", wrong:"En 1789, Washington fue nombrado primer rey de Estados Unidos."},
+{correct:"Washington es conocido en EE. UU. como el Padre de la Patria.", wrong:"Washington es conocido en EE. UU. como el Libertador."},
+{correct:"Thomas Jefferson promovió la compra de Luisiana a Francia en 1803.", wrong:"Thomas Jefferson promovió la compra de Florida a España en 1803."},
+{correct:"El pensamiento de Jefferson estuvo muy influido por la Ilustración.", wrong:"El pensamiento de Jefferson estuvo muy influido por el feudalismo medieval."},
+{correct:"Benjamin Franklin fue embajador de las colonias en Francia.", wrong:"Benjamin Franklin fue embajador de las colonias en España."},
+{correct:"Franklin hizo importantes descubrimientos sobre la electricidad.", wrong:"Franklin hizo importantes descubrimientos sobre la genética."},
+{correct:"En 1787 los representantes se reunieron en Filadelfia para redactar la Constitución.", wrong:"En 1787 los representantes se reunieron en Boston para redactar la Constitución."},
+{correct:"La Constitución de 1787 estableció una república federal.", wrong:"La Constitución de 1787 estableció una monarquía parlamentaria."},
+{correct:"El sistema político se organizó según la separación de poderes.", wrong:"El sistema político se organizó según un poder único y absoluto."},
+{correct:"La Constitución de 1787 no resolvió el problema de la esclavitud, lo que derivó en la guerra de Secesión (1861-1865).", wrong:"La Constitución de 1787 abolió la esclavitud de inmediato en todo el país."},
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* =========================================================
+   AUDIO — fife/tambor colonial sencillo + efectos
+   ========================================================= */
+let actx=null, masterGain=null, muted=false;
+function ensureAudio(){
+  if(!actx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    actx = new AC();
+    masterGain = actx.createGain();
+    masterGain.gain.value = muted?0:0.45;
+    masterGain.connect(actx.destination);
+  }
+}
+function tone(freq,dur,type,vol,delay){
+  delay=delay||0;
+  const t=actx.currentTime+delay;
+  const osc=actx.createOscillator();
+  osc.type=type; osc.frequency.value=freq;
+  const g=actx.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  osc.connect(g).connect(masterGain);
+  osc.start(t); osc.stop(t+dur+0.03);
+}
+function playSplash(){
+  ensureAudio();
+  const t0=actx.currentTime;
+  const bufSize=actx.sampleRate*0.4;
+  const buffer=actx.createBuffer(1,bufSize,actx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1)*(1-i/bufSize);
+  const noise=actx.createBufferSource();
+  noise.buffer=buffer;
+  const filter=actx.createBiquadFilter();
+  filter.type="bandpass"; filter.frequency.value=700;
+  const g=actx.createGain();
+  g.gain.setValueAtTime(0.3,t0);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+0.4);
+  noise.connect(filter).connect(g).connect(masterGain);
+  noise.start(t0);
+  tone(300,0.2,"sine",0.2);
+}
+function playMiss(){
+  ensureAudio();
+  tone(180,0.3,"sawtooth",0.15);
+}
+function playFanfare(){
+  ensureAudio();
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,0.4,"square",0.25,i*0.18));
+}
+
+/* --------- música de fondo estilo "fife and drum" colonial --------- */
+let musicTimer = null;
+function drumHit(vol){
+  ensureAudio();
+  const t0 = actx.currentTime;
+  const bufSize = actx.sampleRate*0.09;
+  const buffer = actx.createBuffer(1,bufSize,actx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1)*(1-i/bufSize);
+  const noise = actx.createBufferSource();
+  noise.buffer = buffer;
+  const filter = actx.createBiquadFilter();
+  filter.type = "highpass"; filter.frequency.value = 900;
+  const g = actx.createGain();
+  g.gain.setValueAtTime(vol,t0);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+0.09);
+  noise.connect(filter).connect(g).connect(masterGain);
+  noise.start(t0);
+}
+function startMusic(){
+  ensureAudio();
+  stopMusic();
+  // melodía original sencilla, estilo "fife" colonial (flauta aguda) a paso marcial
+  const melody = [
+    784,784,880,784,659,0, 784,880,988,880,784,0,
+    659,659,698,659,587,0, 659,698,784,698,659,0,
+  ];
+  let step = 0;
+  musicTimer = setInterval(() => {
+    const note = melody[step % melody.length];
+    if(note) tone(note, 0.16, "triangle", 0.09);
+    if(step % 2 === 0) drumHit(step % 4 === 0 ? 0.16 : 0.08);
+    step++;
+  }, 165);
+}
+function stopMusic(){
+  if(musicTimer){ clearInterval(musicTimer); musicTimer = null; }
+}
+
+function toggleMute(){
+  muted=!muted; ensureAudio();
+  masterGain.gain.value=muted?0:0.45;
+  document.getElementById("muteBtn").textContent = muted?"🔇":"🔊";
+}
+document.getElementById("muteBtn").addEventListener("click", toggleMute);
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const W=canvas.width, H=canvas.height;
+
+let deck=[];
+let roundIndex=0;
+let score=0;
+let targets=[]; // {x,y,vx,vy,text,correct,w,h}
+let phase="idle"; // idle | round | resolve | sonsOfLiberty | finale | done
+let roundStart=0;
+let resolveStart=0;
+let resolveOutcome=null; // 'correct' | 'wrong' | 'timeout'
+let cratePos=null; // animación del cajón volando
+let splashParticles=[];
+let splashDone=false;
+let sonsAnim=0;
+let fireworks=[];
+let lastFirework=0;
+
+const hud=document.getElementById("hud");
+const roundLabel=document.getElementById("roundLabel");
+const scoreLabel=document.getElementById("scoreLabel");
+const startScreen=document.getElementById("startScreen");
+const endScreen=document.getElementById("endScreen");
+const endTitle=document.getElementById("endTitle");
+const endBody=document.getElementById("endBody");
+
+function startGame(){
+  deck = shuffle(QUESTIONS).slice(0,10);
+  roundIndex=0; score=0;
+  startScreen.classList.add("hidden");
+  endScreen.classList.add("hidden");
+  hud.classList.remove("hidden");
+  updateHud();
+  startMusic();
+  startRound();
+  requestAnimationFrame(loop);
+}
+
+function updateHud(){
+  roundLabel.textContent = Math.min(roundIndex+1,10);
+  scoreLabel.textContent = score;
+}
+
+function startRound(){
+  const item = deck[roundIndex];
+  const speed = 55 + roundIndex*16; // sube con cada ronda
+  const mkTarget = (text, correct, side) => {
+    const angle = Math.random()*Math.PI*2;
+    return {
+      x: side==="l" ? 150+Math.random()*100 : 500+Math.random()*100,
+      y: 140+Math.random()*160,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed,
+      text, correct,
+      w: 280, h: 100,
+    };
+  };
+  targets = shuffle([
+    mkTarget(item.correct, true, "l"),
+    mkTarget(item.wrong, false, "r"),
+  ]);
+  phase = "round";
+  roundStart = performance.now();
+}
+
+canvas.addEventListener("click", (e) => {
+  if(phase !== "round") return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W/rect.width, scaleY = H/rect.height;
+  const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+  for(const t of targets){
+    if(mx > t.x-t.w/2 && mx < t.x+t.w/2 && my > t.y-t.h/2 && my < t.y+t.h/2){
+      resolveRound(t.correct ? "correct" : "wrong", { x:t.x, y:t.y });
+      return;
+    }
+  }
+  // no le dio a ningún cartel: el cajón cae directo al agua, donde hiciste clic
+  resolveRound("water", { x: mx, y: Math.max(my, 240) });
+});
+
+function resolveRound(outcome, point){
+  phase = "resolve";
+  resolveOutcome = outcome;
+  resolveStart = performance.now();
+  splashDone = false;
+  splashParticles = [];
+  const thrower = { x: 90, y: 380 };
+  cratePos = { from: thrower, to: point, t:0 };
+  if(outcome === "correct"){
+    score++;
+    updateHud();
+  } else {
+    playMiss();
+  }
+}
+
+function resolveTimeout(){
+  phase = "timeoutMsg";
+  resolveOutcome = "timeout";
+  resolveStart = performance.now();
+}
+
+function nextRound(){
+  roundIndex++;
+  if(roundIndex >= 10){
+    if(score >= 9){
+      startFinale();
+    } else {
+      endGame();
+    }
+    return;
+  }
+  updateHud();
+  startRound();
+}
+
+let wasLastCorrect = false;
+
+function endGame(){
+  phase = "done";
+  stopMusic();
+  hud.classList.add("hidden");
+  endScreen.classList.remove("hidden");
+  if(score < 5){
+    endTitle.textContent = "💀 GAME OVER";
+    endBody.textContent = `Acertaste solo ${score} de 10. El té sigue en el barco: la revuelta se apagó antes de empezar, y la Corona ni se enteró.`;
+  } else {
+    endTitle.textContent = "😤 Lograron provocar a los ingleses";
+    endBody.textContent = `Acertaste ${score} de 10. No fue un motín perfecto, pero conseguiste enfurecer bastante a la Corona británica — las tensiones siguen creciendo en las colonias.`;
+  }
+}
+
+function startFinale(){
+  phase = "sonsOfLiberty";
+  stopMusic();
+  sonsAnim = performance.now();
+}
+
+document.getElementById("startBtn").addEventListener("click", startGame);
+document.getElementById("restartBtn").addEventListener("click", () => {
+  endScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+});
+
+/* =========================================================
+   DIBUJO — puerto de Boston, personaje, carteles, animaciones
+   ========================================================= */
+function drawShip(){
+  const bx = 610, by = 210; // punto de referencia: línea de flotación, centro del barco
+  ctx.save();
+  ctx.translate(bx, by);
+
+  // casco: curva realista, más angosto en la proa (derecha) y popa alta (izquierda)
+  const hullGrad = ctx.createLinearGradient(0,-20,0,30);
+  hullGrad.addColorStop(0,"#5a4028"); hullGrad.addColorStop(1,"#2a1c10");
+  ctx.fillStyle = hullGrad;
+  ctx.beginPath();
+  ctx.moveTo(-95,-14);
+  ctx.quadraticCurveTo(-95,26, -60,34);
+  ctx.lineTo(90,34);
+  ctx.quadraticCurveTo(112,20, 100,-6);
+  ctx.lineTo(-95,-14);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.stroke();
+
+  // línea de flotación clara y franja de troneras (aspecto de fragata mercante)
+  ctx.fillStyle="#c9b48a";
+  ctx.fillRect(-92,-6,190,7);
+  ctx.fillStyle="#1a120a";
+  for(let i=-80;i<95;i+=20){ ctx.fillRect(i,-3,10,6); }
+
+  // castillo de popa, más alto, típico de los barcos del siglo XVIII
+  ctx.fillStyle="#3a2818";
+  ctx.fillRect(-96,-32,34,20);
+  ctx.strokeStyle="#000"; ctx.lineWidth=1.5; ctx.strokeRect(-96,-32,34,20);
+  ctx.fillStyle="#8a1c1c";
+  ctx.fillRect(-92,-30,26,4);
+
+  // bauprés (mástil de proa inclinado)
+  ctx.strokeStyle="#3a2818"; ctx.lineWidth=5;
+  ctx.beginPath(); ctx.moveTo(90,-4); ctx.lineTo(140,-24); ctx.stroke();
+
+  // tres mástiles con velas cuadradas
+  const masts = [ {x:-55,h:150}, {x:-5,h:170}, {x:45,h:130} ];
+  masts.forEach((m,i)=>{
+    ctx.strokeStyle="#2a1c10"; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(m.x,-10); ctx.lineTo(m.x,-10-m.h); ctx.stroke();
+
+    // vergas y velas (2 por mástil)
+    [0.3,0.55].forEach((f,vi)=>{
+      const y = -10-m.h*f - m.h*0.12;
+      const w = 46 - vi*8;
+      ctx.strokeStyle="#2a1c10"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(m.x-w,y); ctx.lineTo(m.x+w,y); ctx.stroke();
+      const sailGrad = ctx.createLinearGradient(m.x,y,m.x,y+26);
+      sailGrad.addColorStop(0,"#f3ead6"); sailGrad.addColorStop(1,"#d8cba8");
+      ctx.fillStyle = sailGrad;
+      ctx.beginPath();
+      ctx.moveTo(m.x-w+3,y+2);
+      ctx.quadraticCurveTo(m.x, y+16, m.x+w-3, y+2);
+      ctx.lineTo(m.x+w-6, y+24);
+      ctx.quadraticCurveTo(m.x, y+34, m.x-w+6, y+24);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle="rgba(0,0,0,.25)"; ctx.lineWidth=1; ctx.stroke();
+    });
+
+    // banderín en la punta del mástil más alto
+    if(i===1){
+      ctx.fillStyle="#c2151a";
+      ctx.beginPath(); ctx.moveTo(m.x,-10-m.h); ctx.lineTo(m.x+18,-10-m.h+5); ctx.lineTo(m.x,-10-m.h+10); ctx.closePath(); ctx.fill();
+    }
+
+    // jarcia (líneas de aparejo hacia el casco)
+    ctx.strokeStyle="rgba(20,14,8,.5)"; ctx.lineWidth=1;
+    [-1,1].forEach(side=>{
+      ctx.beginPath(); ctx.moveTo(m.x, -10-m.h*0.75); ctx.lineTo(m.x+side*30, 0); ctx.stroke();
+    });
+  });
+
+  ctx.restore();
+}
+
+function drawHarbor(){
+  const sky = ctx.createLinearGradient(0,0,0,220);
+  sky.addColorStop(0,"#2a4a6b"); sky.addColorStop(1,"#5a7a9a");
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,220);
+
+  // horizonte de Boston colonial: casas de ladrillo con techo a dos aguas,
+  // ventanas de cuadrículas pequeñas y una torre de iglesia como la Old North Church
+  for(let i=0;i<8;i++){
+    const x = i*94+16;
+    const hgt = 46+((i*37)%40);
+    const isChurch = i===3;
+    const w = isChurch ? 34 : 62;
+    const brick = i%2===0 ? "#7a4a34" : "#6b4028";
+
+    if(isChurch){
+      // torre de iglesia con aguja, como la Old North Church
+      ctx.fillStyle = "#e8e0d0";
+      ctx.fillRect(x+14, 220-hgt-60, w-14, hgt+60);
+      ctx.strokeStyle="#8a7a5a"; ctx.lineWidth=1; ctx.strokeRect(x+14,220-hgt-60,w-14,hgt+60);
+      ctx.fillStyle="#c2402b";
+      ctx.beginPath();
+      ctx.moveTo(x+14,220-hgt-60); ctx.lineTo(x+14+(w-14)/2,220-hgt-100); ctx.lineTo(x+w,220-hgt-60);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle="#3a2818";
+      ctx.fillRect(x+14+(w-14)/2-2, 220-hgt-115, 4, 15);
+      // ventanal de campanario
+      ctx.fillStyle="#2a1c10";
+      ctx.beginPath(); ctx.arc(x+14+(w-14)/2, 220-hgt-30, 6, Math.PI, 0); ctx.fill();
+      ctx.fillRect(x+14+(w-14)/2-6, 220-hgt-30, 12, 14);
+      continue;
+    }
+
+    // cuerpo de ladrillo
+    ctx.fillStyle = brick;
+    ctx.fillRect(x, 220-hgt, w, hgt);
+    ctx.strokeStyle="rgba(0,0,0,.3)"; ctx.lineWidth=1; ctx.strokeRect(x,220-hgt,w,hgt);
+
+    // techo a dos aguas
+    ctx.fillStyle="#2a2018";
+    ctx.beginPath();
+    ctx.moveTo(x-4, 220-hgt);
+    ctx.lineTo(x+w/2, 220-hgt-18);
+    ctx.lineTo(x+w+4, 220-hgt);
+    ctx.closePath(); ctx.fill();
+
+    // chimenea
+    ctx.fillStyle="#4a3020";
+    ctx.fillRect(x+w-16, 220-hgt-26, 8, 14);
+
+    // ventanas pequeñas en cuadrícula, con marco blanco
+    const cols = Math.floor(w/18), rows = Math.max(1, Math.floor(hgt/22));
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const wx = x+10+c*18, wy = 220-hgt+10+r*22;
+        if(wy > 220-14) continue;
+        ctx.fillStyle="#e8e0d0"; ctx.fillRect(wx-1,wy-1,10,12);
+        ctx.fillStyle = (r+c)%3===0 ? "rgba(255,210,120,.85)" : "#1a1410";
+        ctx.fillRect(wx,wy,8,10);
+        ctx.strokeStyle="rgba(0,0,0,.4)"; ctx.lineWidth=0.6;
+        ctx.beginPath(); ctx.moveTo(wx+4,wy); ctx.lineTo(wx+4,wy+10); ctx.moveTo(wx,wy+5); ctx.lineTo(wx+8,wy+5); ctx.stroke();
+      }
+    }
+
+    // puerta
+    ctx.fillStyle="#2a1c10";
+    ctx.fillRect(x+w/2-6, 220-16, 12, 16);
+  }
+
+  // agua
+  const water = ctx.createLinearGradient(0,220,0,H);
+  water.addColorStop(0,"#1a4a6b"); water.addColorStop(1,"#0a2438");
+  ctx.fillStyle=water; ctx.fillRect(0,220,W,H-220);
+  ctx.strokeStyle="rgba(255,255,255,.12)"; ctx.lineWidth=2;
+  for(let i=0;i<8;i++){
+    const y = 240+i*24;
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=20){
+      ctx.lineTo(x, y+Math.sin((x+performance.now()/300+i*40)/40)*3);
+    }
+    ctx.stroke();
+  }
+
+  // barco de época, más realista: casco curvo, tres mástiles con velas cuadradas y aparejo
+  drawShip();
+
+  // muelle en primer plano
+  ctx.fillStyle="#4a3320";
+  ctx.fillRect(0,H-40,W,40);
+  ctx.fillStyle="#3a2818";
+  for(let x=10;x<W;x+=40) ctx.fillRect(x,H-40,6,40);
+}
+
+function drawFounder(throwing){
+  const x=90, y=360;
+  ctx.save();
+  ctx.translate(x,y);
+  // sombra
+  ctx.fillStyle="rgba(0,0,0,.35)";
+  ctx.beginPath(); ctx.ellipse(0,42,26,7,0,0,Math.PI*2); ctx.fill();
+  // piernas
+  ctx.fillStyle="#e8e0d0"; ctx.fillRect(-14,10,10,32); ctx.fillRect(4,10,10,32);
+  // abrigo azul con solapas doradas (uniforme continental, caricaturizado)
+  const coatGrad = ctx.createLinearGradient(-22,-30,22,14);
+  coatGrad.addColorStop(0,"#3a5a9a"); coatGrad.addColorStop(1,"#1a2f5c");
+  ctx.fillStyle=coatGrad;
+  ctx.fillRect(-22,-30,44,44);
+  ctx.fillStyle="#d4a933";
+  ctx.fillRect(-22,-30,7,44); ctx.fillRect(15,-30,7,44);
+  ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.strokeRect(-22,-30,44,44);
+  // brazo lanzador
+  ctx.save();
+  ctx.translate(20,-14);
+  ctx.rotate(throwing ? -0.9 : 0.5);
+  ctx.fillStyle="#3a5a9a"; ctx.fillRect(-6,-4,28,10);
+  ctx.restore();
+  // cabeza y peluca empolvada
+  ctx.fillStyle="#e8caa0"; ctx.beginPath(); ctx.arc(0,-42,17,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="#e9e3d8";
+  ctx.beginPath(); ctx.ellipse(0,-50,18,13,0,Math.PI,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-16,-38,6,9,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(16,-38,6,9,0,0,Math.PI*2); ctx.fill();
+  // sombrero tricornio
+  ctx.fillStyle="#1a1a1a";
+  ctx.beginPath(); ctx.moveTo(-20,-52); ctx.lineTo(0,-70); ctx.lineTo(20,-52); ctx.lineTo(12,-49); ctx.lineTo(-12,-49); ctx.closePath(); ctx.fill();
+  // sonrisa exagerada (chiste de los "dientes de madera")
+  ctx.fillStyle="#f4ead9";
+  ctx.fillRect(-9,-38,18,6);
+  ctx.strokeStyle="#000"; ctx.lineWidth=1;
+  for(let i=-8;i<9;i+=6) { ctx.beginPath(); ctx.moveTo(i,-38); ctx.lineTo(i,-32); ctx.stroke(); }
+  // ojos
+  ctx.fillStyle="#000";
+  ctx.beginPath(); ctx.arc(-6,-45,1.6,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(6,-45,1.6,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function wrapText(text, maxWidth, font){
+  ctx.font = font;
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for(const w of words){
+    const test = line ? line+" "+w : w;
+    if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = w; }
+    else line = test;
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+
+function drawTarget(t){
+  ctx.save();
+  ctx.translate(t.x, t.y);
+  const grad = ctx.createLinearGradient(-t.w/2,-t.h/2,t.w/2,t.h/2);
+  grad.addColorStop(0,"#8a6a3a"); grad.addColorStop(1,"#5a3f22");
+  ctx.fillStyle = grad;
+  ctx.fillRect(-t.w/2,-t.h/2,t.w,t.h);
+  ctx.strokeStyle="#2a1c10"; ctx.lineWidth=3;
+  ctx.strokeRect(-t.w/2,-t.h/2,t.w,t.h);
+  ctx.strokeStyle="rgba(255,255,255,.2)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(-t.w/2,0); ctx.lineTo(t.w/2,0); ctx.stroke();
+
+  const font = "700 19px Rajdhani, sans-serif";
+  const lines = wrapText(t.text, t.w-18, font);
+  ctx.fillStyle="#fff6e0";
+  ctx.font=font; ctx.textAlign="center";
+  const lineH=21;
+  const startY = -(lines.length-1)*lineH/2 + 6;
+  lines.slice(0,5).forEach((line,i)=>ctx.fillText(line, 0, startY+i*lineH));
+  ctx.restore();
+}
+
+function moveTargets(dt){
+  const margin = 155;
+  targets.forEach(t => {
+    t.x += t.vx*dt; t.y += t.vy*dt;
+    if(t.x < margin || t.x > W-75){ t.vx *= -1; t.x = Math.max(margin, Math.min(W-75,t.x)); }
+    if(t.y < 110 || t.y > 370){ t.vy *= -1; t.y = Math.max(110, Math.min(370,t.y)); }
+  });
+}
+
+function drawCrateFlying(){
+  if(!cratePos) return;
+  const t = Math.min(1, cratePos.t);
+  const x = cratePos.from.x + (cratePos.to.x-cratePos.from.x)*t;
+  const y = cratePos.from.y + (cratePos.to.y-cratePos.from.y)*t - Math.sin(t*Math.PI)*70;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(t*8);
+  ctx.fillStyle="#7a5a34";
+  ctx.fillRect(-12,-10,24,20);
+  ctx.strokeStyle="#000"; ctx.lineWidth=2; ctx.strokeRect(-12,-10,24,20);
+  ctx.restore();
+}
+
+function drawSplash(x,y){
+  ctx.fillStyle="rgba(200,230,255,.8)";
+  splashParticles.forEach(p=>{
+    ctx.globalAlpha = Math.max(0,p.life);
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+function drawSonsOfLiberty(t){
+  drawHarbor();
+  // tres figuras coloniales disfrazadas, volcando un cajón al mar
+  for(let i=0;i<3;i++){
+    const x = 300+i*90, y=210;
+    const tip = Math.min(1, Math.max(0,(t-i*0.5)));
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.fillStyle="#4a3a2a"; ctx.fillRect(-12,-10,24,34);
+    // plumas (disfraz)
+    ctx.fillStyle="#c2402b";
+    ctx.beginPath(); ctx.moveTo(-6,-22); ctx.lineTo(0,-38); ctx.lineTo(6,-22); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#e0bb96"; ctx.beginPath(); ctx.arc(0,-18,9,0,Math.PI*2); ctx.fill();
+    // cajón inclinándose
+    ctx.save();
+    ctx.translate(16,0);
+    ctx.rotate(-tip*1.6);
+    ctx.fillStyle="#7a5a34"; ctx.fillRect(-10,-8,20,16);
+    ctx.strokeStyle="#000"; ctx.lineWidth=1.5; ctx.strokeRect(-10,-8,20,16);
+    ctx.restore();
+    ctx.restore();
+  }
+  ctx.fillStyle="#fff6e0";
+  ctx.font="bold 20px 'Playfair Display', serif";
+  ctx.textAlign="center";
+  ctx.fillText("¡Al agua con el té del Rey!", W/2, 60);
+}
+
+function drawFireworkBurst(fx,age){
+  const life=1200; if(age>life) return;
+  const p=age/life, n=16;
+  for(let i=0;i<n;i++){
+    const ang=(i/n)*Math.PI*2, dist=p*90;
+    ctx.globalAlpha=Math.max(0,1-p);
+    ctx.fillStyle=fx.color;
+    ctx.fillRect(fx.x+Math.cos(ang)*dist-2, fx.y+Math.sin(ang)*dist-2+p*p*30, 4,4);
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawFounderFigure(x,y,coat,seated,scale){
+  scale = scale || 1;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.scale(scale,scale);
+  ctx.fillStyle=coat;
+  ctx.fillRect(-16,-10,32, seated?30:40);
+  ctx.fillStyle="#e8caa0"; ctx.beginPath(); ctx.arc(0,-22,14,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="#e9e3d8"; ctx.beginPath(); ctx.ellipse(0,-30,15,10,0,Math.PI,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-13,-20,5,7,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(13,-20,5,7,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawDeclarationScene(now){
+  // salón de la asamblea: paredes de madera con ventanales, evocando la
+  // célebre escena de la presentación de la Declaración ante el Congreso
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#4a3826"); g.addColorStop(1,"#241a10");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // ventanales arqueados al fondo
+  for(let i=0;i<3;i++){
+    const wx = 90+i*260;
+    ctx.fillStyle="#6a8aa8";
+    ctx.beginPath();
+    ctx.moveTo(wx,140); ctx.lineTo(wx,60); ctx.quadraticCurveTo(wx+35,30,wx+70,60); ctx.lineTo(wx+70,140);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle="#2a1c10"; ctx.lineWidth=3; ctx.stroke();
+    ctx.strokeStyle="rgba(0,0,0,.3)"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(wx+35,35); ctx.lineTo(wx+35,140); ctx.moveTo(wx,90); ctx.lineTo(wx+70,90); ctx.stroke();
+  }
+  // cortinajes rojos a los costados
+  ctx.fillStyle="rgba(140,30,30,.55)";
+  ctx.fillRect(0,20,50,220); ctx.fillRect(W-50,20,50,220);
+
+  // estrado del presidente del Congreso (Hancock), al fondo y centrado, más elevado
+  ctx.fillStyle="#3a2818"; ctx.fillRect(340,150,80,50);
+  ctx.strokeStyle="#1a1008"; ctx.lineWidth=2; ctx.strokeRect(340,150,80,50);
+  drawFounderFigure(380,190,"#4a2a5a",true);
+
+  // delegados sentados alrededor, en segundo plano
+  const seated = [ {x:80,y:230}, {x:150,y:245}, {x:610,y:230}, {x:680,y:245}, {x:640,y:200} ];
+  seated.forEach(s=>{
+    ctx.fillStyle="rgba(0,0,0,.35)";
+    drawFounderFigure(s.x,s.y,"#33405a",false,0.75);
+  });
+
+  // mesa central con el documento, y el Comité de los Cinco presentándolo
+  ctx.fillStyle="#5a3f22"; ctx.fillRect(230,300,300,90);
+  ctx.strokeStyle="#2a1c10"; ctx.lineWidth=3; ctx.strokeRect(230,300,300,90);
+  ctx.fillStyle="#f3e6c8"; ctx.fillRect(290,282,180,55);
+  ctx.strokeStyle="#8a6a3a"; ctx.lineWidth=2; ctx.strokeRect(290,282,180,55);
+  ctx.fillStyle="#2a1c10"; ctx.font="bold 11px Rajdhani"; ctx.textAlign="center";
+  ctx.fillText("DECLARACIÓN DE INDEPENDENCIA", 380, 300);
+  ctx.font="10px Rajdhani";
+  ctx.fillText("4 DE JULIO DE 1776", 380, 315);
+  ctx.strokeStyle="#1a1a8a"; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let i=0;i<3;i++){ ctx.moveTo(300,325+i*6); ctx.lineTo(300+150*Math.min(1,Math.max(0,(now%3000)/1500-i*0.3)),325+i*6); }
+  ctx.stroke();
+
+  const committee = [
+    {x:150,y:290,coat:"#3a5a9a"},  // Adams
+    {x:210,y:270,coat:"#2a5a3a"},  // Franklin
+    {x:290,y:255,coat:"#5a2a2a"},  // Jefferson, al centro presentando
+    {x:490,y:270,coat:"#4a3a6b"},  // Livingston
+    {x:560,y:290,coat:"#6b4a2a"},  // Sherman
+  ];
+  committee.forEach(f=> drawFounderFigure(f.x,f.y,f.coat,false));
+
+  // fuegos artificiales patrios
+  if(now-lastFirework>320){
+    lastFirework=now;
+    const colors=["#c2151a","#f4ead9","#3a5fc4"];
+    fireworks.push({x:80+Math.random()*(W-160), y:40+Math.random()*140, color:colors[Math.floor(Math.random()*colors.length)], born:now});
+    if(fireworks.length>20) fireworks.shift();
+  }
+  fireworks.forEach(fx=>drawFireworkBurst(fx, now-fx.born));
+
+  ctx.fillStyle="#d4a933"; ctx.font="bold 22px 'Playfair Display', serif"; ctx.textAlign="center";
+  ctx.fillText("¡FELIZ 4 DE JULIO DE 1776!", W/2, 60);
+}
+
+/* =========================================================
+   LOOP PRINCIPAL
+   ========================================================= */
+let lastT = 0;
+function loop(now){
+  const dt = Math.min(0.05, (now-lastT)/1000 || 0);
+  lastT = now;
+
+  if(phase === "round"){
+    drawHarbor();
+    moveTargets(dt);
+    targets.forEach(drawTarget);
+    drawFounder(false);
+    const elapsed = now - roundStart;
+    const remain = Math.max(0, 15 - elapsed/1000);
+    ctx.fillStyle = remain<3 ? "#ff6a5a" : "#fff6e0";
+    ctx.font = "bold 15px Rajdhani"; ctx.textAlign="center";
+    ctx.fillText(`⏱ ${remain.toFixed(1)}s`, W/2, 30);
+    if(elapsed > 15000){
+      resolveTimeout();
+    }
+  } else if(phase === "timeoutMsg"){
+    drawHarbor();
+    targets.forEach(drawTarget);
+    drawFounder(false);
+    ctx.fillStyle="rgba(10,15,25,.55)"; ctx.fillRect(0,150,W,90);
+    ctx.fillStyle="#ffcf4d"; ctx.font="bold 22px 'Playfair Display', serif"; ctx.textAlign="center";
+    ctx.fillText("⏳ ¡Se acabó el tiempo! No llegaste a lanzar.", W/2, 200);
+    if(now - resolveStart > 1300){
+      wasLastCorrect = false;
+      nextRound();
+    }
+  } else if(phase === "resolve"){
+    drawHarbor();
+    moveTargets(dt*0.2);
+    targets.forEach(drawTarget);
+    const t = Math.min(1, (now-resolveStart)/650);
+    cratePos.t = t;
+    drawFounder(true);
+    drawCrateFlying();
+    if(t>=1 && splashParticles.length===0 && !splashDone){
+      splashDone = true;
+      playSplash();
+      for(let i=0;i<16;i++){
+        const ang=Math.random()*Math.PI*2, spd=1+Math.random()*3;
+        splashParticles.push({x:cratePos.to.x,y:cratePos.to.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-2,life:1});
+      }
+    }
+    if(t>=1){
+      ctx.fillStyle = resolveOutcome==="correct" ? "#9af0ac" : "#ff6a5a";
+      ctx.font="bold 20px 'Playfair Display', serif"; ctx.textAlign="center";
+      ctx.fillText(resolveOutcome==="correct" ? "¡Al agua con el té!" : "¡Fallaste! El cajón se hundió sin más.", W/2, 200);
+    }
+    splashParticles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy+1; p.life-=0.03; });
+    splashParticles = splashParticles.filter(p=>p.life>0);
+    drawSplash();
+    if(t>=1 && splashParticles.length===0 && splashDone){
+      splashDone = false;
+      wasLastCorrect = resolveOutcome === "correct";
+      if(resolveOutcome === "correct"){
+        nextRound();
+      } else {
+        phase = "revealCorrect";
+        resolveStart = now;
+      }
+    }
+  } else if(phase === "revealCorrect"){
+    drawHarbor();
+    moveTargets(dt*0.15);
+    targets.forEach(t => {
+      drawTarget(t);
+      if(t.correct){
+        ctx.save();
+        ctx.strokeStyle = "#3fae52";
+        ctx.lineWidth = 5;
+        ctx.shadowColor = "rgba(63,174,82,.9)"; ctx.shadowBlur = 18;
+        ctx.strokeRect(t.x-t.w/2-4, t.y-t.h/2-4, t.w+8, t.h+8);
+        ctx.restore();
+      }
+    });
+    drawFounder(false);
+    ctx.fillStyle="rgba(10,15,25,.6)"; ctx.fillRect(0,60,W,40);
+    ctx.fillStyle="#9af0ac"; ctx.font="bold 20px 'Playfair Display', serif"; ctx.textAlign="center";
+    ctx.fillText("✅ La afirmación verdadera era esta:", W/2, 86);
+    if(now - resolveStart > 3000){
+      nextRound();
+    }
+  } else if(phase === "sonsOfLiberty"){
+    const t = (now-sonsAnim)/1800;
+    drawSonsOfLiberty(t);
+    if(t>=2.2){
+      phase="finale";
+    }
+  } else if(phase === "finale"){
+    drawDeclarationScene(now);
+    if(!finaleFanfarePlayed){ playFanfare(); finaleFanfarePlayed = true; }
+    if(now - (window._finaleStart||(window._finaleStart=now)) > 6000){
+      endGame();
+      endTitle.textContent = "🎆 ¡Ha sido un éxito!";
+      endBody.textContent = `Acertaste ${score} de 10. Las Trece Colonias se alzaron: ahí están George Washington, Benjamin Franklin y los demás Padres Fundadores, firmando la Declaración de Independencia el 4 de julio de 1776.`;
+    }
+  }
+
+  requestAnimationFrame(loop);
+}
+let finaleFanfarePlayed = false;
+</script>
+</body>
+</html>

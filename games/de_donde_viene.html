@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>¿Con Qué Se Hace? — Sector Primario</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#123a2e; --bg2:#0a2a20;
+    --panel:#fef8e7; --ink:#2a2018;
+    --green:#2e9e5b; --green-dark:#1e6b3d;
+    --gold:#e0a020; --red:#c2402b;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 50% -10%, #1c5a44 0%, var(--bg) 60%, var(--bg2) 100%);
+    font-family:'Baloo 2', sans-serif;
+    color:var(--ink);
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px 40px; min-height:100vh;
+  }
+  .wrap{ width:100%; max-width:900px; }
+  h1{
+    text-align:center; color:#fff2c9; font-weight:800;
+    font-size:clamp(20px,4vw,30px); margin:6px 0 2px;
+    text-shadow:0 3px 0 rgba(0,0,0,.35);
+  }
+  .subtitle{ text-align:center; color:#bfe0cf; margin-bottom:16px; font-size:15.5px; font-weight:600; }
+
+  .panel{
+    background:var(--panel); border:5px solid var(--ink); border-radius:20px;
+    box-shadow:0 12px 0 rgba(0,0,0,.25); padding:24px; position:relative; overflow:hidden;
+  }
+
+  .hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-weight:800; color:var(--green-dark); font-size:15px; }
+
+  .target-row{ display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .slot{
+    width:64px; height:64px; background:var(--card); border:4px dashed #ccc; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; font-size:30px; position:relative;
+    transition:transform .15s ease;
+  }
+  .slot.filled{ border-style:solid; border-color:var(--green-dark); background:#e2f5e6; }
+  .eq-sign{ font-size:26px; font-weight:800; color:var(--green-dark); }
+  .plus-sign{ font-size:20px; font-weight:800; color:#88a; }
+  .target-product{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:var(--card); border:4px solid var(--gold); border-radius:16px; padding:8px 16px;
+  }
+  .target-product .emoji{ font-size:52px; }
+  .target-product .name{ font-weight:800; font-size:16px; }
+
+  .instruction{ text-align:center; font-weight:700; font-size:16px; color:#443; margin:12px 0 16px; }
+
+  .palette-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:12px; }
+  .ing-card{
+    background:var(--card); border:3px solid var(--ink); border-radius:12px;
+    padding:12px 4px; text-align:center; cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,.2); transition:transform .1s ease, box-shadow .1s ease;
+    position:relative;
+  }
+  .ing-card:hover:not(.disabled){ transform:translateY(-3px); box-shadow:0 7px 0 rgba(0,0,0,.25); }
+  .ing-card .emoji{ font-size:32px; }
+  .ing-card .label{ font-size:12px; font-weight:700; margin-top:3px; }
+  .ing-card.correct-picked{ background:#c9f2cf; border-color:var(--green-dark); }
+  .ing-card.disabled{ opacity:.35; cursor:default; filter:grayscale(1); }
+  .ing-card.shake{ animation:shakeCard .4s ease; }
+  @keyframes shakeCard{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px) rotate(-4deg);} 40%{transform:translateX(8px) rotate(4deg);} 60%{transform:translateX(-6px);} 80%{transform:translateX(6px);} }
+
+  .feedback-box{
+    margin-top:14px; text-align:center; font-weight:700; font-size:15.5px;
+    background:#fff2d0; border:3px solid var(--gold); border-radius:12px; padding:10px 14px;
+  }
+  .feedback-box.wrong{ background:#fbdcd4; border-color:var(--red); color:var(--red); font-weight:800; }
+  .feedback-box.hidden{ display:none; }
+  .hidden{ display:none !important; }
+  .create-result-banner{
+    text-align:center; background:#fff2c9; border:3px solid var(--gold); border-radius:12px;
+    padding:10px 14px; margin-bottom:12px; font-size:15px;
+  }
+
+  /* ---------- ruleta de platos ---------- */
+  .roulette-row{ display:flex; justify-content:center; gap:40px; margin:10px 0; flex-wrap:wrap; }
+  .roulette-wheel-wrap{ position:relative; width:220px; height:220px; }
+  .roulette-pointer{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:32px;
+    color:var(--gold); z-index:2; text-shadow:0 2px 0 var(--ink);
+  }
+  .roulette-wheel{
+    width:220px; height:220px; border-radius:50%; border:6px solid var(--ink);
+    position:relative; box-shadow:0 6px 0 rgba(0,0,0,.3);
+    transition: transform 2.4s cubic-bezier(.15,.85,.25,1);
+  }
+  .roulette-wheel span{
+    position:absolute; top:50%; left:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+    display:flex; align-items:center; justify-content:center; font-size:30px;
+    transform-origin: 17px 17px;
+  }
+  .dish-guess-input{
+    font-family:'Baloo 2', sans-serif; font-size:20px; padding:12px 16px;
+    border:3px solid var(--ink); border-radius:12px; width:80%; max-width:380px;
+  }
+
+  .explosion-layer{ position:absolute; inset:0; pointer-events:none; display:flex; align-items:center; justify-content:center; z-index:5; }
+  .boom-emoji{ font-size:70px; opacity:0; }
+  .boom-emoji.go{ animation:boomPop .6s ease forwards; }
+  .chef-mascot{
+    position:absolute; inset:0; z-index:7; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; pointer-events:none;
+    background:rgba(255,255,255,0); opacity:0;
+  }
+  .chef-mascot.go{ animation:chefFadeInOut 1.4s ease forwards; background:rgba(255,247,224,.92); }
+  .chef-mascot .chef-emoji{ font-size:110px; }
+  .chef-mascot .chef-emoji.go{ animation:chefDespair .5s ease-in-out 4; }
+  .chef-mascot .chef-bubble{
+    background:#fff; border:3px solid var(--ink); border-radius:14px; padding:8px 16px;
+    font-weight:800; font-size:16px; margin-top:6px; box-shadow:0 4px 0 rgba(0,0,0,.2);
+  }
+  @keyframes chefFadeInOut{
+    0%{ opacity:0; } 12%{ opacity:1; } 85%{ opacity:1; } 100%{ opacity:0; }
+  }
+  @keyframes chefDespair{
+    0%,100%{ transform:rotate(0deg) translateY(0); }
+    25%{ transform:rotate(-10deg) translateY(-6px); }
+    75%{ transform:rotate(10deg) translateY(-6px); }
+  }
+  @keyframes boomPop{
+    0%{ opacity:0; transform:scale(0.2) rotate(0deg); }
+    30%{ opacity:1; transform:scale(1.3) rotate(-8deg); }
+    60%{ opacity:1; transform:scale(1) rotate(6deg); }
+    100%{ opacity:0; transform:scale(1.6) rotate(0deg); }
+  }
+  .spark{ position:absolute; font-size:22px; opacity:0; }
+  .spark.go{ animation:sparkFly .6s ease-out forwards; }
+  @keyframes sparkFly{
+    0%{ opacity:1; transform:translate(0,0) scale(1); }
+    100%{ opacity:0; transform:translate(var(--dx), var(--dy)) scale(0.4); }
+  }
+
+  .success-pop{
+    position:absolute; inset:0; background:rgba(46,158,91,.94); z-index:6;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; text-align:center; padding:20px; opacity:0; pointer-events:none;
+  }
+  .success-pop.show{ opacity:1; pointer-events:auto; }
+  .success-pop .big{ font-size:64px; margin-bottom:6px; }
+  .success-pop h2{ margin:4px 0; font-size:24px; }
+
+  .legend{ text-align:center; margin-top:16px; font-size:13px; color:#bfe0cf; }
+
+  /* ---------- pestañas de modo y de cocina ---------- */
+  .mode-tabs{ display:flex; justify-content:center; gap:10px; margin-bottom:14px; }
+  .mode-tab{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:14px;
+    background:#0a2a20; color:#bfe0cf; border:3px solid #1c5a44; border-radius:12px;
+    padding:9px 16px; cursor:pointer;
+  }
+  .mode-tab.active{ background:var(--gold); color:#3a2804; border-color:var(--ink); }
+
+  /* ---------- menú a scorrimento (carrusel de juegos) ---------- */
+  .scroll-menu-wrap{ margin-bottom:16px; }
+  .home-grid{ display:flex; flex-direction:column; gap:16px; max-width:420px; margin:20px auto; }
+  .home-btn{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:14px;
+    background:#0a2a20; color:#bfe0cf; border:3px solid #1c5a44; border-radius:12px;
+    padding:8px 14px; cursor:pointer; margin-bottom:10px;
+  }
+  .home-btn:hover{ background:#1c5a44; }
+  .scroll-menu{
+    display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
+    padding:6px 10px 12px; -webkit-overflow-scrolling:touch;
+  }
+  .scroll-menu::-webkit-scrollbar{ height:6px; }
+  .scroll-menu::-webkit-scrollbar-thumb{ background:#1c5a44; border-radius:4px; }
+  .scroll-card{
+    background:#0f3a2c; border:3px solid #1c5a44;
+    border-radius:16px; padding:22px 14px; text-align:center; cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .scroll-card:hover{ transform:translateY(-3px); }
+  .scroll-card.active{ background:var(--gold); border-color:var(--ink); }
+  .scroll-card-emoji{ font-size:34px; }
+  .scroll-card-title{ font-weight:800; font-size:15px; color:#fff2c9; margin-top:4px; }
+  .scroll-card.active .scroll-card-title{ color:#3a2804; }
+  .scroll-card-desc{ font-size:11.5px; color:#bfe0cf; margin-top:4px; line-height:1.3; }
+  .scroll-card.active .scroll-card-desc{ color:#5a3f10; }
+  .scroll-dots{ display:flex; justify-content:center; gap:6px; }
+  .scroll-dots .dot{ width:8px; height:8px; border-radius:50%; background:#1c5a44; }
+  .scroll-dots .dot.active{ background:var(--gold); }
+
+  .section-header{
+    text-align:center; font-family:'Baloo 2', sans-serif; font-weight:800; font-size:20px;
+    color:#fff; background:var(--accent); border:4px solid var(--ink); border-radius:14px;
+    padding:10px; margin-bottom:14px; box-shadow:0 5px 0 rgba(0,0,0,.25);
+  }
+
+  .cuisine-tabs{ display:flex; justify-content:center; gap:8px; margin-bottom:14px; }
+  .cuisine-tab{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:13px;
+    background:#eee; color:#443; border:2px solid var(--ink); border-radius:10px;
+    padding:6px 12px; cursor:pointer;
+  }
+  .cuisine-tab.active{ background:var(--green); color:#fff; }
+
+  .back-btn{
+    background:none; border:none; color:var(--green-dark); font-weight:800; font-size:15px;
+    cursor:pointer; padding:0; margin-bottom:12px; display:flex; align-items:center; gap:4px;
+  }
+
+  .bigbtn{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:16px;
+    background:var(--green); color:#fff; border:4px solid var(--ink); border-radius:14px;
+    padding:11px 22px; cursor:pointer; box-shadow:0 5px 0 var(--green-dark);
+  }
+  .bigbtn:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--green-dark); }
+
+  /* ---------- grilla de platos ---------- */
+  .dish-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px; }
+  .dish-card{
+    background:var(--card); border:3px solid var(--ink); border-radius:14px;
+    padding:14px 8px; text-align:center; cursor:pointer;
+    box-shadow:0 5px 0 rgba(0,0,0,.2); transition:transform .1s ease; position:relative;
+  }
+  .dish-card:hover{ transform:translateY(-3px); }
+  .dish-card .flag{ position:absolute; top:6px; right:6px; font-size:15px; }
+  .dish-card .emoji{ font-size:36px; }
+  .dish-card .label{ font-size:12.5px; font-weight:700; margin-top:4px; }
+
+  /* ---------- cocina estilo Overcooked (1 jugador) ---------- */
+  .kitchen-wrap{ display:flex; justify-content:center; overflow-x:auto; margin-bottom:10px; }
+  .kitchen-grid{
+    position:relative; border:4px solid var(--ink); border-radius:10px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.18), transparent 60%),
+      repeating-linear-gradient(45deg, #d8ac74 0 29px, #caa06a 29px 58px);
+    box-shadow: inset 0 0 30px rgba(0,0,0,.25);
+    background-size: 58px 58px, 82px 82px;
+    flex-shrink:0;
+  }
+  .kitchen-station{
+    position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    font-size:26px; background:linear-gradient(160deg,#fffdf5,#e8d19a); border:3px solid var(--ink); border-radius:10px;
+    box-shadow:0 5px 0 rgba(0,0,0,.28), inset 0 2px 3px rgba(255,255,255,.6), inset 0 -3px 4px rgba(0,0,0,.15);
+    transition:opacity .2s ease, transform .15s ease;
+  }
+  .kitchen-station.used{ opacity:.25; filter:grayscale(1); }
+  .kitchen-station.board{ background:linear-gradient(160deg,#f3e6c8,#c9a468); }
+  .kitchen-station.pot{ background:linear-gradient(160deg,#ffe9d2,#e8945a); }
+  .kitchen-station.plate{ background:linear-gradient(160deg,#eaf6ff,#a9d6f5); }
+  .kitchen-station.serve{ background:linear-gradient(160deg,#ffe4e4,#e88c8c); }
+  .kitchen-station.trash{ background:linear-gradient(160deg,#d8d8d8,#8a8a8a); }
+  .kitchen-station .st-label{ position:absolute; bottom:-16px; font-size:9px; font-weight:800; color:#334; white-space:nowrap; }
+  .kitchen-player{
+    position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    font-size:34px; transition:left .12s linear, top .12s linear; z-index:3;
+    filter:drop-shadow(0 6px 3px rgba(0,0,0,.35));
+  }
+  .kitchen-player .held-badge{
+    position:absolute; top:-14px; right:-6px; font-size:18px;
+    background:#fff; border:2px solid var(--ink); border-radius:50%; width:24px; height:24px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .kitchen-player .held-state{
+    position:absolute; bottom:-8px; right:-6px; font-size:13px;
+  }
+  .kitchen-player.chopping{ animation:choppingBob .18s ease-in-out infinite; }
+  .kitchen-player.cooking{ animation:cookingWobble .3s ease-in-out infinite; }
+  @keyframes choppingBob{ 0%,100%{ transform:translateY(0) rotate(0); } 50%{ transform:translateY(-8px) rotate(-8deg); } }
+  @keyframes cookingWobble{ 0%,100%{ transform:scale(1) rotate(0); } 50%{ transform:scale(1.08) rotate(4deg); } }
+
+  .grab-pop{ position:absolute; font-size:22px; pointer-events:none; animation:grabPopFx .5s ease-out forwards; z-index:6; }
+  @keyframes grabPopFx{ 0%{ opacity:1; transform:translateY(0) scale(1); } 100%{ opacity:0; transform:translateY(-34px) scale(1.5); } }
+
+  .station-flash{ animation:stationFlash .3s ease; }
+  @keyframes stationFlash{ 0%{ box-shadow:0 0 0 6px rgba(255,255,255,.9); } 100%{ box-shadow:0 5px 0 rgba(0,0,0,.28); } }
+
+  .steam-fx{ position:absolute; font-size:20px; pointer-events:none; animation:steamRise .9s ease-out forwards; z-index:6; }
+  @keyframes steamRise{ 0%{ opacity:.9; transform:translateY(0) scale(.8); } 100%{ opacity:0; transform:translateY(-40px) scale(1.3); } }
+
+  .plate-pop{ animation:platePopFx .35s ease; }
+  @keyframes platePopFx{ 0%{ transform:scale(1.5); } 100%{ transform:scale(1); } }
+
+  .serve-fly{ animation:serveFlyFx .5s ease-in forwards; }
+  @keyframes serveFlyFx{ 0%{ transform:translateY(0) scale(1); opacity:1; } 100%{ transform:translateY(-60px) scale(.3); opacity:0; } }
+
+  .kitchen-dpad{
+    display:grid; grid-template-columns:repeat(3,54px); grid-template-rows:repeat(3,44px);
+    justify-content:center; gap:6px; margin:4px 0 14px;
+  }
+  .dpad-btn{
+    font-size:18px; font-weight:800; background:var(--card); border:3px solid var(--ink); border-radius:10px;
+    cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.2);
+  }
+  .dpad-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .dpad-btn[data-dir="action"]{ background:var(--gold); }
+
+  .controls-hint{
+    background:#fff2d0; border:3px solid var(--gold); border-radius:12px; padding:10px 14px;
+    font-size:13.5px; text-align:center; margin-bottom:6px; line-height:1.5;
+  }
+  .kitchen-player.p2{ filter:hue-rotate(150deg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧪 ¿CON QUÉ SE HACE?</h1>
+  <div class="subtitle" id="modeSubtitle">Cada producto ya está armado — descubrí de qué ingredientes del sector primario viene</div>
+
+  <div style="text-align:center; margin-bottom:10px;">
+    <button class="cuisine-tab" id="musicToggleBtn" style="font-size:14px;">🔇 Música</button>
+  </div>
+
+  <!-- ============ PANTALLA DE INICIO (único menú) ============ -->
+  <div id="homeScreen">
+    <div class="home-grid">
+      <div class="scroll-card" id="tabFree" data-tab="free">
+        <div class="scroll-card-emoji">🧪</div>
+        <div class="scroll-card-title">Sigue la receta</div>
+        <div class="scroll-card-desc">Descubrí qué sale al juntar recursos del sector primario</div>
+      </div>
+      <div class="scroll-card" id="tabDishes" data-tab="dishes">
+        <div class="scroll-card-emoji">🍳</div>
+        <div class="scroll-card-title">ExtraCocinado</div>
+        <div class="scroll-card-desc">Cociná 60 recetas reales en tu propia cocina, al estilo Overcooked</div>
+      </div>
+      <div class="scroll-card" id="tabCreate" data-tab="create">
+        <div class="scroll-card-emoji">🧑‍🍳</div>
+        <div class="scroll-card-title">Creá tu plato</div>
+        <div class="scroll-card-desc">Combiná lo que quieras desde cero</div>
+      </div>
+      <div class="scroll-card" id="tabRoulette" data-tab="roulette">
+        <div class="scroll-card-emoji">🎰</div>
+        <div class="scroll-card-title">Ruleta de Platos</div>
+        <div class="scroll-card-desc">Girá la ruleta y adiviná el nombre de un plato real</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODO LIBRE (el juego ya existente) ============ -->
+  <div id="freeMode" class="hidden">
+    <button class="home-btn" id="homeBtnFree">🏠 Menú principal</button>
+    <div class="section-header" style="--accent:#2e9e5b;">🧪 SIGUE LA RECETA</div>
+    <div class="panel" id="mainPanel">
+      <div class="hud">
+        <div id="scoreLabel">Descubiertos: 0 / 0</div>
+        <div id="roundLabel">Ronda</div>
+      </div>
+
+      <div class="target-row" id="targetRow"></div>
+      <div class="instruction" id="instructionText">Hacé clic en los ingredientes correctos</div>
+
+      <div class="palette-grid" id="paletteGrid"></div>
+      <div class="feedback-box hidden" id="feedbackBox"></div>
+
+      <div class="explosion-layer" id="explosionLayer"></div>
+      <div class="success-pop" id="successPop">
+        <div class="big" id="successEmoji">🎉</div>
+        <h2 id="successText">¡Combinación correcta!</h2>
+        <div id="successSub" style="font-size:15px; margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="legend">💧 Fuego y Herramienta representan procesos simples de transformación · sin castigos por fallar</div>
+  </div>
+
+  <!-- ============ MODO EXTRACOCINADO (platos famosos, estilo Overcooked) ============ -->
+  <div id="dishesMode" class="hidden">
+    <button class="home-btn" id="homeBtnDishes">🏠 Menú principal</button>
+    <div class="section-header" style="--accent:#c2402b;">🍳 EXTRACOCINADO</div>
+    <!-- CONFIGURACIÓN DEL TURNO (cooperativo, estilo Overcooked) -->
+    <div class="panel" id="dishSelectScreen">
+      <div style="text-align:center; font-weight:700; margin-bottom:10px;">¿Cuántos jugadores van a cocinar este turno?</div>
+      <div class="cuisine-tabs">
+        <button class="cuisine-tab active" id="playersOneBtn">🧑‍🍳 1 Jugador</button>
+        <button class="cuisine-tab" id="playersTwoBtn">🧑‍🍳🧑‍🍳 2 Jugadores (cooperativo)</button>
+      </div>
+
+      <div id="controlsHint" class="controls-hint"></div>
+
+      <div style="text-align:center; margin:18px 0;">
+        <button class="bigbtn" id="startShiftBtn">▶ EMPEZAR TURNO (3:00)</button>
+      </div>
+
+      <div style="text-align:center; font-weight:700; margin-bottom:10px;">Vista previa de los 60 platos que pueden salir</div>
+      <div class="cuisine-tabs">
+        <button class="cuisine-tab active" id="cuisineAll">Todos</button>
+        <button class="cuisine-tab" id="cuisineIt">🇮🇹 Italiana</button>
+        <button class="cuisine-tab" id="cuisineEs">🇪🇸 Española</button>
+        <button class="cuisine-tab" id="cuisineDo">🇩🇴 Dominicana</button>
+        <button class="cuisine-tab" id="cuisineJp">🇯🇵 Japonesa</button>
+        <button class="cuisine-tab" id="cuisineOtra">🌍 Otras</button>
+      </div>
+      <div class="dish-grid" id="dishGrid"></div>
+    </div>
+
+    <!-- TURNO EN CURSO: COCINA ESTILO OVERCOOKED (1-2 jugadores) -->
+    <div class="panel hidden" id="dishRoundScreen">
+      <button class="back-btn" id="backToDishListBtn">◀ Volver a los platos</button>
+      <div class="hud">
+        <div id="shiftTimerLabel">⏱ 3:00</div>
+        <div id="scoreComboLabel">🏆 0 pts · Combo x0</div>
+        <div id="kitchenOrderLabel">Pedido: —</div>
+      </div>
+
+      <div class="target-row" id="dishTargetRow"></div>
+      <div class="instruction" id="dishInstructionText">Flechas para moverte · ESPACIO para agarrar / cortar / servir</div>
+
+      <div class="kitchen-wrap">
+        <div class="kitchen-grid" id="kitchenGrid"></div>
+      </div>
+
+      <div class="kitchen-dpad">
+        <div></div><button class="dpad-btn" data-dir="up">▲</button><div></div>
+        <button class="dpad-btn" data-dir="left">◀</button>
+        <button class="dpad-btn" data-dir="action">⎵</button>
+        <button class="dpad-btn" data-dir="right">▶</button>
+        <div></div><button class="dpad-btn" data-dir="down">▼</button><div></div>
+      </div>
+
+      <div class="feedback-box hidden" id="dishFeedbackBox"></div>
+
+      <div class="explosion-layer" id="dishExplosionLayer"></div>
+      <div class="chef-mascot" id="dishChefMascot"></div>
+      <div class="success-pop" id="dishSuccessPop">
+        <div class="big" id="dishSuccessEmoji">🎉</div>
+        <h2 id="dishSuccessText">¡Plato completo!</h2>
+        <div id="dishSuccessSub" style="font-size:15px; margin-top:4px;"></div>
+      </div>
+      <div class="success-pop" id="dishFailPop" style="background:rgba(194,64,43,.94);">
+        <div class="big">⏰</div>
+        <h2>¡Pedido caducado!</h2>
+        <div style="font-size:15px; margin-top:4px;">Se pierde el combo, pero el turno sigue. ¡Ya viene el próximo pedido!</div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS DEL TURNO -->
+    <div class="panel hidden result-screen" id="shiftResultsScreen">
+      <div class="trophy" id="shiftStars">⭐⭐⭐</div>
+      <h2>¡Turno terminado!</h2>
+      <div class="sector-tag" id="shiftScoreTag">0 PUNTOS</div>
+      <div class="explain" id="shiftStatsText"></div>
+      <button class="bigbtn" id="shiftBackBtn">VOLVER A EMPEZAR ▶</button>
+    </div>
+
+    <div class="legend">🍝 En pasta y pizza, la "masa" ya viene con su propio origen aclarado entre paréntesis</div>
+  </div>
+
+  <!-- ============ MODO CREÁ TU PLATO ============ -->
+  <div id="createMode" class="hidden">
+    <button class="home-btn" id="homeBtnCreate">🏠 Menú principal</button>
+    <div class="section-header" style="--accent:#e0a020;">🧑‍🍳 CREÁ TU PLATO</div>
+    <div class="panel" id="createPanel">
+      <div style="text-align:center; font-weight:700; margin-bottom:10px;">
+        Elegí entre 2 y 5 ingredientes y creá tu propio plato realista (o no tanto)
+      </div>
+
+      <div class="target-row" id="createTray" style="min-height:70px;"></div>
+      <div class="instruction" id="createInstruction">Elegidos: 0 / 5</div>
+
+      <div class="create-result-banner hidden" id="createResultBanner">
+        <span id="createResultEmoji">🍽️</span>
+        <b id="createResultText">¡Tu creación!</b>
+        <span id="createResultSub" style="font-weight:600;"></span>
+      </div>
+
+      <div style="display:flex; justify-content:center; gap:12px; margin-bottom:14px;">
+        <button class="bigbtn" id="cookBtn">🍳 COCINAR</button>
+        <button class="bigbtn" id="clearTrayBtn" style="background:#888; box-shadow:0 5px 0 #555;">🗑️ VACIAR</button>
+      </div>
+
+      <div class="palette-grid" id="createPaletteGrid"></div>
+
+      <div class="explosion-layer" id="createExplosionLayer"></div>
+      <div class="chef-mascot" id="createChefMascot"></div>
+    </div>
+
+    <div class="legend">🧪 Si combinás algo que no tiene ningún sentido culinario, vas a saberlo enseguida</div>
+  </div>
+
+  <!-- ============ MODO RULETA DE PLATOS ============ -->
+  <div id="rouletteMode" class="hidden">
+    <button class="home-btn" id="homeBtnRoulette">🏠 Menú principal</button>
+    <div class="section-header" style="--accent:#7a3fb0;">🎰 RULETA DE PLATOS</div>
+    <div class="panel" style="text-align:center;">
+      <div style="font-weight:700; margin-bottom:14px; font-size:19px;">Girá la ruleta para sacar dos ingredientes, y después nombrá un plato real que los lleve a los dos</div>
+
+      <div class="roulette-row">
+        <div class="roulette-wheel-wrap">
+          <div class="roulette-pointer">▼</div>
+          <div class="roulette-wheel" id="wheelA"></div>
+        </div>
+        <div class="roulette-wheel-wrap">
+          <div class="roulette-pointer">▼</div>
+          <div class="roulette-wheel" id="wheelB"></div>
+        </div>
+      </div>
+
+      <button class="bigbtn" id="spinBtn" style="margin:16px 0; font-size:19px;">🎰 GIRAR RULETA</button>
+
+      <div id="rouletteResultLine" class="controls-hint hidden" style="font-size:18px;"></div>
+
+      <div style="margin-top:20px; border-top:3px dashed var(--ink); padding-top:18px;">
+        <div style="font-weight:700; margin-bottom:10px; font-size:19px;">Nombrá un plato real que contenga los dos ingredientes de la ruleta:</div>
+        <input type="text" id="dishGuessInput" placeholder="Ej: paella, sushi, mangú, tacos..." class="dish-guess-input">
+        <button class="bigbtn" id="guessBtn" style="margin-top:10px; font-size:19px;">✅ VERIFICAR PLATO</button>
+        <div id="guessResult" style="margin-top:16px; font-size:70px;"></div>
+        <div id="guessResultText" style="font-weight:700; font-size:20px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const INGREDIENTS = {
+  trigo: { name: "Trigo", emoji: "🌾" },
+  leche: { name: "Leche", emoji: "🥛" },
+  uvas: { name: "Uvas", emoji: "🍇" },
+  cacao: { name: "Cacao", emoji: "🟤" },
+  cafeGrano: { name: "Café en grano", emoji: "🫘" },
+  algodon: { name: "Algodón", emoji: "🌱" },
+  madera: { name: "Madera", emoji: "🪵" },
+  lana: { name: "Lana", emoji: "🧶" },
+  pescado: { name: "Pescado", emoji: "🐟" },
+  hierro: { name: "Mineral de hierro", emoji: "⛏️" },
+  cana: { name: "Caña de azúcar", emoji: "🎋" },
+  huevos: { name: "Huevos", emoji: "🥚" },
+  miel: { name: "Miel", emoji: "🍯" },
+  caucho: { name: "Caucho", emoji: "🌳" },
+  arena: { name: "Arena", emoji: "🏖️" },
+  cobre: { name: "Cobre", emoji: "🟠" },
+  vaca: { name: "Vaca", emoji: "🐄" },
+  agua: { name: "Agua", emoji: "💧" },
+  fuego: { name: "Fuego", emoji: "🔥" },
+  herramienta: { name: "Herramienta", emoji: "🔨" },
+  tomate: { name: "Tomate", emoji: "🍅" },
+  cebolla: { name: "Cebolla", emoji: "🧅" },
+  ajo: { name: "Ajo", emoji: "🧄" },
+  papa: { name: "Papa", emoji: "🥔" },
+  sal: { name: "Sal", emoji: "🧂" },
+  limon: { name: "Limón", emoji: "🍋" },
+  arroz: { name: "Arroz", emoji: "🍚" },
+  alga: { name: "Alga marina", emoji: "🌊" },
+  litio: { name: "Litio", emoji: "⚡" },
+  silicio: { name: "Silicio", emoji: "💎" },
+  petroleo: { name: "Petróleo", emoji: "🛢️" },
+  masa: { name: "Masa", emoji: "🥯" },
+  pan: { name: "Pan", emoji: "🍞" },
+  queso: { name: "Queso", emoji: "🧀" },
+  carne: { name: "Carne", emoji: "🥩" },
+  azucar: { name: "Azúcar", emoji: "🍬" },
+  plastico: { name: "Plástico", emoji: "🧴" },
+  acero: { name: "Acero", emoji: "🔩" },
+  vidrio: { name: "Vidrio", emoji: "🔷" },
+  cuero: { name: "Cuero", emoji: "🟫" },
+  tela: { name: "Tela", emoji: "🧵" },
+  hilo: { name: "Hilo de lana", emoji: "🪢" },
+};
+
+const RECIPES = [
+  { ing: ["trigo", "agua"], result: { name: "Masa", emoji: "🥯" } },
+  { ing: ["masa", "fuego"], result: { name: "Pan", emoji: "🍞" } },
+  { ing: ["leche", "fuego"], result: { name: "Queso", emoji: "🧀" } },
+  { ing: ["leche", "herramienta"], result: { name: "Manteca", emoji: "🧈" } },
+  { ing: ["uvas", "agua"], result: { name: "Mosto", emoji: "🍹" } },
+  { ing: ["cafeGrano", "fuego"], result: { name: "Café", emoji: "☕" } },
+  { ing: ["algodon", "herramienta"], result: { name: "Tela", emoji: "🧵" } },
+  { ing: ["tela", "herramienta"], result: { name: "Camiseta", emoji: "👕" } },
+  { ing: ["madera", "herramienta"], result: { name: "Tablas", emoji: "🪵" } },
+  { ing: ["lana", "herramienta"], result: { name: "Hilo de lana", emoji: "🪢" } },
+  { ing: ["hilo", "herramienta"], result: { name: "Suéter", emoji: "🧥" } },
+  { ing: ["pescado", "fuego"], result: { name: "Pescado cocido", emoji: "🍲" } },
+  { ing: ["pescado", "cobre"], result: { name: "Lata de atún", emoji: "🥫" } },
+  { ing: ["hierro", "fuego"], result: { name: "Acero", emoji: "🔩" } },
+  { ing: ["acero", "herramienta"], result: { name: "Bicicleta", emoji: "🚲" } },
+  { ing: ["cana", "fuego"], result: { name: "Azúcar", emoji: "🍬" } },
+  { ing: ["caucho", "herramienta"], result: { name: "Neumático", emoji: "🛞" } },
+  { ing: ["arena", "fuego"], result: { name: "Vidrio", emoji: "🔷" } },
+  { ing: ["vidrio", "herramienta"], result: { name: "Ventana", emoji: "🪟" } },
+  { ing: ["cobre", "herramienta"], result: { name: "Cable eléctrico", emoji: "🔌" } },
+  { ing: ["vaca", "herramienta"], result: { name: "Cuero", emoji: "🟫" } },
+  { ing: ["cuero", "herramienta"], result: { name: "Zapatos", emoji: "👞" } },
+  { ing: ["miel", "agua"], result: { name: "Hidromiel", emoji: "🍶" } },
+  { ing: ["vaca", "fuego"], result: { name: "Carne", emoji: "🥩" } },
+  { ing: ["petroleo", "fuego"], result: { name: "Plástico", emoji: "🧴" } },
+  { ing: ["arroz", "agua"], result: { name: "Arroz cocido", emoji: "🍚" } },
+  { ing: ["limon", "azucar"], result: { name: "Limonada", emoji: "🍋" } },
+
+  { ing: ["cacao", "leche", "azucar"], result: { name: "Chocolate con leche", emoji: "🍫" } },
+  { ing: ["trigo", "tomate", "queso"], result: { name: "Pizza", emoji: "🍕" } },
+  { ing: ["carne", "pan", "queso"], result: { name: "Hamburguesa", emoji: "🍔" } },
+  { ing: ["arroz", "pescado", "alga"], result: { name: "Sushi", emoji: "🍣" } },
+  { ing: ["huevos", "trigo", "azucar", "leche"], result: { name: "Torta", emoji: "🎂" } },
+  { ing: ["tomate", "cebolla", "ajo"], result: { name: "Salsa casera", emoji: "🍅" } },
+  { ing: ["papa", "fuego", "sal"], result: { name: "Papas fritas", emoji: "🍟" } },
+  { ing: ["cafeGrano", "leche", "azucar"], result: { name: "Café con leche", emoji: "☕" } },
+  { ing: ["lana", "algodon", "herramienta"], result: { name: "Manta", emoji: "🧣" } },
+  { ing: ["huevos", "leche", "trigo"], result: { name: "Panqueques", emoji: "🥞" } },
+
+  { ing: ["cobre", "litio", "silicio", "plastico"], result: { name: "Teléfono móvil", emoji: "📱" } },
+  { ing: ["acero", "caucho", "vidrio", "plastico"], result: { name: "Auto", emoji: "🚗" } },
+  { ing: ["madera", "acero", "tela", "herramienta"], result: { name: "Silla de oficina", emoji: "🪑" } },
+  { ing: ["arroz", "carne", "tomate", "cebolla"], result: { name: "Guiso", emoji: "🍛" } },
+  { ing: ["algodon", "cuero", "tela", "herramienta"], result: { name: "Mochila", emoji: "🎒" } },
+];
+
+let deck = [];
+let roundIndex = 0;
+let discoveredCount = 0;
+let currentRecipe = null;
+let currentPool = [];
+let pickedCorrect = [];
+let wrongTried = [];
+let locked = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  deck = shuffle(RECIPES);
+  roundIndex = 0;
+  discoveredCount = 0;
+  updateScore();
+  startRound();
+}
+
+function updateScore() {
+  document.getElementById("scoreLabel").textContent = `Descubiertos: ${discoveredCount} / ${RECIPES.length}`;
+  document.getElementById("roundLabel").textContent = `Producto ${Math.min(roundIndex + 1, deck.length)} / ${deck.length}`;
+}
+
+function startRound() {
+  if (roundIndex >= deck.length) {
+    deck = shuffle(RECIPES);
+    roundIndex = 0;
+  }
+  currentRecipe = deck[roundIndex];
+  pickedCorrect = [];
+  wrongTried = [];
+  locked = false;
+
+  const allKeys = Object.keys(INGREDIENTS);
+  const correctKeys = currentRecipe.ing;
+  const distractorPool = shuffle(allKeys.filter((k) => !correctKeys.includes(k)));
+  const distractorCount = Math.max(4, 8 - correctKeys.length);
+  currentPool = shuffle([...correctKeys, ...distractorPool.slice(0, distractorCount)]);
+
+  document.getElementById("instructionText").textContent =
+    `Hacé clic en los ${correctKeys.length} ingredientes que forman este producto`;
+
+  renderTarget();
+  renderPalette();
+  document.getElementById("feedbackBox").classList.add("hidden");
+  document.getElementById("successPop").classList.remove("show");
+  updateScore();
+}
+
+function renderTarget() {
+  const row = document.getElementById("targetRow");
+  row.innerHTML = "";
+  currentRecipe.ing.forEach((key, i) => {
+    if (i > 0) {
+      const plus = document.createElement("span");
+      plus.className = "plus-sign";
+      plus.textContent = "+";
+      row.appendChild(plus);
+    }
+    const slot = document.createElement("div");
+    slot.className = "slot" + (pickedCorrect.includes(key) ? " filled" : "");
+    slot.id = "slot-" + key;
+    slot.textContent = pickedCorrect.includes(key) ? INGREDIENTS[key].emoji : "?";
+    row.appendChild(slot);
+  });
+  const eq = document.createElement("span");
+  eq.className = "eq-sign";
+  eq.textContent = "=";
+  row.appendChild(eq);
+  const target = document.createElement("div");
+  target.className = "target-product";
+  target.innerHTML = `<div class="emoji">${currentRecipe.result.emoji}</div><div class="name">${currentRecipe.result.name}</div>`;
+  row.appendChild(target);
+}
+
+function renderPalette() {
+  const grid = document.getElementById("paletteGrid");
+  grid.innerHTML = "";
+  currentPool.forEach((key) => {
+    const ing = INGREDIENTS[key];
+    const card = document.createElement("div");
+    let cls = "ing-card";
+    if (pickedCorrect.includes(key)) cls += " correct-picked disabled";
+    if (wrongTried.includes(key)) cls += " disabled";
+    card.className = cls;
+    card.id = "ing-" + key;
+    card.innerHTML = `<div class="emoji">${ing.emoji}</div><div class="label">${ing.name}</div>`;
+    if (!pickedCorrect.includes(key) && !wrongTried.includes(key)) {
+      card.addEventListener("click", () => pickIngredient(key, card));
+    }
+    grid.appendChild(card);
+  });
+}
+
+function pickIngredient(key, card) {
+  if (locked) return;
+
+  if (currentRecipe.ing.includes(key)) {
+    pickedCorrect.push(key);
+    const slot = document.getElementById("slot-" + key);
+    if (slot) {
+      slot.textContent = INGREDIENTS[key].emoji;
+      slot.classList.add("filled");
+    }
+    card.classList.add("correct-picked", "disabled");
+
+    if (pickedCorrect.length >= currentRecipe.ing.length) {
+      roundSuccess();
+    }
+  } else {
+    triggerExplosion(key, card);
+  }
+}
+
+function triggerExplosion(key, card) {
+  locked = true;
+  wrongTried.push(key);
+  card.classList.add("shake");
+
+  const layer = document.getElementById("explosionLayer");
+  layer.innerHTML = "";
+  const boom = document.createElement("div");
+  boom.className = "boom-emoji go";
+  boom.textContent = "💥";
+  layer.appendChild(boom);
+  for (let i = 0; i < 8; i++) {
+    const spark = document.createElement("div");
+    spark.className = "spark go";
+    spark.textContent = ["✨", "💢", "🔸"][i % 3];
+    const ang = (i / 8) * Math.PI * 2;
+    spark.style.setProperty("--dx", Math.cos(ang) * 90 + "px");
+    spark.style.setProperty("--dy", Math.sin(ang) * 90 + "px");
+    layer.appendChild(spark);
+  }
+
+  const feedback = document.getElementById("feedbackBox");
+  feedback.classList.remove("hidden");
+  feedback.classList.add("wrong");
+  const invented = `${currentRecipe.result.name} con ${INGREDIENTS[key].name}`;
+  const IRONIC_LINES = [
+    `💥 "${invented}"... felicitaciones, acabás de inventar algo incomible.`,
+    `💥 "${invented}"... eso ni el gato lo come.`,
+    `💥 "${invented}"... el sector primario te devuelve el pedido, avergonzado.`,
+    `💥 "${invented}"... Nobel de Química no te van a dar, seguro.`,
+    `💥 "${invented}"... eso no existe, y con razón.`,
+  ];
+  feedback.textContent = IRONIC_LINES[Math.floor(Math.random() * IRONIC_LINES.length)];
+
+  setTimeout(() => {
+    card.classList.remove("shake");
+    card.classList.add("disabled");
+    layer.innerHTML = "";
+    feedback.classList.add("hidden");
+    feedback.classList.remove("wrong");
+    locked = false;
+  }, 2000);
+}
+
+function roundSuccess() {
+  locked = true;
+  discoveredCount++;
+  updateScore();
+
+  const pop = document.getElementById("successPop");
+  document.getElementById("successEmoji").textContent = currentRecipe.result.emoji;
+  document.getElementById("successText").textContent = `¡${currentRecipe.result.name}!`;
+  document.getElementById("successSub").textContent =
+    currentRecipe.ing.map((k) => INGREDIENTS[k].name).join(" + ") + " = " + currentRecipe.result.name;
+  pop.classList.add("show");
+
+  setTimeout(() => {
+    pop.classList.remove("show");
+    roundIndex++;
+    startRound();
+  }, 1800);
+}
+
+startGame();
+
+/* =============================================================
+   MODO "PLATOS FAMOSOS" — 60 recetas reales (mayoría italianas
+   y españolas), con ingredientes basados en las recetas de
+   GialloZafferano (y su versión en español, giallozafferano.es,
+   que también cubre clásicos españoles como la tortilla o la
+   paella). El jugador elige el plato y hace clic en sus
+   ingredientes reales.
+   ============================================================= */
+let currentDish = null;
+let currentCuisineFilter = "all";
+
+const DISH_INGREDIENTS = {
+  pasta: { name: "Pasta", emoji: "🍝" },
+  masaPizza: { name: "Masa de pizza", emoji: "🍕" },
+  guanciale: { name: "Guanciale", emoji: "🥓", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Guanciale.jpg" },
+  panceta: { name: "Panceta", emoji: "🥓", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Pancetta.jpg" },
+  pecorino: { name: "Pecorino romano", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Pecorino%20romano%20cheese.jpg" },
+  parmesano: { name: "Parmesano", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Parmigiano%20Reggiano%20cheese.jpg" },
+  mozzarella: { name: "Mozzarella", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Mozzarella%20di%20bufala2.jpg" },
+  gorgonzola: { name: "Gorgonzola", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Gorgonzola%201.jpg" },
+  ricotta: { name: "Ricotta", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Ricotta.jpeg" },
+  mascarpone: { name: "Mascarpone", emoji: "🧀", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Mascarpone%202.jpg" },
+  pimientaNegra: { name: "Pimienta negra", emoji: "⚫" },
+  huevo: { name: "Huevo", emoji: "🥚" },
+  tomate: { name: "Tomate", emoji: "🍅" },
+  albahaca: { name: "Albahaca", emoji: "🌿" },
+  aceiteOliva: { name: "Aceite de oliva", emoji: "🫒" },
+  ajo: { name: "Ajo", emoji: "🧄" },
+  oregano: { name: "Orégano", emoji: "🌿" },
+  carnePicada: { name: "Carne picada", emoji: "🥩" },
+  ternera: { name: "Ternera", emoji: "🐮" },
+  cerdo: { name: "Cerdo", emoji: "🐷" },
+  pollo: { name: "Pollo", emoji: "🍗" },
+  conejo: { name: "Conejo", emoji: "🐰" },
+  leche: { name: "Leche", emoji: "🥛" },
+  nata: { name: "Nata", emoji: "🥛" },
+  mantequilla: { name: "Mantequilla", emoji: "🧈" },
+  harina: { name: "Harina", emoji: "🌾" },
+  arroz: { name: "Arroz", emoji: "🍚" },
+  azafran: { name: "Azafrán", emoji: "🌼" },
+  cebolla: { name: "Cebolla", emoji: "🧅" },
+  cafeEspresso: { name: "Café espresso", emoji: "☕" },
+  cacaoPolvo: { name: "Cacao en polvo", emoji: "🍫" },
+  bizcochos: { name: "Bizcochos (savoiardi)", emoji: "🍪" },
+  azucar: { name: "Azúcar", emoji: "🍬" },
+  vainilla: { name: "Vainilla", emoji: "🌱" },
+  vinoBlanco: { name: "Vino blanco", emoji: "🥂" },
+  zanahoria: { name: "Zanahoria", emoji: "🥕" },
+  apio: { name: "Apio", emoji: "🥬" },
+  berenjena: { name: "Berenjena", emoji: "🍆" },
+  espinaca: { name: "Espinaca", emoji: "🥬" },
+  patata: { name: "Patata", emoji: "🥔" },
+  pan: { name: "Pan", emoji: "🍞" },
+  panRallado: { name: "Pan rallado", emoji: "🍞" },
+  pepino: { name: "Pepino", emoji: "🥒" },
+  pimiento: { name: "Pimiento", emoji: "🫑" },
+  vinagre: { name: "Vinagre", emoji: "🍶" },
+  judiasBlancas: { name: "Judías blancas", emoji: "🫘" },
+  garbanzos: { name: "Garbanzos", emoji: "🫘" },
+  col: { name: "Col", emoji: "🥬" },
+  harinaMaiz: { name: "Harina de maíz", emoji: "🌽" },
+  setas: { name: "Setas", emoji: "🍄" },
+  almejas: { name: "Almejas", emoji: "🦪" },
+  mejillones: { name: "Mejillones", emoji: "🦪" },
+  calamar: { name: "Calamar", emoji: "🦑" },
+  gambas: { name: "Gambas", emoji: "🦐" },
+  pulpo: { name: "Pulpo", emoji: "🐙" },
+  perejil: { name: "Perejil", emoji: "🌿" },
+  pistachos: { name: "Pistachos", emoji: "🥜" },
+  almendras: { name: "Almendras", emoji: "🌰" },
+  chocolate: { name: "Chocolate", emoji: "🍫" },
+  calabacin: { name: "Calabacín", emoji: "🥒" },
+  anchoas: { name: "Anchoas", emoji: "🐟" },
+  jamon: { name: "Jamón", emoji: "🍖" },
+  chorizo: { name: "Chorizo", emoji: "🌭" },
+  morcilla: { name: "Morcilla", emoji: "🌭" },
+  pimenton: { name: "Pimentón", emoji: "🌶️" },
+  guindilla: { name: "Guindilla", emoji: "🌶️" },
+  romero: { name: "Romero", emoji: "🌿" },
+  canela: { name: "Canela", emoji: "🟤" },
+  callos: { name: "Callos (tripa)", emoji: "🍲" },
+  atun: { name: "Atún", emoji: "🐟" },
+  bacalao: { name: "Bacalao", emoji: "🐟" },
+  alcaparras: { name: "Alcaparras", emoji: "🫒" },
+  limon: { name: "Limón", emoji: "🍋" },
+  judiaVerde: { name: "Judía verde", emoji: "🫛" },
+  garrofon: { name: "Garrofón (alubia)", emoji: "🫘" },
+  salsa: { name: "Sal", emoji: "🧂" },
+  guisantes: { name: "Guisantes", emoji: "🟢" },
+  queso: { name: "Queso genérico", emoji: "🧀" },
+  cobre: { name: "Cobre", emoji: "🟠" },
+  hierro: { name: "Mineral de hierro", emoji: "⛏️" },
+  madera: { name: "Madera", emoji: "🪵" },
+  plastico: { name: "Plástico", emoji: "🧴" },
+  arena: { name: "Arena", emoji: "🏖️" },
+  platano: { name: "Plátano verde", emoji: "🍌" },
+  yuca: { name: "Yuca", emoji: "🥔" },
+  aguacate: { name: "Aguacate", emoji: "🥑" },
+  tortilla: { name: "Tortilla de maíz", emoji: "🫓" },
+};
+
+const DISHES = [
+  // ---------------- ITALIANA ----------------
+  { name: "Spaghetti alla Carbonara", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "guanciale", "huevo", "pecorino", "pimientaNegra"], confusables: ["nata", "parmesano", "panceta"], img: "https://commons.wikimedia.org/wiki/Special:FilePath/Spaghetti%20carbonara.jpg" },
+  { name: "Cacio e Pepe", emoji: "🧀", cuisine: "italiana", ing: ["pasta", "pecorino", "pimientaNegra"], confusables: ["nata", "parmesano", "aceiteOliva"], img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cacio%20e%20pepe.jpg" },
+  { name: "Pasta all'Amatriciana", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "guanciale", "tomate", "pecorino", "pimientaNegra"], confusables: ["panceta", "cebolla", "parmesano"] },
+  { name: "Pasta alla Gricia", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "guanciale", "pecorino", "pimientaNegra"] },
+  { name: "Pizza Margherita", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "mozzarella", "albahaca", "aceiteOliva"], confusables: ["nata", "oregano", "gorgonzola"], img: "https://commons.wikimedia.org/wiki/Special:FilePath/Eq%20it-na%20pizza-margherita%20sep2005%20sml.jpg" },
+  { name: "Pizza Marinara", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "ajo", "oregano", "aceiteOliva"] },
+  { name: "Pizza Quattro Formaggi", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "mozzarella", "gorgonzola", "parmesano"] },
+  { name: "Lasaña a la Boloñesa", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "carnePicada", "tomate", "leche", "parmesano"], confusables: ["nata", "mozzarella"] },
+  { name: "Risotto a la Milanesa", emoji: "🍚", cuisine: "italiana", ing: ["arroz", "azafran", "mantequilla", "parmesano", "cebolla"], confusables: ["nata", "vinoBlanco"] },
+  { name: "Tiramisú", emoji: "🍰", cuisine: "italiana", ing: ["cafeEspresso", "mascarpone", "huevo", "azucar", "cacaoPolvo", "bizcochos"], confusables: ["leche", "chocolate", "nata"] },
+  { name: "Panna Cotta", emoji: "🍮", cuisine: "italiana", ing: ["nata", "azucar", "vainilla"] },
+  { name: "Osso Buco", emoji: "🍖", cuisine: "italiana", ing: ["ternera", "vinoBlanco", "zanahoria", "cebolla", "apio"] },
+  { name: "Parmigiana de Berenjenas", emoji: "🍆", cuisine: "italiana", ing: ["berenjena", "tomate", "mozzarella", "parmesano", "albahaca"] },
+  { name: "Gnocchi al Pomodoro", emoji: "🥔", cuisine: "italiana", ing: ["patata", "harina", "huevo", "tomate", "albahaca"] },
+  { name: "Ravioli de Ricotta y Espinaca", emoji: "🥟", cuisine: "italiana", ing: ["pasta", "ricotta", "espinaca", "parmesano", "mantequilla"] },
+  { name: "Ensalada Caprese", emoji: "🍅", cuisine: "italiana", ing: ["tomate", "mozzarella", "albahaca", "aceiteOliva"] },
+  { name: "Bruschetta al Pomodoro", emoji: "🍞", cuisine: "italiana", ing: ["pan", "tomate", "ajo", "albahaca", "aceiteOliva"] },
+  { name: "Minestrone", emoji: "🍲", cuisine: "italiana", ing: ["judiasBlancas", "zanahoria", "apio", "patata", "tomate", "pasta"] },
+  { name: "Saltimbocca alla Romana", emoji: "🍖", cuisine: "italiana", ing: ["ternera", "jamon", "vinoBlanco", "mantequilla"] },
+  { name: "Vitello Tonnato", emoji: "🍖", cuisine: "italiana", ing: ["ternera", "atun", "alcaparras", "huevo"] },
+  { name: "Arancini", emoji: "🍙", cuisine: "italiana", ing: ["arroz", "tomate", "carnePicada", "mozzarella", "huevo", "panRallado"] },
+  { name: "Focaccia Genovesa", emoji: "🍞", cuisine: "italiana", ing: ["harina", "aceiteOliva", "salsa"] },
+  { name: "Trofie al Pesto", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "albahaca", "pistachos", "parmesano", "ajo", "aceiteOliva"] },
+  { name: "Panzanella", emoji: "🥗", cuisine: "italiana", ing: ["pan", "tomate", "pepino", "cebolla", "aceiteOliva", "vinagre"] },
+  { name: "Ribollita", emoji: "🍲", cuisine: "italiana", ing: ["judiasBlancas", "col", "pan", "tomate", "zanahoria"] },
+  { name: "Pappa al Pomodoro", emoji: "🍅", cuisine: "italiana", ing: ["pan", "tomate", "ajo", "albahaca", "aceiteOliva"] },
+  { name: "Polenta", emoji: "🌽", cuisine: "italiana", ing: ["harinaMaiz", "mantequilla", "parmesano"] },
+  { name: "Risotto a los Boletus", emoji: "🍄", cuisine: "italiana", ing: ["arroz", "setas", "mantequilla", "parmesano", "vinoBlanco"] },
+  { name: "Spaghetti alle Vongole", emoji: "🍝", cuisine: "italiana", ing: ["pasta", "almejas", "ajo", "perejil", "vinoBlanco"] },
+  { name: "Tortellini in Brodo", emoji: "🥟", cuisine: "italiana", ing: ["pasta", "carnePicada", "parmesano"] },
+  { name: "Cannoli Sicilianos", emoji: "🥐", cuisine: "italiana", ing: ["harina", "ricotta", "azucar", "chocolate", "pistachos"] },
+  { name: "Zabaione", emoji: "🍮", cuisine: "italiana", ing: ["huevo", "azucar", "vinoBlanco"] },
+  { name: "Frittata de Calabacín", emoji: "🍳", cuisine: "italiana", ing: ["huevo", "calabacin", "parmesano", "cebolla"] },
+  { name: "Bagna Cauda", emoji: "🫙", cuisine: "italiana", ing: ["ajo", "anchoas", "aceiteOliva", "mantequilla"] },
+  { name: "Gnocchi alla Sorrentina", emoji: "🥔", cuisine: "italiana", ing: ["patata", "harina", "tomate", "mozzarella", "albahaca"] },
+  { name: "Cotoletta alla Milanese", emoji: "🍖", cuisine: "italiana", ing: ["ternera", "huevo", "panRallado", "mantequilla", "parmesano"] },
+
+  // ---------------- ESPAÑOLA ----------------
+  { name: "Tortilla Española", emoji: "🍳", cuisine: "española", ing: ["patata", "huevo", "cebolla", "aceiteOliva"], confusables: ["pimiento", "chorizo"] },
+  { name: "Paella Valenciana", emoji: "🥘", cuisine: "española", ing: ["arroz", "pollo", "conejo", "judiaVerde", "garrofon", "azafran"], confusables: ["chorizo", "guisantes", "gambas"], img: "https://commons.wikimedia.org/wiki/Special:FilePath/01%20Paella%20Valenciana%20original.jpg" },
+  { name: "Paella de Marisco", emoji: "🥘", cuisine: "española", ing: ["arroz", "gambas", "mejillones", "calamar", "tomate", "azafran"] },
+  { name: "Gazpacho", emoji: "🥣", cuisine: "española", ing: ["tomate", "pepino", "pimiento", "cebolla", "ajo", "aceiteOliva", "pan"], confusables: ["pimenton", "leche"] },
+  { name: "Salmorejo", emoji: "🥣", cuisine: "española", ing: ["tomate", "pan", "ajo", "aceiteOliva", "jamon"] },
+  { name: "Croquetas de Jamón", emoji: "🥟", cuisine: "española", ing: ["jamon", "leche", "mantequilla", "harina", "huevo", "panRallado"], confusables: ["pollo", "queso"] },
+  { name: "Patatas Bravas", emoji: "🍟", cuisine: "española", ing: ["patata", "tomate", "pimenton", "aceiteOliva", "ajo"] },
+  { name: "Pulpo a la Gallega", emoji: "🐙", cuisine: "española", ing: ["pulpo", "patata", "pimenton", "aceiteOliva", "salsa"] },
+  { name: "Fabada Asturiana", emoji: "🍲", cuisine: "española", ing: ["judiasBlancas", "chorizo", "morcilla", "panceta", "azafran"] },
+  { name: "Cochinillo Asado", emoji: "🍖", cuisine: "española", ing: ["cerdo", "ajo", "romero", "vinoBlanco", "mantequilla"] },
+  { name: "Pisto Manchego", emoji: "🍆", cuisine: "española", ing: ["calabacin", "pimiento", "tomate", "cebolla", "berenjena", "aceiteOliva"] },
+  { name: "Churros con Chocolate", emoji: "🥖", cuisine: "española", ing: ["harina", "salsa", "chocolate", "azucar"] },
+  { name: "Crema Catalana", emoji: "🍮", cuisine: "española", ing: ["leche", "huevo", "azucar", "canela", "limon"], confusables: ["nata", "chocolate"] },
+  { name: "Pan con Tomate", emoji: "🍞", cuisine: "española", ing: ["pan", "tomate", "ajo", "aceiteOliva"] },
+  { name: "Cocido Madrileño", emoji: "🍲", cuisine: "española", ing: ["garbanzos", "ternera", "chorizo", "morcilla", "col", "patata"] },
+  { name: "Callos a la Madrileña", emoji: "🍲", cuisine: "española", ing: ["callos", "chorizo", "morcilla", "pimenton", "garbanzos"] },
+  { name: "Ajoblanco", emoji: "🥣", cuisine: "española", ing: ["almendras", "pan", "ajo", "aceiteOliva", "vinagre"] },
+  { name: "Empanada Gallega", emoji: "🥧", cuisine: "española", ing: ["harina", "atun", "cebolla", "pimiento", "tomate"] },
+  { name: "Marmitako", emoji: "🍲", cuisine: "española", ing: ["atun", "patata", "pimiento", "tomate", "cebolla"] },
+  { name: "Escalivada", emoji: "🍆", cuisine: "española", ing: ["berenjena", "pimiento", "cebolla", "aceiteOliva"] },
+  { name: "Tarta de Santiago", emoji: "🥮", cuisine: "española", ing: ["almendras", "azucar", "huevo", "limon"] },
+  { name: "Migas", emoji: "🍞", cuisine: "española", ing: ["pan", "chorizo", "panceta", "pimiento", "ajo"] },
+  { name: "Bacalao al Pil Pil", emoji: "🐟", cuisine: "española", ing: ["bacalao", "ajo", "aceiteOliva", "guindilla"] },
+  { name: "Gambas al Ajillo", emoji: "🦐", cuisine: "española", ing: ["gambas", "ajo", "guindilla", "aceiteOliva", "perejil"] },
+
+  // ---------------- DOMINICANA ----------------
+  { name: "Mangú", emoji: "🍌", cuisine: "dominicana", ing: ["platano", "mantequilla", "cebolla"] },
+  { name: "Sancocho", emoji: "🍲", cuisine: "dominicana", ing: ["pollo", "ternera", "platano", "patata"] },
+  { name: "Mofongo", emoji: "🍌", cuisine: "dominicana", ing: ["platano", "ajo", "cerdo"] },
+  { name: "Moro de Guandules", emoji: "🍚", cuisine: "dominicana", ing: ["arroz", "guisantes", "cebolla"] },
+  { name: "Pollo Guisado", emoji: "🍗", cuisine: "dominicana", ing: ["pollo", "tomate", "cebolla", "ajo"] },
+  { name: "Tostones", emoji: "🍌", cuisine: "dominicana", ing: ["platano", "aceiteOliva", "salsa"] },
+  { name: "Habichuelas con Dulce", emoji: "🍮", cuisine: "dominicana", ing: ["judiasBlancas", "leche", "azucar", "canela"] },
+  { name: "Chicharrón de Cerdo", emoji: "🍖", cuisine: "dominicana", ing: ["cerdo", "salsa"] },
+  { name: "Yaniqueques", emoji: "🫓", cuisine: "dominicana", ing: ["harina", "salsa"] },
+  { name: "Locrio", emoji: "🍚", cuisine: "dominicana", ing: ["arroz", "pollo", "tomate"] },
+
+  // ---------------- OTRAS COCINAS FAMOSAS DEL MUNDO ----------------
+  { name: "Tacos", emoji: "🌮", cuisine: "otra", ing: ["tortilla", "carnePicada", "cebolla", "tomate"] },
+  { name: "Curry de Pollo", emoji: "🍛", cuisine: "otra", ing: ["pollo", "cebolla", "tomate"] },
+  { name: "Hummus", emoji: "🧆", cuisine: "otra", ing: ["garbanzos", "aceiteOliva", "ajo"] },
+  { name: "Ratatouille", emoji: "🍆", cuisine: "otra", ing: ["berenjena", "calabacin", "tomate", "pimiento"] },
+  { name: "Falafel", emoji: "🧆", cuisine: "otra", ing: ["garbanzos", "ajo", "perejil"] },
+  { name: "Guacamole", emoji: "🥑", cuisine: "otra", ing: ["aguacate", "limon", "cebolla"] },
+  { name: "Ceviche", emoji: "🐟", cuisine: "otra", ing: ["atun", "limon", "cebolla"] },
+  { name: "Fish and Chips", emoji: "🍟", cuisine: "otra", ing: ["bacalao", "patata"] },
+  { name: "Sushi", emoji: "🍣", cuisine: "japonesa", ing: ["arroz", "atun"] },
+  { name: "Ramen", emoji: "🍜", cuisine: "japonesa", ing: ["pollo", "huevo", "cebolla"] },
+
+  // ---------------- JAPONESA ----------------
+  { name: "Tempura de Gambas", emoji: "🍤", cuisine: "japonesa", ing: ["gambas", "harina", "huevo"] },
+  { name: "Yakitori", emoji: "🍢", cuisine: "japonesa", ing: ["pollo", "salsa"] },
+  { name: "Okonomiyaki", emoji: "🥞", cuisine: "japonesa", ing: ["harina", "huevo", "col"] },
+  { name: "Gyoza", emoji: "🥟", cuisine: "japonesa", ing: ["harina", "carnePicada", "col"] },
+  { name: "Udon", emoji: "🍜", cuisine: "japonesa", ing: ["harina", "salsa"] },
+  { name: "Tonkatsu", emoji: "🍖", cuisine: "japonesa", ing: ["cerdo", "panRallado", "huevo"] },
+  { name: "Onigiri", emoji: "🍙", cuisine: "japonesa", ing: ["arroz", "salsa"] },
+  { name: "Takoyaki", emoji: "🐙", cuisine: "japonesa", ing: ["pulpo", "harina", "huevo"] },
+  { name: "Yakisoba", emoji: "🍜", cuisine: "japonesa", ing: ["harina", "pollo", "col"] },
+  { name: "Katsudon", emoji: "🍚", cuisine: "japonesa", ing: ["cerdo", "huevo", "arroz", "cebolla"] },
+
+  // ---------------- MÁS PIZZAS (todas con harina, además de la masa) ----------------
+  { name: "Pizza Pepperoni", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "mozzarella", "chorizo"] },
+  { name: "Pizza Diavola", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "mozzarella", "guindilla"] },
+  { name: "Pizza Prosciutto", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "mozzarella", "jamon"] },
+  { name: "Pizza Capricciosa", emoji: "🍕", cuisine: "italiana", ing: ["masaPizza", "harina", "tomate", "mozzarella", "setas", "jamon"] },
+  { name: "Panzerotti", emoji: "🥟", cuisine: "italiana", ing: ["masaPizza", "harina", "mozzarella", "tomate"] },
+
+  // ---------------- OTRAS COCINAS DEL MUNDO (más) ----------------
+  { name: "Quesadilla", emoji: "🧀", cuisine: "otra", ing: ["tortilla", "queso"] },
+  { name: "Enchiladas", emoji: "🌯", cuisine: "otra", ing: ["tortilla", "pollo", "tomate", "queso"] },
+  { name: "Naan", emoji: "🫓", cuisine: "otra", ing: ["harina", "mantequilla", "salsa"] },
+  { name: "Quiche Lorena", emoji: "🥧", cuisine: "otra", ing: ["harina", "huevo", "leche", "panceta"] },
+  { name: "Moussaka", emoji: "🍆", cuisine: "otra", ing: ["berenjena", "carnePicada", "leche", "queso"] },
+];
+
+function dishVisual(dish, size) {
+  if (dish.img) {
+    return `<img src="${dish.img}" alt="${dish.name}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:10px;border:2px solid var(--ink);" onerror="this.outerHTML='<div class=&quot;emoji&quot;>${dish.emoji}</div>'">`;
+  }
+  return `<div class="emoji">${dish.emoji}</div>`;
+}
+
+function ingVisual(ing, size) {
+  if (ing.img) {
+    return `<img src="${ing.img}" alt="${ing.name}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:8px;border:2px solid var(--ink);" onerror="this.outerHTML='<span>${ing.emoji}</span>'">`;
+  }
+  return `<span>${ing.emoji}</span>`;
+}
+
+function renderDishGrid() {
+  const grid = document.getElementById("dishGrid");
+  grid.innerHTML = "";
+  const list = DISHES.filter((d) => currentCuisineFilter === "all" || d.cuisine === currentCuisineFilter);
+  list.forEach((dish) => {
+    const card = document.createElement("div");
+    card.className = "dish-card";
+    const flag = dish.cuisine === "italiana" ? "🇮🇹" : dish.cuisine === "española" ? "🇪🇸" : dish.cuisine === "dominicana" ? "🇩🇴" : dish.cuisine === "japonesa" ? "🇯🇵" : "🌍";
+    card.innerHTML = `<div class="flag">${flag}</div>${dishVisual(dish, 64)}<div class="label">${dish.name}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+const CELL = 58;
+const GRID_COLS = 9;
+const GRID_ROWS = 5;
+const BOARD_POS = { col: 1, row: 2 };
+const POT_POS = { col: 3, row: 2 };
+const PLATE_POS = { col: 5, row: 2 };
+const SERVE_POS = { col: 7, row: 2 };
+const TRASH_POS = { col: 8, row: 4 };
+const SHIFT_SECONDS = 180;
+
+let kitchenPool = [];
+let plated = [];
+let playerCount = 1;
+let players = [{ col: 3, row: 4, holding: null }, { col: 5, row: 4, holding: null }];
+let kitchenLocked = false;
+let kitchenInputLocked = [false, false];
+
+let shiftActive = false;
+let shiftTimer = SHIFT_SECONDS;
+let orderTimer = 0;
+let shiftInterval = null;
+let score = 0;
+let combo = 0;
+let maxCombo = 0;
+let ordersCompleted = 0;
+let ordersFailed = 0;
+
+function setupKitchenGrid() {
+  const grid = document.getElementById("kitchenGrid");
+  grid.style.width = GRID_COLS * CELL + "px";
+  grid.style.height = GRID_ROWS * CELL + "px";
+}
+
+document.getElementById("playersOneBtn").addEventListener("click", () => setPlayerCount(1));
+document.getElementById("playersTwoBtn").addEventListener("click", () => setPlayerCount(2));
+
+function setPlayerCount(n) {
+  playerCount = n;
+  document.getElementById("playersOneBtn").classList.toggle("active", n === 1);
+  document.getElementById("playersTwoBtn").classList.toggle("active", n === 2);
+  const hint = document.getElementById("controlsHint");
+  if (n === 1) {
+    hint.innerHTML = "🧑‍🍳 <b>Jugador 1</b>: flechas para moverte, ESPACIO para interactuar (o usá el D-pad en pantalla).";
+  } else {
+    hint.innerHTML =
+      "🧑‍🍳 <b>Jugador 1</b>: flechas para moverte, ESPACIO para interactuar.<br>" +
+      "🧑‍🍳 <b>Jugador 2</b>: teclas W A S D para moverte, F para interactuar.<br>" +
+      "Repártanse las tareas: uno corta y cocina, el otro emplata y sirve.";
+  }
+}
+setPlayerCount(1);
+
+document.getElementById("startShiftBtn").addEventListener("click", startShift);
+
+function startShift() {
+  score = 0;
+  combo = 0;
+  maxCombo = 0;
+  ordersCompleted = 0;
+  ordersFailed = 0;
+  shiftTimer = SHIFT_SECONDS;
+  shiftActive = true;
+  players = [
+    { col: 3, row: 4, holding: null },
+    { col: 5, row: 4, holding: null },
+  ];
+  kitchenLocked = false;
+  kitchenInputLocked = [false, false];
+
+  updateShiftLabel();
+  updateScoreLabel();
+
+  clearInterval(shiftInterval);
+  shiftInterval = setInterval(() => {
+    shiftTimer--;
+    orderTimer--;
+    updateShiftLabel();
+    if (orderTimer <= 0) {
+      onOrderExpired();
+    }
+    if (shiftTimer <= 0) {
+      endShift();
+    }
+  }, 1000);
+
+  dishSelectScreen.classList.add("hidden");
+  dishRoundScreen.classList.remove("hidden");
+  document.getElementById("dishFailPop").classList.remove("show");
+  document.getElementById("dishSuccessPop").classList.remove("show");
+  document.getElementById("shiftResultsScreen").classList.add("hidden");
+
+  drawNewOrder();
+}
+
+function updateShiftLabel() {
+  const m = Math.max(0, Math.floor(shiftTimer / 60));
+  const s = Math.max(0, shiftTimer % 60);
+  document.getElementById("shiftTimerLabel").textContent = `⏱ ${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function updateScoreLabel() {
+  document.getElementById("scoreComboLabel").textContent = `🏆 ${score} pts · Combo x${combo}`;
+}
+
+function drawNewOrder() {
+  if (!shiftActive) return;
+  currentDish = DISHES[Math.floor(Math.random() * DISHES.length)];
+  plated = [];
+  players.forEach((p) => (p.holding = null));
+
+  const allKeys = Object.keys(DISH_INGREDIENTS);
+  const correctKeys = currentDish.ing;
+  const guaranteed = (currentDish.confusables || []).filter((k) => !correctKeys.includes(k));
+  const remainingPool = shuffle(allKeys.filter((k) => !correctKeys.includes(k) && !guaranteed.includes(k)));
+  const stationSlots = Math.min(GRID_COLS, Math.max(6, correctKeys.length + 3));
+  const extraNeeded = Math.max(0, stationSlots - correctKeys.length - guaranteed.length);
+  const poolKeys = shuffle([...correctKeys, ...guaranteed, ...remainingPool.slice(0, extraNeeded)]).slice(0, GRID_COLS);
+  kitchenPool = poolKeys.map((key, i) => ({ key, col: i, row: 0, used: false }));
+
+  orderTimer = 15 * correctKeys.length + 20;
+  document.getElementById("kitchenOrderLabel").textContent = `Pedido: ${currentDish.name}`;
+
+  renderDishTarget();
+  renderKitchen();
+  document.getElementById("dishFeedbackBox").classList.add("hidden");
+  document.getElementById("dishExplosionLayer").innerHTML = "";
+  const chefEl = document.getElementById("dishChefMascot");
+  chefEl.classList.remove("go");
+  chefEl.innerHTML = "";
+}
+
+function renderDishTarget() {
+  const row = document.getElementById("dishTargetRow");
+  row.innerHTML = "";
+  currentDish.ing.forEach((key, i) => {
+    if (i > 0) {
+      const plus = document.createElement("span");
+      plus.className = "plus-sign";
+      plus.textContent = "+";
+      row.appendChild(plus);
+    }
+    const slot = document.createElement("div");
+    slot.className = "slot" + (plated.includes(key) ? " filled" : "");
+    slot.id = "dishSlot-" + key;
+    slot.textContent = plated.includes(key) ? DISH_INGREDIENTS[key].emoji : "?";
+    row.appendChild(slot);
+  });
+  const eq = document.createElement("span");
+  eq.className = "eq-sign";
+  eq.textContent = "=";
+  row.appendChild(eq);
+  const target = document.createElement("div");
+  target.className = "target-product";
+  target.innerHTML = `${dishVisual(currentDish, 90)}<div class="name">${currentDish.name}</div>`;
+  row.appendChild(target);
+}
+
+function renderKitchen() {
+  const grid = document.getElementById("kitchenGrid");
+  grid.innerHTML = "";
+  setupKitchenGrid();
+
+  kitchenPool.forEach((st) => {
+    const el = document.createElement("div");
+    el.className = "kitchen-station" + (st.used ? " used" : "");
+    el.style.left = st.col * CELL + 3 + "px";
+    el.style.top = st.row * CELL + 3 + "px";
+    el.innerHTML = `${ingVisual(DISH_INGREDIENTS[st.key], 40)}<span class="st-label">${DISH_INGREDIENTS[st.key].name}</span>`;
+    grid.appendChild(el);
+  });
+
+  const board = document.createElement("div");
+  board.className = "kitchen-station board";
+  board.style.left = BOARD_POS.col * CELL + 3 + "px";
+  board.style.top = BOARD_POS.row * CELL + 3 + "px";
+  board.innerHTML = `🔪<span class="st-label">Tabla</span>`;
+  grid.appendChild(board);
+
+  const pot = document.createElement("div");
+  pot.className = "kitchen-station pot";
+  pot.style.left = POT_POS.col * CELL + 3 + "px";
+  pot.style.top = POT_POS.row * CELL + 3 + "px";
+  pot.innerHTML = `🍳<span class="st-label">Olla</span>`;
+  grid.appendChild(pot);
+
+  const plate = document.createElement("div");
+  plate.className = "kitchen-station plate";
+  plate.style.left = PLATE_POS.col * CELL + 3 + "px";
+  plate.style.top = PLATE_POS.row * CELL + 3 + "px";
+  plate.innerHTML = `🍽️<span class="st-label">Plato</span>`;
+  grid.appendChild(plate);
+
+  const serve = document.createElement("div");
+  serve.className = "kitchen-station serve";
+  serve.style.left = SERVE_POS.col * CELL + 3 + "px";
+  serve.style.top = SERVE_POS.row * CELL + 3 + "px";
+  serve.innerHTML = `🛎️<span class="st-label">Entrega</span>`;
+  grid.appendChild(serve);
+
+  const trash = document.createElement("div");
+  trash.className = "kitchen-station trash";
+  trash.style.left = TRASH_POS.col * CELL + 3 + "px";
+  trash.style.top = TRASH_POS.row * CELL + 3 + "px";
+  trash.innerHTML = `🗑️<span class="st-label">Basura</span>`;
+  grid.appendChild(trash);
+
+  for (let i = 0; i < playerCount; i++) {
+    const p = players[i];
+    const el = document.createElement("div");
+    el.className = "kitchen-player" + (i === 1 ? " p2" : "");
+    el.id = "kitchenPlayer" + i;
+    el.style.left = p.col * CELL + 3 + "px";
+    el.style.top = p.row * CELL + 3 + "px";
+    const badgeState = p.holding ? (p.holding.cooked ? "🔥" : p.holding.chopped ? "🔪" : "🌱") : "";
+    el.innerHTML = `${i === 0 ? "🧑‍🍳" : "👩‍🍳"}${p.holding ? `<span class="held-badge">${DISH_INGREDIENTS[p.holding.key].emoji}</span><span class="held-state">${badgeState}</span>` : ""}`;
+    grid.appendChild(el);
+  }
+}
+
+function movePlayer(i, dx, dy) {
+  if (i >= playerCount || kitchenLocked || kitchenInputLocked[i]) return;
+  const p = players[i];
+  p.col = Math.max(0, Math.min(GRID_COLS - 1, p.col + dx));
+  p.row = Math.max(0, Math.min(GRID_ROWS - 1, p.row + dy));
+  const el = document.getElementById("kitchenPlayer" + i);
+  if (el) {
+    el.style.left = p.col * CELL + 3 + "px";
+    el.style.top = p.row * CELL + 3 + "px";
+  }
+}
+
+function sameCell(a, b) {
+  return a.col === b.col && a.row === b.row;
+}
+
+function spawnFx(cls, emoji, col, row) {
+  const grid = document.getElementById("kitchenGrid");
+  const fx = document.createElement("div");
+  fx.className = cls;
+  fx.textContent = emoji;
+  fx.style.left = col * CELL + 14 + "px";
+  fx.style.top = row * CELL - 6 + "px";
+  grid.appendChild(fx);
+  setTimeout(() => fx.remove(), 900);
+}
+
+function kitchenAction(i) {
+  if (i >= playerCount || kitchenLocked || kitchenInputLocked[i]) return;
+  const p = players[i];
+
+  const st = kitchenPool.find((s) => !s.used && sameCell(p, s));
+  if (st && !p.holding) {
+    p.holding = { key: st.key, chopped: false, cooked: false, fromStation: st };
+    st.used = true;
+    renderKitchen();
+    spawnFx("grab-pop", DISH_INGREDIENTS[st.key].emoji, st.col, st.row);
+    const stEl = document.querySelectorAll(".kitchen-station")[kitchenPool.indexOf(st)];
+    if (stEl) {
+      stEl.classList.add("station-flash");
+      setTimeout(() => stEl.classList.remove("station-flash"), 300);
+    }
+    return;
+  }
+
+  if (sameCell(p, BOARD_POS) && p.holding && !p.holding.chopped) {
+    kitchenInputLocked[i] = true;
+    const el = document.getElementById("kitchenPlayer" + i);
+    el.classList.add("chopping");
+    spawnFx("grab-pop", "🔪", BOARD_POS.col, BOARD_POS.row);
+    setTimeout(() => {
+      el.classList.remove("chopping");
+      p.holding.chopped = true;
+      kitchenInputLocked[i] = false;
+    }, 700);
+    return;
+  }
+
+  if (sameCell(p, POT_POS) && p.holding && p.holding.chopped && !p.holding.cooked) {
+    kitchenInputLocked[i] = true;
+    const el = document.getElementById("kitchenPlayer" + i);
+    el.classList.add("cooking");
+    spawnFx("steam-fx", "💨", POT_POS.col, POT_POS.row);
+    setTimeout(() => spawnFx("steam-fx", "💨", POT_POS.col, POT_POS.row), 400);
+    setTimeout(() => {
+      el.classList.remove("cooking");
+      p.holding.cooked = true;
+      kitchenInputLocked[i] = false;
+    }, 1100);
+    return;
+  }
+
+  if (sameCell(p, PLATE_POS) && p.holding && p.holding.chopped && p.holding.cooked) {
+    const heldKey = p.holding.key;
+    if (currentDish.ing.includes(heldKey) && !plated.includes(heldKey)) {
+      plated.push(heldKey);
+      p.holding = null;
+      renderDishTarget();
+      renderKitchen();
+      const plateSlot = document.getElementById("dishSlot-" + heldKey);
+      if (plateSlot) {
+        plateSlot.classList.add("plate-pop");
+        setTimeout(() => plateSlot.classList.remove("plate-pop"), 400);
+      }
+    } else {
+      if (p.holding.fromStation) p.holding.fromStation.used = false;
+      p.holding = null;
+      renderKitchen();
+      kitchenWrongPlate(heldKey);
+    }
+    return;
+  }
+
+  if (sameCell(p, SERVE_POS) && plated.length >= currentDish.ing.length) {
+    const el = document.getElementById("kitchenPlayer" + i);
+    el.classList.add("serve-fly");
+    kitchenSuccess();
+    return;
+  }
+
+  if (sameCell(p, TRASH_POS) && p.holding) {
+    spawnFx("grab-pop", "🗑️", TRASH_POS.col, TRASH_POS.row);
+    if (p.holding.fromStation) p.holding.fromStation.used = false;
+    p.holding = null;
+    renderKitchen();
+  }
+}
+
+function kitchenWrongPlate(key) {
+  kitchenLocked = true;
+  const layer = document.getElementById("dishExplosionLayer");
+  layer.innerHTML = "";
+  const boom = document.createElement("div");
+  boom.className = "boom-emoji go";
+  boom.textContent = "💥";
+  layer.appendChild(boom);
+
+  const CHEF_LINES = [
+    "¡NOOO! ¡Eso jamás va en esta receta!",
+    "¡Con esto arruinás el plato entero!",
+    "¡Por Dios, eso es un sacrilegio culinario!",
+    "¡Mamma mia, así no!",
+  ];
+  const chef = document.getElementById("dishChefMascot");
+  const line = CHEF_LINES[Math.floor(Math.random() * CHEF_LINES.length)];
+  chef.innerHTML = `<div class="chef-emoji go">🧑‍🍳</div><div class="chef-bubble">${line}</div>`;
+  chef.classList.remove("go");
+  void chef.offsetWidth;
+  chef.classList.add("go");
+
+  const feedback = document.getElementById("dishFeedbackBox");
+  feedback.classList.remove("hidden");
+  feedback.classList.add("wrong");
+  feedback.textContent = `💥 "${DISH_INGREDIENTS[key].name}" no va en ${currentDish.name}. ¡Volvé a la despensa por otra cosa!`;
+
+  combo = 0;
+  updateScoreLabel();
+
+  setTimeout(() => {
+    layer.innerHTML = "";
+    chef.classList.remove("go");
+    chef.innerHTML = "";
+    feedback.classList.add("hidden");
+    feedback.classList.remove("wrong");
+    kitchenLocked = false;
+  }, 1450);
+}
+
+function kitchenSuccess() {
+  kitchenLocked = true;
+  const basePoints = 60 + currentDish.ing.length * 15;
+  const speedBonus = Math.max(0, orderTimer) * 2;
+  combo++;
+  maxCombo = Math.max(maxCombo, combo);
+  const comboBonus = (combo - 1) * 20;
+  const total = basePoints + speedBonus + comboBonus;
+  score += total;
+  ordersCompleted++;
+  updateScoreLabel();
+
+  const pop = document.getElementById("dishSuccessPop");
+  document.getElementById("dishSuccessEmoji").textContent = currentDish.emoji;
+  document.getElementById("dishSuccessText").textContent = `¡${currentDish.name} servido! +${total}`;
+  document.getElementById("dishSuccessSub").textContent =
+    combo > 1 ? `COMBO x${combo}! Bonus de velocidad y de combo incluidos.` : "Bonus de velocidad incluido.";
+  pop.classList.add("show");
+
+  setTimeout(() => {
+    pop.classList.remove("show");
+    kitchenLocked = false;
+    if (shiftActive) drawNewOrder();
+  }, 1300);
+}
+
+function onOrderExpired() {
+  kitchenLocked = true;
+  ordersFailed++;
+  combo = 0;
+  updateScoreLabel();
+  document.getElementById("dishFailPop").classList.add("show");
+
+  setTimeout(() => {
+    document.getElementById("dishFailPop").classList.remove("show");
+    kitchenLocked = false;
+    if (shiftActive) drawNewOrder();
+  }, 1300);
+}
+
+function endShift() {
+  shiftActive = false;
+  clearInterval(shiftInterval);
+  kitchenLocked = true;
+
+  const results = document.getElementById("shiftResultsScreen");
+  const stars = score >= 1200 ? "⭐⭐⭐" : score >= 600 ? "⭐⭐" : score >= 200 ? "⭐" : "☆";
+  document.getElementById("shiftStars").textContent = stars;
+  document.getElementById("shiftScoreTag").textContent = `${score} PUNTOS`;
+  document.getElementById("shiftStatsText").innerHTML =
+    `Pedidos completados: <b>${ordersCompleted}</b><br>` +
+    `Pedidos caducados: <b>${ordersFailed}</b><br>` +
+    `Combo máximo: <b>x${maxCombo}</b>`;
+  results.classList.remove("hidden");
+  dishRoundScreen.classList.add("hidden");
+}
+
+document.addEventListener("keydown", (e) => {
+  if (dishRoundScreen.classList.contains("hidden")) return;
+  const k = e.key;
+  if (k === "ArrowUp") { movePlayer(0, 0, -1); e.preventDefault(); }
+  else if (k === "ArrowDown") { movePlayer(0, 0, 1); e.preventDefault(); }
+  else if (k === "ArrowLeft") { movePlayer(0, -1, 0); e.preventDefault(); }
+  else if (k === "ArrowRight") { movePlayer(0, 1, 0); e.preventDefault(); }
+  else if (k === " ") { kitchenAction(0); e.preventDefault(); }
+  else if (k === "w" || k === "W") { movePlayer(1, 0, -1); }
+  else if (k === "s" || k === "S") { movePlayer(1, 0, 1); }
+  else if (k === "a" || k === "A") { movePlayer(1, -1, 0); }
+  else if (k === "d" || k === "D") { movePlayer(1, 1, 0); }
+  else if (k === "f" || k === "F") { kitchenAction(1); }
+});
+
+document.querySelectorAll(".dpad-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const dir = btn.dataset.dir;
+    if (dir === "up") movePlayer(0, 0, -1);
+    else if (dir === "down") movePlayer(0, 0, 1);
+    else if (dir === "left") movePlayer(0, -1, 0);
+    else if (dir === "right") movePlayer(0, 1, 0);
+    else if (dir === "action") kitchenAction(0);
+  });
+});
+
+document.getElementById("backToDishListBtn").addEventListener("click", () => {
+  shiftActive = false;
+  clearInterval(shiftInterval);
+  dishRoundScreen.classList.add("hidden");
+  document.getElementById("shiftResultsScreen").classList.add("hidden");
+  dishSelectScreen.classList.remove("hidden");
+});
+document.getElementById("shiftBackBtn").addEventListener("click", () => {
+  document.getElementById("shiftResultsScreen").classList.add("hidden");
+  dishSelectScreen.classList.remove("hidden");
+});
+
+document.getElementById("cuisineAll").addEventListener("click", () => setCuisineFilter("all", "cuisineAll"));
+document.getElementById("cuisineIt").addEventListener("click", () => setCuisineFilter("italiana", "cuisineIt"));
+document.getElementById("cuisineEs").addEventListener("click", () => setCuisineFilter("española", "cuisineEs"));
+document.getElementById("cuisineDo").addEventListener("click", () => setCuisineFilter("dominicana", "cuisineDo"));
+document.getElementById("cuisineJp").addEventListener("click", () => setCuisineFilter("japonesa", "cuisineJp"));
+document.getElementById("cuisineOtra").addEventListener("click", () => setCuisineFilter("otra", "cuisineOtra"));
+function setCuisineFilter(filter, btnId) {
+  currentCuisineFilter = filter;
+  document.querySelectorAll(".cuisine-tab").forEach((b) => b.classList.remove("active"));
+  document.getElementById(btnId).classList.add("active");
+  renderDishGrid();
+}
+
+/* =============================================================
+   MODO "CREÁ TU PLATO" — combinaciones libres y realistas desde
+   cero. Si coincide con un plato real, lo revela; si incluye algo
+   no comestible, el chef reacciona con humor; si no, se inventa
+   un nombre de plato con los ingredientes elegidos.
+   ============================================================= */
+const NON_FOOD_KEYS = ["cobre", "hierro", "madera", "plastico", "arena"];
+const SILLY_ADJECTIVES = ["Sorpresa", "Deconstruido", "a la Piedra", "del Chef Loco", "Experimental", "Fusión", "Misterioso", "Casero", "Gourmet", "de Autor", "a mi Manera"];
+let createTraySelection = [];
+let createLocked = false;
+
+function renderCreatePalette() {
+  const grid = document.getElementById("createPaletteGrid");
+  grid.innerHTML = "";
+  Object.keys(DISH_INGREDIENTS).forEach((key) => {
+    const ing = DISH_INGREDIENTS[key];
+    const card = document.createElement("div");
+    card.className = "ing-card" + (createTraySelection.includes(key) ? " correct-picked" : "");
+    card.innerHTML = `<div class="emoji">${ingVisual(ing, 32)}</div><div class="label">${ing.name}</div>`;
+    card.addEventListener("click", () => toggleCreateIngredient(key));
+    grid.appendChild(card);
+  });
+}
+
+function toggleCreateIngredient(key) {
+  if (createLocked) return;
+  document.getElementById("createResultBanner").classList.add("hidden");
+  const idx = createTraySelection.indexOf(key);
+  if (idx >= 0) createTraySelection.splice(idx, 1);
+  else {
+    if (createTraySelection.length >= 5) return;
+    createTraySelection.push(key);
+  }
+  renderCreateTray();
+  renderCreatePalette();
+}
+
+function renderCreateTray() {
+  const tray = document.getElementById("createTray");
+  tray.innerHTML = "";
+  createTraySelection.forEach((key, i) => {
+    if (i > 0) {
+      const plus = document.createElement("span");
+      plus.className = "plus-sign";
+      plus.textContent = "+";
+      tray.appendChild(plus);
+    }
+    const slot = document.createElement("div");
+    slot.className = "slot filled";
+    slot.textContent = DISH_INGREDIENTS[key].emoji;
+    tray.appendChild(slot);
+  });
+  document.getElementById("createInstruction").textContent = `Elegidos: ${createTraySelection.length} / 5`;
+}
+
+document.getElementById("clearTrayBtn").addEventListener("click", () => {
+  if (createLocked) return;
+  createTraySelection = [];
+  document.getElementById("createResultBanner").classList.add("hidden");
+  renderCreateTray();
+  renderCreatePalette();
+});
+
+let createBannerTimer = null;
+function showCreateBanner() {
+  const banner = document.getElementById("createResultBanner");
+  banner.classList.remove("hidden");
+  clearTimeout(createBannerTimer);
+  createBannerTimer = setTimeout(() => {
+    banner.classList.add("hidden");
+  }, 3000);
+}
+
+document.getElementById("cookBtn").addEventListener("click", () => {
+  if (createTraySelection.length < 2 || createLocked) return;
+  createLocked = true;
+  const set = createTraySelection.slice().sort();
+
+  const match = DISHES.find((d) => {
+    const dset = d.ing.slice().sort();
+    return dset.length === set.length && dset.every((v, i) => v === set[i]);
+  });
+  const hasNonFood = createTraySelection.some((k) => NON_FOOD_KEYS.includes(k));
+
+  const banner = document.getElementById("createResultBanner");
+  const emoji = document.getElementById("createResultEmoji");
+  const text = document.getElementById("createResultText");
+  const sub = document.getElementById("createResultSub");
+  const ingredientList = createTraySelection.map((k) => DISH_INGREDIENTS[k].name).join(" + ");
+
+  if (match) {
+    emoji.textContent = match.emoji;
+    text.textContent = `¡Sin querer recreaste "${match.name}"!`;
+    sub.textContent = "Ingredientes: " + ingredientList;
+    showCreateBanner();
+    createLocked = false;
+  } else if (hasNonFood) {
+    const layer = document.getElementById("createExplosionLayer");
+    layer.innerHTML = "";
+    const boom = document.createElement("div");
+    boom.className = "boom-emoji go";
+    boom.textContent = "☠️";
+    layer.appendChild(boom);
+    const chef = document.getElementById("createChefMascot");
+    chef.innerHTML = `<div class="chef-emoji go">🧑‍🍳</div><div class="chef-bubble">¡¿Qué le hiciste a mi cocina?! ¡Eso NO se come!</div>`;
+    chef.classList.remove("go");
+    void chef.offsetWidth;
+    chef.classList.add("go");
+    setTimeout(() => {
+      layer.innerHTML = "";
+      chef.classList.remove("go");
+      chef.innerHTML = "";
+      createLocked = false;
+    }, 1600);
+  } else {
+    const adj = SILLY_ADJECTIVES[Math.floor(Math.random() * SILLY_ADJECTIVES.length)];
+    const mainName = DISH_INGREDIENTS[createTraySelection[0]].name;
+    emoji.textContent = "🍽️";
+    text.textContent = `¡Inventaste "${mainName} ${adj}"!`;
+    sub.textContent = "Ingredientes: " + ingredientList;
+    showCreateBanner();
+    createLocked = false;
+  }
+});
+
+/* =============================================================
+   MODO "RULETA DE PLATOS" — dos ruedas que caen en ingredientes
+   al azar, y un cuadro para escribir el nombre de un plato real
+   (base de datos con cocina italiana, española, dominicana y
+   otros platos famosos del mundo).
+   ============================================================= */
+const ROULETTE_SEGMENTS = [
+  "harina", "leche", "atun", "arroz", "huevo", "tomate", "cerdo", "pollo",
+  "queso", "chocolate", "gambas", "limon", "aceiteOliva", "cebolla", "ajo", "patata",
+];
+const WHEEL_RADIUS = 78;
+
+function buildWheel(elId) {
+  const wheel = document.getElementById(elId);
+  wheel.innerHTML = "";
+  const n = ROULETTE_SEGMENTS.length;
+  const colors = ["#f2d98a", "#e8b45a"];
+  const gradientParts = ROULETTE_SEGMENTS.map((_, i) => {
+    const a0 = (360 / n) * i;
+    const a1 = (360 / n) * (i + 1);
+    return `${colors[i % 2]} ${a0}deg ${a1}deg`;
+  });
+  wheel.style.background = `conic-gradient(${gradientParts.join(",")})`;
+
+  ROULETTE_SEGMENTS.forEach((key, i) => {
+    const angle = (360 / n) * i + 360 / n / 2;
+    const span = document.createElement("span");
+    const ing = DISH_INGREDIENTS[key] || INGREDIENTS[key];
+    span.textContent = ing.emoji;
+    span.style.transform = `rotate(${angle}deg) translateY(-${WHEEL_RADIUS}px) rotate(${-angle}deg)`;
+    wheel.appendChild(span);
+  });
+}
+
+function initRouletteWheels() {
+  if (!document.getElementById("wheelA").children.length) {
+    buildWheel("wheelA");
+    buildWheel("wheelB");
+  }
+}
+
+function spinWheel(elId) {
+  const wheel = document.getElementById(elId);
+  const n = ROULETTE_SEGMENTS.length;
+  const targetIndex = Math.floor(Math.random() * n);
+  const segCenter = (360 / n) * targetIndex + 360 / n / 2;
+  const fullSpins = 5 + Math.floor(Math.random() * 3);
+  const finalAngle = fullSpins * 360 + (360 - segCenter);
+  wheel.style.transform = `rotate(${finalAngle}deg)`;
+  return ROULETTE_SEGMENTS[targetIndex];
+}
+
+let currentRouletteA = null;
+let currentRouletteB = null;
+
+document.getElementById("spinBtn").addEventListener("click", () => {
+  const resultLine = document.getElementById("rouletteResultLine");
+  resultLine.classList.add("hidden");
+  const btn = document.getElementById("spinBtn");
+  btn.disabled = true;
+  document.getElementById("guessResult").textContent = "";
+  document.getElementById("guessResultText").textContent = "";
+  document.getElementById("dishGuessInput").value = "";
+
+  const keyA = spinWheel("wheelA");
+  const keyB = spinWheel("wheelB");
+
+  setTimeout(() => {
+    currentRouletteA = keyA;
+    currentRouletteB = keyB;
+    const ingA = DISH_INGREDIENTS[keyA] || INGREDIENTS[keyA];
+    const ingB = DISH_INGREDIENTS[keyB] || INGREDIENTS[keyB];
+    resultLine.innerHTML = `¡Te tocaron <b>${ingA.emoji} ${ingA.name}</b> y <b>${ingB.emoji} ${ingB.name}</b>! Nombrá un plato real que lleve ESOS DOS ingredientes.`;
+    resultLine.classList.remove("hidden");
+    btn.disabled = false;
+  }, 2500);
+});
+
+// base de datos de platos reales: italiana, española, dominicana y otros
+// platos muy famosos de distintas cocinas del mundo, para el verificador
+const REAL_DISH_NAMES = [
+  ...DISHES.map((d) => d.name),
+  // dominicana
+  "mangú", "sancocho", "mofongo", "moro de guandules", "pollo guisado", "tostones",
+  "pastelón", "habichuelas con dulce", "chicharrón de cerdo", "la bandera dominicana",
+  "bandera dominicana", "yaniqueques", "casabe", "locrio", "chimichurri dominicano",
+  "arroz con habichuelas", "concón",
+  // otras cocinas famosas del mundo
+  "sushi", "ramen", "pad thai", "curry", "tacos", "burrito", "hummus", "cuscús",
+  "couscous", "pho", "dim sum", "kebab", "goulash", "borscht", "croissant", "quiche",
+  "ratatouille", "fondue", "schnitzel", "pierogi", "moussaka", "falafel", "biryani",
+  "pollo tandoori", "tandoori chicken", "tempura", "dumplings", "sashimi", "enchiladas",
+  "guacamole", "ceviche", "feijoada", "empanadas", "baklava", "shawarma", "bibimbap",
+  "kimchi", "pad see ew", "fish and chips", "poutine", "jambalaya", "gumbo",
+  "chow mein", "rollitos primavera", "spring rolls", "naan", "samosa", "sopa pho",
+  "risotto", "goulash húngaro", "wiener schnitzel", "currywurst", "bratwurst",
+  "paella", "tortilla", "gazpacho", "churros", "fabada",
+];
+
+function normalizeDishName(s) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, "")
+    .trim();
+}
+const REAL_DISH_NAMES_NORM = REAL_DISH_NAMES.map(normalizeDishName);
+
+const DISHES_NORM = DISHES.map((d) => ({ dish: d, norm: normalizeDishName(d.name) }));
+
+function checkDishGuess() {
+  const input = document.getElementById("dishGuessInput");
+  const guess = normalizeDishName(input.value || "");
+  const resultEmoji = document.getElementById("guessResult");
+  const resultText = document.getElementById("guessResultText");
+  if (!guess) return;
+
+  if (!currentRouletteA || !currentRouletteB) {
+    resultEmoji.textContent = "🎰";
+    resultText.textContent = "Primero girá la ruleta para saber qué dos ingredientes tenés que usar.";
+    return;
+  }
+
+  const ingAName = (DISH_INGREDIENTS[currentRouletteA] || INGREDIENTS[currentRouletteA]).name;
+  const ingBName = (DISH_INGREDIENTS[currentRouletteB] || INGREDIENTS[currentRouletteB]).name;
+
+  const matchedEntry = DISHES_NORM.find(
+    (e) => e.norm === guess || e.norm.includes(guess) || guess.includes(e.norm)
+  );
+
+  if (!matchedEntry) {
+    const isKnownName = REAL_DISH_NAMES_NORM.some(
+      (name) => name === guess || name.includes(guess) || guess.includes(name)
+    );
+    resultEmoji.textContent = "❌";
+    resultText.textContent = isKnownName
+      ? `"${input.value}" es un plato real, pero no tenemos su receta detallada para comprobar los ingredientes. ¡Probá con otro!`
+      : `"${input.value}" no está en nuestra base de platos reales. ¡Probá con otro!`;
+    return;
+  }
+
+  const ing = matchedEntry.dish.ing;
+  const hasA = ing.includes(currentRouletteA);
+  const hasB = ing.includes(currentRouletteB);
+
+  if (hasA && hasB) {
+    resultEmoji.textContent = "✅";
+    resultText.textContent = `¡Correcto! "${matchedEntry.dish.name}" lleva ${ingAName} y ${ingBName}. ¡Ganaste esta ronda!`;
+  } else {
+    resultEmoji.textContent = "❌";
+    resultText.textContent = `"${matchedEntry.dish.name}" es un plato real, pero no lleva ${!hasA ? ingAName : ingBName}${!hasA && !hasB ? ` ni ${ingBName}` : ""}. ¡Probá con otro!`;
+  }
+}
+document.getElementById("guessBtn").addEventListener("click", checkDishGuess);
+document.getElementById("dishGuessInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkDishGuess();
+});
+
+/* =============================================================
+   MÚSICA DE COCINA DE FONDO — melodía sintetizada al estilo
+   "clásica francesa de cocina" (clavecín + cuerdas pizzicato en
+   compás de vals), con cambios de ritmo periódicos como en
+   Overcooked 2 (fases calmas y fases "presto").
+   ============================================================= */
+let audioCtx = null;
+let musicPlaying = false;
+let musicTimer = null;
+let musicPhase = "calm"; // calm | presto
+let phaseSwitchTimer = null;
+let beatIndex = 0;
+
+// melodía corta, en Do mayor, pensada para repetirse como vals de cocina
+const MUSIC_THEMES = {
+  recipe: {
+    melody: [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.0, 698.46],
+    bass: [130.81, 196.0, 164.81, 196.0],
+    wave: "triangle", bassWave: "sine", calmBpm: 132, prestoBpm: 190,
+  },
+  kitchen: {
+    melody: [587.33, 698.46, 783.99, 880.0, 783.99, 698.46, 587.33, 523.25],
+    bass: [146.83, 110.0, 116.54, 130.81],
+    wave: "sine", bassWave: "triangle", calmBpm: 148, prestoBpm: 220,
+  },
+  create: {
+    melody: [698.46, 880.0, 1046.5, 880.0, 932.33, 1174.66, 1396.91, 1174.66],
+    bass: [174.61, 130.81, 116.54, 130.81],
+    wave: "triangle", bassWave: "sine", calmBpm: 112, prestoBpm: 168,
+  },
+  roulette: {
+    melody: [659.25, 783.99, 987.77, 783.99, 739.99, 880.0, 1046.5, 880.0],
+    bass: [164.81, 123.47, 130.81, 123.47],
+    wave: "sine", bassWave: "triangle", calmBpm: 140, prestoBpm: 205,
+  },
+};
+let currentMusicTheme = "recipe";
+
+function pluckNote(freq, time, dur, gainVal, type) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || "triangle";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.exponentialRampToValueAtTime(gainVal, time + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(time);
+  osc.stop(time + dur + 0.05);
+
+  // segunda voz levemente desafinada, para un aire más "moderno" y lleno,
+  // sin caer en sonido de 8 bits
+  const osc2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.type = type || "triangle";
+  osc2.frequency.value = freq * 1.004;
+  gain2.gain.setValueAtTime(0.0001, time);
+  gain2.gain.exponentialRampToValueAtTime(gainVal * 0.5, time + 0.02);
+  gain2.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  osc2.connect(gain2);
+  gain2.connect(audioCtx.destination);
+  osc2.start(time);
+  osc2.stop(time + dur + 0.05);
+}
+
+function scheduleMusicStep() {
+  if (!musicPlaying) return;
+  const theme = MUSIC_THEMES[currentMusicTheme];
+  const bpm = musicPhase === "presto" ? theme.prestoBpm : theme.calmBpm;
+  const beatDur = 60 / bpm;
+  const now = audioCtx.currentTime;
+
+  const note = theme.melody[beatIndex % theme.melody.length];
+  pluckNote(note, now, beatDur * 0.8, 0.05, theme.wave);
+
+  if (beatIndex % 2 === 0) {
+    const bass = theme.bass[(beatIndex / 2) % theme.bass.length];
+    pluckNote(bass, now, beatDur * 1.3, 0.045, theme.bassWave);
+  }
+
+  beatIndex++;
+  musicTimer = setTimeout(scheduleMusicStep, beatDur * 1000);
+}
+
+function setMusicTheme(theme) {
+  currentMusicTheme = theme;
+  beatIndex = 0;
+}
+
+function schedulePhaseSwitch() {
+  const delay = musicPhase === "calm" ? 13000 : 9000;
+  phaseSwitchTimer = setTimeout(() => {
+    musicPhase = musicPhase === "calm" ? "presto" : "calm";
+    schedulePhaseSwitch();
+  }, delay);
+}
+
+function toggleMusic() {
+  const btn = document.getElementById("musicToggleBtn");
+  if (!musicPlaying) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    musicPlaying = true;
+    beatIndex = 0;
+    musicPhase = "calm";
+    scheduleMusicStep();
+    schedulePhaseSwitch();
+    btn.textContent = "🔊 Música";
+  } else {
+    musicPlaying = false;
+    clearTimeout(musicTimer);
+    clearTimeout(phaseSwitchTimer);
+    btn.textContent = "🔇 Música";
+  }
+}
+document.getElementById("musicToggleBtn").addEventListener("click", toggleMusic);
+
+/* --------- pestañas de modo (libre / platos famosos / creá tu plato / ruleta) --------- */
+const tabFree = document.getElementById("tabFree");
+const tabDishes = document.getElementById("tabDishes");
+const tabCreate = document.getElementById("tabCreate");
+const tabRoulette = document.getElementById("tabRoulette");
+const freeMode = document.getElementById("freeMode");
+const dishesMode = document.getElementById("dishesMode");
+const createMode = document.getElementById("createMode");
+const rouletteMode = document.getElementById("rouletteMode");
+const homeScreen = document.getElementById("homeScreen");
+const modeSubtitle = document.getElementById("modeSubtitle");
+
+function activateTab(tab, mode, subtitle) {
+  homeScreen.classList.add("hidden");
+  [tabFree, tabDishes, tabCreate, tabRoulette].forEach((t) => t.classList.remove("active"));
+  [freeMode, dishesMode, createMode, rouletteMode].forEach((m) => m.classList.add("hidden"));
+  tab.classList.add("active");
+  mode.classList.remove("hidden");
+  modeSubtitle.textContent = subtitle;
+}
+
+function goHome() {
+  [freeMode, dishesMode, createMode, rouletteMode].forEach((m) => m.classList.add("hidden"));
+  if (typeof shiftActive !== "undefined" && shiftActive) {
+    shiftActive = false;
+    clearInterval(shiftInterval);
+  }
+  homeScreen.classList.remove("hidden");
+  modeSubtitle.textContent = "Elegí a qué querés jugar";
+}
+
+document.getElementById("homeBtnFree").addEventListener("click", goHome);
+document.getElementById("homeBtnDishes").addEventListener("click", goHome);
+document.getElementById("homeBtnCreate").addEventListener("click", goHome);
+document.getElementById("homeBtnRoulette").addEventListener("click", goHome);
+
+tabFree.addEventListener("click", () => {
+  activateTab(tabFree, freeMode, "Cada producto ya está armado — descubrí de qué ingredientes del sector primario viene");
+  setMusicTheme("recipe");
+});
+tabDishes.addEventListener("click", () => {
+  activateTab(tabDishes, dishesMode, "ExtraCocinado: elegí un plato famoso y cocinalo vos mismo, contrarreloj");
+  if (!document.getElementById("dishGrid").children.length) renderDishGrid();
+  setMusicTheme("kitchen");
+});
+tabCreate.addEventListener("click", () => {
+  activateTab(tabCreate, createMode, "Combiná lo que quieras y mirá qué sale — puede ser real, o una locura total");
+  if (!document.getElementById("createPaletteGrid").children.length) renderCreatePalette();
+  setMusicTheme("create");
+});
+tabRoulette.addEventListener("click", () => {
+  activateTab(tabRoulette, rouletteMode, "Girá la ruleta y después probá tu suerte nombrando un plato real");
+  initRouletteWheels();
+  setMusicTheme("roulette");
+});
+
+</script>
+</body>
+</html>
