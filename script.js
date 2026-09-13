@@ -79,8 +79,40 @@ const games = [
     image: "assets/game-covers/rigori russi.png",
     previewUrl: "games/revolucion_rusa_penaltis.html",
     playUrl: "games/revolucion_rusa_penaltis.html"
-  }
-];
+ },
+ {
+    id: 6,
+    title: "¡Motín del Té! Boston 1773",
+    category: "Historia",
+    collection: "Revolución Americana",
+    mode: "Quiz",
+    duration: "3 min",
+    description:
+      "Revive el motín del té de Boston de 1773 y descubre las causas y consecuencias de este episodio clave de la independencia americana.",
+    longDescription:
+      "Un juego histórico sobre el Boston Tea Party, uno de los detonantes de la Revolución Americana contra el dominio británico.",
+    gradient: "linear-gradient(135deg, rgba(20,60,120,0.9), rgba(180,30,45,0.85))",
+    image: "assets/game-covers/Washington.png",
+    previewUrl: "games/boston_tea_party.html",
+    playUrl: "games/boston_tea_party.html"
+  },
+  {
+    id: 7,
+    title: "¿Con Qué Se Hace? — Sector Primario",
+    category: "Educativo",
+    collection: "Geografía",
+    mode: "Quiz",
+    duration: "3 min",
+    description:
+      "Descubre de qué materia prima viene cada producto y aprende sobre el sector primario y el origen de las cosas que usamos.",
+    longDescription:
+      "Un juego educativo sobre geografía y el sector primario: agricultura, ganadería, pesca y minería, y cómo esos recursos se convierten en productos.",
+    gradient: "linear-gradient(135deg, rgba(58,159,90,0.9), rgba(212,175,55,0.85))",
+    image: "assets/game-covers/Recetas.png",
+    previewUrl: "games/de_donde_viene.html",
+    playUrl: "games/de_donde_viene.html"
+  
+    ];
 
 const translations = {
   es: { nav: ["Catálogo", "Destacados", "Contacto"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos" },
@@ -94,6 +126,8 @@ const gameTranslations = {
     3: { title: "Industrial Revolution", description: "Place the machine correctly and answer key questions about European industrialization.", longDescription: "A train-and-station game mixing speed, observation, and historical knowledge." },
     4: { title: "Napoleon vs Wellington", description: "An arcade quiz duel with scores, turns, and visual energy inspired by military history.", longDescription: "Challenge your rival with questions about Napoleon, Waterloo, and the French Empire." },
     5: { title: "Russian Revolution: Penalty Shootout", description: "Answer historical questions for the Bolsheviks and Mensheviks in an exciting penalty shootout.", longDescription: "A history and quick-thinking mini-game where correct answers score goals for your team." }
+    6: { title: "Boston Tea Party 1773", description: "Relive the 1773 Boston Tea Party and discover the causes and consequences of this key episode of American independence.", longDescription: "A history game about the Boston Tea Party, one of the sparks of the American Revolution against British rule." },
+    7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." }
   }
 };
 
