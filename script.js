@@ -328,3 +328,4 @@ document.getElementById("suggestionSubmit").addEventListener("click", async () =
 });
 
 applyLanguage();
+Corregir script.js
