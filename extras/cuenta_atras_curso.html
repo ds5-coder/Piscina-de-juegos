@@ -195,8 +195,7 @@ function update() {
 
   const next = allTeaching.find(d => d >= today);
   if (next) {
-    document.getElementById("nextDay").textContent =
-      fmt(next) + (todayIsTeaching && iso(next)===iso(today) ? " · ¡Es hoy!" : "");
+    document.getElementById("nextDay").textContent = fmt(next);
   } else {
     document.getElementById("nextDay").textContent = "🎉 ¡Curso terminado!";
   }
