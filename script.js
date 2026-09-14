@@ -131,8 +131,8 @@ const games = [
 ];
 
 const translations = {
-  es: { nav: ["Catálogo", "Destacados", "Contacto"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos" },
-  en: { nav: ["Catalog", "Featured", "Contact"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool" }
+  es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Cuenta atrás del curso 2026/27", extraText: "Un contador de días lectivos para el curso 2026/27 de la Comunidad de Madrid." },
+  en: { nav: ["Catalog", "Featured", "Contact", "Countdown"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", extraTitle: "Countdown to the 2026/27 school year", extraText: "A school-day countdown for the 2026/27 academic year in the Community of Madrid (widget content stays in Spanish)." }
 };
 
 const gameTranslations = {
@@ -302,6 +302,8 @@ function applyLanguage() {
   document.querySelector(".contact-card h3").textContent = t.suggestions;
   document.querySelector(".contact-card .primary-button").textContent = t.send;
   document.getElementById("suggestionText").placeholder = t.suggestionPlaceholder;
+  document.querySelector(".extra-section h2").textContent = t.extraTitle;
+  document.querySelector(".extra-text").textContent = t.extraText;
   languageToggle.innerHTML = language === "es" ? "<span aria-hidden=\"true\">🇬🇧</span><span>EN</span>" : "<span aria-hidden=\"true\">🇪🇸</span><span>ES</span>";
   renderFeaturedGame();
   renderGames();
@@ -344,5 +346,23 @@ document.getElementById("suggestionSubmit").addEventListener("click", async () =
     suggestionButton.disabled = false;
   }
 });
+
+const cuentaAtrasFrame = document.getElementById("cuentaAtrasFrame");
+if (cuentaAtrasFrame) {
+  const resizeCuentaAtrasFrame = () => {
+    try {
+      const frameDoc = cuentaAtrasFrame.contentWindow.document;
+      cuentaAtrasFrame.style.height = `${frameDoc.documentElement.scrollHeight}px`;
+    } catch (error) {
+      // El iframe aún no ha cargado o el acceso está bloqueado; se mantiene el alto de reserva.
+    }
+  };
+  let resizeTimeout;
+  cuentaAtrasFrame.addEventListener("load", resizeCuentaAtrasFrame);
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeCuentaAtrasFrame, 150);
+  });
+}
 
 applyLanguage();

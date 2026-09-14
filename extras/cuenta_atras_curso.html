@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta atrás — Curso 2026/27</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card: #161616;
+    --text: #f1f5f2;
+    --muted: #9aa39d;
+    --accent: #3ddc84;
+    --accent2: #f8ab3c;
+    --line: #2a2e2b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 18px 42px; }
+  header { text-align: center; margin-bottom: 22px; }
+  h1 { margin: 0 0 6px; font-size: clamp(28px, 5vw, 46px); }
+  .subtitle { color: var(--muted); font-size: 16px; }
+  .hero {
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+    padding: 30px 20px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+  .label { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; font-size: 13px; }
+  .number { font-size: clamp(72px, 17vw, 150px); line-height: .9; font-weight: 850; margin: 12px 0 8px; color: var(--accent); }
+  .caption { font-size: 21px; font-weight: 700; }
+  .today { margin-top: 10px; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 18px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 10px; text-align: center;
+  }
+  .stat b { display:block; font-size: 28px; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .progressbox {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-top: 18px;
+  }
+  .progressline { height: 14px; background: #262a27; border-radius: 99px; overflow: hidden; margin: 12px 0 8px; }
+  .bar { height:100%; width:0; background: var(--accent); border-radius:99px; transition:width .5s; }
+  .progressmeta { display:flex; justify-content:space-between; color:var(--muted); font-size:13px; }
+  .next {
+    margin-top:18px; background: #241c0c; border: 1px solid #4a3a17; border-radius:18px; padding:18px;
+  }
+  .next strong { color: var(--accent2); }
+  details {
+    margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px;
+  }
+  summary { cursor:pointer; font-weight:700; }
+  ul { color:var(--muted); line-height:1.7; }
+  footer { margin-top:20px; text-align:center; color:var(--muted); font-size:12px; }
+  @media (max-width: 650px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .stat:last-child { grid-column: span 2; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎒 Cuenta atrás del cole</h1>
+    <div class="subtitle">Curso 2026/27 · Comunidad de Madrid</div>
+  </header>
+
+  <section class="hero">
+    <div class="label" id="statusLabel">Quedan</div>
+    <div class="number" id="remaining">—</div>
+    <div class="caption">días lectivos</div>
+    <div class="today" id="today">—</div>
+  </section>
+
+  <section class="grid" id="weekdayGrid"></section>
+
+  <section class="progressbox">
+    <strong>Progreso del curso</strong>
+    <div class="progressline"><div class="bar" id="bar"></div></div>
+    <div class="progressmeta">
+      <span id="done">—</span>
+      <span id="percent">—</span>
+      <span id="total">172 días</span>
+    </div>
+  </section>
+
+  <section class="next">
+    <strong id="nextTitle">Próximo día lectivo</strong>
+    <div id="nextDay" style="margin-top:5px">—</div>
+  </section>
+
+  <details>
+    <summary>¿Qué cuenta como día no lectivo?</summary>
+    <ul>
+      <li>Vacaciones de Navidad: 23 de diciembre de 2026 al 10 de enero de 2027.</li>
+      <li>Semana Santa: 19 al 29 de marzo de 2027.</li>
+      <li>Festivos/no lectivos generales incluidos: 12 de octubre, 2 de noviembre, 7 y 8 de diciembre, 12 y 15 de febrero y 3 de mayo.</li>
+      <li>Fines de semana.</li>
+    </ul>
+    <p style="color:var(--muted);font-size:13px">
+      El contador está preparado para el calendario general de la Comunidad de Madrid.
+      Si tu centro tiene días no lectivos propios o fiestas locales adicionales, se pueden añadir.
+    </p>
+  </details>
+
+  <footer>Se actualiza automáticamente cada día al abrir la página.</footer>
+</div>
+
+<script>
+const START = new Date("2026-09-07T00:00:00");
+const END = new Date("2027-06-18T23:59:59");
+
+// Festivos/no lectivos generales del calendario utilizado.
+const HOLIDAYS = new Set([
+  "2026-10-12","2026-11-02","2026-12-07","2026-12-08",
+  "2027-02-12","2027-02-15","2027-05-03"
+]);
+
+function iso(d) {
+  return d.toISOString().slice(0,10);
+}
+function isNonTeaching(d) {
+  const day = d.getDay(); // 0 domingo, 6 sábado
+  if (day === 0 || day === 6) return true;
+  const s = iso(d);
+  if (HOLIDAYS.has(s)) return true;
+  if (s >= "2026-12-23" && s <= "2027-01-10") return true;
+  if (s >= "2027-03-19" && s <= "2027-03-29") return true;
+  return false;
+}
+function isTeaching(d) {
+  return d >= START && d <= END && !isNonTeaching(d);
+}
+function eachDay(a,b,fn) {
+  const d = new Date(a);
+  d.setHours(0,0,0,0);
+  const end = new Date(b);
+  end.setHours(0,0,0,0);
+  while (d <= end) { fn(new Date(d)); d.setDate(d.getDate()+1); }
+}
+function fmt(d) {
+  return d.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+}
+
+const allTeaching = [];
+eachDay(START, END, d => { if (isTeaching(d)) allTeaching.push(d); });
+
+function update() {
+  const now = new Date();
+  const today = new Date(now); today.setHours(0,0,0,0);
+
+  const future = allTeaching.filter(d => d > today);
+  const todayIsTeaching = isTeaching(today);
+
+  let remaining = future.length;
+  let label = "Quedan";
+  if (todayIsTeaching) {
+    // Durante el día actual, la cifra principal incluye hoy.
+    remaining += 1;
+    label = "Hoy + quedan";
+  } else if (today > END) {
+    remaining = 0; label = "Curso terminado";
+  } else if (today < START) {
+    remaining = allTeaching.length; label = "Quedan";
+  }
+
+  document.getElementById("remaining").textContent = remaining;
+  document.getElementById("statusLabel").textContent = label;
+  document.getElementById("today").textContent =
+    now.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"}) +
+    (todayIsTeaching ? " · 📚 Hoy hay cole" : " · 💤 Hoy no hay cole");
+
+  const weekdayNames = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
+  const counts = [0,0,0,0,0];
+  future.forEach(d => counts[(d.getDay()+6)%7]++);
+  if (todayIsTeaching) counts[(today.getDay()+6)%7]++;
+
+  document.getElementById("weekdayGrid").innerHTML = weekdayNames.map((n,i)=>
+    `<div class="stat"><b>${counts[i]}</b><span>${n} lectivos</span></div>`
+  ).join("");
+
+  const completed = allTeaching.filter(d => d < today).length;
+  const total = allTeaching.length;
+  const pct = Math.max(0, Math.min(100, completed / total * 100));
+  document.getElementById("done").textContent = `${completed} realizados`;
+  document.getElementById("percent").textContent = `${pct.toFixed(1)}%`;
+  document.getElementById("total").textContent = `${total} días`;
+
+  document.getElementById("bar").style.width = pct + "%";
+
+  const next = allTeaching.find(d => d >= today);
+  if (next) {
+    document.getElementById("nextDay").textContent =
+      fmt(next) + (todayIsTeaching && iso(next)===iso(today) ? " · ¡Es hoy!" : "");
+  } else {
+    document.getElementById("nextDay").textContent = "🎉 ¡Curso terminado!";
+  }
+}
+update();
+setInterval(update, 60 * 1000);
+</script>
+</body>
+</html>
