@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>El Mensajero de las Trincheras</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e8dcc0; --ink:#2a2318; --accent:#7a2e2e; --accent2:#3a5a4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(90,74,48,.35), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0px, transparent 2px, transparent 4px),
+      #141210;
+    font-family:'Merriweather', serif;
+    color:var(--paper);
+    display:flex; flex-direction:column; align-items:center;
+    padding:16px 10px 40px; min-height:100vh;
+  }
+  .wrap{ width:100%; max-width:980px; }
+  h1{
+    font-family:'Special Elite', monospace; text-align:center; color:var(--paper);
+    font-size:clamp(20px,4vw,30px); letter-spacing:1px; margin:6px 0 2px;
+    text-shadow:2px 2px 0 rgba(0,0,0,.6), 0 0 18px rgba(120,90,40,.35);
+  }
+  .subtitle{ text-align:center; color:#b8a888; margin-bottom:14px; font-size:14px; font-style:italic; }
+
+  .hidden{ display:none !important; }
+
+  .panel{
+    background:
+      radial-gradient(ellipse 300px 160px at 12% 8%, rgba(120,95,55,.16), transparent 70%),
+      radial-gradient(ellipse 260px 200px at 90% 85%, rgba(90,70,40,.14), transparent 70%),
+      var(--paper);
+    color:var(--ink); border:3px solid #000; border-radius:2px;
+    box-shadow:0 10px 0 rgba(0,0,0,.4), inset 0 0 0 6px rgba(122,46,46,.08), inset 0 0 40px rgba(90,70,40,.25);
+    padding:22px; position:relative;
+  }
+
+  .barbed-wire{
+    height:14px; margin:10px 0 16px; opacity:.8;
+    background-image: repeating-linear-gradient(100deg, transparent 0 18px, #3a2f20 18px 20px, transparent 20px 38px),
+      repeating-linear-gradient(100deg, transparent 4px, #3a2f20 5px, transparent 6px);
+    background-size: 38px 3px, 38px 14px;
+    background-repeat: repeat-x;
+  }
+
+  /* ---------- pantalla de campaña ---------- */
+  .timeline{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .level-row{
+    display:flex; align-items:center; gap:14px; padding:10px 14px; border:2px solid var(--ink);
+    border-left:8px solid var(--accent2);
+    border-radius:2px; background:linear-gradient(100deg,#f2e9d0,#ecdfb8); cursor:pointer; transition:transform .1s ease;
+  }
+  .level-row.locked{ opacity:.5; cursor:default; filter:grayscale(.4); border-left-color:#7a6a4a; }
+  .level-row:not(.locked):hover{ transform:translateX(4px); background:linear-gradient(100deg,#e6d8ae,#ddc99a); border-left-color:var(--accent); }
+  .level-num{
+    font-family:'Special Elite', monospace; font-size:18px; width:36px; height:36px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #8a3a3a, var(--accent) 70%); color:#f2e9d0;
+    box-shadow:0 0 0 2px #000, inset 0 -3px 4px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center;
+  }
+  .level-info .lname{ font-weight:800; font-size:16px; font-family:'Special Elite', monospace; letter-spacing:.5px; }
+  .level-info .lyear{ font-size:12.5px; color:#5a4a30; }
+
+  /* ---------- pantalla de juego ---------- */
+  .game-hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-family:'Special Elite', monospace; font-size:13px; }
+  .mission-box{
+    background:#f2e9d0; border:2px solid var(--ink); border-radius:6px; padding:8px 12px;
+    font-size:14px; margin-bottom:8px; min-height:20px;
+  }
+  canvas{ display:block; margin:0 auto; border:3px solid #000; border-radius:4px; background:#3a5a3a; max-width:100%; }
+
+  .controls-row{ text-align:center; margin-top:10px; font-size:13px; color:#5a4a30; }
+
+  .fb-crowd-wrap{
+    display:grid; grid-template-columns:26px auto 26px; grid-template-rows:26px auto 26px;
+    grid-template-areas:"tl top tr" "left field right" "bl bottom br";
+    justify-content:center; background:#3a2f20; padding:4px; border-radius:6px; max-width:100%;
+  }
+  #fbCanvas{ grid-area:field; max-width:100%; height:auto; }
+  .fb-crowd{ font-size:13px; line-height:26px; overflow:hidden; white-space:nowrap; color:#e8dcc0; opacity:.85; }
+  .fb-crowd-top, .fb-crowd-bottom{ grid-column:1/-1; text-align:center; letter-spacing:2px; }
+  .fb-crowd-side{ writing-mode:vertical-rl; text-align:center; letter-spacing:2px; }
+
+  /* ---------- overlays de evento / final ---------- */
+  .story-overlay{
+    position:absolute; inset:0; background:rgba(20,16,12,.96); color:#e8dcc0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:26px 26px 20px; border-radius:6px; z-index:5; opacity:0; pointer-events:none;
+    transition:opacity .4s ease; overflow-y:auto;
+  }
+  .story-overlay.show{ opacity:1; pointer-events:auto; }
+  .lose-screen{
+    background:
+      radial-gradient(ellipse 90px 60px at 20% 30%, rgba(120,10,10,.55), transparent 70%),
+      radial-gradient(ellipse 60px 90px at 80% 70%, rgba(110,8,8,.5), transparent 70%),
+      radial-gradient(ellipse 140px 80px at 50% 85%, rgba(90,6,6,.45), transparent 70%),
+      radial-gradient(ellipse 50px 50px at 75% 15%, rgba(130,12,12,.5), transparent 70%),
+      rgba(20,16,12,.96) !important;
+  }
+  .story-overlay h2{ font-family:'Special Elite', monospace; letter-spacing:1px; margin:0 0 10px; }
+  .story-overlay p{ max-width:520px; line-height:1.45; font-size:14.5px; margin:6px 0; }
+  .story-overlay .shots{ font-family:'Special Elite', monospace; font-size:34px; color:#c94b4b; margin:10px 0; letter-spacing:4px; }
+
+  .timeline-chain{ display:flex; flex-direction:column; align-items:center; gap:2px; margin:10px 0; font-family:'Special Elite', monospace; }
+  .timeline-chain .step{ background:#2a231a; color:#e8dcc0; border:1px solid #7a6a4a; border-radius:5px; padding:4px 14px; font-size:12px; }
+  .timeline-chain .arrow{ font-size:13px; color:#c94b4b; line-height:1; }
+
+  .bigbtn{
+    font-family:'Special Elite', monospace; font-size:15px;
+    background:var(--accent); color:#fff; border:2px solid #000; border-radius:8px;
+    padding:11px 22px; cursor:pointer; margin-top:12px;
+  }
+  .bigbtn:hover{ background:#8f3838; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>✉️ EL MENSAJERO DE LAS TRINCHERAS</h1>
+  <div class="subtitle">Una campaña sobre comunicación, incertidumbre y decisiones — no sobre combate</div>
+  <div style="text-align:center; margin-bottom:10px;">
+    <button class="bigbtn" id="musicToggleBtn" style="font-size:13px; padding:8px 16px;">🔇 Música</button>
+    <button class="bigbtn" id="globalHomeBtn" style="font-size:13px; padding:8px 16px; background:#3a5a4a;">🏠 Menú principal</button>
+  </div>
+
+  <!-- PANTALLA DE CAMPAÑA -->
+  <div class="panel" id="campaignScreen">
+    <div style="text-align:center; font-family:'Special Elite', monospace; font-size:22px; letter-spacing:1px; color:var(--accent); margin-bottom:2px;">⚔ CUARTEL GENERAL ⚔</div>
+    <div style="text-align:center; font-weight:700; margin-bottom:4px;">Campaña — Primera Guerra Mundial (1914-1918)</div>
+    <div style="text-align:center; font-size:15px; color:#7a2e2e; margin-bottom:8px; font-family:'Special Elite', monospace; letter-spacing:.5px; text-shadow:1px 1px 0 rgba(0,0,0,.15);">Cada nivel introduce un nuevo problema histórico que resolver moviéndote, no luchando</div>
+    <div class="barbed-wire"></div>
+    <div class="timeline" id="timelineList"></div>
+  </div>
+
+  <!-- PANTALLA DE JUEGO -->
+  <div class="panel hidden" id="gameScreen">
+    <div class="game-hud">
+      <span id="phaseLabel">FASE 1</span>
+      <span id="dateLabel">28 DE JUNIO DE 1914 — SARAJEVO</span>
+    </div>
+    <div class="mission-box" id="missionBox">Lleva el mensaje hasta el punto marcado con 🏛</div>
+    <canvas id="gameCanvas" width="950" height="550"></canvas>
+    <div class="controls-row">Flechas o WASD para moverte — no hay combate, solo hay que llegar</div>
+
+    <div class="story-overlay" id="introOverlay">
+      <h2>28 DE JUNIO DE 1914</h2>
+      <p>Eres un mensajero en Sarajevo. Tu trabajo es sencillo: llevar la correspondencia entre la oficina de correos y el cuartel, cruzando el Puente Latino sobre el río Miljacka.</p>
+      <p>Nadie sabe todavía que esta mañana va a cambiar la historia de Europa.</p>
+      <button class="bigbtn" id="startPhase1Btn">EMPEZAR ▶</button>
+    </div>
+
+    <div class="story-overlay" id="eventOverlay">
+      <h2>CERCA DEL PUENTE LATINO</h2>
+      <div class="shots">💥　💥</div>
+      <p><b>DOS DISPAROS.</b></p>
+      <p>La gente en la calle se detiene, confundida. Algo grave acaba de pasar cerca del puente.</p>
+      <button class="bigbtn" id="continueToPhase2Btn">CONTINUAR ▶</button>
+    </div>
+
+    <div class="story-overlay" id="missionUpdateOverlay">
+      <h2>NUEVA MISIÓN</h2>
+      <p>Se ha producido un atentado. El heredero del trono austrohúngaro ha sido tiroteado.</p>
+      <p><b>Lleva la noticia al puesto de mando.</b> Algunas calles están cortadas — vas a tener que encontrar otra ruta.</p>
+      <button class="bigbtn" id="startPhase2Btn">CONTINUAR ▶</button>
+    </div>
+
+    <div class="story-overlay lose-screen" id="runOverOverlay">
+      <h2>PERDISTE</h2>
+      <p>El coche real del archiduque y su mujer te ha atropellado.</p>
+      <button class="bigbtn" id="retryLevelBtn">REINTENTAR ▶</button>
+    </div>
+
+    <div class="story-overlay lose-screen" id="princeOverlay">
+      <h2>PERDISTE</h2>
+      <p id="princeOverlayText"></p>
+      <button class="bigbtn" id="princeRetryBtn">REINTENTAR ▶</button>
+    </div>
+
+    <div class="story-overlay lose-screen" id="drownedOverlay">
+      <h2>PERDISTE</h2>
+      <p>Has caído al río Miljacka fuera del puente y la corriente te ha arrastrado. El mensaje se ha perdido en el agua.</p>
+      <button class="bigbtn" id="drownedRetryBtn">REINTENTAR ▶</button>
+    </div>
+
+    <div class="story-overlay" id="finalOverlay">
+      <h2>28 DE JUNIO DE 1914 — SARAJEVO</h2>
+      <p>Gavrilo Princip, un joven nacionalista serbobosnio, asesinó al archiduque Francisco Fernando, heredero del Imperio austrohúngaro, y a su esposa Sofía.</p>
+      <p>El atentado desencadenó una crisis diplomática que, a través de una serie de decisiones políticas, ultimátums, declaraciones de guerra y movilizaciones, contribuyó al comienzo de la Primera Guerra Mundial.</p>
+      <div class="timeline-chain">
+        <div class="step">ATENTADO DE SARAJEVO</div>
+        <div class="arrow">↓</div>
+        <div class="step">CRISIS DIPLOMÁTICA</div>
+        <div class="arrow">↓</div>
+        <div class="step">ULTIMÁTUM A SERBIA</div>
+        <div class="arrow">↓</div>
+        <div class="step">DECLARACIÓN DE GUERRA</div>
+        <div class="arrow">↓</div>
+        <div class="step">MOVILIZACIONES</div>
+        <div class="arrow">↓</div>
+        <div class="step">PRIMERA GUERRA MUNDIAL</div>
+      </div>
+      <p style="font-size:13px; color:#b8a888;">El atentado fue un detonante dentro de un contexto político mucho más amplio — no la única causa de la guerra.</p>
+      <button class="bigbtn" id="nextLevelFromOneBtn">SIGUIENTE NIVEL ▶</button>
+      <button class="bigbtn" id="backToCampaignBtn" style="background:#3a5a4a;">VOLVER A LA CAMPAÑA</button>
+    </div>
+    <div class="story-overlay" id="genericIntroOverlay">
+      <h2 id="genericIntroTitle">NIVEL</h2>
+      <p id="genericIntroText"></p>
+      <button class="bigbtn" id="genericStartBtn">EMPEZAR ▶</button>
+    </div>
+
+    <div class="story-overlay lose-screen" id="genericLostOverlay">
+      <h2>PERDISTE</h2>
+      <p id="genericLostText"></p>
+      <button class="bigbtn" id="genericRetryBtn">REINTENTAR ▶</button>
+    </div>
+
+    <div class="story-overlay" id="genericFinalOverlay">
+      <h2 id="genericFinalTitle">NIVEL SUPERADO</h2>
+      <p id="genericFinalText"></p>
+      <div class="timeline-chain" id="genericFinalChain"></div>
+      <button class="bigbtn" id="nextLevelBtn">SIGUIENTE NIVEL ▶</button>
+      <button class="bigbtn" id="genericBackBtn" style="background:#3a5a4a;">VOLVER A LA CAMPAÑA</button>
+    </div>
+  </div>
+
+  <!-- ============ NIVEL EXTRA: PARTIDO DE NAVIDAD (fútbol de chapas) ============ -->
+  <div class="panel hidden" id="footballScreen">
+    <button class="bigbtn" id="homeBtnFootball" style="background:#3a5a4a; margin-bottom:10px;">◀ VOLVER A LA CAMPAÑA</button>
+    <div class="section-header" style="--accent:#1c6b3a;">⚽ PARTIDO DE NAVIDAD — 1914</div>
+
+    <div id="fbChooseScreen">
+      <p style="text-align:center; max-width:560px; margin:0 auto 14px;">
+        Nochebuena de 1914. En varios puntos del frente occidental, soldados alemanes y británicos salieron de las
+        trincheras, se saludaron en tierra de nadie y jugaron partidos improvisados de fútbol.
+      </p>
+      <div id="fbModeChoice">
+        <div style="text-align:center; font-weight:700; margin-bottom:10px;">¿Cómo quieres jugar?</div>
+        <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:18px;">
+          <div class="level-row" id="chooseSinglePlayerBtn" style="cursor:pointer; flex-direction:column; text-align:center; width:180px;">
+            <div style="font-size:40px;">🤖</div>
+            <div class="lname">1 jugador</div>
+            <div class="lyear">Contra la IA</div>
+          </div>
+          <div class="level-row" id="chooseMultiplayerBtn" style="cursor:pointer; flex-direction:column; text-align:center; width:180px;">
+            <div style="font-size:40px;">👥</div>
+            <div class="lname">2 jugadores</div>
+            <div class="lyear">Turnos alternados en la misma pantalla</div>
+          </div>
+        </div>
+      </div>
+      <div id="fbTeamChoice" class="hidden">
+        <div style="text-align:center; font-weight:700; margin-bottom:10px;" id="fbTeamChoiceLabel">Elegí tu equipo</div>
+        <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+          <div class="level-row" id="chooseGermanyBtn" style="cursor:pointer; flex-direction:column; text-align:center; width:180px;">
+            <div style="font-size:40px;">🔴</div>
+            <div class="lname">Alemania</div>
+            <div class="lyear">Fichas rojas</div>
+          </div>
+          <div class="level-row" id="chooseEnglandBtn" style="cursor:pointer; flex-direction:column; text-align:center; width:180px;">
+            <div style="font-size:40px;">⚪</div>
+            <div class="lname">Inglaterra</div>
+            <div class="lyear">Fichas blancas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="fbGameScreen" class="hidden">
+      <div style="text-align:center; font-family:'Special Elite', monospace; font-size:30px; font-weight:800; margin-bottom:2px; letter-spacing:1px;">
+        <span id="fbScoreLabel">ALEMANIA 0 — 0 INGLATERRA</span>
+      </div>
+      <div style="text-align:center; font-size:14px; color:#5a4a30; margin-bottom:8px;" id="fbTurnLabel">Tu turno</div>
+      <div class="fb-crowd-wrap">
+        <div class="fb-crowd fb-crowd-top"></div>
+        <div class="fb-crowd fb-crowd-side left"></div>
+        <canvas id="fbCanvas" width="480" height="680"></canvas>
+        <div class="fb-crowd fb-crowd-side right"></div>
+        <div class="fb-crowd fb-crowd-bottom"></div>
+      </div>
+      <div class="controls-row">Arrastrá una ficha tuya hacia atrás y soltá para tirar — como un tirachinas</div>
+    </div>
+
+    <div class="story-overlay" id="fbGoalOverlay">
+      <h2 id="fbGoalTitle" style="font-size:56px;">¡GOL!</h2>
+      <p id="fbGoalText" style="font-size:26px; font-weight:800;"></p>
+    </div>
+
+    <div class="story-overlay" id="fbFinalOverlay">
+      <h2 id="fbFinalTitle" style="font-size:48px;">FIN DEL PARTIDO</h2>
+      <p id="fbFinalText"></p>
+      <button class="bigbtn" id="fbNextBtn">SIGUIENTE NIVEL ▶</button>
+      <button class="bigbtn" id="fbBackBtn" style="background:#3a5a4a;">VOLVER A LA CAMPAÑA</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   AUDIO — música noir de fondo + efectos de sonido puntuales
+   para cada evento del juego, todo sintetizado con Web Audio.
+   ============================================================= */
+let audioCtx = null;
+let musicPlaying = false;
+let musicTimer = null;
+let noirBeat = 0;
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+}
+
+function tone(freq, time, dur, gainVal, type, detuneVibrato) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || "sawtooth";
+  osc.frequency.value = freq;
+  if (detuneVibrato) {
+    const lfo = audioCtx.createOscillator();
+    const lfoGain = audioCtx.createGain();
+    lfo.frequency.value = 5.5;
+    lfoGain.gain.value = 6;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.detune);
+    lfo.start(time); lfo.stop(time + dur + 0.1);
+  }
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.exponentialRampToValueAtTime(gainVal, time + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(time); osc.stop(time + dur + 0.05);
+}
+
+// tema orquestal tenso, inspirado en el pulso implacable de una
+// partitura de suspense de acción: cuerdas graves en ostinato,
+// golpes metálicos de percusión y algún acorde de metales grave
+function stringPulse(freq, time, dur, gainVal) {
+  [1, 1.003, 0.997].forEach((detune) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.value = freq * detune;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(gainVal, time + 0.03);
+    gain.gain.linearRampToValueAtTime(gainVal * 0.6, time + dur * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(time); osc.stop(time + dur + 0.05);
+  });
+}
+
+function brassStab(freq, time, dur, gainVal) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "sawtooth";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.linearRampToValueAtTime(gainVal, time + 0.09);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(time); osc.stop(time + dur + 0.05);
+}
+
+function percHit(time, gainVal) {
+  const bufferSize = audioCtx.sampleRate * 0.28;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.2);
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(gainVal, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+  noise.connect(gain); gain.connect(audioCtx.destination);
+  noise.start(time);
+}
+
+// ostinato grave en Re menor, patrón implacable de 8 pasos
+const THEME_BASS = [73.42, 73.42, 82.41, 73.42, 65.41, 65.41, 73.42, 61.74];
+const THEME_BRASS = [146.83, null, null, 164.81, null, null, 130.81, null];
+
+let musicDarkness = 0; // 0 (nivel 1) a 1 (nivel 10): más oscuro y urgente en cada nivel
+
+function setMusicLevel(levelNum) {
+  musicDarkness = Math.min(1, Math.max(0, (levelNum - 1) / 9));
+}
+
+function scheduleThemeStep() {
+  if (!musicPlaying) return;
+  const beatDur = 0.36 - musicDarkness * 0.11;
+  const pitchMult = 1 - musicDarkness * 0.22;
+  const now = audioCtx.currentTime;
+  const step = noirBeat % THEME_BASS.length;
+
+  stringPulse(THEME_BASS[step] * pitchMult, now, beatDur * 0.95, 0.05 + musicDarkness * 0.02);
+  percHit(now, (step % 2 === 0 ? 0.16 : 0.09) + musicDarkness * 0.08);
+  if (THEME_BRASS[step] && Math.random() > musicDarkness * 0.5) {
+    brassStab(THEME_BRASS[step] * pitchMult, now, beatDur * 2.2, 0.035 * (1 - musicDarkness * 0.4));
+  }
+
+  noirBeat++;
+  musicTimer = setTimeout(scheduleThemeStep, beatDur * 1000);
+}
+
+function toggleMusic() {
+  ensureAudio();
+  const btn = document.getElementById("musicToggleBtn");
+  musicPlaying = !musicPlaying;
+  if (musicPlaying) {
+    noirBeat = 0;
+    scheduleThemeStep();
+    btn.textContent = "🔊 Música";
+  } else {
+    clearTimeout(musicTimer);
+    btn.textContent = "🔇 Música";
+  }
+}
+
+// --- efectos de sonido puntuales ---
+function sfxGunshots() {
+  if (!musicPlaying) return;
+  ensureAudio();
+  [0, 0.24].forEach((delay) => {
+    const time = audioCtx.currentTime + delay;
+
+    // "crack" agudo e instantáneo, como el chasquido real de un disparo
+    const crackSize = audioCtx.sampleRate * 0.04;
+    const crackBuf = audioCtx.createBuffer(1, crackSize, audioCtx.sampleRate);
+    const crackData = crackBuf.getChannelData(0);
+    for (let i = 0; i < crackSize; i++) crackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / crackSize, 0.6);
+    const crack = audioCtx.createBufferSource();
+    crack.buffer = crackBuf;
+    const crackFilter = audioCtx.createBiquadFilter();
+    crackFilter.type = "highpass"; crackFilter.frequency.value = 1800;
+    const crackGain = audioCtx.createGain();
+    crackGain.gain.setValueAtTime(1.0, time);
+    crackGain.gain.exponentialRampToValueAtTime(0.01, time + 0.04);
+    crack.connect(crackFilter); crackFilter.connect(crackGain); crackGain.connect(audioCtx.destination);
+    crack.start(time);
+
+    // cuerpo/estampido grave que sigue al chasquido, con una pequeña cola de eco
+    const bodySize = audioCtx.sampleRate * 0.3;
+    const bodyBuf = audioCtx.createBuffer(1, bodySize, audioCtx.sampleRate);
+    const bodyData = bodyBuf.getChannelData(0);
+    for (let i = 0; i < bodySize; i++) bodyData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bodySize, 1.6);
+    const body = audioCtx.createBufferSource();
+    body.buffer = bodyBuf;
+    const bodyFilter = audioCtx.createBiquadFilter();
+    bodyFilter.type = "lowpass"; bodyFilter.frequency.value = 900;
+    const bodyGain = audioCtx.createGain();
+    bodyGain.gain.setValueAtTime(0.001, time);
+    bodyGain.gain.linearRampToValueAtTime(0.9, time + 0.008);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
+    body.connect(bodyFilter); bodyFilter.connect(bodyGain); bodyGain.connect(audioCtx.destination);
+    body.start(time);
+
+    // eco lejano, más apagado, como si rebotara entre edificios
+    const echoGain = audioCtx.createGain();
+    echoGain.gain.setValueAtTime(0.001, time + 0.09);
+    echoGain.gain.linearRampToValueAtTime(0.22, time + 0.1);
+    echoGain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
+    const echoFilter = audioCtx.createBiquadFilter();
+    echoFilter.type = "lowpass"; echoFilter.frequency.value = 500;
+    const echoSource = audioCtx.createBufferSource();
+    echoSource.buffer = bodyBuf;
+    echoSource.connect(echoFilter); echoFilter.connect(echoGain); echoGain.connect(audioCtx.destination);
+    echoSource.start(time + 0.09);
+
+    // golpe grave bajo el disparo, para más cuerpo/violencia
+    const thump = audioCtx.createOscillator();
+    const thumpGain = audioCtx.createGain();
+    thump.type = "square";
+    thump.frequency.setValueAtTime(120, time);
+    thump.frequency.exponentialRampToValueAtTime(40, time + 0.12);
+    thumpGain.gain.setValueAtTime(0.35, time);
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+    thump.connect(thumpGain); thumpGain.connect(audioCtx.destination);
+    thump.start(time); thump.stop(time + 0.16);
+  });
+
+  // grito de mujer justo después de los disparos: barrido de tono agudo
+  const screamTime = audioCtx.currentTime + 0.45;
+  const scream = audioCtx.createOscillator();
+  const screamGain = audioCtx.createGain();
+  scream.type = "sawtooth";
+  scream.frequency.setValueAtTime(700, screamTime);
+  scream.frequency.linearRampToValueAtTime(1100, screamTime + 0.25);
+  scream.frequency.exponentialRampToValueAtTime(500, screamTime + 0.9);
+  const vibrato = audioCtx.createOscillator();
+  const vibratoGain = audioCtx.createGain();
+  vibrato.frequency.value = 11;
+  vibratoGain.gain.value = 45;
+  vibrato.connect(vibratoGain); vibratoGain.connect(scream.frequency);
+  screamGain.gain.setValueAtTime(0.0001, screamTime);
+  screamGain.gain.linearRampToValueAtTime(0.22, screamTime + 0.12);
+  screamGain.gain.exponentialRampToValueAtTime(0.0001, screamTime + 0.95);
+  scream.connect(screamGain); screamGain.connect(audioCtx.destination);
+  scream.start(screamTime); vibrato.start(screamTime);
+  scream.stop(screamTime + 1); vibrato.stop(screamTime + 1);
+}
+
+function sfxDistantGunfire() {
+  if (!musicPlaying) return;
+  ensureAudio();
+  const time = audioCtx.currentTime;
+  const bufferSize = audioCtx.sampleRate * 0.12;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5);
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.18, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+  noise.connect(gain); gain.connect(audioCtx.destination);
+  noise.start(time);
+}
+
+function sfxExplosion() {
+  if (!musicPlaying) return;
+  ensureAudio();
+  const time = audioCtx.currentTime;
+  const bufferSize = audioCtx.sampleRate * 0.5;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.8);
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.7, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.5);
+  noise.connect(gain); gain.connect(audioCtx.destination);
+  noise.start(time);
+
+  const boom = audioCtx.createOscillator();
+  const boomGain = audioCtx.createGain();
+  boom.type = "sine";
+  boom.frequency.setValueAtTime(90, time);
+  boom.frequency.exponentialRampToValueAtTime(30, time + 0.4);
+  boomGain.gain.setValueAtTime(0.5, time);
+  boomGain.gain.exponentialRampToValueAtTime(0.001, time + 0.45);
+  boom.connect(boomGain); boomGain.connect(audioCtx.destination);
+  boom.start(time); boom.stop(time + 0.5);
+}
+
+function sfxHit() {
+  if (!musicPlaying) return;
+  ensureAudio();
+  const time = audioCtx.currentTime;
+  tone(140, time, 0.35, 0.09, "sawtooth");
+  tone(90, time, 0.4, 0.08, "square");
+}
+
+function sfxSuccess() {
+  if (!musicPlaying) return;
+  ensureAudio();
+  const time = audioCtx.currentTime;
+  [523.25, 659.25, 783.99].forEach((f, i) => tone(f, time + i * 0.11, 0.35, 0.06, "triangle"));
+}
+
+document.getElementById("musicToggleBtn").addEventListener("click", toggleMusic);
+document.getElementById("globalHomeBtn").addEventListener("click", () => {
+  phase = "intro";
+  gPhase = "intro";
+  if (typeof fbStopWarAmbient === "function") fbStopWarAmbient();
+  document.getElementById("gameScreen").classList.add("hidden");
+  document.getElementById("footballScreen").classList.add("hidden");
+  document.getElementById("campaignScreen").classList.remove("hidden");
+  renderCampaign();
+});
+
+/* =============================================================
+   ESTRUCTURA DE CAMPAÑA — pensada para poder sumar niveles
+   nuevos sin tocar el motor. Solo el nivel 1 está desarrollado;
+   el resto queda como columna vertebral para ampliar después.
+   ============================================================= */
+let unlockedCount = 11; // todos los niveles disponibles desde el inicio
+
+const LEVELS = [
+  { id: 1, name: "Sarajevo", year: "28 de junio de 1914", mechanic: "Desplazamiento y cambio de situación" },
+  { id: 2, name: "Movilización", year: "1914", mechanic: "Esquivar columnas de tropas en marcha" },
+  { id: 3, name: "Primera batalla del Marne", year: "1914", mechanic: "Laberinto de trincheras y alambradas" },
+  { id: 4, name: "Ypres", year: "1915", mechanic: "Evitar las nubes de gas cloro" },
+  { id: 5, name: "Verdún", year: "1916", mechanic: "Esquivar impactos de artillería" },
+  { id: 6, name: "Somme", year: "1916", mechanic: "Ametralladoras y primeros tanques" },
+  { id: 7, name: "Passchendaele", year: "1917", mechanic: "Barro que frena tus pasos" },
+  { id: 8, name: "Caporetto", year: "1917", mechanic: "No dejarte ver por las patrullas" },
+  { id: 9, name: "Ofensivas de 1918", year: "1918", mechanic: "Tanques y tropas en movimiento" },
+  { id: 10, name: "Armisticio", year: "11 de noviembre de 1918", mechanic: "Un último tramo sin combate" },
+  { id: 11, name: "Partido de Navidad", year: "24-25 de diciembre de 1914", mechanic: "Fútbol de chapas: Alemania vs Inglaterra" },
+];
+
+const LEVEL_ORDER = [1, 2, 3, 11, 4, 5, 6, 7, 8, 9, 10];
+
+function renderCampaign() {
+  const list = document.getElementById("timelineList");
+  list.innerHTML = "";
+  LEVEL_ORDER.forEach((id, i) => {
+    const lvl = LEVELS.find((l) => l.id === id);
+    const unlocked = id <= unlockedCount;
+    const row = document.createElement("div");
+    row.className = "level-row" + (unlocked ? "" : " locked");
+    row.innerHTML = `
+      <div class="level-num">${i + 1}</div>
+      <div class="level-info">
+        <div class="lname">${lvl.name}${unlocked ? "" : " 🔒"}</div>
+        <div class="lyear">${lvl.year} — ${lvl.mechanic}</div>
+      </div>`;
+    if (unlocked) row.addEventListener("click", () => startLevel(lvl.id));
+    list.appendChild(row);
+  });
+}
+
+function nextLevelId(currentId) {
+  const idx = LEVEL_ORDER.indexOf(currentId);
+  if (idx === -1 || idx === LEVEL_ORDER.length - 1) return null;
+  return LEVEL_ORDER[idx + 1];
+}
+renderCampaign();
+
+/* =============================================================
+   NIVEL 1 — SARAJEVO. Mapa top-down sencillo con río, Puente
+   Latino, calles y edificios. Dos fases sobre el mismo mapa.
+   ============================================================= */
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const W = canvas.width, H = canvas.height;
+
+// edificios (rectángulos de colisión + dibujo)
+const BUILDINGS = [
+  { x: 25, y: 25, w: 175, h: 112, color: "#8a7050", label: "Correos" },
+  { x: 250, y: 25, w: 150, h: 100, color: "#7a6248" },
+  { x: 450, y: 25, w: 188, h: 112, color: "#846a4c" },
+  { x: 700, y: 25, w: 225, h: 112, color: "#78604a" },
+  { x: 25, y: 412, w: 162, h: 112, color: "#7a6248" },
+  { x: 238, y: 412, w: 138, h: 112, color: "#846a4c" },
+  { x: 550, y: 412, w: 188, h: 112, color: "#8a7050", label: "Cuartel" },
+  { x: 775, y: 412, w: 150, h: 112, color: "#78604a" },
+];
+
+// río horizontal y Puente Latino
+const RIVER = { y0: 250, y1: 300 };
+const BRIDGE = { x0: 412, x1: 538 };
+
+// bloqueos de calle que aparecen recién en la fase 2 (el puente
+// nunca se bloquea del todo: dejan un hueco para poder pasar)
+const STREET_BLOCKS_PHASE2 = [
+  { x: 600, y: 300, w: 50, h: 69 },
+  { x: 700, y: 375, w: 50, h: 69 },
+];
+
+const START_POS = { x: 75, y: 162 };
+const DEST_B = { x: 644, y: 381, label: "🏛 Cuartel", w: 32 };
+const DEST_C = { x: 850, y: 381, label: "🚩 Puesto de mando", w: 32 };
+
+let player = { x: START_POS.x, y: START_POS.y, r: 12, speed: 3.1 };
+let keys = {};
+let phase = "intro"; // intro | phase1 | eventPause | phase2 | done
+let bridgeTriggered = false;
+let currentDest = DEST_B;
+
+// peatones simples (decorativos, reaccionan al evento)
+let pedestrians = [];
+function initPedestrians() {
+  pedestrians = [];
+  for (let i = 0; i < 6; i++) {
+    pedestrians.push({
+      x: 60 + Math.random() * 640,
+      y: 60 + Math.random() * 300,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      alarmed: false,
+    });
+  }
+}
+initPedestrians();
+
+// un vehículo decorativo que recorre la calle principal
+let car = { x: 25, y: 213, dir: 1 };
+let princip = { x: 475, y: 195, active: false, speed: 1.7 };
+
+function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+function isBlocked(x, y, r) {
+  for (const b of BUILDINGS) {
+    if (rectsOverlap(x - r, y - r, r * 2, r * 2, b.x, b.y, b.w, b.h)) return true;
+  }
+  if (phase === "phase2" || phase === "eventPause") {
+    for (const s of STREET_BLOCKS_PHASE2) {
+      if (rectsOverlap(x - r, y - r, r * 2, r * 2, s.x, s.y, s.w, s.h)) return true;
+    }
+  }
+  return canvasBounds(x, y, r);
+}
+function inRiverOutsideBridge(x, y, r) {
+  if (y + r > RIVER.y0 && y - r < RIVER.y1) {
+    if (x < BRIDGE.x0 || x > BRIDGE.x1) return true;
+  }
+  return false;
+}
+function canvasBounds(x, y, r) {
+  return x - r < 0 || x + r > W || y - r < 0 || y + r > H;
+}
+
+function startLevel(id) {
+  document.getElementById("campaignScreen").classList.add("hidden");
+  document.getElementById("gameScreen").classList.remove("hidden");
+  setMusicLevel(id);
+  if (id === 1) {
+    resetLevel1();
+    document.getElementById("introOverlay").classList.add("show");
+    phase = "intro";
+    requestAnimationFrame(gameLoop);
+  } else if (id === 11) {
+    document.getElementById("gameScreen").classList.add("hidden");
+    document.getElementById("footballScreen").classList.remove("hidden");
+    startFootballLevel();
+  } else {
+    startGenericLevel(id);
+  }
+}
+
+function resetLevel1() {
+  player = { x: START_POS.x, y: START_POS.y, r: 12, speed: 3.1 };
+  bridgeTriggered = false;
+  currentDest = DEST_B;
+  initPedestrians();
+  car = { x: 25, y: 213, dir: 1 };
+  princip = { x: 475, y: 195, active: false, speed: 1.7 };
+  document.getElementById("phaseLabel").textContent = "FASE 1";
+  document.getElementById("missionBox").textContent = "Lleva el mensaje hasta el punto marcado con 🏛, cruzando el Puente Latino";
+  [ "introOverlay","eventOverlay","missionUpdateOverlay","finalOverlay","runOverOverlay","princeOverlay","drownedOverlay" ].forEach((id) => document.getElementById(id).classList.remove("show"));
+}
+
+document.getElementById("startPhase1Btn").addEventListener("click", () => {
+  document.getElementById("introOverlay").classList.remove("show");
+  phase = "phase1";
+});
+
+document.getElementById("continueToPhase2Btn").addEventListener("click", () => {
+  document.getElementById("eventOverlay").classList.remove("show");
+  document.getElementById("missionUpdateOverlay").classList.add("show");
+});
+
+document.getElementById("startPhase2Btn").addEventListener("click", () => {
+  document.getElementById("missionUpdateOverlay").classList.remove("show");
+  document.getElementById("phaseLabel").textContent = "FASE 2";
+  document.getElementById("missionBox").textContent = "Lleva la noticia al 🚩 Puesto de mando — algunas calles están cortadas, y Gavrilo Princip te persigue desde allí";
+  currentDest = DEST_C;
+  princip.x = DEST_C.x;
+  princip.y = DEST_C.y;
+  phase = "phase2";
+});
+
+document.getElementById("backToCampaignBtn").addEventListener("click", () => {
+  document.getElementById("finalOverlay").classList.remove("show");
+  document.getElementById("gameScreen").classList.add("hidden");
+  document.getElementById("campaignScreen").classList.remove("hidden");
+  phase = "intro";
+});
+
+document.getElementById("retryLevelBtn").addEventListener("click", () => {
+  document.getElementById("runOverOverlay").classList.remove("show");
+  resetLevel1();
+  document.getElementById("introOverlay").classList.add("show");
+  phase = "intro";
+});
+
+document.getElementById("princeRetryBtn").addEventListener("click", () => {
+  document.getElementById("princeOverlay").classList.remove("show");
+  resetLevel1();
+  document.getElementById("introOverlay").classList.add("show");
+  phase = "intro";
+});
+
+document.getElementById("drownedRetryBtn").addEventListener("click", () => {
+  document.getElementById("drownedOverlay").classList.remove("show");
+  resetLevel1();
+  document.getElementById("introOverlay").classList.add("show");
+  phase = "intro";
+});
+
+document.addEventListener("keydown", (e) => {
+  keys[e.key.toLowerCase()] = true;
+  if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(e.key.toLowerCase())) e.preventDefault();
+});
+document.addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
+
+function updatePlayer() {
+  if (phase !== "phase1" && phase !== "phase2") return;
+  let dx = 0, dy = 0;
+  if (keys["arrowup"] || keys["w"]) dy -= 1;
+  if (keys["arrowdown"] || keys["s"]) dy += 1;
+  if (keys["arrowleft"] || keys["a"]) dx -= 1;
+  if (keys["arrowright"] || keys["d"]) dx += 1;
+  if (dx || dy) {
+    const len = Math.hypot(dx, dy);
+    dx = (dx / len) * player.speed;
+    dy = (dy / len) * player.speed;
+    if (!isBlocked(player.x + dx, player.y, player.r)) player.x += dx;
+    if (!isBlocked(player.x, player.y + dy, player.r)) player.y += dy;
+  }
+
+  // el coche te atropella si lo tocas: pierdes
+  if (rectsOverlap(player.x - player.r, player.y - player.r, player.r * 2, player.r * 2, car.x, car.y, 42, 20)) {
+    triggerRunOver();
+    return;
+  }
+
+  // caer al río fuera del puente: te ahogas
+  if (inRiverOutsideBridge(player.x, player.y, player.r)) {
+    triggerDrowned();
+    return;
+  }
+
+  // disparador: cruzar el Puente Latino en fase 1
+  if (phase === "phase1" && !bridgeTriggered) {
+    if (player.x > BRIDGE.x0 - 10 && player.x < BRIDGE.x1 + 10 && player.y > RIVER.y0 - 10 && player.y < RIVER.y1 + 10) {
+      bridgeTriggered = true;
+      triggerAssassinationEvent();
+    }
+  }
+
+  // llegar al destino actual
+  if (Math.hypot(player.x - currentDest.x, player.y - currentDest.y) < 32) {
+    if (phase === "phase1") {
+      phase = "eventPause";
+      // si llega al cuartel sin haber cruzado por el puente (poco probable dado el río), igual disparamos el evento
+      if (!bridgeTriggered) { bridgeTriggered = true; triggerAssassinationEvent(); }
+    } else if (phase === "phase2") {
+      phase = "done";
+      sfxSuccess();
+      document.getElementById("finalOverlay").classList.add("show");
+    }
+  }
+}
+
+function triggerAssassinationEvent() {
+  phase = "eventPause";
+  pedestrians.forEach((p) => { p.alarmed = true; p.vx = 0; p.vy = 0; });
+  sfxGunshots();
+  setTimeout(() => {
+    document.getElementById("eventOverlay").classList.add("show");
+  }, 400);
+}
+
+function triggerRunOver() {
+  phase = "lost";
+  sfxHit();
+  document.getElementById("runOverOverlay").classList.add("show");
+}
+
+function triggerDrowned() {
+  phase = "lost";
+  sfxHit();
+  document.getElementById("drownedOverlay").classList.add("show");
+}
+
+function updateWorld(dt) {
+  if (phase === "eventPause" || phase === "done" || phase === "lost") return;
+  pedestrians.forEach((p) => {
+    if (p.alarmed) return;
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 40 || p.x > W - 40) p.vx *= -1;
+    if (p.y < 40 || p.y > H - 40) p.vy *= -1;
+  });
+  car.x += car.dir * 1.75;
+  if (car.x > W - 75 || car.x < 25) car.dir *= -1;
+
+  if (phase === "phase2") {
+    princip.active = true;
+    const dx = player.x - princip.x, dy = player.y - princip.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    if (!isBlocked(princip.x + (dx / dist) * princip.speed, princip.y, 11)) princip.x += (dx / dist) * princip.speed;
+    if (!isBlocked(princip.x, princip.y + (dy / dist) * princip.speed, 11)) princip.y += (dy / dist) * princip.speed;
+    if (Math.hypot(player.x - princip.x, player.y - princip.y) < player.r + 11) triggerPrincipCaught();
+  } else {
+    princip.active = false;
+  }
+}
+
+function triggerPrincipCaught() {
+  phase = "lost";
+  sfxGunshots();
+  document.getElementById("princeOverlayText").textContent = "Gavrilo Princip te ha alcanzado antes de llegar al puente. Te ha disparado a ti también.";
+  document.getElementById("princeOverlay").classList.add("show");
+}
+
+function drawMap() {
+  // fondo de calles
+  ctx.fillStyle = "#4a4438";
+  ctx.fillRect(0, 0, W, H);
+
+  // río
+  ctx.fillStyle = "#3a6a8a";
+  ctx.fillRect(0, RIVER.y0, W, RIVER.y1 - RIVER.y0);
+  ctx.fillStyle = "rgba(255,255,255,.08)";
+  for (let i = 0; i < W; i += 26) ctx.fillRect(i, RIVER.y0 + 14, 14, 3);
+
+  // Puente Latino
+  ctx.fillStyle = "#9a8a68";
+  ctx.fillRect(BRIDGE.x0, RIVER.y0 - 6, BRIDGE.x1 - BRIDGE.x0, RIVER.y1 - RIVER.y0 + 12);
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 2;
+  ctx.strokeRect(BRIDGE.x0, RIVER.y0 - 6, BRIDGE.x1 - BRIDGE.x0, RIVER.y1 - RIVER.y0 + 12);
+  ctx.fillStyle = "#2a2318"; ctx.font = "11px 'Special Elite'"; ctx.textAlign = "center";
+  ctx.fillText("PUENTE LATINO", (BRIDGE.x0 + BRIDGE.x1) / 2, RIVER.y0 - 12);
+
+  // edificios
+  BUILDINGS.forEach((b) => {
+    ctx.fillStyle = b.color;
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeStyle = "#2a2318"; ctx.lineWidth = 2;
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+    // ventanitas
+    ctx.fillStyle = "rgba(255,220,150,.5)";
+    for (let wx = b.x + 10; wx < b.x + b.w - 10; wx += 22) {
+      for (let wy = b.y + 10; wy < b.y + b.h - 14; wy += 22) {
+        ctx.fillRect(wx, wy, 10, 12);
+      }
+    }
+    if (b.label) {
+      ctx.fillStyle = "#fff"; ctx.font = "bold 12px 'Special Elite'"; ctx.textAlign = "center";
+      ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h + 16);
+    }
+  });
+
+  // bloqueos de calle en fase 2
+  if (phase === "phase2" || phase === "eventPause") {
+    STREET_BLOCKS_PHASE2.forEach((s) => {
+      ctx.fillStyle = "#c94b4b";
+      ctx.fillRect(s.x, s.y, s.w, s.h);
+      ctx.strokeStyle = "#000"; ctx.strokeRect(s.x, s.y, s.w, s.h);
+    });
+  }
+
+  // vehículo
+  ctx.fillStyle = "#2a2a2a";
+  ctx.fillRect(car.x, car.y, 42, 20);
+
+  // Gavrilo Princip — figura civil sencilla, sin ningún arma representada
+  if (princip.active) {
+    ctx.fillStyle = "#3a3228";
+    ctx.beginPath(); ctx.arc(princip.x, princip.y, 11, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = "#e8dcc0"; ctx.font = "9px 'Special Elite'"; ctx.textAlign = "center";
+    ctx.fillText("G. P.", princip.x, princip.y - 13);
+  }
+
+  // peatones
+  pedestrians.forEach((p) => {
+    ctx.fillStyle = p.alarmed ? "#c94b4b" : "#d8c8a0";
+    ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+  });
+
+  // destino actual
+  ctx.fillStyle = "#f2e9d0"; ctx.font = "20px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(currentDest.label.split(" ")[0], currentDest.x, currentDest.y + 7);
+
+  // jugador (mensajero)
+  ctx.fillStyle = "#e8c468";
+  ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = "#2a2318"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("✉️", player.x, player.y - 14);
+}
+
+function gameLoop() {
+  updatePlayer();
+  updateWorld();
+  drawMap();
+  requestAnimationFrame(gameLoop);
+}
+
+/* =============================================================
+   MOTOR GENÉRICO PARA LOS NIVELES 2-10 — misma mecánica base
+   (ir de A a B esquivando obstáculos) con distintos tipos de
+   peligro según el contexto histórico de cada batalla.
+   ============================================================= */
+const GW = 950, GH = 550;
+const G_START = { x: 50, y: 275 };
+const G_GOAL = { x: 900, y: 275 };
+
+const GENERIC_LEVELS = {
+  2: {
+    name: "Movilización — 1914",
+    intro: "Alemania activa el Plan Schlieffen: mover a millones de soldados a través de Bélgica en trenes, en pocos días, para golpear Francia antes de que Rusia termine de movilizarse. Tienes que cruzar varias vías con trenes en marcha.",
+    mission: "Cruza las vías del Plan Schlieffen esquivando los trenes",
+    walls: [],
+    hazards: [
+      { type: "patrol", x: 200, y: 0, w: 40, h: 150, axis: "y", from: 0, to: GH - 150, speed: 4.2, color: "#3a3a3a" },
+      { type: "patrol", x: 380, y: GH - 150, w: 40, h: 150, axis: "y", from: 0, to: GH - 150, speed: -4.6, color: "#3a3a3a" },
+      { type: "patrol", x: 560, y: 0, w: 40, h: 150, axis: "y", from: 0, to: GH - 150, speed: 4.9, color: "#3a3a3a" },
+      { type: "patrol", x: 740, y: GH - 150, w: 40, h: 150, axis: "y", from: 0, to: GH - 150, speed: -4.3, color: "#3a3a3a" },
+    ],
+    lostText: "Un tren de tropas te ha arrollado en las vías.",
+    finalText: "El Plan Schlieffen buscaba una victoria rápida sobre Francia moviendo enormes columnas de tropas a través de Bélgica, antes de que Rusia completara su lenta movilización. La invasión de Bélgica arrastró también a Gran Bretaña al conflicto.",
+    chain: ["PLAN SCHLIEFFEN ACTIVADO", "INVASIÓN DE BÉLGICA", "GRAN BRETAÑA ENTRA EN GUERRA"],
+  },
+  3: {
+    name: "Primera batalla del Marne — 1914",
+    intro: "El avance alemán se ha detenido. La guerra de movimiento ha terminado: empiezan las trincheras y la artillería empieza a caer sobre la zona, cada vez más rápido y con menos pausa.",
+    mission: "Atraviesa la línea de trincheras esquivando los proyectiles, que aceleran con el tiempo",
+    walls: [
+      { x: 150, y: 0, w: 22, h: 375 }, { x: 300, y: 175, w: 22, h: 375 },
+      { x: 450, y: 0, w: 22, h: 375 }, { x: 600, y: 175, w: 22, h: 375 },
+      { x: 750, y: 0, w: 22, h: 375 },
+    ],
+    hazards: [
+      { type: "shot", x: 400, y: -20, vx: 0, vy: 2.2, r: 12, rampSpeed: true },
+      { type: "shot", x: 550, y: GH + 20, vx: 0, vy: -2.4, r: 12, rampSpeed: true },
+      { type: "shot", x: 700, y: -20, vx: 0, vy: 2.6, r: 12, rampSpeed: true },
+      { type: "shot", x: -20, y: 150, vx: 2.3, vy: 0, r: 12, rampSpeed: true },
+      { type: "shot", x: GW + 20, y: 400, vx: -2.5, vy: 0, r: 12, rampSpeed: true },
+      { type: "shot", x: 250, y: -20, vx: 0, vy: 2.0, r: 12, rampSpeed: true },
+      { type: "shot", x: 850, y: GH + 20, vx: 0, vy: -2.3, r: 12, rampSpeed: true },
+      { type: "shot", x: 630, y: GH + 20, vx: 0, vy: -2.5, r: 12, rampSpeed: true },
+      { type: "shot", x: -20, y: 480, vx: 2.4, vy: 0, r: 12, rampSpeed: true },
+      { type: "shot", x: GW + 20, y: 90, vx: -2.2, vy: 0, r: 12, rampSpeed: true },
+    ],
+    lostText: "",
+    finalText: "En septiembre de 1914, el avance alemán fue detenido cerca del río Marne. La guerra de movimientos había terminado: ambos bandos comenzaron a atrincherarse, dando inicio a años de guerra de posiciones.",
+    chain: ["AVANCE ALEMÁN DETENIDO", "AMBOS BANDOS SE ATRINCHERAN", "EMPIEZA LA GUERRA DE POSICIONES"],
+  },
+  4: {
+    name: "Ypres — 1915",
+    intro: "Se ha visto una extraña nube amarillo-verdosa avanzando desde las líneas enemigas. No sabes todavía qué es, pero está claro que hay que evitarla.",
+    mission: "Cruza el campo evitando la nube de gas",
+    walls: [],
+    hazards: [
+      { type: "gas", x: 475, y: 275, r: 75, vx: 3.6, vy: 1.4, color: "rgba(150,200,80,.55)" },
+      { type: "gas", x: 188, y: 125, r: 50, vx: 3.0, vy: -1.8, color: "rgba(150,200,80,.55)" },
+      { type: "gas", x: 750, y: 400, r: 55, vx: -3.2, vy: 1.5, color: "rgba(150,200,80,.55)" },
+    ],
+    lostText: "El gas cloro te alcanzó antes de que pudieras alejarte.",
+    finalText: "En abril de 1915, durante la Segunda Batalla de Ypres, Alemania utilizó por primera vez gas cloro a gran escala en el frente occidental, abriendo una nueva y terrible dimensión de la guerra.",
+    chain: ["PRIMER USO DE GAS CLORO", "CARRERA ARMAMENTÍSTICA QUÍMICA", "LLEGAN LAS MÁSCARAS DE GAS"],
+  },
+  5: {
+    name: "Verdún — 1916",
+    intro: "La artillería lleva meses cayendo sobre esta zona sin descanso. Vas a ver dónde va a caer el próximo impacto justo antes de que ocurra.",
+    mission: "Cruza la zona bombardeada hasta el puesto de resistencia",
+    battlefield: true,
+    walls: [],
+    hazards: [
+      { type: "shell", x: 250, y: 188, r: 50, period: 3400, warnAt: 2600 , randomPos: true },
+      { type: "shell", x: 475, y: 375, r: 55, period: 3000, warnAt: 2300 , randomPos: true },
+      { type: "shell", x: 675, y: 162, r: 50, period: 3600, warnAt: 2800 , randomPos: true },
+      { type: "shell", x: 800, y: 400, r: 48, period: 3200, warnAt: 2500 , randomPos: true },
+      { type: "shell", x: 375, y: 275, r: 42, period: 2800, warnAt: 2100 , randomPos: true },
+      { type: "shell", x: 550, y: 275, r: 46, period: 3100, warnAt: 2400 , randomPos: true },
+      { type: "shell", x: 460, y: 200, r: 40, period: 2900, warnAt: 2200 , randomPos: true },
+    ],
+    lostText: "Un obús cayó justo donde estabas parado.",
+    finalText: "La batalla de Verdún, en 1916, se convirtió en un símbolo de desgaste: durante diez meses, franceses y alemanes resistieron bajo un bombardeo casi constante, con enormes pérdidas humanas y sin apenas avances territoriales.",
+    chain: ["OFENSIVA ALEMANA SOBRE VERDÚN", "DIEZ MESES DE DESGASTE", "SÍMBOLO DE LA RESISTENCIA FRANCESA"],
+  },
+  6: {
+    name: "Somme — 1916",
+    intro: "Frente a ti está la tierra de nadie. Un tanque británico avanza directamente hacia ti — no puede cruzar las trincheras: metete en una para escapar un momento, pero vas a tener que volver a salir para llegar a la bandera. Además, la artillería sigue cayendo, cada vez en un punto distinto.",
+    mission: "Cruza la tierra de nadie sin que el tanque te alcance, esquivando también la artillería",
+    walls: [],
+    hazards: [
+      { type: "trench", x: 0, y: 150, w: GW, h: 32 },
+      { type: "trench", x: 0, y: 420, w: GW, h: 32 },
+      { type: "chaseTank", x: 780, y: 275, w: 90, h: 60, speed: 1.85 },
+      { type: "shell", x: 100, y: 275, r: 46, period: 3400, warnAt: 2000, randomPos: true, lateralOnly: true },
+      { type: "shell", x: 850, y: 450, r: 44, period: 3800, warnAt: 2300, randomPos: true, lateralOnly: true },
+    ],
+    lostText: "El tanque te ha pasado por encima. No hubo tiempo de reaccionar.",
+    finalText: "En la batalla del Somme, el ejército británico sufrió más de 57.000 bajas solo el primer día. Fue también donde, por primera vez en la historia, se emplearon tanques en combate — aunque muchos quedaron atascados en las propias trincheras del campo de batalla.",
+    chain: ["OFENSIVA BRITÁNICA EN EL SOMME", "PRIMEROS TANQUES EN COMBATE", "MÁS DE UN MILLÓN DE BAJAS"],
+  },
+  7: {
+    name: "Passchendaele — 1917",
+    intro: "Días de lluvia han convertido el terreno en un lodazal que te frena a cada paso — y para colmo, siguen cayendo bombas y llegan disparos desde las líneas enemigas, cada vez más rápido.",
+    mission: "Atraviesa el barro esquivando bombas, disparos y minas hasta la posición avanzada",
+    walls: [
+      { x: 325, y: 0, w: 25, h: 188 }, { x: 325, y: 362, w: 25, h: 188 },
+      { x: 650, y: 112, w: 25, h: 438 },
+    ],
+    hazards: [
+      { type: "mud", x: 112, y: 75, w: 188, h: 400 },
+      { type: "mud", x: 425, y: 75, w: 188, h: 400 },
+      { type: "mud", x: 738, y: 75, w: 138, h: 400 },
+      { type: "shot", x: 480, y: -20, vx: 0, vy: 3.2, r: 12, rampSpeed: true },
+      { type: "shot", x: 250, y: GH + 20, vx: 0, vy: -3.4, r: 12, rampSpeed: true },
+      { type: "shot", x: GW + 20, y: 460, vx: -4.0, vy: 0, r: 10, rampSpeed: true },
+      { type: "shot", x: GW + 20, y: 140, vx: -4.2, vy: 0, r: 10, rampSpeed: true },
+      { type: "shot", x: 620, y: -20, vx: 0, vy: 3.6, r: 12, rampSpeed: true },
+      { type: "shot", x: 100, y: GH + 20, vx: 0, vy: -3.8, r: 12, rampSpeed: true },
+      { type: "shot", x: -20, y: 300, vx: 4.2, vy: 0, r: 10, rampSpeed: true },
+      { type: "shot", x: -20, y: 500, vx: 4.6, vy: 0, r: 10, rampSpeed: true },
+      { type: "mine", x: 230, y: 230, r: 14 },
+      { type: "mine", x: 500, y: 480, r: 14 },
+      { type: "mine", x: 780, y: 260, r: 14 },
+      { type: "mine", x: 550, y: 150, r: 14 },
+    ],
+    lostText: "",
+    finalText: "La Tercera Batalla de Ypres, conocida como Passchendaele, se libró bajo lluvias torrenciales que convirtieron el campo de batalla en un lodazal: muchos soldados heridos murieron ahogados en el barro.",
+    chain: ["LLUVIAS TORRENCIALES", "EL TERRENO SE VUELVE UN LODAZAL", "AVANCE MÍNIMO A ALTÍSIMO COSTE"],
+  },
+  8: {
+    name: "Caporetto — 1917",
+    intro: "El frente se ha derrumbado y tu ejército se retira. Hay patrullas enemigas vigilando la zona — si te ven, estás perdido.",
+    mission: "Retírate hacia la retaguardia sin que te vean las patrullas",
+    walls: [
+      { x: 275, y: 200, w: 112, h: 30 }, { x: 575, y: 325, w: 112, h: 30 },
+    ],
+    hazards: [
+      { type: "guard", x: 275, y: 125, range: 130, speed: 0.024, coneLen: 210, coneWidth: 0.62 },
+      { type: "guard", x: 525, y: 425, range: 150, speed: -0.02, coneLen: 225, coneWidth: 0.58 },
+      { type: "guard", x: 750, y: 188, range: 120, speed: 0.028, coneLen: 195, coneWidth: 0.62 },
+    ],
+    lostText: "Una patrulla te vio retirándote. Te han capturado.",
+    finalText: "En octubre de 1917, el ejército italiano sufrió una derrota devastadora en Caporetto y se vio obligado a una retirada masiva de más de cien kilómetros.",
+    chain: ["RUPTURA DEL FRENTE ITALIANO", "RETIRADA DE MÁS DE 100 KM", "REORGANIZACIÓN EN EL RÍO PIAVE"],
+  },
+  9: {
+    name: "Ofensivas de 1918",
+    intro: "La guerra ha recuperado movilidad. Hay más tanques persiguiéndote, barro que te frena, y menos tiempo para dudar.",
+    mission: "Avanza hasta la última línea enemiga",
+    walls: [],
+    hazards: [
+      { type: "trench", x: 460, y: 0, w: 30, h: GH },
+      { type: "chaseTank", x: 200, y: 100, w: 85, h: 55, speed: 1.7 },
+      { type: "chaseTank", x: 700, y: 450, w: 85, h: 55, speed: 1.6 },
+      { type: "sweep", x: 0, y: 340, w: GW, h: 20, period: 1600, activeFor: 700, color: "#c94b4b" },
+      { type: "mud", x: 130, y: 150, w: 160, h: 380 },
+      { type: "mud", x: 660, y: 150, w: 160, h: 380 },
+    ],
+    lostText: "Un tanque o una ráfaga te alcanzaron en plena ofensiva.",
+    finalText: "En 1918, con la llegada de tropas estadounidenses y un mayor uso de tanques y aviación, la guerra recuperó movilidad. Las ofensivas aliadas de ese año acabarían quebrando las líneas alemanas.",
+    chain: ["LLEGAN LAS TROPAS ESTADOUNIDENSES", "OFENSIVAS ALIADAS COORDINADAS", "COLAPSO DE LAS LÍNEAS ALEMANAS"],
+  },
+  10: {
+    name: "Armisticio — 11 de noviembre de 1918",
+    intro: "Son las 10:30 de la mañana. El armisticio ya está firmado y entrará en vigor a las 11:00 en punto — pero los generales quieren seguir combatiendo hasta el último minuto. Sobrevive los treinta minutos que faltan.",
+    mission: "Sobrevive 30 segundos esquivando todos los peligros del frente. No hace falta llegar a ningún lado.",
+    survival: true,
+    survivalSeconds: 30,
+    battlefield: true,
+    fallenSoldiers: true,
+    tensionLights: true,
+    walls: [],
+    hazards: [
+      { type: "patrol", x: 150, y: 0, w: 40, h: 160, axis: "y", from: 0, to: GH - 160, speed: 3.4, color: "#0a0a0a", ghostTrain: true },
+      { type: "patrol", x: 780, y: GH - 160, w: 40, h: 160, axis: "y", from: 0, to: GH - 160, speed: -3.2, color: "#0a0a0a", ghostTrain: true },
+      { type: "gas", x: 250, y: 500, r: 55, vx: 1.8, vy: -0.8, color: "rgba(150,200,80,.55)" },
+      { type: "gas", x: 700, y: 480, r: 48, vx: -1.6, vy: -0.9, color: "rgba(150,200,80,.55)" },
+      { type: "shell", x: 550, y: 200, r: 50, period: 1800, warnAt: 1100, randomPos: true },
+      { type: "shell", x: 300, y: 400, r: 45, period: 2000, warnAt: 1200, randomPos: true },
+      { type: "shot", x: GW + 20, y: 200, vx: -2.6, vy: 0, r: 11, rampSpeed: true },
+      { type: "shot", x: -20, y: 350, vx: 2.4, vy: 0, r: 11, rampSpeed: true },
+      { type: "chaseTank", x: 435, y: 249, w: 80, h: 52, speed: 1.4 },
+      { type: "mine", x: 400, y: 275, r: 14 },
+    ],
+    lostText: "",
+    finalText: "El 11 de noviembre de 1918, a las once de la mañana, entró en vigor el armisticio que puso fin a los combates. La Primera Guerra Mundial había terminado, dejando más de quince millones de muertos y un mapa de Europa transformado para siempre.",
+    chain: ["ALTO EL FUEGO A LAS 11:00", "FIN DE LA PRIMERA GUERRA MUNDIAL", "TRATADO DE VERSALLES (1919)"],
+    isLast: true,
+  },
+};
+
+let gLevel = null, gLevelId = null, gPhase = "intro";
+let gSurvivalStart = 0;
+let gPlayer = { x: G_START.x, y: G_START.y, r: 10, speed: 2.4 };
+let gHazardState = [];
+let gStartTime = 0;
+
+function startGenericLevel(id) {
+  gLevelId = id;
+  gLevel = GENERIC_LEVELS[id];
+  gBattlefieldDecor = null;
+  gNextFlashAt = 0; gFlashUntil = 0;
+  gPlayer = { x: G_START.x, y: G_START.y, r: 10, speed: 2.4 };
+  gHazardState = gLevel.hazards.map((h) => ({ ...h, phase: Math.random() * 1000, startX: h.x, startY: h.y, angle: h.angle || 0 }));
+  gStartTime = performance.now();
+  gPhase = "intro";
+
+  document.getElementById("phaseLabel").textContent = "NIVEL " + id;
+  document.getElementById("dateLabel").textContent = gLevel.name.toUpperCase();
+  document.getElementById("missionBox").textContent = gLevel.mission;
+  document.getElementById("genericIntroTitle").textContent = gLevel.name.toUpperCase();
+  document.getElementById("genericIntroText").textContent = gLevel.intro;
+
+  [ "genericIntroOverlay","genericLostOverlay","genericFinalOverlay" ].forEach((elId) => document.getElementById(elId).classList.remove("show"));
+  document.getElementById("genericIntroOverlay").classList.add("show");
+  requestAnimationFrame(genericLoop);
+}
+
+document.getElementById("genericStartBtn").addEventListener("click", () => {
+  document.getElementById("genericIntroOverlay").classList.remove("show");
+  gPhase = "playing";
+  gSurvivalStart = performance.now();
+});
+document.getElementById("genericRetryBtn").addEventListener("click", () => {
+  document.getElementById("genericLostOverlay").classList.remove("show");
+  startGenericLevel(gLevelId);
+});
+document.getElementById("genericBackBtn").addEventListener("click", () => {
+  document.getElementById("genericFinalOverlay").classList.remove("show");
+  document.getElementById("gameScreen").classList.add("hidden");
+  document.getElementById("campaignScreen").classList.remove("hidden");
+  renderCampaign();
+});
+document.getElementById("nextLevelBtn").addEventListener("click", () => {
+  document.getElementById("genericFinalOverlay").classList.remove("show");
+  const next = nextLevelId(gLevelId);
+  if (next) startLevel(next);
+});
+document.getElementById("nextLevelFromOneBtn").addEventListener("click", () => {
+  document.getElementById("finalOverlay").classList.remove("show");
+  const next = nextLevelId(1);
+  if (next) startLevel(next);
+});
+
+function gIsBlocked(x, y, r) {
+  if (x - r < 0 || x + r > GW || y - r < 0 || y + r > GH) return true;
+  for (const w of gLevel.walls) {
+    if (rectsOverlap(x - r, y - r, r * 2, r * 2, w.x, w.y, w.w, w.h)) return true;
+  }
+  return false;
+}
+
+function genericUpdatePlayer() {
+  if (gPhase !== "playing") return;
+  let dx = 0, dy = 0;
+  if (keys["arrowup"] || keys["w"]) dy -= 1;
+  if (keys["arrowdown"] || keys["s"]) dy += 1;
+  if (keys["arrowleft"] || keys["a"]) dx -= 1;
+  if (keys["arrowright"] || keys["d"]) dx += 1;
+
+  let speed = gPlayer.speed;
+  for (const hz of gHazardState) {
+    if (hz.type === "mud" && rectsOverlap(gPlayer.x - gPlayer.r, gPlayer.y - gPlayer.r, gPlayer.r * 2, gPlayer.r * 2, hz.x, hz.y, hz.w, hz.h)) {
+      speed = gPlayer.speed * 0.4;
+    }
+  }
+
+  if (dx || dy) {
+    const len = Math.hypot(dx, dy);
+    dx = (dx / len) * speed; dy = (dy / len) * speed;
+    if (!gIsBlocked(gPlayer.x + dx, gPlayer.y, gPlayer.r)) gPlayer.x += dx;
+    if (!gIsBlocked(gPlayer.x, gPlayer.y + dy, gPlayer.r)) gPlayer.y += dy;
+  }
+
+  if (gLevel.survival) {
+    const elapsed = performance.now() - gSurvivalStart;
+    const remain = Math.max(0, gLevel.survivalSeconds - elapsed / 1000);
+    document.getElementById("dateLabel").textContent = gLevel.name.toUpperCase() + " — " + remain.toFixed(1) + "s";
+    if (remain <= 0) genericWin();
+    return;
+  }
+
+  if (Math.hypot(gPlayer.x - G_GOAL.x, gPlayer.y - G_GOAL.y) < 28) {
+    genericWin();
+  }
+}
+
+function genericWin() {
+  gPhase = "won";
+  if (gLevelId + 1 > unlockedCount && gLevelId < 10) unlockedCount = gLevelId + 1;
+  document.getElementById("genericFinalTitle").textContent = gLevel.isLast ? "FIN DE LA CAMPAÑA" : "NIVEL SUPERADO";
+  document.getElementById("genericFinalText").textContent = gLevel.finalText;
+  const chainEl = document.getElementById("genericFinalChain");
+  chainEl.innerHTML = "";
+  (gLevel.chain || []).forEach((step, i) => {
+    if (i > 0) {
+      const arrow = document.createElement("div");
+      arrow.className = "arrow";
+      arrow.textContent = "↓";
+      chainEl.appendChild(arrow);
+    }
+    const div = document.createElement("div");
+    div.className = "step";
+    div.textContent = step;
+    chainEl.appendChild(div);
+  });
+  sfxSuccess();
+  document.getElementById("nextLevelBtn").classList.toggle("hidden", !!gLevel.isLast);
+  document.getElementById("genericFinalOverlay").classList.add("show");
+}
+
+function genericUpdateHazards(now, dt) {
+  if (gPhase !== "playing") return;
+  const elapsed = now - gStartTime;
+  gHazardState.forEach((hz) => {
+    const ramp = hz.rampSpeed ? 1 + Math.min(1.4, elapsed / 15000) : 1;
+    if (hz.type === "patrol") {
+      const spd = hz.speed * ramp;
+      if (hz.axis === "x") {
+        hz.x += spd;
+        if (hz.x < hz.from) { hz.x = hz.from; hz.speed *= -1; }
+        if (hz.x > hz.to) { hz.x = hz.to; hz.speed *= -1; }
+      } else {
+        hz.y += spd;
+        if (hz.y < hz.from) { hz.y = hz.from; hz.speed *= -1; }
+        if (hz.y > hz.to) { hz.y = hz.to; hz.speed *= -1; }
+      }
+      if (rectsOverlap(gPlayer.x - gPlayer.r, gPlayer.y - gPlayer.r, gPlayer.r * 2, gPlayer.r * 2, hz.x, hz.y, hz.w, hz.h)) genericLose(hz);
+    } else if (hz.type === "shot") {
+      hz.x += hz.vx * ramp; hz.y += hz.vy * ramp;
+      if (hz.x < -20 || hz.x > GW + 20 || hz.y < -20 || hz.y > GH + 20) {
+        hz.x = hz.startX; hz.y = hz.startY;
+      }
+      if (Math.hypot(gPlayer.x - hz.x, gPlayer.y - hz.y) < hz.r + gPlayer.r) genericLose(hz);
+    } else if (hz.type === "gas") {
+      hz.x += hz.vx; hz.y += hz.vy;
+      if (hz.x < hz.r || hz.x > GW - hz.r) hz.vx *= -1;
+      if (hz.y < hz.r || hz.y > GH - hz.r) hz.vy *= -1;
+      if (Math.hypot(gPlayer.x - hz.x, gPlayer.y - hz.y) < hz.r + gPlayer.r) genericLose(hz);
+    } else if (hz.type === "shell") {
+      const cycleIndex = Math.floor((now - gStartTime + hz.phase) / hz.period);
+      if (hz.randomPos && hz.lastCycle !== cycleIndex) {
+        hz.lastCycle = cycleIndex;
+        if (hz.lateralOnly) {
+          const onLeft = Math.random() < 0.5;
+          hz.x = onLeft ? 60 + Math.random() * 140 : GW - 200 + Math.random() * 140;
+        } else {
+          hz.x = 60 + Math.random() * (GW - 120);
+        }
+        hz.y = 60 + Math.random() * (GH - 120);
+      }
+      const t = (now - gStartTime + hz.phase) % hz.period;
+      hz.warning = t > hz.warnAt && t < hz.period - 200;
+      const wasActive = hz.active;
+      hz.active = t >= hz.period - 200;
+      if (hz.active && !wasActive) sfxExplosion();
+      if ((hz.warning || hz.active) && Math.hypot(gPlayer.x - hz.x, gPlayer.y - hz.y) < hz.r) genericLose(hz);
+    } else if (hz.type === "sweep") {
+      const t = (now - gStartTime + hz.phase) % hz.period;
+      hz.active = t < hz.activeFor;
+      if (hz.active && rectsOverlap(gPlayer.x - gPlayer.r, gPlayer.y - gPlayer.r, gPlayer.r * 2, gPlayer.r * 2, hz.x, hz.y, hz.w, hz.h)) genericLose(hz);
+    } else if (hz.type === "trench") {
+      // no le hace nada al jugador: solo es un obstáculo que el tanque no puede cruzar
+    } else if (hz.type === "mine") {
+      if (!hz.exploded && Math.hypot(gPlayer.x - hz.x, gPlayer.y - hz.y) < hz.r + gPlayer.r) {
+        hz.exploded = true;
+        sfxExplosion();
+        genericLose({ type: "mine" });
+      }
+    } else if (hz.type === "chaseTank") {
+      const trenches = gHazardState.filter((h) => h.type === "trench");
+      const mudZones = gHazardState.filter((h) => h.type === "mud");
+      const tankBlocked = (nx, ny) => {
+        if (nx < 0 || nx + hz.w > GW || ny < 0 || ny + hz.h > GH) return true;
+        return trenches.some((tr) => rectsOverlap(nx, ny, hz.w, hz.h, tr.x, tr.y, tr.w, tr.h));
+      };
+      const inMud = mudZones.some((m) => rectsOverlap(hz.x, hz.y, hz.w, hz.h, m.x, m.y, m.w, m.h));
+      const tankSpeed = inMud ? hz.speed * 0.4 : hz.speed;
+      const cx = hz.x + hz.w / 2, cy = hz.y + hz.h / 2;
+      const dx = gPlayer.x - cx, dy = gPlayer.y - cy;
+      const dist = Math.hypot(dx, dy) || 1;
+      hz.facing = Math.atan2(dy, dx);
+      const mvx = (dx / dist) * tankSpeed, mvy = (dy / dist) * tankSpeed;
+      if (!tankBlocked(hz.x + mvx, hz.y)) hz.x += mvx;
+      if (!tankBlocked(hz.x, hz.y + mvy)) hz.y += mvy;
+      if (rectsOverlap(gPlayer.x - gPlayer.r, gPlayer.y - gPlayer.r, gPlayer.r * 2, gPlayer.r * 2, hz.x, hz.y, hz.w, hz.h)) genericLose({ type: "tank", tank: true });
+    } else if (hz.type === "guard") {
+      hz.angle = (((hz.angle || 0) + hz.speed) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      const dx = gPlayer.x - hz.x, dy = gPlayer.y - hz.y;
+      const dist = Math.hypot(dx, dy) || 0.001;
+      let seen = false;
+      if (dist < hz.coneLen - gPlayer.r) {
+        // producto escalar de vectores unitarios: da directamente el coseno del
+        // ángulo entre "hacia dónde mira el guardia" y "hacia dónde está el
+        // jugador", sin ningún problema de wraparound de ángulos posible
+        const dirX = Math.cos(hz.angle), dirY = Math.sin(hz.angle);
+        const toPlayerX = dx / dist, toPlayerY = dy / dist;
+        const dot = dirX * toPlayerX + dirY * toPlayerY;
+        if (dot > Math.cos(hz.coneWidth)) seen = true;
+      }
+      // exige contacto sostenido durante varios fotogramas seguidos: si el cono
+      // ya se movió y dejó de tocarte, el contador se reinicia y no pierdes
+      hz.catchFrames = seen ? (hz.catchFrames || 0) + 1 : 0;
+      if (hz.catchFrames >= 4) genericLose(hz);
+    }
+  });
+}
+
+const HAZARD_LOST_TEXTS = {
+  patrol: "Una columna de soldados en marcha te ha arrollado en plena calle.",
+  tank: "Un tanque te ha pasado por encima. No hubo tiempo de reaccionar.",
+  gas: "El gas cloro te ha alcanzado antes de que pudieras alejarte.",
+  shell: "Un obús ha caído justo donde estabas parado.",
+  shot: "Un proyectil te ha alcanzado de lleno.",
+  mine: "Has pisado una mina terrestre.",
+  sweep: "Una ráfaga de ametralladora te ha alcanzado en pleno cruce.",
+  guard: "Una patrulla te ha visto. Te han capturado.",
+};
+
+function genericLose(hz) {
+  if (gPhase !== "playing") return;
+  gPhase = "lost";
+  sfxHit();
+  let text = gLevel.lostText;
+  if (hz) {
+    const key = hz.tank ? "tank" : hz.type;
+    text = HAZARD_LOST_TEXTS[key] || text;
+  }
+  if (gLevel.survival) {
+    const elapsed = (performance.now() - gSurvivalStart) / 1000;
+    const remain = Math.max(0, gLevel.survivalSeconds - elapsed);
+    text += ` Te faltaban ${remain.toFixed(1)} segundos para llegar al armisticio.`;
+  }
+  document.getElementById("genericLostText").textContent = text;
+  document.getElementById("genericLostOverlay").classList.add("show");
+}
+
+let gBattlefieldDecor = null;
+let gNextFlashAt = 0, gFlashUntil = 0, gFlashColor = "rgba(255,255,255,.3)";
+function generateBattlefieldDecor() {
+  const craters = [];
+  for (let i = 0; i < 10; i++) craters.push({ x: 40 + Math.random() * (GW - 80), y: 40 + Math.random() * (GH - 80), r: 18 + Math.random() * 22 });
+  const mudPatches = [];
+  for (let i = 0; i < 6; i++) mudPatches.push({ x: 40 + Math.random() * (GW - 80), y: 40 + Math.random() * (GH - 80), rx: 30 + Math.random() * 40, ry: 18 + Math.random() * 20 });
+  const wire = [];
+  for (let i = 0; i < 5; i++) wire.push({ x: Math.random() * GW, y: Math.random() * GH, len: 40 + Math.random() * 60 });
+  const fallen = [];
+  if (gLevel.fallenSoldiers) {
+    for (let i = 0; i < 8; i++) {
+      fallen.push({ x: 40 + Math.random() * (GW - 80), y: 40 + Math.random() * (GH - 80), rot: Math.random() * Math.PI, wounded: Math.random() < 0.5 });
+    }
+  }
+  return { craters, mudPatches, wire, fallen };
+}
+
+function genericDraw(now) {
+  if (gLevel.battlefield) {
+    ctx.fillStyle = "#4a4030";
+    ctx.fillRect(0, 0, GW, GH);
+    if (!gBattlefieldDecor) gBattlefieldDecor = generateBattlefieldDecor();
+    gBattlefieldDecor.craters.forEach((c) => {
+      ctx.fillStyle = "rgba(30,25,15,.5)";
+      ctx.beginPath(); ctx.ellipse(c.x, c.y, c.r, c.r * 0.7, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,.4)"; ctx.lineWidth = 2; ctx.stroke();
+    });
+    gBattlefieldDecor.mudPatches.forEach((m) => {
+      ctx.fillStyle = "rgba(70,55,30,.35)";
+      ctx.beginPath(); ctx.ellipse(m.x, m.y, m.rx, m.ry, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    gBattlefieldDecor.wire.forEach((w) => {
+      ctx.strokeStyle = "rgba(30,25,15,.6)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(w.x, w.y); ctx.lineTo(w.x + w.len, w.y + 6); ctx.stroke();
+      for (let i = 0; i < w.len; i += 10) {
+        ctx.beginPath(); ctx.moveTo(w.x + i, w.y + (i / w.len) * 6 - 3); ctx.lineTo(w.x + i + 5, w.y + (i / w.len) * 6 + 3); ctx.stroke();
+      }
+    });
+    (gBattlefieldDecor.fallen || []).forEach((f) => {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.rotate(f.rot);
+      ctx.fillStyle = "rgba(40,45,35,.75)";
+      ctx.beginPath(); ctx.ellipse(0, 0, 20, 7, 0, 0, Math.PI * 2); ctx.fill();
+      if (f.wounded) {
+        ctx.fillStyle = "rgba(230,230,230,.6)";
+        ctx.fillRect(-6, -2, 12, 4);
+      }
+      ctx.restore();
+    });
+  } else {
+    ctx.fillStyle = "#4a4438";
+    ctx.fillRect(0, 0, GW, GH);
+
+    // franjas de terreno decorativas
+    ctx.fillStyle = "rgba(0,0,0,.08)";
+    for (let i = 0; i < GW; i += 40) ctx.fillRect(i, 0, 1, GH);
+  }
+
+  gLevel.walls.forEach((w) => {
+    ctx.fillStyle = "#6a5a3a";
+    ctx.fillRect(w.x, w.y, w.w, w.h);
+    ctx.strokeStyle = "#000"; ctx.strokeRect(w.x, w.y, w.w, w.h);
+  });
+
+  gHazardState.forEach((hz) => {
+    if (hz.type === "patrol") {
+      ctx.fillStyle = hz.color;
+      ctx.fillRect(hz.x, hz.y, hz.w, hz.h);
+      ctx.strokeStyle = "#000"; ctx.strokeRect(hz.x, hz.y, hz.w, hz.h);
+      if (hz.axis === "y" && hz.h > hz.w) {
+        ctx.strokeStyle = hz.ghostTrain ? "rgba(200,40,40,.6)" : "rgba(255,255,255,.5)"; ctx.lineWidth = 2;
+        for (let ty = hz.y + 15; ty < hz.y + hz.h; ty += 30) {
+          ctx.beginPath(); ctx.moveTo(hz.x + 4, ty); ctx.lineTo(hz.x + hz.w - 4, ty); ctx.stroke();
+        }
+        if (hz.ghostTrain) {
+          ctx.shadowColor = "rgba(200,30,30,.9)"; ctx.shadowBlur = 14;
+          ctx.font = "24px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText("💀", hz.x + hz.w / 2, hz.y + hz.h / 2 + 8);
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.font = "22px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText("🚂", hz.x + hz.w / 2, hz.y + hz.h / 2 + 8);
+        }
+      } else {
+        ctx.font = (hz.tank ? "26px" : "18px") + " sans-serif"; ctx.textAlign = "center";
+        ctx.fillText(hz.tank ? "🛡️" : "🪖", hz.x + hz.w / 2, hz.y + hz.h / 2 + 8);
+      }
+    } else if (hz.type === "gas") {
+      ctx.fillStyle = hz.color;
+      ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2); ctx.fill();
+    } else if (hz.type === "shot") {
+      ctx.fillStyle = "#2a2a2a";
+      ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "#c94b4b"; ctx.lineWidth = 2; ctx.stroke();
+    } else if (hz.type === "mud") {
+      ctx.fillStyle = "rgba(90,65,35,.55)";
+      ctx.fillRect(hz.x, hz.y, hz.w, hz.h);
+    } else if (hz.type === "trench") {
+      ctx.fillStyle = "#6b4a2a";
+      ctx.fillRect(hz.x, hz.y, hz.w, hz.h);
+      ctx.strokeStyle = "#3a2a18"; ctx.lineWidth = 3; ctx.strokeRect(hz.x, hz.y, hz.w, hz.h);
+      ctx.fillStyle = "rgba(0,0,0,.2)";
+      for (let ty = hz.y + 10; ty < hz.y + hz.h; ty += 20) ctx.fillRect(hz.x + 4, ty, hz.w - 8, 6);
+    } else if (hz.type === "mine") {
+      ctx.fillStyle = "#3a3a2a";
+      ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = "#8a1c1c";
+      ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r * 0.35, 0, Math.PI * 2); ctx.fill();
+    } else if (hz.type === "chaseTank") {
+      const tcx = hz.x + hz.w / 2, tcy = hz.y + hz.h / 2;
+      ctx.save();
+      ctx.translate(tcx, tcy);
+      ctx.rotate(hz.facing || 0);
+      const hw = hz.w / 2, hh = hz.h / 2;
+      ctx.fillStyle = "#2e6a3a";
+      ctx.beginPath();
+      ctx.moveTo(-hw, -hh + 10); ctx.lineTo(-hw + 14, -hh); ctx.lineTo(hw - 14, -hh);
+      ctx.lineTo(hw, -hh + 10); ctx.lineTo(hw, hh - 10); ctx.lineTo(hw - 14, hh);
+      ctx.lineTo(-hw + 14, hh); ctx.lineTo(-hw, hh - 10);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "#14310f"; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.strokeStyle = "#14310f"; ctx.lineWidth = 1.5;
+      for (let i = -hw + 8; i < hw - 8; i += 9) {
+        ctx.beginPath(); ctx.moveTo(i, -hh + 2); ctx.lineTo(i, hh - 2); ctx.stroke();
+      }
+      ctx.fillStyle = "#24502c";
+      ctx.fillRect(-hw * 0.45, -hh * 0.55, hw * 0.9, hh * 1.1);
+      ctx.strokeStyle = "#000"; ctx.lineWidth = 2;
+      ctx.strokeRect(-hw * 0.45, -hh * 0.55, hw * 0.9, hh * 1.1);
+      ctx.fillStyle = "#1a3a20";
+      ctx.fillRect(0, -4, hw + 22, 8);
+      ctx.strokeRect(0, -4, hw + 22, 8);
+      ctx.restore();
+    } else if (hz.type === "shell") {
+      if (hz.warning) {
+        ctx.strokeStyle = "rgba(255,80,80,.8)"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2); ctx.stroke();
+      }
+      if (hz.active) {
+        ctx.fillStyle = "rgba(255,120,40,.85)";
+        ctx.beginPath(); ctx.arc(hz.x, hz.y, hz.r, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (hz.type === "sweep") {
+      ctx.fillStyle = hz.active ? hz.color : "rgba(200,80,80,.25)";
+      ctx.fillRect(hz.x, hz.y, hz.w, hz.h);
+    } else if (hz.type === "guard") {
+      ctx.save();
+      ctx.translate(hz.x, hz.y);
+      ctx.rotate(hz.angle || 0);
+      ctx.fillStyle = "rgba(255,220,80,.28)";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, hz.coneLen, -hz.coneWidth, hz.coneWidth);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+      ctx.font = "20px sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("👁️", hz.x, hz.y + 6);
+    }
+  });
+
+  if (!gLevel.survival) {
+    ctx.font = "24px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("🚩", G_GOAL.x, G_GOAL.y + 8);
+  }
+
+  ctx.fillStyle = "#e8c468";
+  ctx.beginPath(); ctx.arc(gPlayer.x, gPlayer.y, gPlayer.r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = "#2a2318"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("✉️", gPlayer.x, gPlayer.y - 14);
+
+  if (gLevel.tensionLights) {
+    if (!gNextFlashAt) gNextFlashAt = now + 400;
+    if (now > gNextFlashAt) {
+      gFlashUntil = now + 90;
+      gFlashColor = Math.random() < 0.35 ? "rgba(220,60,50,.35)" : "rgba(255,240,200,.3)";
+      gNextFlashAt = now + 350 + Math.random() * 900;
+    }
+    if (now < gFlashUntil) {
+      ctx.fillStyle = gFlashColor;
+      ctx.fillRect(0, 0, GW, GH);
+    }
+    ctx.strokeStyle = "rgba(255,60,40,.5)"; ctx.lineWidth = 10;
+    ctx.strokeRect(5, 5, GW - 10, GH - 10);
+  }
+}
+
+function genericLoop(now) {
+  genericUpdatePlayer();
+  genericUpdateHazards(now);
+  genericDraw(now);
+  if (gPhase === "playing" || gPhase === "intro") requestAnimationFrame(genericLoop);
+}
+/* =============================================================
+   NIVEL EXTRA — PARTIDO DE NAVIDAD (fútbol de chapas / button
+   soccer). Física de colisiones elásticas circulares, tiro por
+   arrastre tipo tirachinas, turnos contra una IA básica.
+   ============================================================= */
+const FW = 480, FH = 680;
+const GOAL_HALF = 65;
+const PIECE_R = 17, BALL_R = 10;
+const FB_FRICTION = 0.982;
+const FB_STOP = 0.06;
+const FB_MAX_DRAG = 130;
+const FB_POWER = 0.115;
+
+let fbCanvas, fbCtx;
+let fbPlayerTeam = "germany";
+let fbMultiplayer = false;
+let fbTurnTeam = "germany";
+let fbPieces = [];
+let fbBall = { x: FW / 2, y: FH / 2, vx: 0, vy: 0, r: BALL_R };
+let fbScore = { germany: 0, england: 0 };
+let fbPhase = "choosing"; // choosing | turnActive | settling | aiThinking | goalPause | over
+let fbDrag = null;
+
+function fbOpponent(team) { return team === "germany" ? "england" : "germany"; }
+function fbIsHumanTurn() { return fbMultiplayer || fbTurnTeam === fbPlayerTeam; }
+
+function fbResetPositions() {
+  fbBall = { x: FW / 2, y: FH / 2, vx: 0, vy: 0, r: BALL_R };
+  fbPieces = [];
+  // formación 3 atrás muy cerrados frente a la portería + 2 adelante, para que sea
+  // difícil marcar desde el saque inicial
+  // Alemania (roja) empieza en la mitad inferior, ataca la portería de arriba (azul)
+  [190, 240, 290].forEach((x) => fbPieces.push({ x, y: 655, vx: 0, vy: 0, r: PIECE_R, team: "germany" }));
+  [170, 310].forEach((x) => fbPieces.push({ x, y: 470, vx: 0, vy: 0, r: PIECE_R, team: "germany" }));
+  // Inglaterra (blanca) empieza en la mitad superior, ataca la portería de abajo (roja)
+  [190, 240, 290].forEach((x) => fbPieces.push({ x, y: 25, vx: 0, vy: 0, r: PIECE_R, team: "england" }));
+  [170, 310].forEach((x) => fbPieces.push({ x, y: 210, vx: 0, vy: 0, r: PIECE_R, team: "england" }));
+}
+
+function startFootballLevel() {
+  fbScore = { germany: 0, england: 0 };
+  fbPhase = "choosing";
+  document.getElementById("fbChooseScreen").classList.remove("hidden");
+  document.getElementById("fbModeChoice").classList.remove("hidden");
+  document.getElementById("fbTeamChoice").classList.add("hidden");
+  document.getElementById("fbGameScreen").classList.add("hidden");
+  document.getElementById("fbGoalOverlay").classList.remove("show");
+  document.getElementById("fbFinalOverlay").classList.remove("show");
+}
+
+let fbWarAmbientTimer = null;
+let fbAmbientNext = "explosion";
+function fbStartWarAmbient() {
+  fbStopWarAmbient();
+  const schedule = () => {
+    fbWarAmbientTimer = setTimeout(() => {
+      if (fbAmbientNext === "explosion") { sfxExplosion(); fbAmbientNext = "gunfire"; }
+      else { sfxDistantGunfire(); fbAmbientNext = "explosion"; }
+      schedule();
+    }, 4000 + Math.random() * 6000);
+  };
+  schedule();
+}
+function fbStopWarAmbient() {
+  clearTimeout(fbWarAmbientTimer);
+  fbWarAmbientTimer = null;
+}
+
+document.getElementById("chooseSinglePlayerBtn").addEventListener("click", () => {
+  fbMultiplayer = false;
+  document.getElementById("fbModeChoice").classList.add("hidden");
+  document.getElementById("fbTeamChoiceLabel").textContent = "Elegí tu equipo (el otro lo juega la IA)";
+  document.getElementById("fbTeamChoice").classList.remove("hidden");
+});
+document.getElementById("chooseMultiplayerBtn").addEventListener("click", () => {
+  fbMultiplayer = true;
+  document.getElementById("fbModeChoice").classList.add("hidden");
+  document.getElementById("fbTeamChoiceLabel").textContent = "Jugador 1: elige con qué equipo empiezas";
+  document.getElementById("fbTeamChoice").classList.remove("hidden");
+});
+
+function fbChooseTeam(team) {
+  fbPlayerTeam = team;
+  fbTurnTeam = "germany";
+  fbResetPositions();
+  fbPhase = "turnActive";
+  fbStartWarAmbient();
+  document.getElementById("fbChooseScreen").classList.add("hidden");
+  document.getElementById("fbGameScreen").classList.remove("hidden");
+  document.querySelectorAll(".fb-crowd").forEach((el) => {
+    el.textContent = "🪖".repeat(40);
+  });
+  if (!fbCanvas) {
+    fbCanvas = document.getElementById("fbCanvas");
+    fbCtx = fbCanvas.getContext("2d");
+    fbCanvas.addEventListener("mousedown", fbPointerDown);
+    window.addEventListener("mousemove", fbPointerMove);
+    window.addEventListener("mouseup", fbPointerUp);
+    fbCanvas.addEventListener("touchstart", (e) => { fbPointerDown(fbTouchPos(e)); e.preventDefault(); }, { passive: false });
+    fbCanvas.addEventListener("touchmove", (e) => { fbPointerMove(fbTouchPos(e)); e.preventDefault(); }, { passive: false });
+    fbCanvas.addEventListener("touchend", (e) => { fbPointerUp(); e.preventDefault(); });
+  }
+  fbUpdateHud();
+  requestAnimationFrame(fbLoop);
+}
+
+document.getElementById("chooseGermanyBtn").addEventListener("click", () => fbChooseTeam("germany"));
+document.getElementById("chooseEnglandBtn").addEventListener("click", () => fbChooseTeam("england"));
+
+function fbUpdateHud() {
+  document.getElementById("fbScoreLabel").textContent = `ALEMANIA ${fbScore.germany} — ${fbScore.england} INGLATERRA`;
+  const teamName = fbTurnTeam === "germany" ? "Alemania" : "Inglaterra";
+  let label = "";
+  if (fbPhase === "turnActive") {
+    label = fbMultiplayer ? `Turno de ${teamName}` : "Tu turno";
+  } else if (fbPhase === "aiThinking" || fbPhase === "settling") {
+    label = fbMultiplayer ? "Esperando..." : "Esperando a la IA...";
+  }
+  document.getElementById("fbTurnLabel").textContent = label;
+}
+
+function fbCanvasPos(clientX, clientY) {
+  const rect = fbCanvas.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) * (FW / rect.width),
+    y: (clientY - rect.top) * (FH / rect.height),
+  };
+}
+function fbTouchPos(e) {
+  const t = e.touches[0] || e.changedTouches[0];
+  return { clientX: t.clientX, clientY: t.clientY };
+}
+
+function fbPointerDown(e) {
+  if (fbPhase !== "turnActive" || !fbIsHumanTurn()) return;
+  const pos = e.clientX !== undefined ? fbCanvasPos(e.clientX, e.clientY) : fbCanvasPos(e.x, e.y);
+  for (const p of fbPieces) {
+    if (p.team === fbTurnTeam && Math.hypot(pos.x - p.x, pos.y - p.y) < p.r + 6) {
+      fbDrag = { piece: p, cx: pos.x, cy: pos.y };
+      return;
+    }
+  }
+}
+function fbPointerMove(e) {
+  if (!fbDrag) return;
+  const pos = e.clientX !== undefined ? fbCanvasPos(e.clientX, e.clientY) : fbCanvasPos(e.x, e.y);
+  fbDrag.cx = pos.x; fbDrag.cy = pos.y;
+}
+function fbPointerUp() {
+  if (!fbDrag) return;
+  const p = fbDrag.piece;
+  let dx = p.x - fbDrag.cx, dy = p.y - fbDrag.cy;
+  const dist = Math.min(Math.hypot(dx, dy), FB_MAX_DRAG);
+  const ang = Math.atan2(dy, dx);
+  p.vx = Math.cos(ang) * dist * FB_POWER;
+  p.vy = Math.sin(ang) * dist * FB_POWER;
+  fbDrag = null;
+  fbPhase = "settling";
+  fbUpdateHud();
+}
+
+function fbAiMove() {
+  const aiTeam = fbTurnTeam;
+  const aiPieces = fbPieces.filter((p) => p.team === aiTeam);
+  const goalX = FW / 2, goalY = aiTeam === "germany" ? 12 : FH - 12;
+
+  // punto "detrás" de la pelota respecto del arco rival: si la ficha golpea
+  // desde ahí, la pelota sale despedida hacia la portería
+  const toGoalAng = Math.atan2(goalY - fbBall.y, goalX - fbBall.x);
+  const behindX = fbBall.x - Math.cos(toGoalAng) * (fbBall.r + PIECE_R + 6);
+  const behindY = fbBall.y - Math.sin(toGoalAng) * (fbBall.r + PIECE_R + 6);
+
+  // elige la ficha propia más cercana a ese punto de impacto ideal
+  let best = aiPieces[0], bestDist = Infinity;
+  aiPieces.forEach((p) => {
+    const d = Math.hypot(p.x - behindX, p.y - behindY);
+    if (d < bestDist) { bestDist = d; best = p; }
+  });
+
+  // cuanto más cerca esté ya del punto ideal, más directo y potente el tiro a portería
+  const lined = Math.max(0, 1 - bestDist / 260);
+  const aimAngle = toGoalAng + (Math.random() - 0.5) * (0.16 - lined * 0.1);
+  const power = FB_MAX_DRAG * (0.75 + lined * 0.3 + Math.random() * 0.12);
+
+  // si la ficha ya está bien parada detrás de la pelota, dispara directo a portería;
+  // si no, primero se acomoda golpeando hacia la pelota para reposicionarse
+  const approachAngle = Math.atan2(fbBall.y - best.y, fbBall.x - best.x);
+  const shotAngle = bestDist < 40 ? aimAngle : approachAngle;
+  best.vx = Math.cos(shotAngle) * power * FB_POWER;
+  best.vy = Math.sin(shotAngle) * power * FB_POWER;
+  fbPhase = "settling";
+  fbUpdateHud();
+}
+
+function fbAllStopped() {
+  if (Math.hypot(fbBall.vx, fbBall.vy) > FB_STOP) return false;
+  return fbPieces.every((p) => Math.hypot(p.vx, p.vy) <= FB_STOP);
+}
+
+function fbPhysicsStep() {
+  const bodies = [...fbPieces, fbBall];
+  bodies.forEach((b) => {
+    b.x += b.vx; b.y += b.vy;
+    b.vx *= FB_FRICTION; b.vy *= FB_FRICTION;
+    if (Math.hypot(b.vx, b.vy) < FB_STOP) { b.vx = 0; b.vy = 0; }
+  });
+
+  // paredes para las fichas: rebotan siempre
+  fbPieces.forEach((p) => {
+    if (p.x < p.r) { p.x = p.r; p.vx *= -0.7; }
+    if (p.x > FW - p.r) { p.x = FW - p.r; p.vx *= -0.7; }
+    if (p.y < p.r) { p.y = p.r; p.vy *= -0.7; }
+    if (p.y > FH - p.r) { p.y = FH - p.r; p.vy *= -0.7; }
+  });
+
+  // paredes para el balón: rebota salvo que entre por la boca de la portería
+  const goalMin = FW / 2 - GOAL_HALF, goalMax = FW / 2 + GOAL_HALF;
+  if (fbBall.x < fbBall.r) { fbBall.x = fbBall.r; fbBall.vx *= -0.8; }
+  if (fbBall.x > FW - fbBall.r) { fbBall.x = FW - fbBall.r; fbBall.vx *= -0.8; }
+  if (fbBall.y < fbBall.r) {
+    if (fbBall.x > goalMin && fbBall.x < goalMax) {
+      if (fbBall.y < -fbBall.r * 2) fbGoal("germany"); // entró por arriba: gol de Alemania
+    } else {
+      fbBall.y = fbBall.r; fbBall.vy *= -0.8;
+    }
+  }
+  if (fbBall.y > FH - fbBall.r) {
+    if (fbBall.x > goalMin && fbBall.x < goalMax) {
+      if (fbBall.y > FH + fbBall.r * 2) fbGoal("england"); // entró por abajo: gol de Inglaterra
+    } else {
+      fbBall.y = FH - fbBall.r; fbBall.vy *= -0.8;
+    }
+  }
+
+  // colisiones elásticas entre todos los cuerpos (masas iguales)
+  for (let i = 0; i < bodies.length; i++) {
+    for (let j = i + 1; j < bodies.length; j++) {
+      const a = bodies[i], b = bodies[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy) || 0.001;
+      const minDist = a.r + b.r;
+      if (dist < minDist) {
+        const nx = dx / dist, ny = dy / dist;
+        const overlap = (minDist - dist) / 2;
+        a.x -= nx * overlap; a.y -= ny * overlap;
+        b.x += nx * overlap; b.y += ny * overlap;
+        const avn = a.vx * nx + a.vy * ny;
+        const bvn = b.vx * nx + b.vy * ny;
+        a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
+        b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
+      }
+    }
+  }
+}
+
+function fbGoal(scoringTeam) {
+  fbPhase = "goalPause";
+  fbScore[scoringTeam]++;
+  sfxSuccess();
+  fbUpdateHud();
+  const teamName = scoringTeam === "germany" ? "Alemania" : "Inglaterra";
+  document.getElementById("fbGoalTitle").textContent = "¡GOL!";
+  document.getElementById("fbGoalText").textContent = `¡Gol de ${teamName}!`;
+  document.getElementById("fbGoalOverlay").classList.add("show");
+
+  setTimeout(() => {
+    document.getElementById("fbGoalOverlay").classList.remove("show");
+    if (fbScore[scoringTeam] >= 3) {
+      fbGameOver(scoringTeam);
+    } else {
+      fbResetPositions();
+      fbTurnTeam = fbOpponent(scoringTeam); // el equipo al que le hicieron el gol saca de nuevo
+      if (fbIsHumanTurn()) {
+        fbPhase = "turnActive";
+        fbUpdateHud();
+      } else {
+        fbPhase = "aiThinking";
+        fbUpdateHud();
+        setTimeout(fbAiMove, 500);
+      }
+    }
+  }, 1800);
+}
+
+function fbGameOver(winnerTeam) {
+  fbPhase = "over";
+  fbStopWarAmbient();
+  const winnerName = winnerTeam === "germany" ? "Alemania" : "Inglaterra";
+  document.getElementById("fbFinalTitle").textContent = fbMultiplayer ? `¡GANÓ ${winnerName.toUpperCase()}!` : (winnerTeam === fbPlayerTeam ? "¡GANASTE!" : "PERDISTE EL PARTIDO");
+  document.getElementById("fbFinalText").textContent =
+    `${winnerName} gana ${fbScore[winnerTeam]} a ${fbScore[fbOpponent(winnerTeam)]}. ` +
+    "Durante la Navidad de 1914, en varios tramos del frente, soldados de ambos bandos dejaron las armas por unas horas, " +
+    "cantaron villancicos, intercambiaron regalos y jugaron al fútbol en tierra de nadie — antes de volver, al día siguiente, a la guerra.";
+  document.getElementById("fbFinalOverlay").classList.add("show");
+}
+
+document.getElementById("fbBackBtn").addEventListener("click", () => {
+  fbStopWarAmbient();
+  document.getElementById("fbFinalOverlay").classList.remove("show");
+  document.getElementById("footballScreen").classList.add("hidden");
+  document.getElementById("campaignScreen").classList.remove("hidden");
+});
+document.getElementById("fbNextBtn").addEventListener("click", () => {
+  fbStopWarAmbient();
+  document.getElementById("fbFinalOverlay").classList.remove("show");
+  document.getElementById("footballScreen").classList.add("hidden");
+  const next = nextLevelId(11);
+  if (next) startLevel(next);
+});
+document.getElementById("homeBtnFootball").addEventListener("click", () => {
+  fbStopWarAmbient();
+  document.getElementById("footballScreen").classList.add("hidden");
+  document.getElementById("campaignScreen").classList.remove("hidden");
+});
+
+function fbDrawField() {
+  fbCtx.fillStyle = "#2e8b3e";
+  fbCtx.fillRect(0, 0, FW, FH);
+  fbCtx.fillStyle = "rgba(255,255,255,.05)";
+  for (let y = 0; y < FH; y += 68) if ((y / 68) % 2 === 0) fbCtx.fillRect(0, y, FW, 34);
+
+  fbCtx.strokeStyle = "#fff"; fbCtx.lineWidth = 3;
+  fbCtx.strokeRect(6, 6, FW - 12, FH - 12);
+  fbCtx.beginPath(); fbCtx.moveTo(6, FH / 2); fbCtx.lineTo(FW - 6, FH / 2); fbCtx.stroke();
+  fbCtx.beginPath(); fbCtx.arc(FW / 2, FH / 2, 55, 0, Math.PI * 2); fbCtx.stroke();
+
+  const goalMin = FW / 2 - GOAL_HALF, goalMax = FW / 2 + GOAL_HALF;
+  // portería de arriba (azul)
+  fbCtx.strokeStyle = "#3a6fd8"; fbCtx.lineWidth = 5;
+  fbCtx.strokeRect(goalMin, 0, goalMax - goalMin, 34);
+  fbCtx.fillStyle = "rgba(58,111,216,.18)"; fbCtx.fillRect(goalMin, 0, goalMax - goalMin, 34);
+  // portería de abajo (roja)
+  fbCtx.strokeStyle = "#c94b4b"; fbCtx.lineWidth = 5;
+  fbCtx.strokeRect(goalMin, FH - 34, goalMax - goalMin, 34);
+  fbCtx.fillStyle = "rgba(201,75,75,.18)"; fbCtx.fillRect(goalMin, FH - 34, goalMax - goalMin, 34);
+}
+
+function fbDraw() {
+  fbDrawField();
+
+  fbPieces.forEach((p) => {
+    fbCtx.beginPath();
+    fbCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    fbCtx.fillStyle = p.team === "germany" ? "#c22b2b" : "#f2f2f2";
+    fbCtx.fill();
+    fbCtx.strokeStyle = "#000"; fbCtx.lineWidth = 2; fbCtx.stroke();
+  });
+
+  fbCtx.beginPath();
+  fbCtx.arc(fbBall.x, fbBall.y, fbBall.r, 0, Math.PI * 2);
+  fbCtx.fillStyle = "#161616"; fbCtx.fill();
+  fbCtx.strokeStyle = "#000"; fbCtx.lineWidth = 1.5; fbCtx.stroke();
+  fbCtx.fillStyle = "#3a3a3a";
+  fbCtx.beginPath(); fbCtx.arc(fbBall.x, fbBall.y, fbBall.r * 0.42, 0, Math.PI * 2); fbCtx.fill();
+  fbCtx.strokeStyle = "rgba(0,0,0,.7)"; fbCtx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const ang = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+    const px = fbBall.x + Math.cos(ang) * fbBall.r * 0.72;
+    const py = fbBall.y + Math.sin(ang) * fbBall.r * 0.72;
+    fbCtx.fillStyle = "#2e2e2e";
+    fbCtx.beginPath(); fbCtx.arc(px, py, fbBall.r * 0.3, 0, Math.PI * 2); fbCtx.fill();
+    fbCtx.stroke();
+  }
+
+  if (fbDrag) {
+    const p = fbDrag.piece;
+    const dx = p.x - fbDrag.cx, dy = p.y - fbDrag.cy;
+    const dist = Math.min(Math.hypot(dx, dy), FB_MAX_DRAG);
+    const ang = Math.atan2(dy, dx);
+    fbCtx.strokeStyle = "rgba(255,220,80,.9)"; fbCtx.lineWidth = 4;
+    fbCtx.beginPath();
+    fbCtx.moveTo(p.x, p.y);
+    fbCtx.lineTo(p.x + Math.cos(ang) * dist, p.y + Math.sin(ang) * dist);
+    fbCtx.stroke();
+  }
+}
+
+function fbLoop() {
+  if (fbPhase === "settling" || fbPhase === "turnActive" || fbPhase === "aiThinking") {
+    fbPhysicsStep();
+    if (fbPhase === "settling" && fbAllStopped()) {
+      fbTurnTeam = fbOpponent(fbTurnTeam);
+      if (fbIsHumanTurn()) {
+        fbPhase = "turnActive";
+        fbUpdateHud();
+      } else {
+        fbPhase = "aiThinking";
+        fbUpdateHud();
+        setTimeout(fbAiMove, 500);
+      }
+    }
+  }
+  fbDraw();
+  if (fbPhase !== "over" && fbPhase !== "choosing") requestAnimationFrame(fbLoop);
+}
+</script>
+</body>
+</html>

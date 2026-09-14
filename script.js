@@ -111,6 +111,22 @@ const games = [
     image: "assets/game-covers/Recetas.png",
     previewUrl: "games/de_donde_viene.html",
     playUrl: "games/de_donde_viene.html"
+  },
+  {
+    id: 8,
+    title: "El Mensajero de las Trincheras",
+    category: "Historia",
+    collection: "Primera Guerra Mundial",
+    mode: "Aventura",
+    duration: "10 min",
+    description:
+      "Una campaña sobre la Primera Guerra Mundial en la que llevas mensajes entre las trincheras esquivando el peligro, sin combatir.",
+    longDescription:
+      "Un juego narrativo por niveles ambientado en la Primera Guerra Mundial (1914-1918): recorres momentos clave del conflicto, desde el atentado de Sarajevo hasta el armisticio, moviéndote y tomando decisiones en vez de luchar.",
+    gradient: "linear-gradient(135deg, rgba(90,110,70,0.92), rgba(120,40,40,0.85))",
+    image: "assets/game-covers/Trincheras.png",
+    previewUrl: "games/mensajero_trincheras.html",
+    playUrl: "games/mensajero_trincheras.html"
   }
 ];
 
@@ -127,7 +143,8 @@ const gameTranslations = {
     4: { title: "Napoleon vs Wellington", description: "An arcade quiz duel with scores, turns, and visual energy inspired by military history.", longDescription: "Challenge your rival with questions about Napoleon, Waterloo, and the French Empire." },
     5: { title: "Russian Revolution: Penalty Shootout", description: "Answer historical questions for the Bolsheviks and Mensheviks in an exciting penalty shootout.", longDescription: "A history and quick-thinking mini-game where correct answers score goals for your team." },
     6: { title: "Boston Tea Party 1773", description: "Relive the 1773 Boston Tea Party and discover the causes and consequences of this key episode of American independence.", longDescription: "A history game about the Boston Tea Party, one of the sparks of the American Revolution against British rule." },
-    7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." }
+    7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." },
+    8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." }
   }
 };
 
@@ -186,7 +203,7 @@ function renderGames() {
   const gameWord = language === "en" ? "game" : "juego";
   resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
   statsGames.textContent = String(games.length);
-  statsCategories.textContent = "6";
+  statsCategories.textContent = "7";
 
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
@@ -206,7 +223,8 @@ function renderGames() {
     "Filosofía": "Philosophy",
     "Revolución Rusa": "Russian Revolution",
     "Revolución Americana": "American Revolution",
-    "Geografía": "Geography"
+    "Geografía": "Geography",
+    "Primera Guerra Mundial": "World War I"
   } : {};
   gamesGrid.innerHTML = collectionLabels.map((collection) => `
     <section class="collection-block">
