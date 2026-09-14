@@ -434,8 +434,14 @@ function updateSchoolCountdownStats() {
   const statEaster = document.getElementById("statEaster");
   if (!statNextBreak || !statChristmas || !statEaster) return;
 
-  const today = new Date();
+  // Pasadas las 14:00 se considera que el día lectivo de hoy ya ha terminado:
+  // estas cifras pasan a contar desde mañana (misma regla que el countdown).
+  const now = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
+  if (now.getHours() >= 14) {
+    today.setDate(today.getDate() + 1);
+  }
 
   const nextBreakStart = findNextLongBreakStart(today);
   statNextBreak.textContent = nextBreakStart ? String(schoolDaysUntil(nextBreakStart, today)) : "—";

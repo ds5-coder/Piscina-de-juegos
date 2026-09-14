@@ -153,20 +153,27 @@ eachDay(START, END, d => { if (isTeaching(d)) allTeaching.push(d); });
 
 function update() {
   const now = new Date();
-  const today = new Date(now); today.setHours(0,0,0,0);
+  const actualToday = new Date(now); actualToday.setHours(0,0,0,0);
 
-  const future = allTeaching.filter(d => d > today);
-  const todayIsTeaching = isTeaching(today);
+  // Pasadas las 14:00 se considera que el día lectivo de hoy ya ha terminado:
+  // "próximo día lectivo" y el resto de cálculos pasan a contar desde mañana.
+  const referenceDay = new Date(actualToday);
+  if (now.getHours() >= 14) {
+    referenceDay.setDate(referenceDay.getDate() + 1);
+  }
+
+  const future = allTeaching.filter(d => d > referenceDay);
+  const referenceIsTeaching = isTeaching(referenceDay);
 
   let remaining = future.length;
   let label = "Quedan";
-  if (todayIsTeaching) {
-    // Durante el día actual, la cifra principal incluye hoy.
+  if (referenceIsTeaching) {
     remaining += 1;
-    label = "Hoy + quedan";
-  } else if (today > END) {
+    // Solo se llama "hoy" si de verdad es hoy (antes de las 14:00).
+    label = referenceDay.getTime() === actualToday.getTime() ? "Hoy + quedan" : "Quedan";
+  } else if (referenceDay > END) {
     remaining = 0; label = "Curso terminado";
-  } else if (today < START) {
+  } else if (referenceDay < START) {
     remaining = allTeaching.length; label = "Quedan";
   }
 
@@ -178,13 +185,13 @@ function update() {
   const weekdayNames = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
   const counts = [0,0,0,0,0];
   future.forEach(d => counts[(d.getDay()+6)%7]++);
-  if (todayIsTeaching) counts[(today.getDay()+6)%7]++;
+  if (referenceIsTeaching) counts[(referenceDay.getDay()+6)%7]++;
 
   document.getElementById("weekdayGrid").innerHTML = weekdayNames.map((n,i)=>
     `<div class="stat"><b>${counts[i]}</b><span>${n} lectivos</span></div>`
   ).join("");
 
-  const completed = allTeaching.filter(d => d < today).length;
+  const completed = allTeaching.filter(d => d < referenceDay).length;
   const total = allTeaching.length;
   const pct = Math.max(0, Math.min(100, completed / total * 100));
   document.getElementById("done").textContent = `${completed} realizados`;
@@ -193,7 +200,7 @@ function update() {
 
   document.getElementById("bar").style.width = pct + "%";
 
-  const next = allTeaching.find(d => d >= today);
+  const next = allTeaching.find(d => d >= referenceDay);
   if (next) {
     document.getElementById("nextDay").textContent = fmt(next);
   } else {
