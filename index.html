@@ -79,17 +79,36 @@
           <div class="section-head compact">
             <div>
               <span class="eyebrow">Countdown</span>
-              <h2>Cuenta atrás del curso 2026/27</h2>
+              <h2>Días lectivos y vacaciones — Curso 2026/27</h2>
             </div>
           </div>
-          <p class="extra-text">Un contador de días lectivos para el curso 2026/27 de la Comunidad de Madrid.</p>
-          <div class="extra-frame-wrap">
+          <p class="extra-text">Un vistazo rápido a lo que queda de curso en el calendario de la Comunidad de Madrid.</p>
+
+          <ul class="stats-list countdown-stats" aria-label="Próximas vacaciones">
+            <li><strong id="statNextBreak">—</strong><span id="extraNextBreakLabel">días lectivos hasta el próximo puente o vacaciones</span></li>
+            <li><strong id="statChristmas">—</strong><span id="extraChristmasLabel">días lectivos hasta Navidad</span></li>
+            <li><strong id="statEaster">—</strong><span id="extraEasterLabel">días lectivos hasta Semana Santa</span></li>
+          </ul>
+
+          <div class="extra-actions">
+            <button class="secondary-button" type="button" id="toggleCountdownBtn" aria-expanded="false">Countdown</button>
+            <button class="secondary-button" type="button" id="toggleCalendarBtn" aria-expanded="false">Ver calendario completo</button>
+          </div>
+
+          <div class="extra-frame-wrap" id="countdownPanel" hidden>
             <iframe
               id="cuentaAtrasFrame"
-              src="extras/cuenta_atras_curso.html"
+              data-src="extras/cuenta_atras_curso.html"
               title="Cuenta atrás del curso 2026/27"
               loading="lazy"
             ></iframe>
+          </div>
+
+          <div class="calendar-wrap" id="calendarPanel" hidden>
+            <img
+              src="assets/calendario_escolar_2026_2027.jpg"
+              alt="Calendario escolar 2026-2027 de la Comunidad de Madrid (FSIE Madrid)"
+            />
           </div>
         </section>
 

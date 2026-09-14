@@ -131,8 +131,8 @@ const games = [
 ];
 
 const translations = {
-  es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Cuenta atrás del curso 2026/27", extraText: "Un contador de días lectivos para el curso 2026/27 de la Comunidad de Madrid." },
-  en: { nav: ["Catalog", "Featured", "Contact", "Countdown"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", extraTitle: "Countdown to the 2026/27 school year", extraText: "A school-day countdown for the 2026/27 academic year in the Community of Madrid (widget content stays in Spanish)." }
+  es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Días lectivos y vacaciones — Curso 2026/27", extraText: "Un vistazo rápido a lo que queda de curso en el calendario de la Comunidad de Madrid.", extraNextBreakLabel: "días lectivos hasta el próximo puente o vacaciones", extraChristmasLabel: "días lectivos hasta Navidad", extraEasterLabel: "días lectivos hasta Semana Santa", extraCalendarButton: "Ver calendario completo" },
+  en: { nav: ["Catalog", "Featured", "Contact", "Countdown"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", extraTitle: "School days & holidays — 2026/27 school year", extraText: "A quick look at what's left this year in the Community of Madrid calendar (the detailed countdown and calendar stay in Spanish).", extraNextBreakLabel: "school days until the next long break", extraChristmasLabel: "school days until Christmas", extraEasterLabel: "school days until Easter break", extraCalendarButton: "View full calendar" }
 };
 
 const gameTranslations = {
@@ -304,6 +304,10 @@ function applyLanguage() {
   document.getElementById("suggestionText").placeholder = t.suggestionPlaceholder;
   document.querySelector(".extra-section h2").textContent = t.extraTitle;
   document.querySelector(".extra-text").textContent = t.extraText;
+  document.getElementById("extraNextBreakLabel").textContent = t.extraNextBreakLabel;
+  document.getElementById("extraChristmasLabel").textContent = t.extraChristmasLabel;
+  document.getElementById("extraEasterLabel").textContent = t.extraEasterLabel;
+  document.getElementById("toggleCalendarBtn").textContent = t.extraCalendarButton;
   languageToggle.innerHTML = language === "es" ? "<span aria-hidden=\"true\">🇬🇧</span><span>EN</span>" : "<span aria-hidden=\"true\">🇪🇸</span><span>ES</span>";
   renderFeaturedGame();
   renderGames();
@@ -347,7 +351,106 @@ document.getElementById("suggestionSubmit").addEventListener("click", async () =
   }
 });
 
+// --- Días lectivos hasta las próximas vacaciones ---
+// Misma configuración de calendario que extras/cuenta_atras_curso.html;
+// si el calendario oficial cambia, hay que actualizar ambos archivos.
+const SCHOOL_YEAR_START = new Date("2026-09-07T00:00:00");
+const SCHOOL_YEAR_END = new Date("2027-06-18T23:59:59");
+const SCHOOL_HOLIDAYS = new Set([
+  "2026-10-12", "2026-11-02", "2026-12-07", "2026-12-08",
+  "2027-02-12", "2027-02-15", "2027-05-03",
+]);
+const CHRISTMAS_BREAK_START = new Date("2026-12-23T00:00:00");
+const EASTER_BREAK_START = new Date("2027-03-19T00:00:00");
+
+function schoolIsoDate(date) {
+  // Fecha local en formato AAAA-MM-DD (no usar toISOString: convierte a UTC
+  // y desplaza un día hacia atrás en la zona horaria de España).
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function schoolIsNonTeachingDay(date) {
+  const weekday = date.getDay();
+  if (weekday === 0 || weekday === 6) return true;
+  const iso = schoolIsoDate(date);
+  if (SCHOOL_HOLIDAYS.has(iso)) return true;
+  if (iso >= "2026-12-23" && iso <= "2027-01-10") return true;
+  if (iso >= "2027-03-19" && iso <= "2027-03-29") return true;
+  return false;
+}
+
+function schoolIsTeachingDay(date) {
+  return date >= SCHOOL_YEAR_START && date <= SCHOOL_YEAR_END && !schoolIsNonTeachingDay(date);
+}
+
+function schoolEachDay(start, end, callback) {
+  const cursor = new Date(start);
+  cursor.setHours(0, 0, 0, 0);
+  const last = new Date(end);
+  last.setHours(0, 0, 0, 0);
+  while (cursor <= last) {
+    callback(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+}
+
+const schoolTeachingDays = [];
+schoolEachDay(SCHOOL_YEAR_START, SCHOOL_YEAR_END, (day) => {
+  if (schoolIsTeachingDay(day)) schoolTeachingDays.push(day);
+});
+
+function schoolDaysUntil(targetDate, fromDate) {
+  return schoolTeachingDays.filter((day) => day >= fromDate && day < targetDate).length;
+}
+
+function findNextLongBreakStart(fromDate) {
+  // Busca el próximo tramo de más de 2 días seguidos no lectivos (puente o vacaciones),
+  // no un simple fin de semana suelto.
+  const scanEnd = new Date(SCHOOL_YEAR_END.getTime() + 1000 * 60 * 60 * 24 * 10);
+  let runStart = null;
+  const cursor = new Date(Math.max(fromDate.getTime(), SCHOOL_YEAR_START.getTime()));
+  cursor.setHours(0, 0, 0, 0);
+  const last = new Date(scanEnd);
+  last.setHours(0, 0, 0, 0);
+  while (cursor <= last) {
+    if (schoolIsNonTeachingDay(cursor)) {
+      if (!runStart) runStart = new Date(cursor);
+    } else if (runStart) {
+      const runLength = Math.round((cursor - runStart) / (1000 * 60 * 60 * 24));
+      if (runLength > 2 && runStart > fromDate) return runStart;
+      runStart = null;
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return null;
+}
+
+function updateSchoolCountdownStats() {
+  const statNextBreak = document.getElementById("statNextBreak");
+  const statChristmas = document.getElementById("statChristmas");
+  const statEaster = document.getElementById("statEaster");
+  if (!statNextBreak || !statChristmas || !statEaster) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const nextBreakStart = findNextLongBreakStart(today);
+  statNextBreak.textContent = nextBreakStart ? String(schoolDaysUntil(nextBreakStart, today)) : "—";
+  statChristmas.textContent = today < CHRISTMAS_BREAK_START ? String(schoolDaysUntil(CHRISTMAS_BREAK_START, today)) : "🎄";
+  statEaster.textContent = today < EASTER_BREAK_START ? String(schoolDaysUntil(EASTER_BREAK_START, today)) : "🐣";
+}
+updateSchoolCountdownStats();
+
+// --- Panel "Countdown" y calendario completo: ocultos hasta pulsar su botón ---
 const cuentaAtrasFrame = document.getElementById("cuentaAtrasFrame");
+const countdownPanel = document.getElementById("countdownPanel");
+const toggleCountdownBtn = document.getElementById("toggleCountdownBtn");
+const calendarPanel = document.getElementById("calendarPanel");
+const toggleCalendarBtn = document.getElementById("toggleCalendarBtn");
+
 if (cuentaAtrasFrame) {
   const resizeCuentaAtrasFrame = () => {
     try {
@@ -362,6 +465,25 @@ if (cuentaAtrasFrame) {
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(resizeCuentaAtrasFrame, 150);
+  });
+}
+
+if (toggleCountdownBtn && countdownPanel && cuentaAtrasFrame) {
+  toggleCountdownBtn.addEventListener("click", () => {
+    const willShow = countdownPanel.hidden;
+    countdownPanel.hidden = !willShow;
+    toggleCountdownBtn.setAttribute("aria-expanded", String(willShow));
+    if (willShow && !cuentaAtrasFrame.getAttribute("src")) {
+      cuentaAtrasFrame.src = cuentaAtrasFrame.dataset.src;
+    }
+  });
+}
+
+if (toggleCalendarBtn && calendarPanel) {
+  toggleCalendarBtn.addEventListener("click", () => {
+    const willShow = calendarPanel.hidden;
+    calendarPanel.hidden = !willShow;
+    toggleCalendarBtn.setAttribute("aria-expanded", String(willShow));
   });
 }
 
