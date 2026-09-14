@@ -62,7 +62,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>🎒 Cuenta atrás del cole</h1>
+    <h1>🎆 HITO 🎆</h1>
     <div class="subtitle">Curso 2026/27 · Comunidad de Madrid</div>
   </header>
 
@@ -173,8 +173,7 @@ function update() {
   document.getElementById("remaining").textContent = remaining;
   document.getElementById("statusLabel").textContent = label;
   document.getElementById("today").textContent =
-    now.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"}) +
-    (todayIsTeaching ? " · 📚 Hoy hay cole" : " · 💤 Hoy no hay cole");
+    now.toLocaleDateString("es-ES", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
 
   const weekdayNames = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
   const counts = [0,0,0,0,0];
