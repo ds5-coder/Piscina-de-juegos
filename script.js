@@ -127,6 +127,22 @@ const games = [
     image: "assets/game-covers/Trincheras.png",
     previewUrl: "games/mensajero_trincheras.html",
     playUrl: "games/mensajero_trincheras.html"
+  },
+  {
+    id: 9,
+    title: "El Secreto de la Ilustración",
+    category: "Historia",
+    collection: "Ilustración",
+    mode: "Aventura",
+    duration: "10 min",
+    description:
+      "Una aventura point-and-click en la que descubres las ideas de la Ilustración: Kant, Locke y el poder de la razón.",
+    longDescription:
+      "Un juego de aventura point-and-click basado en apuntes reales sobre la Ilustración, donde exploras, dialogas y tomas decisiones para desentrañar el secreto del Siglo de las Luces.",
+    gradient: "linear-gradient(135deg, rgba(212,175,55,0.9), rgba(40,60,120,0.88))",
+    image: "assets/game-covers/Ilustracion.png",
+    previewUrl: "games/secreto_ilustracion.html",
+    playUrl: "games/secreto_ilustracion.html"
   }
 ];
 
@@ -144,7 +160,8 @@ const gameTranslations = {
     5: { title: "Russian Revolution: Penalty Shootout", description: "Answer historical questions for the Bolsheviks and Mensheviks in an exciting penalty shootout.", longDescription: "A history and quick-thinking mini-game where correct answers score goals for your team." },
     6: { title: "Boston Tea Party 1773", description: "Relive the 1773 Boston Tea Party and discover the causes and consequences of this key episode of American independence.", longDescription: "A history game about the Boston Tea Party, one of the sparks of the American Revolution against British rule." },
     7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." },
-    8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." }
+    8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." },
+    9: { title: "The Secret of the Enlightenment", description: "A point-and-click adventure where you uncover the ideas of the Enlightenment: Kant, Locke, and the power of reason.", longDescription: "A point-and-click adventure based on real notes about the Enlightenment, where you explore, talk, and make choices to unravel the secret of the Age of Reason." }
   }
 };
 
@@ -203,7 +220,7 @@ function renderGames() {
   const gameWord = language === "en" ? "game" : "juego";
   resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
   statsGames.textContent = String(games.length);
-  statsCategories.textContent = "7";
+  statsCategories.textContent = "8";
 
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
@@ -224,7 +241,8 @@ function renderGames() {
     "Revolución Rusa": "Russian Revolution",
     "Revolución Americana": "American Revolution",
     "Geografía": "Geography",
-    "Primera Guerra Mundial": "World War I"
+    "Primera Guerra Mundial": "World War I",
+    "Ilustración": "Enlightenment"
   } : {};
   gamesGrid.innerHTML = collectionLabels.map((collection) => `
     <section class="collection-block">
