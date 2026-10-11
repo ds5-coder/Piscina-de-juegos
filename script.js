@@ -389,6 +389,27 @@ const games = [
     image: "assets/art-covers/david_coronacion_napoleon.jpg",
     previewUrl: "arte/david_coronacion_napoleon.html",
     playUrl: "arte/david_coronacion_napoleon.html"
+  },
+  {
+    id: 22,
+    title: "Napoleón en su estudio de las Tullerías",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    movements: ["Neoclasicismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el retrato de Napoleón como legislador, con el Código Civil sobre la mesa.",
+    longDescription:
+      "Una página interactiva con las claves de «Napoleón en su estudio de las Tullerías» (1812), un retrato neoclásico de estilo Imperio entre el realismo y la idealización.",
+    gradient: "linear-gradient(135deg, rgba(30,50,90,0.92), rgba(190,150,60,0.85))",
+    image: "assets/art-covers/david_napoleon_estudio.jpg",
+    previewUrl: "arte/david_napoleon_estudio.html",
+    playUrl: "arte/david_napoleon_estudio.html"
   }
 ];
 
@@ -424,7 +445,8 @@ const gameTranslations = {
     18: { title: "Saturn Devouring His Son", description: "Explore Goya's painting point by point: the myth, the violence and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Saturn Devouring His Son', one of Goya's Black Paintings and a forerunner of Expressionism." },
     19: { title: "The Oath of the Horatii", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the ideal of sacrifice for the homeland that foreshadowed the Revolution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Oath of the Horatii' (1784), the manifesto work of Neoclassicism and a model for revolutionary painting." },
     20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." },
-    21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." }
+    21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." },
+    22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." }
   }
 };
 
