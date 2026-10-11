@@ -348,6 +348,26 @@ const games = [
     image: "assets/art-covers/david_juramento_horacios.jpg",
     previewUrl: "arte/david_juramento_horacios.html",
     playUrl: "arte/david_juramento_horacios.html"
+  },
+  {
+    id: 20,
+    title: "Cristo velado",
+    category: "Escultura",
+    collection: "Arte",
+    mode: "Sanmartino",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Sanmartino",
+    movements: ["Barroco"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la escultura de Giuseppe Sanmartino punto por punto: el velo de mármol, el cuerpo yacente y la leyenda alquímica de la Capilla Sansevero.",
+    longDescription:
+      "Una página interactiva con las claves del «Cristo velado» (1753), una obra del barroco tardío de virtuosismo técnico asombroso.",
+    gradient: "linear-gradient(135deg, rgba(80,76,70,0.92), rgba(190,180,165,0.85))",
+    image: "assets/art-covers/sanmartino_cristo_velado.jpg",
+    previewUrl: "arte/sanmartino_cristo_velado.html",
+    playUrl: "arte/sanmartino_cristo_velado.html"
   }
 ];
 
@@ -381,7 +401,8 @@ const gameTranslations = {
     16: { title: "The Storming of the Bastille", description: "Explore Jean-Pierre Houël's watercolour point by point: the details, the symbols and the image of the Bastille in flames on 14 July 1789 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Houël's watercolour of the storming of the Bastille (1789), an almost journalistic view between Neoclassicism and pre-Romantic sensibility." },
     17: { title: "Wanderer above the Sea of Fog", description: "Explore Caspar David Friedrich's painting point by point: the figure seen from behind, the sea of fog and the Romantic idea of the sublime (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Friedrich's painting, the best-known image of German Romanticism." },
     18: { title: "Saturn Devouring His Son", description: "Explore Goya's painting point by point: the myth, the violence and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Saturn Devouring His Son', one of Goya's Black Paintings and a forerunner of Expressionism." },
-    19: { title: "The Oath of the Horatii", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the ideal of sacrifice for the homeland that foreshadowed the Revolution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Oath of the Horatii' (1784), the manifesto work of Neoclassicism and a model for revolutionary painting." }
+    19: { title: "The Oath of the Horatii", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the ideal of sacrifice for the homeland that foreshadowed the Revolution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Oath of the Horatii' (1784), the manifesto work of Neoclassicism and a model for revolutionary painting." },
+    20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." }
   }
 };
 
@@ -441,7 +462,7 @@ function matchesSubfilters(game, query) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Neoclasicismo": "Neoclassicism", "Romanticismo": "Romanticism" } : {};
+  const names = language === "en" ? { "Barroco": "Baroque", "Neoclasicismo": "Neoclassicism", "Romanticismo": "Romanticism" } : {};
   return names[movement] || movement;
 }
 
@@ -487,10 +508,13 @@ function subcollectionTitle(collectionGames) {
 
 function renderGames() {
   const visibleGames = getVisibleGames();
-  // "cuadros" si todo lo visible es arte, "juegos" si no hay arte, "elementos" si hay de ambos.
+  // "cuadros" si todo es pintura, "obras" si hay otras artes (escultura), "juegos" si no hay arte, "elementos" si se mezclan.
   const artCount = visibleGames.filter((game) => game.isArt).length;
+  const allPaintings = visibleGames.every((game) => game.isArt && game.category !== "Escultura");
   const itemWords = artCount === visibleGames.length && artCount > 0
-    ? (language === "en" ? ["painting", "paintings"] : ["cuadro", "cuadros"])
+    ? (allPaintings
+      ? (language === "en" ? ["painting", "paintings"] : ["cuadro", "cuadros"])
+      : (language === "en" ? ["work", "works"] : ["obra", "obras"]))
     : artCount === 0
       ? (language === "en" ? ["game", "games"] : ["juego", "juegos"])
       : (language === "en" ? ["item", "items"] : ["elemento", "elementos"]);
@@ -526,7 +550,7 @@ function renderGames() {
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>${hasSubfilter() ? (language === "en" ? "No paintings found" : "No encontramos cuadros") : (language === "en" ? "No games found" : "No encontramos juegos")}</h3>
+        <h3>${hasSubfilter() ? (language === "en" ? "No works found" : "No encontramos obras") : (language === "en" ? "No games found" : "No encontramos juegos")}</h3>
         <p>${language === "en" ? "Try another search or change the category." : "Prueba con otra búsqueda o cambia la categoría."}</p>
       </div>
     `;
