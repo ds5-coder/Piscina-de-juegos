@@ -307,6 +307,26 @@ const games = [
     image: "assets/art-covers/friedrich_caminante.jpg",
     previewUrl: "arte/friedrich_caminante.html",
     playUrl: "arte/friedrich_caminante.html"
+  },
+  {
+    id: 18,
+    title: "Saturno devorando a un hijo",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Goya",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Goya punto por punto: el mito, la violencia y el mundo de pesadilla de las Pinturas negras.",
+    longDescription:
+      "Una página interactiva con las claves de «Saturno devorando a un hijo», una de las Pinturas negras de Goya, precursora del expresionismo.",
+    gradient: "linear-gradient(135deg, rgba(20,18,16,0.95), rgba(120,40,30,0.85))",
+    image: "assets/art-covers/goya_saturno.jpg",
+    previewUrl: "arte/goya_saturno.html",
+    playUrl: "arte/goya_saturno.html"
   }
 ];
 
@@ -338,7 +358,8 @@ const gameTranslations = {
     14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." },
     15: { title: "The Death of Marat", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the murder of the revolutionary leader Jean-Paul Marat in his bath (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the murder of Marat (1793), a landmark of politically committed Neoclassicism." },
     16: { title: "The Storming of the Bastille", description: "Explore Jean-Pierre Houël's watercolour point by point: the details, the symbols and the image of the Bastille in flames on 14 July 1789 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Houël's watercolour of the storming of the Bastille (1789), an almost journalistic view between Neoclassicism and pre-Romantic sensibility." },
-    17: { title: "Wanderer above the Sea of Fog", description: "Explore Caspar David Friedrich's painting point by point: the figure seen from behind, the sea of fog and the Romantic idea of the sublime (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Friedrich's painting, the best-known image of German Romanticism." }
+    17: { title: "Wanderer above the Sea of Fog", description: "Explore Caspar David Friedrich's painting point by point: the figure seen from behind, the sea of fog and the Romantic idea of the sublime (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Friedrich's painting, the best-known image of German Romanticism." },
+    18: { title: "Saturn Devouring His Son", description: "Explore Goya's painting point by point: the myth, the violence and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Saturn Devouring His Son', one of Goya's Black Paintings and a forerunner of Expressionism." }
   }
 };
 
