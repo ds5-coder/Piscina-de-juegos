@@ -145,6 +145,25 @@ const games = [
     playUrl: "games/secreto_ilustracion.html"
   },
   {
+    id: 11,
+    title: "El 2 de mayo de 1808: claves del cuadro",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Goya",
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de la lucha contra los mamelucos en la Puerta del Sol.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de Goya sobre el levantamiento del 2 de mayo de 1808 en Madrid.",
+    gradient: "linear-gradient(135deg, rgba(46,44,39,0.95), rgba(160,90,60,0.8))",
+    image: "assets/art-covers/goya_2_de_mayo.jpg",
+    previewUrl: "arte/goya_2_de_mayo.html",
+    playUrl: "arte/goya_2_de_mayo.html"
+  },
+  {
     id: 10,
     title: "El 3 de mayo de 1808: claves del cuadro",
     category: "Pintura",
@@ -162,6 +181,25 @@ const games = [
     image: "assets/art-covers/goya_3_de_mayo.jpg",
     previewUrl: "arte/goya_3_de_mayo.html",
     playUrl: "arte/goya_3_de_mayo.html"
+  },
+  {
+    id: 12,
+    title: "El sueño de la razón produce monstruos: claves",
+    category: "Grabado",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Goya",
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el grabado de Goya punto por punto: los animales nocturnos, los símbolos y el significado de la razón dormida.",
+    longDescription:
+      "Una página interactiva con las claves del grabado «El sueño de la razón produce monstruos», de los Caprichos de Goya.",
+    gradient: "linear-gradient(135deg, rgba(60,56,50,0.95), rgba(150,140,120,0.8))",
+    image: "assets/art-covers/goya_sueno_razon.jpg",
+    previewUrl: "arte/goya_sueno_razon.html",
+    playUrl: "arte/goya_sueno_razon.html"
   }
 ];
 
@@ -181,7 +219,9 @@ const gameTranslations = {
     7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." },
     8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." },
     9: { title: "The Secret of the Enlightenment", description: "A point-and-click adventure where you uncover the ideas of the Enlightenment: Kant, Locke, and the power of reason.", longDescription: "A point-and-click adventure based on real notes about the Enlightenment, where you explore, talk, and make choices to unravel the secret of the Age of Reason." },
-    10: { title: "The Third of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." }
+    10: { title: "The Third of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." },
+    11: { title: "The Second of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the fight against the Mamluks at the Puerta del Sol (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the uprising of 2 May 1808 in Madrid." },
+    12: { title: "The Sleep of Reason Produces Monsters: keys", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." }
   }
 };
 
@@ -191,13 +231,21 @@ function gameText(game, field) {
 
 const state = {
   category: "",
+  subcategory: "",
   query: "",
   selectedGame: null
 };
 
+// Colecciones con un segundo nivel (autores): al elegirlas aparece otro desplegable.
+const SUBFILTERED_COLLECTIONS = ["Arte"];
+function hasSubfilter() {
+  return SUBFILTERED_COLLECTIONS.includes(state.category);
+}
+
 const gamesGrid = document.getElementById("gamesGrid");
 const searchInput = document.getElementById("searchInput");
 const filterSelect = document.getElementById("filterSelect");
+const subFilterSelect = document.getElementById("subFilterSelect");
 const resultsCount = document.getElementById("resultsCount");
 const featuredTitle = document.getElementById("featuredTitle");
 const featuredCategory = document.getElementById("featuredCategory");
@@ -227,7 +275,9 @@ function getVisibleGames() {
     // Sin colección elegida (y sin búsqueda) no se muestra nada.
     const matchesCategory = !state.category
       ? Boolean(query)
-      : state.category === "Todos" || game.collection === state.category;
+      : (state.category === "Todos" || game.collection === state.category) &&
+        (!hasSubfilter() || state.subcategory === "Todos" || game.subcollection === state.subcategory ||
+          (!state.subcategory && Boolean(query)));
     const matchesSearch =
       !query ||
       gameText(game, "title").toLowerCase().includes(query) ||
@@ -273,6 +323,17 @@ function renderGames() {
       <div class="empty-state">
         <h3>${language === "en" ? "Choose a collection" : "Elige una colección"}</h3>
         <p>${language === "en" ? "Pick a collection (or “All”) in the menu above to see its games." : "Elige una colección (o “Todas”) en el desplegable de arriba para ver sus juegos."}</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (hasSubfilter() && !state.subcategory && !state.query.trim()) {
+    resultsCount.textContent = "";
+    gamesGrid.innerHTML = `
+      <div class="empty-state">
+        <h3>${language === "en" ? "Choose an artist" : "Elige un autor"}</h3>
+        <p>${language === "en" ? "Pick an artist (or “All artists”) in the second menu to see their works." : "Elige un autor (o “Todos los autores”) en el segundo desplegable para ver sus obras."}</p>
       </div>
     `;
     return;
@@ -333,10 +394,34 @@ function buildFilterSelect() {
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
   filterSelect.value = state.category;
+  buildSubFilterSelect();
+}
+
+// Segundo desplegable (autores, en orden alfabético): solo visible en colecciones con subnivel.
+function buildSubFilterSelect() {
+  subFilterSelect.hidden = !hasSubfilter();
+  if (!hasSubfilter()) return;
+  const authors = [...new Set(games
+    .filter((game) => game.collection === state.category && game.subcollection)
+    .map((game) => game.subcollection))]
+    .sort((first, second) => first.localeCompare(second, language));
+  const placeholder = { value: "", label: language === "en" ? "Choose an artist…" : "Elige un autor…" };
+  const all = { value: "Todos", label: language === "en" ? "All artists" : "Todos los autores" };
+  subFilterSelect.innerHTML = [placeholder, all, ...authors.map((author) => ({ value: author, label: author }))]
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("");
+  subFilterSelect.value = state.subcategory;
 }
 
 filterSelect.addEventListener("change", () => {
   state.category = filterSelect.value;
+  state.subcategory = "";
+  buildSubFilterSelect();
+  renderGames();
+});
+
+subFilterSelect.addEventListener("change", () => {
+  state.subcategory = subFilterSelect.value;
   renderGames();
 });
 
@@ -344,7 +429,9 @@ filterSelect.addEventListener("change", () => {
 document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
   link.addEventListener("click", () => {
     state.category = link.dataset.filterCollection;
+    state.subcategory = "";
     filterSelect.value = state.category;
+    buildSubFilterSelect();
     renderGames();
   });
 });
