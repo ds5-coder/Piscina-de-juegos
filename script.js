@@ -287,6 +287,26 @@ const games = [
     image: "assets/art-covers/houel_toma_bastilla.jpg",
     previewUrl: "arte/houel_toma_bastilla.html",
     playUrl: "arte/houel_toma_bastilla.html"
+  },
+  {
+    id: 17,
+    title: "El caminante sobre el mar de nubes",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Friedrich",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Friedrich",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Caspar David Friedrich punto por punto: la figura de espaldas, el mar de nubes y la idea romántica de lo sublime.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de Friedrich, la imagen más conocida del romanticismo alemán.",
+    gradient: "linear-gradient(135deg, rgba(70,85,100,0.92), rgba(160,170,180,0.85))",
+    image: "assets/art-covers/friedrich_caminante.jpg",
+    previewUrl: "arte/friedrich_caminante.html",
+    playUrl: "arte/friedrich_caminante.html"
   }
 ];
 
@@ -317,7 +337,8 @@ const gameTranslations = {
     13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." },
     14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." },
     15: { title: "The Death of Marat", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the murder of the revolutionary leader Jean-Paul Marat in his bath (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the murder of Marat (1793), a landmark of politically committed Neoclassicism." },
-    16: { title: "The Storming of the Bastille", description: "Explore Jean-Pierre Houël's watercolour point by point: the details, the symbols and the image of the Bastille in flames on 14 July 1789 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Houël's watercolour of the storming of the Bastille (1789), an almost journalistic view between Neoclassicism and pre-Romantic sensibility." }
+    16: { title: "The Storming of the Bastille", description: "Explore Jean-Pierre Houël's watercolour point by point: the details, the symbols and the image of the Bastille in flames on 14 July 1789 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Houël's watercolour of the storming of the Bastille (1789), an almost journalistic view between Neoclassicism and pre-Romantic sensibility." },
+    17: { title: "Wanderer above the Sea of Fog", description: "Explore Caspar David Friedrich's painting point by point: the figure seen from behind, the sea of fog and the Romantic idea of the sublime (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Friedrich's painting, the best-known image of German Romanticism." }
   }
 };
 
@@ -478,7 +499,7 @@ function renderGames() {
       ${subcollectionTitle(blockGames(collection))}
       ${blockGames(collection).map((game) => `
         <article class="game-card">
-          <div class="game-visual" style="background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+          <div class="game-visual${game.isArt ? " art-visual" : ""}" style="${game.isArt ? `--art-image: url('${game.image}');` : `background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`}"></div>
           <div class="game-top-row">
             <h3>${gameText(game, "title")}</h3>
             <span class="game-badge">${game.category}</span>

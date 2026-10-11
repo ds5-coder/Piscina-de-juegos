@@ -937,3 +937,18 @@ button {
     min-height: 320px;
   }
 }
+
+/* Obras de arte: se ve el cuadro entero (sin recortar) sobre fondo oscuro. */
+.game-visual.art-visual {
+  height: 260px;
+  background-color: #0b0d13;
+  background-image: var(--art-image);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.game-visual.art-visual::before,
+.game-visual.art-visual::after {
+  display: none;
+}
