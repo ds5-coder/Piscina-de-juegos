@@ -473,6 +473,26 @@ const games = [
     image: "assets/art-covers/david_muerte_socrates.jpg",
     previewUrl: "arte/david_muerte_socrates.html",
     playUrl: "arte/david_muerte_socrates.html"
+  },
+  {
+    id: 26,
+    title: "El beso de la muerte",
+    category: "Escultura",
+    collection: "Arte",
+    mode: "Jaume Barba (atribuida)",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Barba",
+    movements: ["Modernismo", "Simbolismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la escultura funeraria del Cementerio de Poblenou punto por punto: el amor, la muerte y su simbolismo.",
+    longDescription:
+      "Una página interactiva con las claves de «El beso de la muerte» (1930), atribuida a Jaume Barba, una de las esculturas funerarias más conocidas de Europa.",
+    gradient: "linear-gradient(135deg, rgba(50,50,55,0.95), rgba(160,160,170,0.8))",
+    image: "assets/art-covers/beso_de_la_muerte.jpg",
+    previewUrl: "arte/beso_de_la_muerte.html",
+    playUrl: "arte/beso_de_la_muerte.html"
   }
 ];
 
@@ -512,7 +532,8 @@ const gameTranslations = {
     22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." },
     23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." },
     24: { title: "The School of Athens", description: "Explore Raphael's fresco point by point: the philosophers of Antiquity, the perspective and the Renaissance ideal of harmony (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The School of Athens' (1509-1511), a landmark of the High Renaissance and a model for later classicism." },
-    25: { title: "The Death of Socrates", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the serene death of Socrates, hero of reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Death of Socrates' (1787), a key work of moralizing Neoclassicism, painted at the height of the Enlightenment and on the eve of the Revolution." }
+    25: { title: "The Death of Socrates", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the serene death of Socrates, hero of reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Death of Socrates' (1787), a key work of moralizing Neoclassicism, painted at the height of the Enlightenment and on the eve of the Revolution." },
+    26: { title: "The Kiss of Death", description: "Explore the funerary sculpture in Poblenou Cemetery point by point: love, death and their symbolism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss of Death' (1930), attributed to Jaume Barba, one of the best-known funerary sculptures in Europe." }
   }
 };
 
@@ -572,7 +593,7 @@ function matchesSubfilters(game, query) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Barroco": "Baroque", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Romanticismo": "Romanticism" } : {};
+  const names = language === "en" ? { "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
   return names[movement] || movement;
 }
 
