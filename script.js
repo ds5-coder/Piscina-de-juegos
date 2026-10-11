@@ -152,6 +152,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    subcollection: "Goya",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.",
@@ -189,7 +190,7 @@ function gameText(game, field) {
 }
 
 const state = {
-  category: "Todos",
+  category: "",
   query: "",
   selectedGame: null
 };
@@ -223,7 +224,10 @@ function renderFeaturedGame() {
 function getVisibleGames() {
   const query = state.query.trim().toLowerCase();
   return games.filter((game) => {
-    const matchesCategory = state.category === "Todos" || game.collection === state.category;
+    // Sin colección elegida (y sin búsqueda) no se muestra nada.
+    const matchesCategory = !state.category
+      ? Boolean(query)
+      : state.category === "Todos" || game.collection === state.category;
     const matchesSearch =
       !query ||
       gameText(game, "title").toLowerCase().includes(query) ||
@@ -248,12 +252,31 @@ function collectionNames() {
   } : {};
 }
 
+// Subtítulo de una colección cuando todos sus juegos visibles comparten subcolección.
+function subcollectionTitle(collectionGames) {
+  const subs = [...new Set(collectionGames.map((game) => game.subcollection).filter(Boolean))];
+  if (subs.length !== 1 || collectionGames.some((game) => !game.subcollection)) return "";
+  const names = language === "en" ? { "Filosofía antigua": "Ancient Philosophy" } : {};
+  return `<p class="subcollection-title">${names[subs[0]] || subs[0]}</p>`;
+}
+
 function renderGames() {
   const visibleGames = getVisibleGames();
   const gameWord = language === "en" ? "game" : "juego";
   resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
   statsGames.textContent = String(games.filter((game) => !game.isArt).length);
   statsCategories.textContent = String(new Set(games.map((game) => game.collection)).size);
+
+  if (!state.category && !state.query.trim()) {
+    resultsCount.textContent = "";
+    gamesGrid.innerHTML = `
+      <div class="empty-state">
+        <h3>${language === "en" ? "Choose a collection" : "Elige una colección"}</h3>
+        <p>${language === "en" ? "Pick a collection (or “All”) in the menu above to see its games." : "Elige una colección (o “Todas”) en el desplegable de arriba para ver sus juegos."}</p>
+      </div>
+    `;
+    return;
+  }
 
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
@@ -271,7 +294,7 @@ function renderGames() {
   gamesGrid.innerHTML = collectionLabels.map((collection) => `
     <section class="collection-block">
       <h3 class="collection-title">${names[collection] || collection}</h3>
-      ${collection === "Filosofía" ? `<p class="subcollection-title">${language === "en" ? "Ancient Philosophy" : "Filosofía antigua"}</p>` : ""}
+      ${subcollectionTitle(visibleGames.filter((game) => game.collection === collection))}
       ${visibleGames.filter((game) => game.collection === collection).map((game) => `
         <article class="game-card">
           <div class="game-visual" style="background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
@@ -305,7 +328,8 @@ function buildFilterSelect() {
   const collections = [...new Set(games.map((game) => game.collection))]
     .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
     .sort((first, second) => first.label.localeCompare(second.label, language));
-  filterSelect.innerHTML = [{ value: "Todos", label: translations[language].all }, ...collections]
+  const placeholder = { value: "", label: language === "en" ? "Choose a collection…" : "Elige una colección…" };
+  filterSelect.innerHTML = [placeholder, { value: "Todos", label: translations[language].all }, ...collections]
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
   filterSelect.value = state.category;
