@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=2" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
     <div class="page-shell">
@@ -33,6 +33,7 @@
           <a href="#destacados">Destacados</a>
           <a href="#contacto">Contacto</a>
           <a href="#countdown">Cuenta atrás</a>
+          <a href="#arte">Arte</a>
         </nav>
 
         <div class="topbar-actions">
@@ -145,6 +146,34 @@
           <div id="gamesGrid" class="games-grid" aria-live="polite"></div>
         </section>
 
+        <section class="art-section" id="arte">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow" id="artEyebrow">Arte</span>
+              <h2 id="artTitle">Obras comentadas</h2>
+            </div>
+          </div>
+          <div class="games-grid">
+            <article class="game-card">
+              <div class="game-visual" style="background-image: url('assets/art-covers/goya_3_de_mayo.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+              <div class="game-top-row">
+                <h3 id="artCardTitle">El 3 de mayo de 1808: claves del cuadro</h3>
+                <span class="game-badge" id="artCardBadge">Pintura</span>
+              </div>
+              <div class="game-meta">
+                <span>Goya</span>
+              </div>
+              <p id="artCardText">Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.</p>
+              <div class="game-bottom-row">
+                <span class="game-badge">Interactivo</span>
+                <div class="game-actions">
+                  <a class="play-button" id="artCardButton" href="arte/goya_3_de_mayo.html" target="_blank" rel="noopener noreferrer">Ver</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section class="contact" id="contacto">
           <div class="section-head compact">
             <div>
@@ -171,6 +200,6 @@
       </main>
     </div>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
   </body>
 </html>

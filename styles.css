@@ -626,6 +626,16 @@ button {
   margin-top: 56px;
 }
 
+.art-section {
+  margin-top: 56px;
+}
+
+a.play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .extra-text {
   margin: 0 0 20px;
   color: var(--muted);
