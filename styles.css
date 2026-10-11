@@ -428,6 +428,23 @@ button {
   color: var(--muted);
 }
 
+.filter-select {
+  width: min(100%, 320px);
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-select option {
+  background: #121c30;
+  color: var(--text);
+}
+
 .filter-group {
   display: flex;
   flex-wrap: wrap;
@@ -624,16 +641,6 @@ button {
 
 .extra-section {
   margin-top: 56px;
-}
-
-.art-section {
-  margin-top: 56px;
-}
-
-a.play-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .extra-text {

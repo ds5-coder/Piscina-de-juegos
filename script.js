@@ -143,12 +143,30 @@ const games = [
     image: "assets/game-covers/Ilustracion.png",
     previewUrl: "games/secreto_ilustracion.html",
     playUrl: "games/secreto_ilustracion.html"
+  },
+  {
+    id: 10,
+    title: "El 3 de mayo de 1808: claves del cuadro",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de Goya sobre los fusilamientos del 3 de mayo de 1808.",
+    gradient: "linear-gradient(135deg, rgba(46,44,39,0.95), rgba(208,167,74,0.8))",
+    image: "assets/art-covers/goya_3_de_mayo.jpg",
+    previewUrl: "arte/goya_3_de_mayo.html",
+    playUrl: "arte/goya_3_de_mayo.html"
   }
 ];
 
 const translations = {
-  es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás", "Arte"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Días lectivos y vacaciones — Curso 2026/27", extraText: "Un vistazo rápido a lo que queda de curso en el calendario de la Comunidad de Madrid.", extraNextBreakLabel: "días lectivos hasta el próximo puente o vacaciones", extraChristmasLabel: "días lectivos hasta Navidad", extraEasterLabel: "días lectivos hasta Semana Santa", extraCalendarButton: "Ver calendario completo", artEyebrow: "Arte", artTitle: "Obras comentadas", artCardTitle: "El 3 de mayo de 1808: claves del cuadro", artCardBadge: "Pintura", artCardText: "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.", artCardButton: "Ver" },
-  en: { nav: ["Catalog", "Featured", "Contact", "Countdown", "Art"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", extraTitle: "School days & holidays — 2026/27 school year", extraText: "A quick look at what's left this year in the Community of Madrid calendar (the detailed countdown and calendar stay in Spanish).", extraNextBreakLabel: "school days until the next long break", extraChristmasLabel: "school days until Christmas", extraEasterLabel: "school days until Easter break", extraCalendarButton: "View full calendar", artEyebrow: "Art", artTitle: "Annotated artworks", artCardTitle: "The Third of May 1808: keys to the painting", artCardBadge: "Painting", artCardText: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", artCardButton: "View" }
+  es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás", "Arte"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Días lectivos y vacaciones — Curso 2026/27", extraText: "Un vistazo rápido a lo que queda de curso en el calendario de la Comunidad de Madrid.", extraNextBreakLabel: "días lectivos hasta el próximo puente o vacaciones", extraChristmasLabel: "días lectivos hasta Navidad", extraEasterLabel: "días lectivos hasta Semana Santa", extraCalendarButton: "Ver calendario completo" },
+  en: { nav: ["Catalog", "Featured", "Contact", "Countdown", "Art"], eyebrow: "Games to learn and play", heroTitle: "Your online game gallery for history, strategy, and culture.", heroText: "Explore a collection of mini-games and interactive experiences designed to entertain while you learn. Browse by collection, search by name, and try any game in seconds.", explore: "Explore games", games: "Games", categories: "Collections", collection: "Collection", curated: "Curated", featured: "Cover", title: "Title", catalog: "Collections", discover: "Discover your next games", search: "Search by name or collection", all: "All", contactTitle: "Private suggestions", idea: "Have an idea?", suggestions: "Suggestions!", send: "Send suggestion", play: "Play", language: "Change language", suggestionPlaceholder: "Write your suggestion here...", suggestionSubject: "Suggestion for Game pool", extraTitle: "School days & holidays — 2026/27 school year", extraText: "A quick look at what's left this year in the Community of Madrid calendar (the detailed countdown and calendar stay in Spanish).", extraNextBreakLabel: "school days until the next long break", extraChristmasLabel: "school days until Christmas", extraEasterLabel: "school days until Easter break", extraCalendarButton: "View full calendar" }
 };
 
 const gameTranslations = {
@@ -161,7 +179,8 @@ const gameTranslations = {
     6: { title: "Boston Tea Party 1773", description: "Relive the 1773 Boston Tea Party and discover the causes and consequences of this key episode of American independence.", longDescription: "A history game about the Boston Tea Party, one of the sparks of the American Revolution against British rule." },
     7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." },
     8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." },
-    9: { title: "The Secret of the Enlightenment", description: "A point-and-click adventure where you uncover the ideas of the Enlightenment: Kant, Locke, and the power of reason.", longDescription: "A point-and-click adventure based on real notes about the Enlightenment, where you explore, talk, and make choices to unravel the secret of the Age of Reason." }
+    9: { title: "The Secret of the Enlightenment", description: "A point-and-click adventure where you uncover the ideas of the Enlightenment: Kant, Locke, and the power of reason.", longDescription: "A point-and-click adventure based on real notes about the Enlightenment, where you explore, talk, and make choices to unravel the secret of the Age of Reason." },
+    10: { title: "The Third of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." }
   }
 };
 
@@ -177,7 +196,7 @@ const state = {
 
 const gamesGrid = document.getElementById("gamesGrid");
 const searchInput = document.getElementById("searchInput");
-const filterGroup = document.getElementById("filterGroup");
+const filterSelect = document.getElementById("filterSelect");
 const resultsCount = document.getElementById("resultsCount");
 const featuredTitle = document.getElementById("featuredTitle");
 const featuredCategory = document.getElementById("featuredCategory");
@@ -215,12 +234,26 @@ function getVisibleGames() {
   });
 }
 
+function collectionNames() {
+  return language === "en" ? {
+    "Revolución Francesa": "French Revolution",
+    "Revolución Industrial": "Industrial Revolution",
+    "Filosofía": "Philosophy",
+    "Revolución Rusa": "Russian Revolution",
+    "Revolución Americana": "American Revolution",
+    "Geografía": "Geography",
+    "Primera Guerra Mundial": "World War I",
+    "Ilustración": "Enlightenment",
+    "Arte": "Art"
+  } : {};
+}
+
 function renderGames() {
   const visibleGames = getVisibleGames();
   const gameWord = language === "en" ? "game" : "juego";
   resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
-  statsGames.textContent = String(games.length);
-  statsCategories.textContent = "8";
+  statsGames.textContent = String(games.filter((game) => !game.isArt).length);
+  statsCategories.textContent = String(new Set(games.map((game) => game.collection)).size);
 
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
@@ -234,19 +267,10 @@ function renderGames() {
 
   const collectionLabels = [...new Set(visibleGames.map((game) => game.collection))]
     .sort((first, second) => first.localeCompare(second, "es"));
-  const collectionNames = language === "en" ? {
-    "Revolución Francesa": "French Revolution",
-    "Revolución Industrial": "Industrial Revolution",
-    "Filosofía": "Philosophy",
-    "Revolución Rusa": "Russian Revolution",
-    "Revolución Americana": "American Revolution",
-    "Geografía": "Geography",
-    "Primera Guerra Mundial": "World War I",
-    "Ilustración": "Enlightenment"
-  } : {};
+  const names = collectionNames();
   gamesGrid.innerHTML = collectionLabels.map((collection) => `
     <section class="collection-block">
-      <h3 class="collection-title">${collectionNames[collection] || collection}</h3>
+      <h3 class="collection-title">${names[collection] || collection}</h3>
       ${collection === "Filosofía" ? `<p class="subcollection-title">${language === "en" ? "Ancient Philosophy" : "Filosofía antigua"}</p>` : ""}
       ${visibleGames.filter((game) => game.collection === collection).map((game) => `
         <article class="game-card">
@@ -262,7 +286,7 @@ function renderGames() {
           <div class="game-bottom-row">
             <span class="game-badge">${game.duration}</span>
             <div class="game-actions">
-              <button class="play-button" type="button" data-action="play" data-id="${game.id}">${language === "en" ? "Play" : "Jugar"}</button>
+              <button class="play-button" type="button" data-action="play" data-id="${game.id}">${game.actionLabel ? game.actionLabel[language] : (language === "en" ? "Play" : "Jugar")}</button>
             </div>
           </div>
         </article>
@@ -276,16 +300,29 @@ searchInput.addEventListener("input", (event) => {
   renderGames();
 });
 
-filterGroup.addEventListener("click", (event) => {
-  const chip = event.target.closest("button[data-category]");
-  if (!chip) return;
+// Desplegable de colecciones en orden alfabético (según el idioma activo).
+function buildFilterSelect() {
+  const collections = [...new Set(games.map((game) => game.collection))]
+    .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
+    .sort((first, second) => first.label.localeCompare(second.label, language));
+  filterSelect.innerHTML = [{ value: "Todos", label: translations[language].all }, ...collections]
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("");
+  filterSelect.value = state.category;
+}
 
-  state.category = chip.dataset.category;
-  filterGroup.querySelectorAll(".filter-chip").forEach((button) => {
-    button.classList.toggle("active", button === chip);
-  });
-
+filterSelect.addEventListener("change", () => {
+  state.category = filterSelect.value;
   renderGames();
+});
+
+// Enlaces del menú que activan un filtro del catálogo (p. ej. "Arte").
+document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
+  link.addEventListener("click", () => {
+    state.category = link.dataset.filterCollection;
+    filterSelect.value = state.category;
+    renderGames();
+  });
 });
 
 gamesGrid.addEventListener("click", (event) => {
@@ -314,7 +351,7 @@ function applyLanguage() {
   document.querySelector(".catalog .eyebrow").textContent = t.catalog;
   document.querySelector(".catalog h2").textContent = t.discover;
   searchInput.placeholder = t.search;
-  document.querySelector('[data-category="Todos"]').textContent = t.all;
+  buildFilterSelect();
   document.querySelector(".contact h2").textContent = t.contactTitle;
   document.querySelector(".contact-label").textContent = t.idea;
   document.querySelector(".contact-card h3").textContent = t.suggestions;
@@ -326,12 +363,6 @@ function applyLanguage() {
   document.getElementById("extraChristmasLabel").textContent = t.extraChristmasLabel;
   document.getElementById("extraEasterLabel").textContent = t.extraEasterLabel;
   document.getElementById("toggleCalendarBtn").textContent = t.extraCalendarButton;
-  document.getElementById("artEyebrow").textContent = t.artEyebrow;
-  document.getElementById("artTitle").textContent = t.artTitle;
-  document.getElementById("artCardTitle").textContent = t.artCardTitle;
-  document.getElementById("artCardBadge").textContent = t.artCardBadge;
-  document.getElementById("artCardText").textContent = t.artCardText;
-  document.getElementById("artCardButton").textContent = t.artCardButton;
   languageToggle.innerHTML = language === "es" ? "<span aria-hidden=\"true\">🇬🇧</span><span>EN</span>" : "<span aria-hidden=\"true\">🇪🇸</span><span>ES</span>";
   renderFeaturedGame();
   renderGames();
