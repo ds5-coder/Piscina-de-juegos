@@ -572,6 +572,44 @@ function subcollectionTitle(collectionGames) {
   return `<p class="subcollection-title">${names[subs[0]] || subs[0]}</p>`;
 }
 
+function gameCardHtml(game) {
+  return `
+        <article class="game-card">
+          <div class="game-visual${game.isArt ? " art-visual" : ""}" style="${game.isArt ? `--art-image: url('${game.image}');` : `background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`}"></div>
+          <div class="game-top-row">
+            <h3>${gameText(game, "title")}</h3>
+            <span class="game-badge">${game.category}</span>
+          </div>
+          <div class="game-meta">
+            <span>${game.mode}</span>${game.movements ? `<span>· ${game.movements.map(movementName).join(" / ")}</span>` : ""}
+          </div>
+          <p>${gameText(game, "description")}</p>
+          <div class="game-bottom-row">
+            <span class="game-badge">${game.duration}</span>
+            <div class="game-actions">
+              <button class="play-button" type="button" data-action="play" data-id="${game.id}">${game.actionLabel ? game.actionLabel[language] : (language === "en" ? "Play" : "Jugar")}</button>
+            </div>
+          </div>
+        </article>
+      `;
+}
+
+// Contenido de una colección: si mezcla cuadros y juegos, se divide en dos secciones (cuadros primero).
+function blockContent(collectionGames) {
+  const artworks = collectionGames.filter((game) => game.isArt);
+  const plainGames = collectionGames.filter((game) => !game.isArt);
+  if (!artworks.length || !plainGames.length) return collectionGames.map(gameCardHtml).join("");
+  const artTitle = artworks.every((game) => game.category !== "Escultura")
+    ? (language === "en" ? "Paintings" : "Cuadros")
+    : (language === "en" ? "Artworks" : "Obras de arte");
+  const gamesTitle = language === "en" ? "Games" : "Juegos";
+  return `
+      <h4 class="block-section-title">${artTitle}</h4>
+      ${artworks.map(gameCardHtml).join("")}
+      <h4 class="block-section-title">${gamesTitle}</h4>
+      ${plainGames.map(gameCardHtml).join("")}`;
+}
+
 function renderGames() {
   const visibleGames = getVisibleGames();
   // "cuadros" si todo es pintura, "obras" si hay otras artes (escultura), "juegos" si no hay arte, "elementos" si se mezclan.
@@ -630,25 +668,7 @@ function renderGames() {
     <section class="collection-block">
       <h3 class="collection-title">${names[collection] || collection}</h3>
       ${subcollectionTitle(blockGames(collection))}
-      ${blockGames(collection).map((game) => `
-        <article class="game-card">
-          <div class="game-visual${game.isArt ? " art-visual" : ""}" style="${game.isArt ? `--art-image: url('${game.image}');` : `background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`}"></div>
-          <div class="game-top-row">
-            <h3>${gameText(game, "title")}</h3>
-            <span class="game-badge">${game.category}</span>
-          </div>
-          <div class="game-meta">
-            <span>${game.mode}</span>${game.movements ? `<span>· ${game.movements.map(movementName).join(" / ")}</span>` : ""}
-          </div>
-          <p>${gameText(game, "description")}</p>
-          <div class="game-bottom-row">
-            <span class="game-badge">${game.duration}</span>
-            <div class="game-actions">
-              <button class="play-button" type="button" data-action="play" data-id="${game.id}">${game.actionLabel ? game.actionLabel[language] : (language === "en" ? "Play" : "Jugar")}</button>
-            </div>
-          </div>
-        </article>
-      `).join("")}
+      ${blockContent(blockGames(collection))}
     </section>
   `).join("");
 }
