@@ -431,6 +431,27 @@ const games = [
     image: "assets/art-covers/leutze_washington_delaware.jpg",
     previewUrl: "arte/leutze_washington_delaware.html",
     playUrl: "arte/leutze_washington_delaware.html"
+  },
+  {
+    id: 24,
+    title: "La escuela de Atenas",
+    category: "Fresco",
+    collection: "Arte",
+    alsoIn: ["Filosofía"],
+    mode: "Rafael",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Rafael",
+    movements: ["Renacimiento"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el fresco de Rafael punto por punto: los filósofos de la Antigüedad, la perspectiva y el ideal de armonía del Renacimiento.",
+    longDescription:
+      "Una página interactiva con las claves de «La escuela de Atenas» (1509-1511), obra cumbre del Renacimiento pleno y modelo para el clasicismo posterior.",
+    gradient: "linear-gradient(135deg, rgba(150,110,60,0.92), rgba(70,100,150,0.85))",
+    image: "assets/art-covers/rafael_escuela_atenas.jpg",
+    previewUrl: "arte/rafael_escuela_atenas.html",
+    playUrl: "arte/rafael_escuela_atenas.html"
   }
 ];
 
@@ -468,7 +489,8 @@ const gameTranslations = {
     20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." },
     21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." },
     22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." },
-    23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." }
+    23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." },
+    24: { title: "The School of Athens", description: "Explore Raphael's fresco point by point: the philosophers of Antiquity, the perspective and the Renaissance ideal of harmony (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The School of Athens' (1509-1511), a landmark of the High Renaissance and a model for later classicism." }
   }
 };
 
@@ -528,7 +550,7 @@ function matchesSubfilters(game, query) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Barroco": "Baroque", "Neoclasicismo": "Neoclassicism", "Romanticismo": "Romanticism" } : {};
+  const names = language === "en" ? { "Barroco": "Baroque", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Romanticismo": "Romanticism" } : {};
   return names[movement] || movement;
 }
 
@@ -565,7 +587,9 @@ function collectionNames() {
 }
 
 // Subtítulo de una colección cuando todos sus juegos visibles comparten subcolección.
-function subcollectionTitle(collectionGames) {
+function subcollectionTitle(allGames) {
+  // En colecciones mixtas (cuadros + juegos) el subtítulo solo depende de los juegos.
+  const collectionGames = allGames.some((game) => !game.isArt) ? allGames.filter((game) => !game.isArt) : allGames;
   const subs = [...new Set(collectionGames.map((game) => game.subcollection).filter(Boolean))];
   if (subs.length !== 1 || collectionGames.some((game) => !game.subcollection)) return "";
   const names = language === "en" ? { "Filosofía antigua": "Ancient Philosophy" } : {};
