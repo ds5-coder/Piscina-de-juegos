@@ -146,7 +146,7 @@ const games = [
   },
   {
     id: 11,
-    title: "El 2 de mayo de 1808: claves del cuadro",
+    title: "El 2 de mayo de 1808",
     category: "Pintura",
     collection: "Arte",
     mode: "Goya",
@@ -165,7 +165,7 @@ const games = [
   },
   {
     id: 10,
-    title: "El 3 de mayo de 1808: claves del cuadro",
+    title: "El 3 de mayo de 1808",
     category: "Pintura",
     collection: "Arte",
     mode: "Goya",
@@ -184,7 +184,7 @@ const games = [
   },
   {
     id: 12,
-    title: "El sueño de la razón produce monstruos: claves",
+    title: "El sueño de la razón produce monstruos",
     category: "Grabado",
     collection: "Arte",
     mode: "Goya",
@@ -200,8 +200,33 @@ const games = [
     image: "assets/art-covers/goya_sueno_razon.jpg",
     previewUrl: "arte/goya_sueno_razon.html",
     playUrl: "arte/goya_sueno_razon.html"
+  },
+  {
+    id: 13,
+    title: "Napoleón cruzando los Alpes",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y la imagen que Napoleón quiso dar de sí mismo.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de David sobre el paso de Napoleón por los Alpes.",
+    gradient: "linear-gradient(135deg, rgba(40,70,100,0.92), rgba(200,130,70,0.85))",
+    image: "assets/art-covers/david_napoleon_alpes.jpg",
+    previewUrl: "arte/david_napoleon_alpes.html",
+    playUrl: "arte/david_napoleon_alpes.html"
   }
 ];
+
+// Cada juego pertenece a su colección principal y, opcionalmente, a otras (alsoIn).
+games.forEach((game) => {
+  game.collections = [game.collection, ...(game.alsoIn || [])];
+});
 
 const translations = {
   es: { nav: ["Catálogo", "Destacados", "Contacto", "Cuenta atrás", "Arte"], eyebrow: "Juegos para aprender y jugar", heroTitle: "Tu galería de juegos online con historia, estrategia y cultura.", heroText: "Aquí tienes una colección de minijuegos y experiencias interactivas pensadas para divertirte mientras aprendes. Explora por colección, busca por nombre y prueba cualquiera en segundos.", explore: "Explorar juegos", games: "Juegos", categories: "Colecciones", collection: "Colección", curated: "Curada", featured: "Portada", title: "Título", catalog: "Colecciones", discover: "Descubre tus próximos juegos", search: "Buscar por nombre o colección", all: "Todas", contactTitle: "Sugerencias privadas", idea: "¿Tienes una idea?", suggestions: "¡Sugerencias!", send: "Enviar sugerencia", play: "Jugar", language: "Cambiar idioma", suggestionPlaceholder: "Escribe tu sugerencia aquí...", suggestionSubject: "Sugerencia para Piscina de juegos", extraTitle: "Días lectivos y vacaciones — Curso 2026/27", extraText: "Un vistazo rápido a lo que queda de curso en el calendario de la Comunidad de Madrid.", extraNextBreakLabel: "días lectivos hasta el próximo puente o vacaciones", extraChristmasLabel: "días lectivos hasta Navidad", extraEasterLabel: "días lectivos hasta Semana Santa", extraCalendarButton: "Ver calendario completo" },
@@ -219,9 +244,10 @@ const gameTranslations = {
     7: { title: "What Is It Made From? — Primary Sector", description: "Discover which raw material each product comes from and learn about the primary sector and where everyday things come from.", longDescription: "An educational game about geography and the primary sector: farming, livestock, fishing, and mining, and how those resources become products." },
     8: { title: "The Trenches Messenger", description: "A World War I campaign where you carry messages between the trenches while dodging danger, without fighting.", longDescription: "A level-based narrative game set in World War I (1914-1918): you relive key moments of the conflict, from the assassination in Sarajevo to the armistice, moving and making decisions instead of fighting." },
     9: { title: "The Secret of the Enlightenment", description: "A point-and-click adventure where you uncover the ideas of the Enlightenment: Kant, Locke, and the power of reason.", longDescription: "A point-and-click adventure based on real notes about the Enlightenment, where you explore, talk, and make choices to unravel the secret of the Age of Reason." },
-    10: { title: "The Third of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." },
-    11: { title: "The Second of May 1808: keys to the painting", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the fight against the Mamluks at the Puerta del Sol (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the uprising of 2 May 1808 in Madrid." },
-    12: { title: "The Sleep of Reason Produces Monsters: keys", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." }
+    10: { title: "The Third of May 1808", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." },
+    11: { title: "The Second of May 1808", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the fight against the Mamluks at the Puerta del Sol (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the uprising of 2 May 1808 in Madrid." },
+    12: { title: "The Sleep of Reason Produces Monsters", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." },
+    13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." }
   }
 };
 
@@ -275,7 +301,7 @@ function getVisibleGames() {
     // Sin colección elegida (y sin búsqueda) no se muestra nada.
     const matchesCategory = !state.category
       ? Boolean(query)
-      : (state.category === "Todos" || game.collection === state.category) &&
+      : (state.category === "Todos" || game.collections.includes(state.category)) &&
         (!hasSubfilter() || state.subcategory === "Todos" || game.subcollection === state.subcategory ||
           (!state.subcategory && Boolean(query)));
     const matchesSearch =
@@ -312,8 +338,17 @@ function subcollectionTitle(collectionGames) {
 
 function renderGames() {
   const visibleGames = getVisibleGames();
-  const gameWord = language === "en" ? "game" : "juego";
-  resultsCount.textContent = `${visibleGames.length} ${gameWord}${visibleGames.length === 1 ? "" : "s"}`;
+  // "cuadros" si todo lo visible es arte, "juegos" si no hay arte, "elementos" si hay de ambos.
+  const artCount = visibleGames.filter((game) => game.isArt).length;
+  const itemWords = artCount === visibleGames.length && artCount > 0
+    ? (language === "en" ? ["painting", "paintings"] : ["cuadro", "cuadros"])
+    : artCount === 0
+      ? (language === "en" ? ["game", "games"] : ["juego", "juegos"])
+      : (language === "en" ? ["item", "items"] : ["elemento", "elementos"]);
+  resultsCount.textContent = `${visibleGames.length} ${itemWords[visibleGames.length === 1 ? 0 : 1]}`;
+  // Juegos de una colección en el bloque que se pinta (con una colección elegida, también los que la tienen como secundaria).
+  const blockGames = (collection) => visibleGames.filter((game) =>
+    state.category && state.category !== "Todos" ? game.collections.includes(collection) : game.collection === collection);
   statsGames.textContent = String(games.filter((game) => !game.isArt).length);
   statsCategories.textContent = String(new Set(games.map((game) => game.collection)).size);
 
@@ -349,14 +384,14 @@ function renderGames() {
     return;
   }
 
-  const collectionLabels = [...new Set(visibleGames.map((game) => game.collection))]
+  const collectionLabels = (state.category && state.category !== "Todos" ? [state.category] : [...new Set(visibleGames.map((game) => game.collection))])
     .sort((first, second) => first.localeCompare(second, "es"));
   const names = collectionNames();
   gamesGrid.innerHTML = collectionLabels.map((collection) => `
     <section class="collection-block">
       <h3 class="collection-title">${names[collection] || collection}</h3>
-      ${subcollectionTitle(visibleGames.filter((game) => game.collection === collection))}
-      ${visibleGames.filter((game) => game.collection === collection).map((game) => `
+      ${subcollectionTitle(blockGames(collection))}
+      ${blockGames(collection).map((game) => `
         <article class="game-card">
           <div class="game-visual" style="background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
           <div class="game-top-row">
@@ -386,7 +421,7 @@ searchInput.addEventListener("input", (event) => {
 
 // Desplegable de colecciones en orden alfabético (según el idioma activo).
 function buildFilterSelect() {
-  const collections = [...new Set(games.map((game) => game.collection))]
+  const collections = [...new Set(games.flatMap((game) => game.collections))]
     .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
     .sort((first, second) => first.label.localeCompare(second.label, language));
   const placeholder = { value: "", label: language === "en" ? "Choose a collection…" : "Elige una colección…" };
@@ -402,7 +437,7 @@ function buildSubFilterSelect() {
   subFilterSelect.hidden = !hasSubfilter();
   if (!hasSubfilter()) return;
   const authors = [...new Set(games
-    .filter((game) => game.collection === state.category && game.subcollection)
+    .filter((game) => game.collections.includes(state.category) && game.subcollection)
     .map((game) => game.subcollection))]
     .sort((first, second) => first.localeCompare(second, language));
   const placeholder = { value: "", label: language === "en" ? "Choose an artist…" : "Elige un autor…" };
