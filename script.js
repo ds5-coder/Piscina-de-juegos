@@ -220,6 +220,26 @@ const games = [
     image: "assets/art-covers/david_napoleon_alpes.jpg",
     previewUrl: "arte/david_napoleon_alpes.html",
     playUrl: "arte/david_napoleon_alpes.html"
+  },
+  {
+    id: 14,
+    title: "El juramento del Juego de Pelota",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el momento en que los diputados juraron no separarse hasta dar una constitución a Francia.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de David sobre el juramento del Juego de Pelota (1789), uno de los primeros actos de la Revolución Francesa.",
+    gradient: "linear-gradient(135deg, rgba(40,70,100,0.92), rgba(190,60,60,0.85))",
+    image: "assets/art-covers/david_juramento_juego_pelota.jpg",
+    previewUrl: "arte/david_juramento_juego_pelota.html",
+    playUrl: "arte/david_juramento_juego_pelota.html"
   }
 ];
 
@@ -247,7 +267,8 @@ const gameTranslations = {
     10: { title: "The Third of May 1808", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the executions of 3 May (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the executions of 3 May 1808." },
     11: { title: "The Second of May 1808", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the fight against the Mamluks at the Puerta del Sol (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the uprising of 2 May 1808 in Madrid." },
     12: { title: "The Sleep of Reason Produces Monsters", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." },
-    13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." }
+    13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." },
+    14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." }
   }
 };
 
@@ -692,6 +713,17 @@ if (toggleCalendarBtn && calendarPanel) {
     calendarPanel.hidden = !willShow;
     toggleCalendarBtn.setAttribute("aria-expanded", String(willShow));
   });
+}
+
+// Enlaces directos al catálogo: index.html?coleccion=Arte&autor=David
+const linkParams = new URLSearchParams(window.location.search);
+const linkedCollection = linkParams.get("coleccion");
+if (linkedCollection && games.some((game) => game.collections.includes(linkedCollection))) {
+  state.category = linkedCollection;
+  const linkedAuthor = linkParams.get("autor");
+  if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && game.subcollection === linkedAuthor)) {
+    state.subcategory = linkedAuthor;
+  }
 }
 
 applyLanguage();
