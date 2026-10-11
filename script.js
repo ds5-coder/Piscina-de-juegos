@@ -153,7 +153,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
-    movement: "Romanticismo",
+    movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de la lucha contra los mamelucos en la Puerta del Sol.",
@@ -173,7 +173,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
-    movement: "Romanticismo",
+    movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.",
@@ -193,7 +193,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
-    movement: "Romanticismo",
+    movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el grabado de Goya punto por punto: los animales nocturnos, los símbolos y el significado de la razón dormida.",
@@ -214,7 +214,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "David",
-    movement: "Neoclasicismo",
+    movements: ["Neoclasicismo", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y la imagen que Napoleón quiso dar de sí mismo.",
@@ -235,7 +235,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "David",
-    movement: "Neoclasicismo",
+    movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el momento en que los diputados juraron no separarse hasta dar una constitución a Francia.",
@@ -256,7 +256,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "David",
-    movement: "Neoclasicismo",
+    movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el asesinato del líder revolucionario Jean-Paul Marat en su bañera.",
@@ -266,6 +266,27 @@ const games = [
     image: "assets/art-covers/david_muerte_marat.jpg",
     previewUrl: "arte/david_muerte_marat.html",
     playUrl: "arte/david_muerte_marat.html"
+  },
+  {
+    id: 16,
+    title: "La toma de la Bastilla",
+    category: "Acuarela",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "Houël",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Houël",
+    movements: ["Neoclasicismo", "Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la acuarela de Jean-Pierre Houël punto por punto: los detalles, los símbolos y la imagen de la Bastilla en llamas durante el 14 de julio de 1789.",
+    longDescription:
+      "Una página interactiva con las claves de la acuarela de Houël sobre la toma de la Bastilla (1789), una vista casi periodística entre el neoclasicismo y la sensibilidad prerromántica.",
+    gradient: "linear-gradient(135deg, rgba(60,70,90,0.92), rgba(210,120,50,0.85))",
+    image: "assets/art-covers/houel_toma_bastilla.jpg",
+    previewUrl: "arte/houel_toma_bastilla.html",
+    playUrl: "arte/houel_toma_bastilla.html"
   }
 ];
 
@@ -295,7 +316,8 @@ const gameTranslations = {
     12: { title: "The Sleep of Reason Produces Monsters", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." },
     13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." },
     14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." },
-    15: { title: "The Death of Marat", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the murder of the revolutionary leader Jean-Paul Marat in his bath (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the murder of Marat (1793), a landmark of politically committed Neoclassicism." }
+    15: { title: "The Death of Marat", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the murder of the revolutionary leader Jean-Paul Marat in his bath (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the murder of Marat (1793), a landmark of politically committed Neoclassicism." },
+    16: { title: "The Storming of the Bastille", description: "Explore Jean-Pierre Houël's watercolour point by point: the details, the symbols and the image of the Bastille in flames on 14 July 1789 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Houël's watercolour of the storming of the Bastille (1789), an almost journalistic view between Neoclassicism and pre-Romantic sensibility." }
   }
 };
 
@@ -350,7 +372,7 @@ function matchesSubfilters(game, query) {
   if (!hasSubfilter()) return true;
   if (!state.subcategory && !state.movement) return Boolean(query);
   const authorOk = !state.subcategory || state.subcategory === "Todos" || game.subcollection === state.subcategory;
-  const movementOk = !state.movement || state.movement === "Todos" || game.movement === state.movement;
+  const movementOk = !state.movement || state.movement === "Todos" || (game.movements || []).includes(state.movement);
   return authorOk && movementOk;
 }
 
@@ -462,7 +484,7 @@ function renderGames() {
             <span class="game-badge">${game.category}</span>
           </div>
           <div class="game-meta">
-            <span>${game.mode}</span>${game.movement ? `<span>· ${movementName(game.movement)}</span>` : ""}
+            <span>${game.mode}</span>${game.movements ? `<span>· ${game.movements.map(movementName).join(" / ")}</span>` : ""}
           </div>
           <p>${gameText(game, "description")}</p>
           <div class="game-bottom-row">
@@ -501,8 +523,8 @@ function buildSubFilterSelect() {
   movementSelect.hidden = !hasSubfilter();
   if (!hasSubfilter()) return;
   const movements = [...new Set(games
-    .filter((game) => game.collections.includes(state.category) && game.movement)
-    .map((game) => game.movement))]
+    .filter((game) => game.collections.includes(state.category) && game.movements)
+    .flatMap((game) => game.movements))]
     .sort((first, second) => movementName(first).localeCompare(movementName(second), language));
   const movementPlaceholder = { value: "", label: language === "en" ? "Choose a movement…" : "Elige un movimiento…" };
   const allMovements = { value: "Todos", label: language === "en" ? "All movements" : "Todos los movimientos" };
@@ -785,7 +807,7 @@ if (linkedCollection && games.some((game) => game.collections.includes(linkedCol
     state.subcategory = linkedAuthor;
   }
   const linkedMovement = linkParams.get("movimiento");
-  if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && game.movement === linkedMovement)) {
+  if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && (game.movements || []).includes(linkedMovement))) {
     state.movement = linkedMovement;
   }
 }
