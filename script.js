@@ -153,6 +153,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
+    movement: "Romanticismo",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de la lucha contra los mamelucos en la Puerta del Sol.",
@@ -172,6 +173,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
+    movement: "Romanticismo",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Goya punto por punto: los detalles, los símbolos y el contexto histórico de los fusilamientos del 3 de mayo.",
@@ -191,6 +193,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "Goya",
+    movement: "Romanticismo",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el grabado de Goya punto por punto: los animales nocturnos, los símbolos y el significado de la razón dormida.",
@@ -211,6 +214,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "David",
+    movement: "Neoclasicismo",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y la imagen que Napoleón quiso dar de sí mismo.",
@@ -231,6 +235,7 @@ const games = [
     duration: "Interactivo",
     isArt: true,
     subcollection: "David",
+    movement: "Neoclasicismo",
     actionLabel: { es: "Ver", en: "View" },
     description:
       "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el momento en que los diputados juraron no separarse hasta dar una constitución a Francia.",
@@ -240,6 +245,27 @@ const games = [
     image: "assets/art-covers/david_juramento_juego_pelota.jpg",
     previewUrl: "arte/david_juramento_juego_pelota.html",
     playUrl: "arte/david_juramento_juego_pelota.html"
+  },
+  {
+    id: 15,
+    title: "La muerte de Marat",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    movement: "Neoclasicismo",
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el asesinato del líder revolucionario Jean-Paul Marat en su bañera.",
+    longDescription:
+      "Una página interactiva con las claves del cuadro de David sobre el asesinato de Marat (1793), obra cumbre del neoclasicismo comprometido políticamente.",
+    gradient: "linear-gradient(135deg, rgba(60,50,40,0.95), rgba(150,60,50,0.85))",
+    image: "assets/art-covers/david_muerte_marat.jpg",
+    previewUrl: "arte/david_muerte_marat.html",
+    playUrl: "arte/david_muerte_marat.html"
   }
 ];
 
@@ -268,7 +294,8 @@ const gameTranslations = {
     11: { title: "The Second of May 1808", description: "Explore Goya's painting point by point: the details, the symbols and the historical context of the fight against the Mamluks at the Puerta del Sol (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Goya's painting of the uprising of 2 May 1808 in Madrid." },
     12: { title: "The Sleep of Reason Produces Monsters", description: "Explore Goya's etching point by point: the nocturnal animals, the symbols and the meaning of the sleeping reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the etching 'The Sleep of Reason Produces Monsters', from Goya's Caprichos." },
     13: { title: "Napoleon Crossing the Alps", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the image Napoleon wanted to project of himself (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of Napoleon crossing the Alps." },
-    14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." }
+    14: { title: "The Tennis Court Oath", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the moment the deputies swore not to separate until France had a constitution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the Tennis Court Oath (1789), one of the first acts of the French Revolution." },
+    15: { title: "The Death of Marat", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the murder of the revolutionary leader Jean-Paul Marat in his bath (the page itself is in Spanish).", longDescription: "An interactive page with the keys to David's painting of the murder of Marat (1793), a landmark of politically committed Neoclassicism." }
   }
 };
 
@@ -279,6 +306,7 @@ function gameText(game, field) {
 const state = {
   category: "",
   subcategory: "",
+  movement: "",
   query: "",
   selectedGame: null
 };
@@ -293,6 +321,7 @@ const gamesGrid = document.getElementById("gamesGrid");
 const searchInput = document.getElementById("searchInput");
 const filterSelect = document.getElementById("filterSelect");
 const subFilterSelect = document.getElementById("subFilterSelect");
+const movementSelect = document.getElementById("movementSelect");
 const resultsCount = document.getElementById("resultsCount");
 const featuredTitle = document.getElementById("featuredTitle");
 const featuredCategory = document.getElementById("featuredCategory");
@@ -316,6 +345,20 @@ function renderFeaturedGame() {
   featuredArt.style.backgroundRepeat = "no-repeat";
 }
 
+// Segundo nivel de Arte: autor y/o movimiento (si no hay ninguno elegido, solo cuenta la búsqueda).
+function matchesSubfilters(game, query) {
+  if (!hasSubfilter()) return true;
+  if (!state.subcategory && !state.movement) return Boolean(query);
+  const authorOk = !state.subcategory || state.subcategory === "Todos" || game.subcollection === state.subcategory;
+  const movementOk = !state.movement || state.movement === "Todos" || game.movement === state.movement;
+  return authorOk && movementOk;
+}
+
+function movementName(movement) {
+  const names = language === "en" ? { "Neoclasicismo": "Neoclassicism", "Romanticismo": "Romanticism" } : {};
+  return names[movement] || movement;
+}
+
 function getVisibleGames() {
   const query = state.query.trim().toLowerCase();
   return games.filter((game) => {
@@ -323,8 +366,7 @@ function getVisibleGames() {
     const matchesCategory = !state.category
       ? Boolean(query)
       : (state.category === "Todos" || game.collections.includes(state.category)) &&
-        (!hasSubfilter() || state.subcategory === "Todos" || game.subcollection === state.subcategory ||
-          (!state.subcategory && Boolean(query)));
+        matchesSubfilters(game, query);
     const matchesSearch =
       !query ||
       gameText(game, "title").toLowerCase().includes(query) ||
@@ -384,12 +426,12 @@ function renderGames() {
     return;
   }
 
-  if (hasSubfilter() && !state.subcategory && !state.query.trim()) {
+  if (hasSubfilter() && !state.subcategory && !state.movement && !state.query.trim()) {
     resultsCount.textContent = "";
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>${language === "en" ? "Choose an artist" : "Elige un autor"}</h3>
-        <p>${language === "en" ? "Pick an artist (or “All artists”) in the second menu to see their works." : "Elige un autor (o “Todos los autores”) en el segundo desplegable para ver sus obras."}</p>
+        <h3>${language === "en" ? "Choose an artist or a movement" : "Elige un autor o un movimiento"}</h3>
+        <p>${language === "en" ? "Pick an artist or an art movement (or “All”) in the menus above to see the works." : "Elige un autor o un movimiento artístico (o “Todos”) en los desplegables de arriba para ver las obras."}</p>
       </div>
     `;
     return;
@@ -398,7 +440,7 @@ function renderGames() {
   if (!visibleGames.length) {
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>${translations[language].noGames || (language === "en" ? "No games found" : "No encontramos juegos")}</h3>
+        <h3>${hasSubfilter() ? (language === "en" ? "No paintings found" : "No encontramos cuadros") : (language === "en" ? "No games found" : "No encontramos juegos")}</h3>
         <p>${language === "en" ? "Try another search or change the category." : "Prueba con otra búsqueda o cambia la categoría."}</p>
       </div>
     `;
@@ -420,7 +462,7 @@ function renderGames() {
             <span class="game-badge">${game.category}</span>
           </div>
           <div class="game-meta">
-            <span>${game.mode}</span>
+            <span>${game.mode}</span>${game.movement ? `<span>· ${movementName(game.movement)}</span>` : ""}
           </div>
           <p>${gameText(game, "description")}</p>
           <div class="game-bottom-row">
@@ -456,7 +498,18 @@ function buildFilterSelect() {
 // Segundo desplegable (autores, en orden alfabético): solo visible en colecciones con subnivel.
 function buildSubFilterSelect() {
   subFilterSelect.hidden = !hasSubfilter();
+  movementSelect.hidden = !hasSubfilter();
   if (!hasSubfilter()) return;
+  const movements = [...new Set(games
+    .filter((game) => game.collections.includes(state.category) && game.movement)
+    .map((game) => game.movement))]
+    .sort((first, second) => movementName(first).localeCompare(movementName(second), language));
+  const movementPlaceholder = { value: "", label: language === "en" ? "Choose a movement…" : "Elige un movimiento…" };
+  const allMovements = { value: "Todos", label: language === "en" ? "All movements" : "Todos los movimientos" };
+  movementSelect.innerHTML = [movementPlaceholder, allMovements, ...movements.map((movement) => ({ value: movement, label: movementName(movement) }))]
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("");
+  movementSelect.value = state.movement;
   const authors = [...new Set(games
     .filter((game) => game.collections.includes(state.category) && game.subcollection)
     .map((game) => game.subcollection))]
@@ -472,6 +525,7 @@ function buildSubFilterSelect() {
 filterSelect.addEventListener("change", () => {
   state.category = filterSelect.value;
   state.subcategory = "";
+  state.movement = "";
   buildSubFilterSelect();
   renderGames();
 });
@@ -481,11 +535,17 @@ subFilterSelect.addEventListener("change", () => {
   renderGames();
 });
 
+movementSelect.addEventListener("change", () => {
+  state.movement = movementSelect.value;
+  renderGames();
+});
+
 // Enlaces del menú que activan un filtro del catálogo (p. ej. "Arte").
 document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
   link.addEventListener("click", () => {
     state.category = link.dataset.filterCollection;
     state.subcategory = "";
+    state.movement = "";
     filterSelect.value = state.category;
     buildSubFilterSelect();
     renderGames();
@@ -723,6 +783,10 @@ if (linkedCollection && games.some((game) => game.collections.includes(linkedCol
   const linkedAuthor = linkParams.get("autor");
   if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && game.subcollection === linkedAuthor)) {
     state.subcategory = linkedAuthor;
+  }
+  const linkedMovement = linkParams.get("movimiento");
+  if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && game.movement === linkedMovement)) {
+    state.movement = linkedMovement;
   }
 }
 
