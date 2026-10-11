@@ -410,6 +410,27 @@ const games = [
     image: "assets/art-covers/david_napoleon_estudio.jpg",
     previewUrl: "arte/david_napoleon_estudio.html",
     playUrl: "arte/david_napoleon_estudio.html"
+  },
+  {
+    id: 23,
+    title: "Washington cruzando el Delaware",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Americana"],
+    mode: "Leutze",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Leutze",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Emanuel Leutze punto por punto: los detalles, los símbolos y el mito del cruce del Delaware en la guerra de independencia de Estados Unidos.",
+    longDescription:
+      "Una página interactiva con las claves de «Washington cruzando el Delaware» (1851), pintura de historia romántica, más mito que documento.",
+    gradient: "linear-gradient(135deg, rgba(40,60,90,0.92), rgba(200,200,215,0.85))",
+    image: "assets/art-covers/leutze_washington_delaware.jpg",
+    previewUrl: "arte/leutze_washington_delaware.html",
+    playUrl: "arte/leutze_washington_delaware.html"
   }
 ];
 
@@ -446,7 +467,8 @@ const gameTranslations = {
     19: { title: "The Oath of the Horatii", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the ideal of sacrifice for the homeland that foreshadowed the Revolution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Oath of the Horatii' (1784), the manifesto work of Neoclassicism and a model for revolutionary painting." },
     20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." },
     21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." },
-    22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." }
+    22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." },
+    23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." }
   }
 };
 
