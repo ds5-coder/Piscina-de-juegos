@@ -368,6 +368,27 @@ const games = [
     image: "assets/art-covers/sanmartino_cristo_velado.jpg",
     previewUrl: "arte/sanmartino_cristo_velado.html",
     playUrl: "arte/sanmartino_cristo_velado.html"
+  },
+  {
+    id: 21,
+    title: "La coronación de Napoleón",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    movements: ["Neoclasicismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y el paso de la República al Imperio.",
+    longDescription:
+      "Una página interactiva con las claves de «La coronación de Napoleón» (1805-1807), el neoclasicismo convertido en estilo oficial del Imperio.",
+    gradient: "linear-gradient(135deg, rgba(120,30,40,0.92), rgba(212,175,55,0.85))",
+    image: "assets/art-covers/david_coronacion_napoleon.jpg",
+    previewUrl: "arte/david_coronacion_napoleon.html",
+    playUrl: "arte/david_coronacion_napoleon.html"
   }
 ];
 
@@ -402,7 +423,8 @@ const gameTranslations = {
     17: { title: "Wanderer above the Sea of Fog", description: "Explore Caspar David Friedrich's painting point by point: the figure seen from behind, the sea of fog and the Romantic idea of the sublime (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Friedrich's painting, the best-known image of German Romanticism." },
     18: { title: "Saturn Devouring His Son", description: "Explore Goya's painting point by point: the myth, the violence and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Saturn Devouring His Son', one of Goya's Black Paintings and a forerunner of Expressionism." },
     19: { title: "The Oath of the Horatii", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the ideal of sacrifice for the homeland that foreshadowed the Revolution (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Oath of the Horatii' (1784), the manifesto work of Neoclassicism and a model for revolutionary painting." },
-    20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." }
+    20: { title: "The Veiled Christ", description: "Explore Giuseppe Sanmartino's sculpture point by point: the marble veil, the recumbent body and the alchemical legend of the Sansevero Chapel (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Veiled Christ' (1753), a late Baroque work of astonishing technical virtuosity." },
+    21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." }
   }
 };
 
