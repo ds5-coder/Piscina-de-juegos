@@ -452,6 +452,27 @@ const games = [
     image: "assets/art-covers/rafael_escuela_atenas.jpg",
     previewUrl: "arte/rafael_escuela_atenas.html",
     playUrl: "arte/rafael_escuela_atenas.html"
+  },
+  {
+    id: 25,
+    title: "La muerte de Sócrates",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Filosofía", "Ilustración", "Revolución Francesa"],
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    movements: ["Neoclasicismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: los detalles, los símbolos y la muerte serena de Sócrates, héroe de la razón.",
+    longDescription:
+      "Una página interactiva con las claves de «La muerte de Sócrates» (1787), obra clave del neoclasicismo moralizante, pintada en plena Ilustración y en vísperas de la Revolución.",
+    gradient: "linear-gradient(135deg, rgba(60,70,90,0.92), rgba(170,140,100,0.85))",
+    image: "assets/art-covers/david_muerte_socrates.jpg",
+    previewUrl: "arte/david_muerte_socrates.html",
+    playUrl: "arte/david_muerte_socrates.html"
   }
 ];
 
@@ -490,7 +511,8 @@ const gameTranslations = {
     21: { title: "The Coronation of Napoleon", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the passage from Republic to Empire (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Coronation of Napoleon' (1805-1807), Neoclassicism turned into the official style of the Empire." },
     22: { title: "Napoleon in His Study at the Tuileries", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the portrait of Napoleon as lawgiver, with the Civil Code on the table (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Napoleon in His Study at the Tuileries' (1812), a Neoclassical Empire-style portrait balancing realism and idealization." },
     23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." },
-    24: { title: "The School of Athens", description: "Explore Raphael's fresco point by point: the philosophers of Antiquity, the perspective and the Renaissance ideal of harmony (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The School of Athens' (1509-1511), a landmark of the High Renaissance and a model for later classicism." }
+    24: { title: "The School of Athens", description: "Explore Raphael's fresco point by point: the philosophers of Antiquity, the perspective and the Renaissance ideal of harmony (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The School of Athens' (1509-1511), a landmark of the High Renaissance and a model for later classicism." },
+    25: { title: "The Death of Socrates", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the serene death of Socrates, hero of reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Death of Socrates' (1787), a key work of moralizing Neoclassicism, painted at the height of the Enlightenment and on the eve of the Revolution." }
   }
 };
 
