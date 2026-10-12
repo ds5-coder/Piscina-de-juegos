@@ -573,6 +573,107 @@ const games = [
     image: "assets/art-covers/dore_paraiso_perdido.jpg",
     previewUrl: "arte/dore_paraiso_perdido.html",
     playUrl: "arte/dore_paraiso_perdido.html"
+  },
+  {
+    id: 31,
+    title: "La Libertad guiando al pueblo",
+    category: "Pintura",
+    collection: "Arte",
+    alsoIn: ["Revolución Francesa"],
+    mode: "Delacroix",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Delacroix",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Eugène Delacroix punto por punto: Marianne, las barricadas y la revolución de julio de 1830.",
+    longDescription:
+      "Una página interactiva con las claves de «La Libertad guiando al pueblo» (1830), manifiesto del romanticismo y origen de Marianne.",
+    gradient: "linear-gradient(135deg, rgba(40,60,120,0.92), rgba(200,50,50,0.85))",
+    image: "assets/art-covers/delacroix_libertad.jpg",
+    previewUrl: "arte/delacroix_libertad.html",
+    playUrl: "arte/delacroix_libertad.html"
+  },
+  {
+    id: 32,
+    title: "El beso",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Hayez",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Hayez",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Francesco Hayez punto por punto: el beso, los detalles y el mensaje patriótico del Risorgimento italiano.",
+    longDescription:
+      "Una página interactiva con las claves de «El beso» (1859), icono del romanticismo y de la unificación italiana.",
+    gradient: "linear-gradient(135deg, rgba(40,70,120,0.92), rgba(190,90,80,0.85))",
+    image: "assets/art-covers/hayez_beso.jpg",
+    previewUrl: "arte/hayez_beso.html",
+    playUrl: "arte/hayez_beso.html"
+  },
+  {
+    id: 33,
+    title: "Stańczyk",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Matejko",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Matejko",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jan Matejko punto por punto: el bufón de la corte, la reflexión melancólica y la Polonia sin Estado.",
+    longDescription:
+      "Una página interactiva con las claves de «Stańczyk» (1862), pintura romántica con un mensaje nacional de reflexión melancólica.",
+    gradient: "linear-gradient(135deg, rgba(120,30,40,0.92), rgba(60,50,60,0.85))",
+    image: "assets/art-covers/matejko_stanczyk.jpg",
+    previewUrl: "arte/matejko_stanczyk.html",
+    playUrl: "arte/matejko_stanczyk.html"
+  },
+  {
+    id: 34,
+    title: "El ángel caído",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Cabanel",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Cabanel",
+    movements: ["Academicismo", "Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Alexandre Cabanel punto por punto: el ángel rebelde, el desnudo académico y el gusto romántico por Satán.",
+    longDescription:
+      "Una página interactiva con las claves de «El ángel caído» (1847), obra académica con el gusto romántico por la figura de Satán.",
+    gradient: "linear-gradient(135deg, rgba(30,40,80,0.92), rgba(200,120,60,0.85))",
+    image: "assets/art-covers/cabanel_angel_caido.jpg",
+    previewUrl: "arte/cabanel_angel_caido.html",
+    playUrl: "arte/cabanel_angel_caido.html"
+  },
+  {
+    id: 35,
+    title: "Dos viejos comiendo sopa",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Goya",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Goya punto por punto: la vejez, la muerte y el mundo de pesadilla de las Pinturas negras.",
+    longDescription:
+      "Una página interactiva con las claves de «Dos viejos comiendo sopa», una de las Pinturas negras de Goya, precursora del expresionismo.",
+    gradient: "linear-gradient(135deg, rgba(20,18,16,0.95), rgba(150,130,90,0.85))",
+    image: "assets/art-covers/goya_dos_viejos_sopa.jpg",
+    previewUrl: "arte/goya_dos_viejos_sopa.html",
+    playUrl: "arte/goya_dos_viejos_sopa.html"
   }
 ];
 
@@ -617,7 +718,12 @@ const gameTranslations = {
     27: { title: "The Clothed Maja", description: "Explore Goya's painting point by point: the reclining maja, her pairing with the Naked Maja and the mystery of its commission (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Clothed Maja' (c. 1800-1807), between late Rococo and pre-Romanticism." },
     28: { title: "Psyche Revived by Cupid's Kiss", description: "Explore Antonio Canova's sculpture point by point: the myth of Cupid and Psyche, the composition and the elegance of the marble (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Psyche Revived by Cupid's Kiss' (1787-1793), a masterpiece of Neoclassicism with pre-Romantic sensibility." },
     29: { title: "Portrait of Madame Buron", description: "Explore Jacques-Louis David's painting point by point: the portrait of his aunt, the gentle Rococo tone and the young David (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Portrait of Madame Buron' (1769), an early work by David, before his Neoclassical turn." },
-    30: { title: "Satan Descends to Earth", description: "Explore Gustave Doré's illustration for Milton's Paradise Lost point by point: the fall, the sublime and the Romantic Hell (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Doré's engraving (1866) for Paradise Lost, which defined how we imagine Hell and Satan." }
+    30: { title: "Satan Descends to Earth", description: "Explore Gustave Doré's illustration for Milton's Paradise Lost point by point: the fall, the sublime and the Romantic Hell (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Doré's engraving (1866) for Paradise Lost, which defined how we imagine Hell and Satan." },
+    31: { title: "Liberty Leading the People", description: "Explore Eugène Delacroix's painting point by point: Marianne, the barricades and the July Revolution of 1830 (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Liberty Leading the People' (1830), a manifesto of Romanticism and the origin of Marianne." },
+    32: { title: "The Kiss", description: "Explore Francesco Hayez's painting point by point: the kiss, the details and the patriotic message of the Italian Risorgimento (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (1859), an icon of Romanticism and of Italian unification." },
+    33: { title: "Stańczyk", description: "Explore Jan Matejko's painting point by point: the court jester, the melancholy reflection and a Poland without a state (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Stańczyk' (1862), a Romantic painting with a national message of melancholy reflection." },
+    34: { title: "The Fallen Angel", description: "Explore Alexandre Cabanel's painting point by point: the rebel angel, the academic nude and the Romantic taste for Satan (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Fallen Angel' (1847), an academic work with the Romantic taste for the figure of Satan." },
+    35: { title: "Two Old Men Eating Soup", description: "Explore Goya's painting point by point: old age, death and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Two Old Men Eating Soup', one of Goya's Black Paintings and a forerunner of Expressionism." }
   }
 };
 
@@ -677,7 +783,7 @@ function matchesSubfilters(game, query) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
+  const names = language === "en" ? { "Academicismo": "Academicism", "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
   return names[movement] || movement;
 }
 
