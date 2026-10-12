@@ -493,6 +493,86 @@ const games = [
     image: "assets/art-covers/beso_de_la_muerte.jpg",
     previewUrl: "arte/beso_de_la_muerte.html",
     playUrl: "arte/beso_de_la_muerte.html"
+  },
+  {
+    id: 27,
+    title: "La maja vestida",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Goya",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Goya",
+    movements: ["Rococó", "Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Goya punto por punto: la maja recostada, su pareja con la Maja desnuda y el misterio de su encargo.",
+    longDescription:
+      "Una página interactiva con las claves de «La maja vestida» (hacia 1800-1807), entre el rococó tardío y el prerromanticismo.",
+    gradient: "linear-gradient(135deg, rgba(150,90,100,0.92), rgba(220,190,120,0.85))",
+    image: "assets/art-covers/goya_maja_vestida.jpg",
+    previewUrl: "arte/goya_maja_vestida.html",
+    playUrl: "arte/goya_maja_vestida.html"
+  },
+  {
+    id: 28,
+    title: "Psique reanimada por el beso del Amor",
+    category: "Escultura",
+    collection: "Arte",
+    mode: "Canova",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Canova",
+    movements: ["Neoclasicismo", "Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la escultura de Antonio Canova punto por punto: el mito de Eros y Psique, la composición y la elegancia del mármol.",
+    longDescription:
+      "Una página interactiva con las claves de «Psique reanimada por el beso del Amor» (1787-1793), obra cumbre del neoclasicismo con sensibilidad prerromántica.",
+    gradient: "linear-gradient(135deg, rgba(200,200,205,0.9), rgba(120,130,160,0.85))",
+    image: "assets/art-covers/canova_eros_psique.jpg",
+    previewUrl: "arte/canova_eros_psique.html",
+    playUrl: "arte/canova_eros_psique.html"
+  },
+  {
+    id: 29,
+    title: "Retrato de Madame Buron",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "David",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "David",
+    movements: ["Rococó"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Jacques-Louis David punto por punto: el retrato de su tía, el tono amable del rococó y el David todavía joven.",
+    longDescription:
+      "Una página interactiva con las claves del «Retrato de Madame Buron» (1769), obra de juventud de David, anterior a su giro neoclásico.",
+    gradient: "linear-gradient(135deg, rgba(150,180,170,0.9), rgba(230,200,170,0.85))",
+    image: "assets/art-covers/david_madame_buron.jpg",
+    previewUrl: "arte/david_madame_buron.html",
+    playUrl: "arte/david_madame_buron.html"
+  },
+  {
+    id: 30,
+    title: "Satán desciende hacia la Tierra",
+    category: "Grabado",
+    collection: "Arte",
+    mode: "Doré",
+    duration: "Interactivo",
+    isArt: true,
+    subcollection: "Doré",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la ilustración de Gustave Doré para «El paraíso perdido» de Milton punto por punto: la caída, lo sublime y el Infierno romántico.",
+    longDescription:
+      "Una página interactiva con las claves del grabado de Doré (1866) para «El paraíso perdido», que definió cómo imaginamos el Infierno y a Satán.",
+    gradient: "linear-gradient(135deg, rgba(20,20,30,0.95), rgba(200,160,80,0.8))",
+    image: "assets/art-covers/dore_paraiso_perdido.jpg",
+    previewUrl: "arte/dore_paraiso_perdido.html",
+    playUrl: "arte/dore_paraiso_perdido.html"
   }
 ];
 
@@ -533,7 +613,11 @@ const gameTranslations = {
     23: { title: "Washington Crossing the Delaware", description: "Explore Emanuel Leutze's painting point by point: the details, the symbols and the myth of the Delaware crossing in the American War of Independence (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Washington Crossing the Delaware' (1851), a Romantic history painting, more myth than document." },
     24: { title: "The School of Athens", description: "Explore Raphael's fresco point by point: the philosophers of Antiquity, the perspective and the Renaissance ideal of harmony (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The School of Athens' (1509-1511), a landmark of the High Renaissance and a model for later classicism." },
     25: { title: "The Death of Socrates", description: "Explore Jacques-Louis David's painting point by point: the details, the symbols and the serene death of Socrates, hero of reason (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Death of Socrates' (1787), a key work of moralizing Neoclassicism, painted at the height of the Enlightenment and on the eve of the Revolution." },
-    26: { title: "The Kiss of Death", description: "Explore the funerary sculpture in Poblenou Cemetery point by point: love, death and their symbolism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss of Death' (1930), attributed to Jaume Barba, one of the best-known funerary sculptures in Europe." }
+    26: { title: "The Kiss of Death", description: "Explore the funerary sculpture in Poblenou Cemetery point by point: love, death and their symbolism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss of Death' (1930), attributed to Jaume Barba, one of the best-known funerary sculptures in Europe." },
+    27: { title: "The Clothed Maja", description: "Explore Goya's painting point by point: the reclining maja, her pairing with the Naked Maja and the mystery of its commission (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Clothed Maja' (c. 1800-1807), between late Rococo and pre-Romanticism." },
+    28: { title: "Psyche Revived by Cupid's Kiss", description: "Explore Antonio Canova's sculpture point by point: the myth of Cupid and Psyche, the composition and the elegance of the marble (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Psyche Revived by Cupid's Kiss' (1787-1793), a masterpiece of Neoclassicism with pre-Romantic sensibility." },
+    29: { title: "Portrait of Madame Buron", description: "Explore Jacques-Louis David's painting point by point: the portrait of his aunt, the gentle Rococo tone and the young David (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Portrait of Madame Buron' (1769), an early work by David, before his Neoclassical turn." },
+    30: { title: "Satan Descends to Earth", description: "Explore Gustave Doré's illustration for Milton's Paradise Lost point by point: the fall, the sublime and the Romantic Hell (the page itself is in Spanish).", longDescription: "An interactive page with the keys to Doré's engraving (1866) for Paradise Lost, which defined how we imagine Hell and Satan." }
   }
 };
 
@@ -593,7 +677,7 @@ function matchesSubfilters(game, query) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
+  const names = language === "en" ? { "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
   return names[movement] || movement;
 }
 
