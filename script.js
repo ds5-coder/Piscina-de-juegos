@@ -152,6 +152,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "Goya",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -172,6 +173,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "Goya",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -192,6 +194,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración"],
     subcollection: "Goya",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -213,6 +216,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "David",
     movements: ["Neoclasicismo", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -234,6 +238,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Revolución Francesa"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -255,6 +260,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Revolución Francesa"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -276,6 +282,7 @@ const games = [
     mode: "Houël",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Revolución Francesa"],
     subcollection: "Houël",
     movements: ["Neoclasicismo", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -296,6 +303,7 @@ const games = [
     mode: "Friedrich",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Restauración y liberalismo"],
     subcollection: "Friedrich",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -316,6 +324,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Restauración y liberalismo"],
     subcollection: "Goya",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -337,6 +346,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración", "Revolución Francesa"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -357,6 +367,7 @@ const games = [
     mode: "Sanmartino",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración"],
     subcollection: "Sanmartino",
     movements: ["Barroco"],
     actionLabel: { es: "Ver", en: "View" },
@@ -378,6 +389,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -399,6 +411,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -420,6 +433,7 @@ const games = [
     mode: "Leutze",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Revolución Americana"],
     subcollection: "Leutze",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -441,6 +455,7 @@ const games = [
     mode: "Rafael",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Renacimiento"],
     subcollection: "Rafael",
     movements: ["Renacimiento"],
     actionLabel: { es: "Ver", en: "View" },
@@ -462,6 +477,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración", "Revolución Francesa"],
     subcollection: "David",
     movements: ["Neoclasicismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -482,6 +498,7 @@ const games = [
     mode: "Jaume Barba (atribuida)",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Siglo XX"],
     subcollection: "Barba",
     movements: ["Modernismo", "Simbolismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -502,6 +519,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Era napoleónica"],
     subcollection: "Goya",
     movements: ["Rococó", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -522,6 +540,7 @@ const games = [
     mode: "Canova",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración"],
     subcollection: "Canova",
     movements: ["Neoclasicismo", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -542,6 +561,7 @@ const games = [
     mode: "David",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Ilustración"],
     subcollection: "David",
     movements: ["Rococó"],
     actionLabel: { es: "Ver", en: "View" },
@@ -562,6 +582,7 @@ const games = [
     mode: "Doré",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Segunda mitad del siglo XIX"],
     subcollection: "Doré",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -583,6 +604,7 @@ const games = [
     mode: "Delacroix",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Restauración y liberalismo"],
     subcollection: "Delacroix",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -603,6 +625,7 @@ const games = [
     mode: "Hayez",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Segunda mitad del siglo XIX"],
     subcollection: "Hayez",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -623,6 +646,7 @@ const games = [
     mode: "Matejko",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Segunda mitad del siglo XIX"],
     subcollection: "Matejko",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -643,6 +667,7 @@ const games = [
     mode: "Cabanel",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Restauración y liberalismo"],
     subcollection: "Cabanel",
     movements: ["Academicismo", "Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -663,6 +688,7 @@ const games = [
     mode: "Goya",
     duration: "Interactivo",
     isArt: true,
+    eras: ["Restauración y liberalismo"],
     subcollection: "Goya",
     movements: ["Romanticismo"],
     actionLabel: { es: "Ver", en: "View" },
@@ -780,11 +806,28 @@ function renderFeaturedGame() {
 // Segundo nivel de Arte: autor y/o movimiento (si no hay ninguno elegido, solo cuenta la búsqueda).
 function matchesSubfilters(game, query) {
   if (!hasSubfilter()) return true;
-  if (!state.subcategory && !state.movement && !state.era) return Boolean(query);
-  const authorOk = !state.subcategory || state.subcategory === "Todos" || game.subcollection === state.subcategory;
-  const movementOk = !state.movement || state.movement === "Todos" || (game.movements || []).includes(state.movement);
-  const eraOk = !state.era || state.era === "Todos" || game.collections.includes(state.era);
+  // Sin momento histórico elegido no sale nada (salvo que se busque algo); autor y movimiento afinan después.
+  if (!state.era) return Boolean(query);
+  const authorOk = !state.subcategory || game.subcollection === state.subcategory;
+  const movementOk = !state.movement || (game.movements || []).includes(state.movement);
+  const eraOk = state.era === "Todos" || (game.eras || []).includes(state.era);
   return authorOk && movementOk && eraOk;
+}
+
+// Momentos históricos de las obras de arte, en orden cronológico.
+const ERAS = ["Renacimiento", "Ilustración", "Revolución Americana", "Revolución Francesa", "Era napoleónica", "Restauración y liberalismo", "Segunda mitad del siglo XIX", "Siglo XX"];
+function eraName(era) {
+  const names = language === "en" ? {
+    "Renacimiento": "Renaissance",
+    "Ilustración": "Enlightenment",
+    "Revolución Americana": "American Revolution",
+    "Revolución Francesa": "French Revolution",
+    "Era napoleónica": "Napoleonic Era",
+    "Restauración y liberalismo": "Restoration and Liberalism",
+    "Segunda mitad del siglo XIX": "Second Half of the 19th Century",
+    "Siglo XX": "20th Century"
+  } : {};
+  return names[era] || era;
 }
 
 function movementName(movement) {
@@ -916,12 +959,12 @@ function renderGames() {
     return;
   }
 
-  if (hasSubfilter() && !state.subcategory && !state.movement && !state.era && !state.query.trim()) {
+  if (hasSubfilter() && !state.era && !state.query.trim()) {
     resultsCount.textContent = "";
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>${language === "en" ? "Choose an artist, a movement or a historical period" : "Elige un autor, un movimiento o un momento histórico"}</h3>
-        <p>${language === "en" ? "Pick an artist, an art movement or a historical period (or “All”) in the menus above to see the works." : "Elige un autor, un movimiento artístico o un momento histórico (o “Todos”) en los desplegables de arriba para ver las obras."}</p>
+        <h3>${language === "en" ? "Choose a historical period" : "Elige un momento histórico"}</h3>
+        <p>${language === "en" ? "Pick a historical period (or “All periods”) in the first menu; then you can narrow down by artist or movement." : "Elige un momento histórico (o “Todos los momentos”) en el primer desplegable; después puedes afinar por autor o movimiento."}</p>
       </div>
     `;
     return;
@@ -987,13 +1030,9 @@ function buildSubFilterSelect() {
   movementSelect.hidden = !hasSubfilter();
   eraSelect.hidden = !hasSubfilter();
   if (!hasSubfilter()) return;
-  // Momento histórico: las colecciones (épocas) a las que pertenecen las obras de arte.
-  const eras = [...new Set(games
-    .filter((game) => game.isArt)
-    .flatMap((game) => game.collections))]
-    .filter((collection) => collection !== "Arte")
-    .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
-    .sort((first, second) => first.label.localeCompare(second.label, language));
+  // Momento histórico (obligatorio para ver obras): los momentos de ERAS en los que hay alguna obra, en orden cronológico.
+  const usedEras = new Set(games.filter((game) => game.isArt).flatMap((game) => game.eras || []));
+  const eras = ERAS.filter((era) => usedEras.has(era)).map((era) => ({ value: era, label: eraName(era) }));
   const eraPlaceholder = { value: "", label: language === "en" ? "Choose a historical period…" : "Elige un momento histórico…" };
   const allEras = { value: "Todos", label: language === "en" ? "All periods" : "Todos los momentos" };
   eraSelect.innerHTML = [eraPlaceholder, allEras, ...eras]
@@ -1004,9 +1043,8 @@ function buildSubFilterSelect() {
     .filter((game) => game.collections.includes(state.category) && game.movements)
     .flatMap((game) => game.movements))]
     .sort((first, second) => movementName(first).localeCompare(movementName(second), language));
-  const movementPlaceholder = { value: "", label: language === "en" ? "Choose a movement…" : "Elige un movimiento…" };
-  const allMovements = { value: "Todos", label: language === "en" ? "All movements" : "Todos los movimientos" };
-  movementSelect.innerHTML = [movementPlaceholder, allMovements, ...movements.map((movement) => ({ value: movement, label: movementName(movement) }))]
+  const movementPlaceholder = { value: "", label: language === "en" ? "All movements" : "Todos los movimientos" };
+  movementSelect.innerHTML = [movementPlaceholder, ...movements.map((movement) => ({ value: movement, label: movementName(movement) }))]
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
   movementSelect.value = state.movement;
@@ -1014,9 +1052,8 @@ function buildSubFilterSelect() {
     .filter((game) => game.collections.includes(state.category) && game.subcollection)
     .map((game) => game.subcollection))]
     .sort((first, second) => first.localeCompare(second, language));
-  const placeholder = { value: "", label: language === "en" ? "Choose an artist…" : "Elige un autor…" };
-  const all = { value: "Todos", label: language === "en" ? "All artists" : "Todos los autores" };
-  subFilterSelect.innerHTML = [placeholder, all, ...authors.map((author) => ({ value: author, label: author }))]
+  const placeholder = { value: "", label: language === "en" ? "All artists" : "Todos los autores" };
+  subFilterSelect.innerHTML = [placeholder, ...authors.map((author) => ({ value: author, label: author }))]
     .map((option) => `<option value="${option.value}">${option.label}</option>`)
     .join("");
   subFilterSelect.value = state.subcategory;
@@ -1307,8 +1344,11 @@ if (linkedCollection && games.some((game) => game.collections.includes(linkedCol
     state.movement = linkedMovement;
   }
   const linkedEra = linkParams.get("epoca");
-  if (hasSubfilter() && games.some((game) => game.isArt && game.collections.includes(linkedEra))) {
+  if (hasSubfilter() && games.some((game) => game.isArt && (game.eras || []).includes(linkedEra))) {
     state.era = linkedEra;
+  } else if (hasSubfilter() && (state.subcategory || state.movement)) {
+    // Enlace con autor o movimiento pero sin momento histórico: se muestran todos los momentos.
+    state.era = "Todos";
   }
 }
 
