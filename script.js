@@ -736,6 +736,7 @@ const state = {
   category: "",
   subcategory: "",
   movement: "",
+  era: "",
   query: "",
   selectedGame: null
 };
@@ -752,6 +753,7 @@ const typeSelect = document.getElementById("typeSelect");
 const filterSelect = document.getElementById("filterSelect");
 const subFilterSelect = document.getElementById("subFilterSelect");
 const movementSelect = document.getElementById("movementSelect");
+const eraSelect = document.getElementById("eraSelect");
 const resultsCount = document.getElementById("resultsCount");
 const featuredTitle = document.getElementById("featuredTitle");
 const featuredCategory = document.getElementById("featuredCategory");
@@ -778,10 +780,11 @@ function renderFeaturedGame() {
 // Segundo nivel de Arte: autor y/o movimiento (si no hay ninguno elegido, solo cuenta la búsqueda).
 function matchesSubfilters(game, query) {
   if (!hasSubfilter()) return true;
-  if (!state.subcategory && !state.movement) return Boolean(query);
+  if (!state.subcategory && !state.movement && !state.era) return Boolean(query);
   const authorOk = !state.subcategory || state.subcategory === "Todos" || game.subcollection === state.subcategory;
   const movementOk = !state.movement || state.movement === "Todos" || (game.movements || []).includes(state.movement);
-  return authorOk && movementOk;
+  const eraOk = !state.era || state.era === "Todos" || game.collections.includes(state.era);
+  return authorOk && movementOk && eraOk;
 }
 
 function movementName(movement) {
@@ -875,7 +878,9 @@ function renderGames() {
   // "cuadros" si todo es pintura, "obras" si hay otras artes (escultura), "juegos" si no hay arte, "elementos" si se mezclan.
   const artCount = visibleGames.filter((game) => game.isArt).length;
   const allPaintings = visibleGames.every((game) => game.isArt && game.category !== "Escultura");
-  const itemWords = artCount === visibleGames.length && artCount > 0
+  const itemWords = visibleGames.length === 0 && hasSubfilter()
+    ? (language === "en" ? ["work", "works"] : ["obra", "obras"])
+    : artCount === visibleGames.length && artCount > 0
     ? (allPaintings
       ? (language === "en" ? ["painting", "paintings"] : ["cuadro", "cuadros"])
       : (language === "en" ? ["work", "works"] : ["obra", "obras"]))
@@ -911,12 +916,12 @@ function renderGames() {
     return;
   }
 
-  if (hasSubfilter() && !state.subcategory && !state.movement && !state.query.trim()) {
+  if (hasSubfilter() && !state.subcategory && !state.movement && !state.era && !state.query.trim()) {
     resultsCount.textContent = "";
     gamesGrid.innerHTML = `
       <div class="empty-state">
-        <h3>${language === "en" ? "Choose an artist or a movement" : "Elige un autor o un movimiento"}</h3>
-        <p>${language === "en" ? "Pick an artist or an art movement (or “All”) in the menus above to see the works." : "Elige un autor o un movimiento artístico (o “Todos”) en los desplegables de arriba para ver las obras."}</p>
+        <h3>${language === "en" ? "Choose an artist, a movement or a historical period" : "Elige un autor, un movimiento o un momento histórico"}</h3>
+        <p>${language === "en" ? "Pick an artist, an art movement or a historical period (or “All”) in the menus above to see the works." : "Elige un autor, un movimiento artístico o un momento histórico (o “Todos”) en los desplegables de arriba para ver las obras."}</p>
       </div>
     `;
     return;
@@ -980,7 +985,21 @@ function buildFilterSelect() {
 function buildSubFilterSelect() {
   subFilterSelect.hidden = !hasSubfilter();
   movementSelect.hidden = !hasSubfilter();
+  eraSelect.hidden = !hasSubfilter();
   if (!hasSubfilter()) return;
+  // Momento histórico: las colecciones (épocas) a las que pertenecen las obras de arte.
+  const eras = [...new Set(games
+    .filter((game) => game.isArt)
+    .flatMap((game) => game.collections))]
+    .filter((collection) => collection !== "Arte")
+    .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
+    .sort((first, second) => first.label.localeCompare(second.label, language));
+  const eraPlaceholder = { value: "", label: language === "en" ? "Choose a historical period…" : "Elige un momento histórico…" };
+  const allEras = { value: "Todos", label: language === "en" ? "All periods" : "Todos los momentos" };
+  eraSelect.innerHTML = [eraPlaceholder, allEras, ...eras]
+    .map((option) => `<option value="${option.value}">${option.label}</option>`)
+    .join("");
+  eraSelect.value = state.era;
   const movements = [...new Set(games
     .filter((game) => game.collections.includes(state.category) && game.movements)
     .flatMap((game) => game.movements))]
@@ -1008,6 +1027,7 @@ typeSelect.addEventListener("change", () => {
   state.category = state.type === "Arte" ? "Arte" : "";
   state.subcategory = "";
   state.movement = "";
+  state.era = "";
   buildFilterSelect();
   renderGames();
 });
@@ -1016,6 +1036,7 @@ filterSelect.addEventListener("change", () => {
   state.category = filterSelect.value;
   state.subcategory = "";
   state.movement = "";
+  state.era = "";
   buildSubFilterSelect();
   renderGames();
 });
@@ -1030,6 +1051,11 @@ movementSelect.addEventListener("change", () => {
   renderGames();
 });
 
+eraSelect.addEventListener("change", () => {
+  state.era = eraSelect.value;
+  renderGames();
+});
+
 // Enlaces del menú que activan un filtro del catálogo (p. ej. "Arte").
 document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
   link.addEventListener("click", () => {
@@ -1037,6 +1063,7 @@ document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
     state.type = state.category === "Arte" ? "Arte" : "Todo";
     state.subcategory = "";
     state.movement = "";
+    state.era = "";
     buildFilterSelect();
     renderGames();
   });
@@ -1278,6 +1305,10 @@ if (linkedCollection && games.some((game) => game.collections.includes(linkedCol
   const linkedMovement = linkParams.get("movimiento");
   if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && (game.movements || []).includes(linkedMovement))) {
     state.movement = linkedMovement;
+  }
+  const linkedEra = linkParams.get("epoca");
+  if (hasSubfilter() && games.some((game) => game.isArt && game.collections.includes(linkedEra))) {
+    state.era = linkedEra;
   }
 }
 
