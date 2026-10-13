@@ -700,6 +700,48 @@ const games = [
     image: "assets/art-covers/goya_dos_viejos_sopa.jpg",
     previewUrl: "arte/goya_dos_viejos_sopa.html",
     playUrl: "arte/goya_dos_viejos_sopa.html"
+  },
+  {
+    id: 36,
+    title: "La muerte como invitado no deseado",
+    category: "Acuarela",
+    collection: "Arte",
+    mode: "Menzel",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Restauración y liberalismo"],
+    subcollection: "Menzel",
+    movements: ["Romanticismo", "Realismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la diminuta acuarela de Adolph Menzel punto por punto: la muerte como invitado, el juego de palabras del «Plusquamperfectum» y el interior realista.",
+    longDescription:
+      "Una página interactiva con las claves de «Plusquamperfectum» (1844), una obra pequeña entre el romanticismo tardío y el realismo.",
+    gradient: "linear-gradient(135deg, rgba(60,50,40,0.95), rgba(170,140,100,0.85))",
+    image: "assets/art-covers/menzel_plusquamperfectum.jpg",
+    previewUrl: "arte/menzel_plusquamperfectum.html",
+    playUrl: "arte/menzel_plusquamperfectum.html"
+  },
+  {
+    id: 37,
+    title: "El desesperado",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Courbet",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Restauración y liberalismo"],
+    subcollection: "Courbet",
+    movements: ["Romanticismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el autorretrato de Gustave Courbet punto por punto: la mirada desbordada, el artista romántico atormentado y los inicios del futuro maestro del realismo.",
+    longDescription:
+      "Una página interactiva con las claves de «El desesperado» (hacia 1843-1845), autorretrato romántico de juventud de Courbet.",
+    gradient: "linear-gradient(135deg, rgba(40,30,25,0.95), rgba(170,110,60,0.85))",
+    image: "assets/art-covers/courbet_desesperado.jpg",
+    previewUrl: "arte/courbet_desesperado.html",
+    playUrl: "arte/courbet_desesperado.html"
   }
 ];
 
@@ -749,7 +791,9 @@ const gameTranslations = {
     32: { title: "The Kiss", description: "Explore Francesco Hayez's painting point by point: the kiss, the details and the patriotic message of the Italian Risorgimento (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (1859), an icon of Romanticism and of Italian unification." },
     33: { title: "Stańczyk", description: "Explore Jan Matejko's painting point by point: the court jester, the melancholy reflection and a Poland without a state (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Stańczyk' (1862), a Romantic painting with a national message of melancholy reflection." },
     34: { title: "The Fallen Angel", description: "Explore Alexandre Cabanel's painting point by point: the rebel angel, the academic nude and the Romantic taste for Satan (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Fallen Angel' (1847), an academic work with the Romantic taste for the figure of Satan." },
-    35: { title: "Two Old Men Eating Soup", description: "Explore Goya's painting point by point: old age, death and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Two Old Men Eating Soup', one of Goya's Black Paintings and a forerunner of Expressionism." }
+    35: { title: "Two Old Men Eating Soup", description: "Explore Goya's painting point by point: old age, death and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Two Old Men Eating Soup', one of Goya's Black Paintings and a forerunner of Expressionism." },
+    36: { title: "Death as an Unwelcome Guest", description: "Explore Adolph Menzel's tiny watercolour point by point: death as a guest, the 'Plusquamperfectum' wordplay and the realist interior (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Plusquamperfectum' (1844), a small work between late Romanticism and Realism." },
+    37: { title: "The Desperate Man", description: "Explore Gustave Courbet's self-portrait point by point: the overwhelmed gaze, the tormented Romantic artist and the beginnings of the future master of Realism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Desperate Man' (c. 1843-1845), a youthful Romantic self-portrait by Courbet." }
   }
 };
 
@@ -831,7 +875,7 @@ function eraName(era) {
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Academicismo": "Academicism", "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
+  const names = language === "en" ? { "Academicismo": "Academicism", "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Realismo": "Realism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
   return names[movement] || movement;
 }
 
