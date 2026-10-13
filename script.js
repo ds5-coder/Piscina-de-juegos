@@ -732,6 +732,7 @@ function gameText(game, field) {
 }
 
 const state = {
+  type: "",
   category: "",
   subcategory: "",
   movement: "",
@@ -747,6 +748,7 @@ function hasSubfilter() {
 
 const gamesGrid = document.getElementById("gamesGrid");
 const searchInput = document.getElementById("searchInput");
+const typeSelect = document.getElementById("typeSelect");
 const filterSelect = document.getElementById("filterSelect");
 const subFilterSelect = document.getElementById("subFilterSelect");
 const movementSelect = document.getElementById("movementSelect");
@@ -790,10 +792,11 @@ function movementName(movement) {
 function getVisibleGames() {
   const query = state.query.trim().toLowerCase();
   return games.filter((game) => {
-    // Sin colección elegida (y sin búsqueda) no se muestra nada.
-    const matchesCategory = !state.category
+    // Sin tipo/colección elegidos (y sin búsqueda) no se muestra nada.
+    const typeOk = !state.type || state.type === "Todo" || (state.type === "Arte") === Boolean(game.isArt);
+    const matchesCategory = !state.type || !state.category
       ? Boolean(query)
-      : (state.category === "Todos" || game.collections.includes(state.category)) &&
+      : typeOk && (state.category === "Todos" || game.collections.includes(state.category)) &&
         matchesSubfilters(game, query);
     const matchesSearch =
       !query ||
@@ -886,6 +889,17 @@ function renderGames() {
   statsGames.textContent = String(games.filter((game) => !game.isArt).length);
   statsCategories.textContent = String(new Set(games.map((game) => game.collection)).size);
 
+  if (!state.type && !state.query.trim()) {
+    resultsCount.textContent = "";
+    gamesGrid.innerHTML = `
+      <div class="empty-state">
+        <h3>${language === "en" ? "Choose Art or Games" : "Elige Arte o Juegos"}</h3>
+        <p>${language === "en" ? "Pick Art or Games (or Everything) in the first menu above." : "Elige Arte o Juegos (o Todo) en el primer desplegable de arriba."}</p>
+      </div>
+    `;
+    return;
+  }
+
   if (!state.category && !state.query.trim()) {
     resultsCount.textContent = "";
     gamesGrid.innerHTML = `
@@ -937,7 +951,21 @@ searchInput.addEventListener("input", (event) => {
 
 // Desplegable de colecciones en orden alfabético (según el idioma activo).
 function buildFilterSelect() {
-  const collections = [...new Set(games.flatMap((game) => game.collections))]
+  // Primer nivel: Arte o Juegos (o Todo).
+  const typeOptions = [
+    { value: "", label: language === "en" ? "Choose: art or games…" : "Elige: arte o juegos…" },
+    { value: "Arte", label: language === "en" ? "Art" : "Arte" },
+    { value: "Juegos", label: language === "en" ? "Games" : "Juegos" },
+    { value: "Todo", label: language === "en" ? "Everything" : "Todo" }
+  ];
+  typeSelect.innerHTML = typeOptions.map((option) => `<option value="${option.value}">${option.label}</option>`).join("");
+  typeSelect.value = state.type;
+
+  // Segundo nivel (Juegos / Todo): colecciones. En Arte se usan autor y movimiento.
+  filterSelect.hidden = state.type !== "Juegos" && state.type !== "Todo";
+  const source = state.type === "Juegos" ? games.filter((game) => !game.isArt) : games;
+  const collections = [...new Set(source.flatMap((game) => game.collections))]
+    .filter((collection) => collection !== "Arte")
     .map((collection) => ({ value: collection, label: collectionNames()[collection] || collection }))
     .sort((first, second) => first.label.localeCompare(second.label, language));
   const placeholder = { value: "", label: language === "en" ? "Choose a collection…" : "Elige una colección…" };
@@ -975,6 +1003,15 @@ function buildSubFilterSelect() {
   subFilterSelect.value = state.subcategory;
 }
 
+typeSelect.addEventListener("change", () => {
+  state.type = typeSelect.value;
+  state.category = state.type === "Arte" ? "Arte" : "";
+  state.subcategory = "";
+  state.movement = "";
+  buildFilterSelect();
+  renderGames();
+});
+
 filterSelect.addEventListener("change", () => {
   state.category = filterSelect.value;
   state.subcategory = "";
@@ -997,10 +1034,10 @@ movementSelect.addEventListener("change", () => {
 document.querySelectorAll("a[data-filter-collection]").forEach((link) => {
   link.addEventListener("click", () => {
     state.category = link.dataset.filterCollection;
+    state.type = state.category === "Arte" ? "Arte" : "Todo";
     state.subcategory = "";
     state.movement = "";
-    filterSelect.value = state.category;
-    buildSubFilterSelect();
+    buildFilterSelect();
     renderGames();
   });
 });
@@ -1233,6 +1270,7 @@ const linkParams = new URLSearchParams(window.location.search);
 const linkedCollection = linkParams.get("coleccion");
 if (linkedCollection && games.some((game) => game.collections.includes(linkedCollection))) {
   state.category = linkedCollection;
+  state.type = linkedCollection === "Arte" ? "Arte" : "Todo";
   const linkedAuthor = linkParams.get("autor");
   if (hasSubfilter() && games.some((game) => game.collections.includes(linkedCollection) && game.subcollection === linkedAuthor)) {
     state.subcategory = linkedAuthor;
