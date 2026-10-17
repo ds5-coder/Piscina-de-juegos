@@ -742,6 +742,174 @@ const games = [
     image: "assets/art-covers/courbet_desesperado.jpg",
     previewUrl: "arte/courbet_desesperado.html",
     playUrl: "arte/courbet_desesperado.html"
+  },
+  {
+    id: 38,
+    title: "Los comedores de patatas",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Van Gogh",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Van Gogh",
+    movements: ["Realismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Vincent van Gogh punto por punto: la vida campesina, la paleta oscura de Nuenen y el realismo social.",
+    longDescription:
+      "Una página interactiva con las claves de «Los comedores de patatas» (1885), el gran cuadro de la etapa oscura de Van Gogh.",
+    gradient: "linear-gradient(135deg, rgba(50,40,30,0.95), rgba(140,110,70,0.85))",
+    image: "assets/art-covers/vangogh_comedores_patatas.jpg",
+    previewUrl: "arte/vangogh_comedores_patatas.html",
+    playUrl: "arte/vangogh_comedores_patatas.html"
+  },
+  {
+    id: 39,
+    title: "Autorretrato (1887)",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Van Gogh",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Van Gogh",
+    movements: ["Postimpresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el autorretrato de Vincent van Gogh punto por punto: la pincelada, el color y la mirada del artista en París.",
+    longDescription:
+      "Una página interactiva con las claves del «Autorretrato» de 1887, pintado por Van Gogh en París bajo la influencia de las novedades del momento.",
+    gradient: "linear-gradient(135deg, rgba(30,70,110,0.92), rgba(220,160,50,0.85))",
+    image: "assets/art-covers/vangogh_autorretrato_1887.jpg",
+    previewUrl: "arte/vangogh_autorretrato_1887.html",
+    playUrl: "arte/vangogh_autorretrato_1887.html"
+  },
+  {
+    id: 40,
+    title: "Los girasoles",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Van Gogh",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Van Gogh",
+    movements: ["Postimpresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el bodegón de Vincent van Gogh punto por punto: los quince girasoles, el amarillo y la luz de Arlés.",
+    longDescription:
+      "Una página interactiva con las claves de «Los girasoles» (agosto de 1888), uno de los bodegones más famosos de la historia del arte.",
+    gradient: "linear-gradient(135deg, rgba(220,170,30,0.92), rgba(120,90,30,0.85))",
+    image: "assets/art-covers/vangogh_girasoles.jpg",
+    previewUrl: "arte/vangogh_girasoles.html",
+    playUrl: "arte/vangogh_girasoles.html"
+  },
+  {
+    id: 41,
+    title: "La noche estrellada",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Van Gogh",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Van Gogh",
+    movements: ["Postimpresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Vincent van Gogh punto por punto: el cielo en remolino, el pueblo dormido y la emoción hecha pintura.",
+    longDescription:
+      "Una página interactiva con las claves de «La noche estrellada» (junio de 1889), obra postimpresionista y precursora del expresionismo.",
+    gradient: "linear-gradient(135deg, rgba(20,40,100,0.95), rgba(240,200,60,0.85))",
+    image: "assets/art-covers/vangogh_noche_estrellada.jpg",
+    previewUrl: "arte/vangogh_noche_estrellada.html",
+    playUrl: "arte/vangogh_noche_estrellada.html"
+  },
+  {
+    id: 42,
+    title: "En el umbral de la eternidad",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Van Gogh",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Van Gogh",
+    movements: ["Postimpresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Vincent van Gogh punto por punto: el anciano afligido, el dolor y la desesperación en sus últimos meses.",
+    longDescription:
+      "Una página interactiva con las claves de «En el umbral de la eternidad» (1890), también llamado «Anciano afligido», obra postimpresionista y precursora del expresionismo.",
+    gradient: "linear-gradient(135deg, rgba(40,50,90,0.95), rgba(150,120,80,0.85))",
+    image: "assets/art-covers/vangogh_umbral_eternidad.jpg",
+    previewUrl: "arte/vangogh_umbral_eternidad.html",
+    playUrl: "arte/vangogh_umbral_eternidad.html"
+  },
+  {
+    id: 43,
+    title: "Pirámide de calaveras",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Cézanne",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Cézanne",
+    movements: ["Postimpresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el bodegón de Paul Cézanne punto por punto: las calaveras, la construcción con el color y la meditación sobre la muerte.",
+    longDescription:
+      "Una página interactiva con las claves de la «Pirámide de calaveras» (hacia 1901), una vanitas postimpresionista de Cézanne.",
+    gradient: "linear-gradient(135deg, rgba(60,70,60,0.95), rgba(190,170,120,0.85))",
+    image: "assets/art-covers/cezanne_piramide_calaveras.jpg",
+    previewUrl: "arte/cezanne_piramide_calaveras.html",
+    playUrl: "arte/cezanne_piramide_calaveras.html"
+  },
+  {
+    id: 44,
+    title: "El beso (Rodin)",
+    category: "Escultura",
+    collection: "Arte",
+    mode: "Rodin",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Rodin",
+    movements: ["Realismo", "Simbolismo", "Impresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora la escultura de Auguste Rodin punto por punto: Paolo y Francesca, el contraste de texturas y el mármol como piel.",
+    longDescription:
+      "Una página interactiva con las claves de «El beso» (concebido en 1882, en mármol 1888-1898), entre el realismo, el simbolismo y el impresionismo escultórico.",
+    gradient: "linear-gradient(135deg, rgba(200,195,185,0.92), rgba(110,100,95,0.85))",
+    image: "assets/art-covers/rodin_el_beso.jpg",
+    previewUrl: "arte/rodin_el_beso.html",
+    playUrl: "arte/rodin_el_beso.html"
+  },
+  {
+    id: 45,
+    title: "Paseo a orillas del mar",
+    category: "Pintura",
+    collection: "Arte",
+    mode: "Sorolla",
+    duration: "Interactivo",
+    isArt: true,
+    eras: ["Fin de siglo y Belle Époque"],
+    subcollection: "Sorolla",
+    movements: ["Luminismo", "Impresionismo"],
+    actionLabel: { es: "Ver", en: "View" },
+    description:
+      "Explora el cuadro de Joaquín Sorolla punto por punto: la luz del Mediterráneo, los vestidos blancos y la pincelada suelta.",
+    longDescription:
+      "Una página interactiva con las claves de «Paseo a orillas del mar» (1909), obra del luminismo con influencia del impresionismo.",
+    gradient: "linear-gradient(135deg, rgba(230,220,200,0.92), rgba(80,150,190,0.85))",
+    image: "assets/art-covers/sorolla_paseo_mar.jpg",
+    previewUrl: "arte/sorolla_paseo_mar.html",
+    playUrl: "arte/sorolla_paseo_mar.html"
   }
 ];
 
@@ -793,7 +961,15 @@ const gameTranslations = {
     34: { title: "The Fallen Angel", description: "Explore Alexandre Cabanel's painting point by point: the rebel angel, the academic nude and the Romantic taste for Satan (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Fallen Angel' (1847), an academic work with the Romantic taste for the figure of Satan." },
     35: { title: "Two Old Men Eating Soup", description: "Explore Goya's painting point by point: old age, death and the nightmarish world of the Black Paintings (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Two Old Men Eating Soup', one of Goya's Black Paintings and a forerunner of Expressionism." },
     36: { title: "Death as an Unwelcome Guest", description: "Explore Adolph Menzel's tiny watercolour point by point: death as a guest, the 'Plusquamperfectum' wordplay and the realist interior (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Plusquamperfectum' (1844), a small work between late Romanticism and Realism." },
-    37: { title: "The Desperate Man", description: "Explore Gustave Courbet's self-portrait point by point: the overwhelmed gaze, the tormented Romantic artist and the beginnings of the future master of Realism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Desperate Man' (c. 1843-1845), a youthful Romantic self-portrait by Courbet." }
+    37: { title: "The Desperate Man", description: "Explore Gustave Courbet's self-portrait point by point: the overwhelmed gaze, the tormented Romantic artist and the beginnings of the future master of Realism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Desperate Man' (c. 1843-1845), a youthful Romantic self-portrait by Courbet." },
+    38: { title: "The Potato Eaters", description: "Explore Vincent van Gogh's painting point by point: peasant life, the dark palette of Nuenen and social realism (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Potato Eaters' (1885), the great painting of Van Gogh's dark period." },
+    39: { title: "Self-Portrait (1887)", description: "Explore Vincent van Gogh's self-portrait point by point: the brushwork, the colour and the artist's gaze in Paris (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 1887 'Self-Portrait', painted by Van Gogh in Paris under the influence of the novelties of the moment." },
+    40: { title: "Sunflowers", description: "Explore Vincent van Gogh's still life point by point: the fifteen sunflowers, the yellow and the light of Arles (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Sunflowers' (August 1888), one of the most famous still lifes in the history of art." },
+    41: { title: "The Starry Night", description: "Explore Vincent van Gogh's painting point by point: the swirling sky, the sleeping village and emotion turned into paint (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Starry Night' (June 1889), a Post-Impressionist work and forerunner of Expressionism." },
+    42: { title: "At Eternity's Gate", description: "Explore Vincent van Gogh's painting point by point: the grieving old man, pain and despair in his last months (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'At Eternity's Gate' (1890), also called 'Sorrowing Old Man', a Post-Impressionist work and forerunner of Expressionism." },
+    43: { title: "Pyramid of Skulls", description: "Explore Paul Cézanne's still life point by point: the skulls, the construction with colour and the meditation on death (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Pyramid of Skulls' (c. 1901), a Post-Impressionist vanitas by Cézanne." },
+    44: { title: "The Kiss (Rodin)", description: "Explore Auguste Rodin's sculpture point by point: Paolo and Francesca, the contrast of textures and marble as skin (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (conceived in 1882, in marble 1888-1898), between Realism, Symbolism and sculptural Impressionism." },
+    45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." }
   }
 };
 
@@ -859,7 +1035,7 @@ function matchesSubfilters(game, query) {
 }
 
 // Momentos históricos de las obras de arte, en orden cronológico.
-const ERAS = ["Renacimiento", "Ilustración", "Revolución Americana", "Revolución Francesa", "Era napoleónica", "Restauración y liberalismo", "Segunda mitad del siglo XIX", "Siglo XX"];
+const ERAS = ["Renacimiento", "Ilustración", "Revolución Americana", "Revolución Francesa", "Era napoleónica", "Restauración y liberalismo", "Segunda mitad del siglo XIX", "Fin de siglo y Belle Époque", "Siglo XX"];
 function eraName(era) {
   const names = language === "en" ? {
     "Renacimiento": "Renaissance",
@@ -869,13 +1045,14 @@ function eraName(era) {
     "Era napoleónica": "Napoleonic Era",
     "Restauración y liberalismo": "Restoration and Liberalism",
     "Segunda mitad del siglo XIX": "Second Half of the 19th Century",
+    "Fin de siglo y Belle Époque": "Fin de Siècle and Belle Époque",
     "Siglo XX": "20th Century"
   } : {};
   return names[era] || era;
 }
 
 function movementName(movement) {
-  const names = language === "en" ? { "Academicismo": "Academicism", "Barroco": "Baroque", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Realismo": "Realism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
+  const names = language === "en" ? { "Academicismo": "Academicism", "Barroco": "Baroque", "Impresionismo": "Impressionism", "Luminismo": "Luminism", "Modernismo": "Modernism", "Neoclasicismo": "Neoclassicism", "Postimpresionismo": "Post-Impressionism", "Realismo": "Realism", "Renacimiento": "Renaissance", "Rococó": "Rococo", "Romanticismo": "Romanticism", "Simbolismo": "Symbolism" } : {};
   return names[movement] || movement;
 }
 
