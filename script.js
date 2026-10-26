@@ -910,6 +910,22 @@ const games = [
     image: "assets/art-covers/sorolla_paseo_mar.jpg",
     previewUrl: "arte/sorolla_paseo_mar.html",
     playUrl: "arte/sorolla_paseo_mar.html"
+  },
+  {
+    id: 46,
+    title: "Franco, en orden (1934-1975)",
+    category: "Historia",
+    collection: "Franquismo",
+    mode: "Ordenar",
+    duration: "4 min",
+    description:
+      "Ordena de más antiguo a más reciente los 16 acontecimientos de la vida de Franco, de 1934 a su muerte en 1975, con 5 intentos y 4 minutos.",
+    longDescription:
+      "Un juego de ordenar acontecimientos: arrastra o selecciona cada hecho de la vida de Franco (1934-1975) hasta su sitio; los que aciertes se fijan con candado.",
+    gradient: "linear-gradient(135deg, rgba(60,70,75,0.95), rgba(184,137,42,0.85))",
+    image: "assets/game-covers/franco_en_orden.png",
+    previewUrl: "games/franco_en_orden.html",
+    playUrl: "games/franco_en_orden.html"
   }
 ];
 
@@ -969,7 +985,8 @@ const gameTranslations = {
     42: { title: "At Eternity's Gate", description: "Explore Vincent van Gogh's painting point by point: the grieving old man, pain and despair in his last months (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'At Eternity's Gate' (1890), also called 'Sorrowing Old Man', a Post-Impressionist work and forerunner of Expressionism." },
     43: { title: "Pyramid of Skulls", description: "Explore Paul Cézanne's still life point by point: the skulls, the construction with colour and the meditation on death (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Pyramid of Skulls' (c. 1901), a Post-Impressionist vanitas by Cézanne." },
     44: { title: "The Kiss (Rodin)", description: "Explore Auguste Rodin's sculpture point by point: Paolo and Francesca, the contrast of textures and marble as skin (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (conceived in 1882, in marble 1888-1898), between Realism, Symbolism and sculptural Impressionism." },
-    45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." }
+    45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." },
+    46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." }
   }
 };
 
@@ -1085,6 +1102,7 @@ function collectionNames() {
     "Geografía": "Geography",
     "Primera Guerra Mundial": "World War I",
     "Ilustración": "Enlightenment",
+    "Franquismo": "Francoist Spain",
     "Arte": "Art"
   } : {};
 }
@@ -1102,7 +1120,7 @@ function subcollectionTitle(allGames) {
 function gameCardHtml(game) {
   return `
         <article class="game-card">
-          <div class="game-visual${game.isArt ? " art-visual" : ""}" style="${game.isArt ? `--art-image: url('${game.image}');` : `background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;`}"></div>
+          <div class="game-visual${game.isArt ? " art-visual" : ""}" style="${game.isArt ? `--art-image: url('${game.image}');` : (game.image ? `background-image: url('${game.image}'); background-size: cover; background-position: center; background-repeat: no-repeat;` : `background: ${game.gradient};`)}"></div>
           <div class="game-top-row">
             <h3>${gameText(game, "title")}</h3>
             <span class="game-badge">${game.category}</span>

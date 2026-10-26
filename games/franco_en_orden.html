@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Franco, en orden (1934-1975)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E8ECE3; --card:#FAFBF6; --ink:#1D262A; --muted:#58665F; --line:#C5CDC0;
+  --ok:#2E6A4C; --okbg:#DAEBDD; --bad:#A3392A; --badbg:#F5DCD5;
+  --accent:#B8892A; --accent-ink:#1D262A; --sel:#E9D9A8;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A1C; --card:#1F2729; --ink:#E6ECE5; --muted:#9BA8A2; --line:#344140;
+    --ok:#7CC79E; --okbg:#1E3A2C; --bad:#E58A77; --badbg:#46241F;
+    --accent:#D9AE52; --accent-ink:#141A1C; --sel:#4A3F20;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A1C; --card:#1F2729; --ink:#E6ECE5; --muted:#9BA8A2; --line:#344140;
+  --ok:#7CC79E; --okbg:#1E3A2C; --bad:#E58A77; --badbg:#46241F;
+  --accent:#D9AE52; --accent-ink:#141A1C; --sel:#4A3F20;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-weight:800;font-size:clamp(1.9rem,6vw,2.8rem);letter-spacing:-.02em;margin:8px 0 4px;line-height:1.05}
+h1 small{display:block;font-family:"Special Elite","Courier New",monospace;font-weight:400;font-size:1rem;letter-spacing:0;color:var(--muted);margin-top:6px}
+.intro{color:var(--muted);max-width:60ch;margin:10px 0 18px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:2px solid var(--ink);margin-bottom:12px}
+.stats{display:flex;gap:18px;align-items:center}
+.stat{display:flex;flex-direction:column}
+.stat b{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.stat span{font-size:.8rem;color:var(--muted)}
+.stat.low b{color:var(--bad)}
+.tries{display:flex;gap:5px;padding-top:4px}
+.tries i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);display:block}
+.tries i.used{background:transparent;opacity:.3}
+.tries i.left{background:var(--ink)}
+.btns{display:flex;gap:8px}
+button{font:inherit;font-weight:600;border-radius:6px;padding:10px 16px;cursor:pointer;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button:focus-visible,.row:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.msg{min-height:1.5em;font-size:.95rem;margin:4px 0 10px;color:var(--muted)}
+.msg.good{color:var(--ok)} .msg.bad{color:var(--bad)}
+
+.end-label{font-family:"Special Elite","Courier New",monospace;color:var(--muted);font-size:.9rem;margin:6px 2px}
+.stage{position:relative}
+ol.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.stage.waiting ol.list{filter:blur(6px);pointer-events:none;user-select:none}
+.cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding-top:120px}
+.toggle{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer}
+.toggle input{width:20px;height:20px;accent-color:var(--accent);margin:0}
+.cover button{font-size:1.2rem;padding:16px 34px}
+
+.row{display:grid;grid-template-columns:2.2rem 1.8rem 1fr auto;align-items:center;gap:8px;background:var(--card);border:2px solid var(--line);border-radius:6px;padding:10px 12px 10px 8px;user-select:none;-webkit-user-select:none;cursor:grab;transition:background .2s,border-color .2s}
+.row .pos{font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
+.row .handle{touch-action:none;color:var(--muted);font-size:1.2rem;line-height:1;text-align:center;padding:6px 0;cursor:grab}
+.row .txt{font-weight:600}
+.row .side{display:flex;align-items:center;gap:8px;font-family:"Special Elite","Courier New",monospace;font-size:.9rem;white-space:nowrap}
+.row .side svg{width:18px;height:18px;flex:none}
+.row.selected{background:var(--sel);border-color:var(--accent)}
+.row.target{border-color:var(--accent);border-style:dashed}
+.row.dragging{position:relative;z-index:4;box-shadow:0 8px 20px rgba(0,0,0,.18);cursor:grabbing;transition:none}
+.row.locked{background:var(--okbg);border-color:var(--ok);cursor:default}
+.row.locked .handle{visibility:hidden}
+.row.locked .side{color:var(--ok)}
+.row.wrong{background:var(--badbg);border-color:var(--bad)}
+.row.wrong .side{color:var(--bad)}
+.row.flash{animation:flash .6s}
+@keyframes flash{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.list.done .row{cursor:default}
+.list.done .handle{visibility:hidden}
+
+.result{margin-top:18px;padding:16px;border:2px solid var(--ink);border-radius:6px;display:none}
+.result.show{display:block}
+.result h2{margin:0 0 4px;font-size:1.5rem;font-weight:800}
+.result p{margin:0;color:var(--muted)}
+.help{font-size:.85rem;color:var(--muted);margin-top:22px;max-width:60ch}
+
+@media (max-width:480px){
+  .row{grid-template-columns:1.6rem 1.6rem 1fr;row-gap:2px}
+  .row .side{grid-column:3;font-size:.85rem}
+  .bar{gap:8px}
+  button{padding:9px 12px}
+}
+@media (prefers-reduced-motion:reduce){.row.flash{animation:none}.row{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Franco, en orden<small>1934-1975</small></h1>
+  <p class="intro">Ordena los acontecimientos del más antiguo (arriba) al más reciente (abajo). Al pulsar «Comprobar», los que estén en su sitio se quedan fijados con candado y ya no se mueven. Tienes 5 intentos y 4 minutos, o puedes jugar sin límite de tiempo.</p>
+
+  <div class="bar">
+    <div class="stats">
+      <div class="stat" id="timeStat"><b id="time">4:00</b><span>Tiempo</span></div>
+      <div class="stat"><b id="score">0/16</b><span>Fijados</span></div>
+      <div class="stat"><div class="tries" id="tries" aria-label="Intentos restantes"></div><span>Intentos</span></div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="checkBtn" disabled>Comprobar</button>
+      <button id="giveBtn" disabled>Rendirse</button>
+    </div>
+  </div>
+
+  <p class="msg" id="msg" aria-live="polite"></p>
+
+  <div class="stage waiting" id="stage">
+    <p class="end-label">Más antiguo</p>
+    <ol class="list" id="list"></ol>
+    <p class="end-label">Más reciente</p>
+    <div class="cover" id="cover"><button class="primary" id="startBtn">Empezar</button><label class="toggle"><input type="checkbox" id="noTime"> Jugar sin límite de tiempo</label></div>
+  </div>
+
+  <div class="result" id="result" aria-live="polite">
+    <h2 id="resTitle"></h2>
+    <p id="resText"></p>
+    <p style="margin-top:12px"><button class="primary" id="againBtn">Jugar otra vez</button></p>
+  </div>
+
+  <p class="help">En el móvil, arrastra desde los puntitos ⋮⋮ o toca un acontecimiento y luego el hueco al que lo quieres llevar. Con teclado: Tab para moverte y Enter para seleccionar y colocar.</p>
+</main>
+
+<script>
+const EVENTS = [
+  ["Reprime la revolución de Asturias","1934"],
+  ["El Frente Popular lo aleja de Madrid","feb. 1936"],
+  ["Avanza desde el sur con el Ejército de África","jul. 1936"],
+  ["Nombrado Generalísimo","sept. 1936"],
+  ["Anuncia el fin de la guerra","1 abr. 1939"],
+  ["Se reúne con Hitler en Hendaya","23 oct. 1940"],
+  ["Envía la División Azul contra la URSS","1941"],
+  ["Retira la División Azul y vuelve a la neutralidad","1943"],
+  ["La ONU recomienda retirar embajadores","1946"],
+  ["Ley de Sucesión","1947"],
+  ["Acuerdos con EE. UU. y Concordato","1953"],
+  ["España entra en la ONU","1955"],
+  ["Plan de Estabilización y visita de Eisenhower","1959"],
+  ["Designa sucesor a Juan Carlos","1969"],
+  ["Nombra presidente a Carrero Blanco, asesinado por ETA","1973"],
+  ["Muere Franco","20 nov. 1975"]
+];
+const N = EVENTS.length, MAX_TRIES = 5, MAX_TIME = 240;
+const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+const $ = id => document.getElementById(id);
+const list = $("list");
+let order, locked, tries, timeLeft, running, ended, selected, timer, finalLocked, timed=true, elapsed=0;
+
+function shuffle(){
+  let a;
+  do{
+    a = [...Array(N).keys()];
+    for(let i=N-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  }while(a.filter((v,i)=>v===i).length>2);
+  return a;
+}
+function reset(){
+  order = shuffle(); locked = Array(N).fill(false);
+  tries = MAX_TRIES; timeLeft = MAX_TIME; elapsed = 0; timed = !$("noTime").checked; running=false; ended=false; selected=null; finalLocked=null;
+  clearInterval(timer);
+  $("stage").classList.add("waiting"); $("cover").style.display="";
+  $("result").classList.remove("show"); list.classList.remove("done");
+  $("msg").textContent=""; $("msg").className="msg";
+  updateBar(); render();
+}
+function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function updateBar(){
+  $("time").textContent = fmt(timed ? timeLeft : elapsed);
+  $("timeStat").querySelector("span").textContent = timed ? "Tiempo" : "Sin límite";
+  $("timeStat").classList.toggle("low", timed && running && timeLeft<=30);
+  $("score").textContent = locked.filter(Boolean).length+"/"+N;
+  $("tries").innerHTML = Array.from({length:MAX_TRIES},(_,i)=>`<i class="${i<tries?'left':'used'}"></i>`).join("");
+  $("tries").setAttribute("aria-label", tries+" intentos restantes");
+  $("checkBtn").disabled = !running; $("giveBtn").disabled = !running;
+}
+function render(){
+  if(ended){
+    list.innerHTML = EVENTS.map((e,i)=>{
+      const ok = finalLocked[i];
+      return `<li class="row ${ok?'locked':'wrong'}"><span class="pos">${i+1}</span><span class="handle"></span><span class="txt">${e[0]}</span><span class="side">${e[1]} ${ok?LOCK:CROSS}</span></li>`;
+    }).join("");
+    return;
+  }
+  list.innerHTML = order.map((ev,s)=>{
+    const lk = locked[s];
+    return `<li class="row${lk?' locked':''}${selected===s?' selected':''}" data-slot="${s}" tabindex="${lk||!running?-1:0}" aria-label="Posición ${s+1}: ${EVENTS[ev][0]}${lk?', fijado':''}">
+      <span class="pos">${s+1}</span><span class="handle" aria-hidden="true">⋮⋮</span>
+      <span class="txt">${EVENTS[ev][0]}</span>
+      <span class="side">${lk?EVENTS[ev][1]+' '+LOCK:''}</span></li>`;
+  }).join("");
+}
+function move(from,to){
+  if(from===to||locked[from]||locked[to]) return;
+  const free = [...Array(N).keys()].filter(s=>!locked[s]);
+  const seq = free.map(s=>order[s]);
+  const a = free.indexOf(from), b = free.indexOf(to);
+  const [x] = seq.splice(a,1); seq.splice(b,0,x);
+  free.forEach((s,k)=>order[s]=seq[k]);
+}
+function tap(slot){
+  if(!running||locked[slot]) return;
+  if(selected===null) selected=slot;
+  else if(selected===slot) selected=null;
+  else { move(selected,slot); selected=null; }
+  render();
+  const el=list.querySelector(`[data-slot="${slot}"]`); if(el) el.focus({preventScroll:true});
+}
+
+/* Arrastrar */
+let drag=null;
+list.addEventListener("pointerdown",e=>{
+  const row=e.target.closest(".row"); if(!row||!running) return;
+  const slot=+row.dataset.slot; if(locked[slot]) return;
+  const onHandle=!!e.target.closest(".handle");
+  if(e.pointerType!=="mouse" && !onHandle) return; // en táctil: tocar = seleccionar
+  e.preventDefault();
+  drag={row,slot,startY:e.clientY,y:e.clientY,moved:false,target:null,id:e.pointerId};
+  row.setPointerCapture(e.pointerId);
+});
+list.addEventListener("pointermove",e=>{
+  if(!drag||e.pointerId!==drag.id) return;
+  drag.y=e.clientY;
+  const dy=e.clientY-drag.startY;
+  if(Math.abs(dy)>5) drag.moved=true;
+  if(!drag.moved) return;
+  drag.row.classList.add("dragging");
+  drag.row.style.transform=`translateY(${dy}px)`;
+  let tgt=null;
+  list.querySelectorAll(".row").forEach(r=>{
+    r.classList.remove("target");
+    if(r===drag.row) return;
+    const b=r.getBoundingClientRect();
+    if(e.clientY>=b.top && e.clientY<=b.bottom && !locked[+r.dataset.slot]) tgt=r;
+  });
+  if(tgt){tgt.classList.add("target"); drag.target=+tgt.dataset.slot;} else drag.target=null;
+  if(e.clientY<70) window.scrollBy(0,-12);
+  else if(e.clientY>window.innerHeight-70) window.scrollBy(0,12);
+});
+function endDrag(e){
+  if(!drag||e.pointerId!==drag.id) return;
+  const d=drag; drag=null;
+  if(d.moved){ if(d.target!==null) move(d.slot,d.target); selected=null; render(); }
+  else { d.row.style.transform=""; lastTap=Date.now(); tap(d.slot); }
+}
+let lastTap=0;
+list.addEventListener("pointerup",endDrag);
+list.addEventListener("pointercancel",e=>{ if(drag){drag=null;render();} });
+list.addEventListener("click",e=>{
+  // toques en móvil fuera del asa
+  const row=e.target.closest(".row"); if(!row||!running) return;
+  if(e.detail===0 || Date.now()-lastTap<400) return;
+  tap(+row.dataset.slot);
+});
+list.addEventListener("keydown",e=>{
+  const row=e.target.closest(".row"); if(!row) return;
+  if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tap(+row.dataset.slot); }
+});
+
+function check(auto){
+  let nuevos=0;
+  order.forEach((ev,s)=>{ if(!locked[s] && ev===s){locked[s]=true;nuevos++;} });
+  if(auto) return;
+  tries--;
+  selected=null; render();
+  const wrong=[...list.querySelectorAll(".row:not(.locked)")];
+  wrong.forEach(r=>r.classList.add("flash"));
+  setTimeout(()=>wrong.forEach(r=>r.classList.remove("flash")),650);
+  const total=locked.filter(Boolean).length;
+  updateBar();
+  if(total===N) return finish("win");
+  if(tries===0) return finish("tries");
+  const m=$("msg");
+  m.className="msg "+(nuevos?"good":"bad");
+  m.textContent = nuevos ? `${nuevos===1?"Uno nuevo fijado":nuevos+" nuevos fijados"}. Te ${tries===1?"queda 1 intento":"quedan "+tries+" intentos"}.`
+                         : `Ninguno nuevo en su sitio. Te ${tries===1?"queda 1 intento":"quedan "+tries+" intentos"}.`;
+}
+function finish(reason){
+  if(reason!=="win") check(true);
+  running=false; ended=true; clearInterval(timer);
+  finalLocked = Array(N).fill(false);
+  order.forEach((ev,s)=>{ if(locked[s]) finalLocked[ev]=true; });
+  const score=finalLocked.filter(Boolean).length;
+  list.classList.add("done"); render(); updateBar();
+  $("msg").textContent="";
+  const used = timed ? MAX_TIME-timeLeft : elapsed;
+  $("resTitle").textContent = reason==="win" ? "¡Perfecto! 16 de 16" : `Has acertado ${score} de ${N}`;
+  $("resText").textContent = reason==="win"
+    ? `Lo has resuelto en ${fmt(used)} con ${MAX_TRIES-tries} ${MAX_TRIES-tries===1?"intento":"intentos"}.`
+    : (reason==="time"?"Se acabó el tiempo. ":reason==="tries"?"Se acabaron los intentos. ":"Te has rendido. ")+"Arriba tienes el orden correcto con las fechas; en rojo, los que no estaban en su sitio.";
+  $("result").classList.add("show");
+  $("result").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function start(){
+  running=true; timed = !$("noTime").checked;
+  $("stage").classList.remove("waiting"); $("cover").style.display="none";
+  render(); updateBar();
+  timer=setInterval(()=>{ if(timed){ timeLeft--; updateBar(); if(timeLeft<=0) finish("time"); } else { elapsed++; updateBar(); } },1000);
+}
+$("startBtn").onclick=start;
+$("noTime").onchange=()=>{ timed=!$("noTime").checked; updateBar(); };
+$("checkBtn").onclick=()=>check(false);
+$("giveBtn").onclick=()=>finish("give");
+$("againBtn").onclick=()=>{ reset(); window.scrollTo({top:0,behavior:"smooth"}); };
+reset();
+</script>
+</body>
+</html>
