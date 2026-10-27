@@ -926,6 +926,22 @@ const games = [
     image: "assets/game-covers/franco_en_orden.png",
     previewUrl: "games/franco_en_orden.html",
     playUrl: "games/franco_en_orden.html"
+  },
+  {
+    id: 47,
+    title: "Match 3D: fútbol",
+    category: "Arcade",
+    collection: "Primera Guerra Mundial",
+    mode: "1 jugador",
+    duration: "5 min",
+    description:
+      "Fútbol 5 contra 5 en un estadio en 3D: cuando vas a chutar el tiempo se congela y dibujas la curva del balón. Partido rápido o torneo de 8 equipos.",
+    longDescription:
+      "Un juego de fútbol en 3D donde pasas, chutas dibujando la trayectoria del balón y paras la potencia y la precisión en la barra verde; cuando chuta la CPU, tú eres el portero.",
+    gradient: "linear-gradient(135deg, rgba(110,80,40,0.95), rgba(60,90,130,0.85))",
+    image: "assets/game-covers/futbol_trincheras.png",
+    previewUrl: "games/match_3d.html",
+    playUrl: "games/match_3d.html"
   }
 ];
 
@@ -986,7 +1002,8 @@ const gameTranslations = {
     43: { title: "Pyramid of Skulls", description: "Explore Paul Cézanne's still life point by point: the skulls, the construction with colour and the meditation on death (the page itself is in Spanish).", longDescription: "An interactive page with the keys to the 'Pyramid of Skulls' (c. 1901), a Post-Impressionist vanitas by Cézanne." },
     44: { title: "The Kiss (Rodin)", description: "Explore Auguste Rodin's sculpture point by point: Paolo and Francesca, the contrast of textures and marble as skin (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (conceived in 1882, in marble 1888-1898), between Realism, Symbolism and sculptural Impressionism." },
     45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." },
-    46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." }
+    46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." },
+    47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." }
   }
 };
 
