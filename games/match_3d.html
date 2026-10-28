@@ -76,6 +76,10 @@ details.help summary{cursor:pointer;font-weight:800;font-size:13px;color:#d7e6ff
 @media(max-width:620px){#bracket{gap:5px}.bm{font-size:10px;padding:3px 4px}}
 .btn.blue{background:linear-gradient(#5aa9ff,#2a6fe0);box-shadow:0 4px 0 #173f8f;color:#fff}
 .netbox{display:flex;flex-direction:column;gap:6px;align-items:center;width:min(92vw,460px)}
+.roomcode{font-size:44px;letter-spacing:8px;font-weight:900;color:#ffd23f;background:rgba(255,255,255,.08);padding:6px 18px 6px 26px;border-radius:14px;user-select:all}
+.roomin{width:min(80vw,260px);text-align:center;font-size:34px;letter-spacing:6px;font-weight:900;text-transform:uppercase;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#ffd23f;padding:6px 8px}
+.nethint{font-size:12.5px;opacity:.85;margin:4px 0;max-width:min(92vw,440px);text-align:center}
+#netManual{max-width:min(92vw,470px);margin-top:4px}
 .netbox textarea{width:100%;height:64px;border-radius:10px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);color:#fff;font-size:11px;padding:6px;resize:none;word-break:break-all}
 .netstatus{font-weight:800;color:#ffd23f;min-height:18px}
 #netmsg{position:absolute;left:50%;top:58px;transform:translateX(-50%);background:rgba(214,40,40,.92);border-radius:10px;padding:6px 14px;font-weight:800;font-size:13px;display:none;pointer-events:none;z-index:5}
@@ -124,7 +128,7 @@ details.help summary{cursor:pointer;font-weight:800;font-size:13px;color:#d7e6ff
       <li>Cuando <b>chuta la CPU</b>, tú eres el portero: tienes 4 segundos para parar la barra en el verde.</li>
       <li><b>Toca el campo</b> o arrastra a otro jugador para moverlo. <b>Choca</b> para robar.</li>
       <li><b>Saques de banda, de portería y córners:</b> el juego se congela y apuntas dónde cae el balón (flechas o arrastrando) y paras las dos barras. Verde+verde: lo controla un compañero (en el córner, remata de cabeza). Si fallas, lo disputa el rival.</li>
-      <li><b>Cómo golpeas depende del cuerpo:</b> de frente, normal · de lado, más efecto y algo menos de fuerza · de espaldas, <b>taco</b> (poca fuerza y menos precisión). Al apuntar, el aro te avisa: <b>puerta libre, al portero, al palo, defensa en el camino o fuera</b>.</li>
+      <li><b>Cómo golpeas depende del cuerpo:</b> de frente, normal · de lado, más efecto y algo menos de fuerza · de espaldas, <b>taco</b> (poca fuerza y menos precisión).</li>
       <li><b>Teclado:</b> flechas para moverte · <b>Con balón:</b> A chutar (desde tu campo, despeje), X pasar, W filtrante, D sprint (se recarga cada 3 s). <b>Al chutar:</b> W/Z suben/bajan la trayectoria · <b>Sin balón:</b> A cambiar jugador, D entrada, W sale el portero, X presionar. <b>En móvil:</b> botón D (sprint / entrada / skill) y botones ▲▼ para la altura del tiro.</li>
     </ul></details>
     <div class="lbl">TU CAMISETA · <b id="colName">Azul</b></div>
@@ -140,7 +144,7 @@ details.help summary{cursor:pointer;font-weight:800;font-size:13px;color:#d7e6ff
     <div class="row"><button class="btn" data-play="easy">Fácil</button><button class="btn alt" data-play="normal">Normal</button><button class="btn alt" data-play="hard">Difícil</button></div>
     <div class="lbl">🏆 TORNEO · 8 EQUIPOS</div>
     <div class="row"><button class="btn gold" data-tour="easy">Fácil</button><button class="btn gold" data-tour="normal">Normal</button><button class="btn gold" data-tour="hard">Difícil</button></div>
-    <div class="row"><button class="btn ghost" data-play="fk">Reto de tiros libres (5)</button><button class="btn blue" id="bNet">🌐 Online 1 contra 1</button></div>
+    <div class="row"><button class="btn ghost" data-play="pen">⚽ Partida de penaltis</button><button class="btn blue" id="bNet">🌐 Online 1 contra 1</button></div>
   </div>
   <div id="tourov" class="ov hidden">
     <h2 id="tourT">Torneo</h2>
@@ -150,22 +154,37 @@ details.help summary{cursor:pointer;font-weight:800;font-size:13px;color:#d7e6ff
   </div>
   <div id="netov" class="ov hidden">
     <h2>🌐 Online 1 contra 1</h2>
-    <p id="netInfo">Juega contra un amigo en otro dispositivo. No hace falta servidor: os intercambiáis un código por el chat que uséis.</p>
-    <div id="netStep0" class="row"><button class="btn" id="netCreate">Crear partida</button><button class="btn alt" id="netJoin">Unirme a una partida</button></div>
+    <p id="netInfo">Juega contra un amigo desde otro móvil u ordenador. Los dos tenéis que abrir este mismo juego.</p>
+    <div id="netStep0" class="row"><button class="btn" id="netCreate">Crear partida</button><button class="btn alt" id="netJoin">Unirme con código</button></div>
     <div id="netHost" class="netbox" style="display:none">
-      <div class="lbl">1 · MANDA ESTE CÓDIGO A TU AMIGO</div>
-      <textarea id="hostCode" readonly placeholder="Generando código…"></textarea><div class="row"><button class="btn ghost" id="hostCopy">Copiar código</button></div>
-      <div class="lbl">2 · PEGA AQUÍ LA RESPUESTA DE TU AMIGO</div>
-      <textarea id="hostAns" placeholder="Pega aquí el código de respuesta"></textarea><div class="row"><button class="btn" id="hostConnect">Conectar</button></div>
+      <div class="lbl">TU CÓDIGO DE SALA</div>
+      <div id="roomCode" class="roomcode">······</div>
+      <div class="row"><button class="btn ghost" id="roomCopy">Copiar invitación</button><button class="btn ghost" id="roomShare">Compartir</button></div>
+      <p class="nethint">Díselo a tu amigo: tiene que abrir el juego, pulsar <b>Online → Unirme con código</b> y escribirlo.</p>
     </div>
     <div id="netGuest" class="netbox" style="display:none">
-      <div class="lbl">1 · PEGA AQUÍ EL CÓDIGO DEL ANFITRIÓN</div>
-      <textarea id="guestCode" placeholder="Pega aquí el código que te han enviado"></textarea><div class="row"><button class="btn" id="guestJoinBtn">Unirme</button></div>
-      <div class="lbl">2 · MANDA ESTA RESPUESTA AL ANFITRIÓN</div>
-      <textarea id="guestAns" readonly placeholder="Aparecerá aquí tu código de respuesta"></textarea><div class="row"><button class="btn ghost" id="guestCopy">Copiar respuesta</button></div>
+      <div class="lbl">CÓDIGO DE SALA DE TU AMIGO</div>
+      <input id="roomInput" class="roomin" maxlength="6" placeholder="K7M2QX" autocapitalize="characters" autocomplete="off" spellcheck="false">
+      <div class="row"><button class="btn" id="roomJoin">Unirme</button></div>
     </div>
     <p id="netStatus" class="netstatus"></p>
     <div class="row"><button class="btn" id="netStart" style="display:none">▶ Empezar partido</button><button class="btn ghost" id="netBack">Volver</button></div>
+    <details class="help" id="netManual"><summary>¿No conecta? Conexión manual (sin sala)</summary>
+      <p class="nethint">Os intercambiáis dos códigos largos por el chat que queráis. Sirve si el servicio de salas no funciona en vuestra red.</p>
+      <div class="row"><button class="btn ghost" id="mCreate">Crear (manual)</button><button class="btn ghost" id="mJoin">Unirme (manual)</button></div>
+      <div id="mHost" class="netbox" style="display:none">
+        <div class="lbl">1 · MANDA ESTE CÓDIGO A TU AMIGO</div>
+        <textarea id="hostCode" readonly placeholder="Generando código…"></textarea><div class="row"><button class="btn ghost" id="hostCopy">Copiar código</button></div>
+        <div class="lbl">2 · PEGA AQUÍ LA RESPUESTA DE TU AMIGO</div>
+        <textarea id="hostAns" placeholder="Pega aquí el código de respuesta"></textarea><div class="row"><button class="btn" id="hostConnect">Conectar</button></div>
+      </div>
+      <div id="mGuest" class="netbox" style="display:none">
+        <div class="lbl">1 · PEGA AQUÍ EL CÓDIGO DEL ANFITRIÓN</div>
+        <textarea id="guestCode" placeholder="Pega aquí el código que te han enviado"></textarea><div class="row"><button class="btn" id="guestJoinBtn">Unirme</button></div>
+        <div class="lbl">2 · MANDA ESTA RESPUESTA AL ANFITRIÓN</div>
+        <textarea id="guestAns" readonly placeholder="Aparecerá aquí tu código de respuesta"></textarea><div class="row"><button class="btn ghost" id="guestCopy">Copiar respuesta</button></div>
+      </div>
+    </details>
   </div>
   <div id="endov" class="ov hidden">
     <h2 id="endTitle">Final</h2>
@@ -694,9 +713,10 @@ function startMatch(kind, diff, opts) {
   createPlayers(); S.ctrl = null; S.pen = null; S.final = null;
   if (kind === 'match') { applyTeamCfg(0, opts && opts.cfg0 !== undefined ? opts.cfg0 : TEAMSEL.me); applyTeamCfg(1, opts && opts.cfg1 !== undefined ? opts.cfg1 : resolveOpp(TEAMSEL.opp)); } else { applyTeamCfg(0, null); applyTeamCfg(1, null); }
   for (const id of ['menu', 'endov', 'pauseov', 'tourov']) $('#' + id).classList.add('hidden');
-  $('#board').style.display = kind === 'fk' ? 'none' : 'flex'; $('#fkinfo').style.display = (kind === 'fk' || (S.tour && S.tour.inMatch)) ? 'block' : 'none';
+  $('#board').style.display = 'flex'; $('#fkinfo').style.display = (S.tour && S.tour.inMatch) ? 'block' : 'none';
   S.mode = 'play';
-  if (kind === 'fk') { S.fk = { n: 0, total: 5, goals: 0, waiting: 0, results: [] }; fkNext(); } else kickoff(0);
+  S.penOnly = !!(opts && opts.penOnly);
+  if (S.penOnly) { S.time = 0; startPenalties(); } else kickoff(0);
   hudUpdate();
 }
 function kickoff(team) {
@@ -771,8 +791,7 @@ function shotResult(kind) {
   if (S.pen && !S.pen.counted) { S.pen.counted = true; S.pen.taken[S.pen.cur]++; if (kind !== 'goal') S.pen.waiting = 2.2; }
   const mine = S.lastShotTeam === 0 || !S.human[0]; if (kind === 'parada' || kind === 'portero') crowdEv(mine ? 'groan' : 'cheerS'); else if (kind === 'palo') crowdEv('gasp'); else if (kind === 'fuera' || kind === 'corto') crowdEv('groan'); else if (kind === 'barrera' || kind === 'bloqueo') crowdEv('gaspS');
   const msg = { goal: '¡GOOOL!', parada: '¡PARADA!', palo: '¡AL PALO!', fuera: '¡FUERA!', corto: '¡SIN FUERZA!', barrera: '¡BARRERA!', bloqueo: '¡BLOQUEADO POR UN DEFENSA!', portero: '¡DIRECTO AL PORTERO!' }[kind];
-  if (S.kind === 'fk') { const f = S.fk; if (f.waiting <= 0 && !f.done) { f.results.push(kind); if (kind === 'goal') f.goals++; if (kind !== 'goal') f.waiting = 2.3; toast(msg, 2.0); } }
-  else if (kind !== 'goal') toast(msg, 1.0);
+  if (kind !== 'goal') toast(msg, 1.0);
 }
 function updateShot(dt) {
   const k = ball.kin; k.t += dt; const u = Math.min(1, k.t / k.T), P = bez(k, u);
@@ -799,7 +818,7 @@ function endShot(k) {
 }
 function goalScored(t) {
   S.gkMode = null; S.ts = 1; S.throwIn = null; S.reach = null; S.corner = null;
-  if (S.pen) S.pen.sc[t]++; else S.score[t]++; S.celebrate = (S.kind === 'fk' || S.pen) ? 2.6 : 3.0; S.kickTeam = 1 - t; ball.owner = null; ball.kin = null;
+  if (S.pen) S.pen.sc[t]++; else S.score[t]++; S.celebrate = S.pen ? 2.6 : 3.0; S.kickTeam = 1 - t; ball.owner = null; ball.kin = null;
   const sc = ball.last === t ? players.find((p) => p === (pathFx && pathFx.shooter)) : null;
   const near = players.filter((p) => p.t === t && p.role !== 'gk').sort((a, b) => Math.hypot(a.x - ball.x, a.z - ball.z) - Math.hypot(b.x - ball.x, b.z - ball.z)); S.scorer = near[0];
   for (const p of players) { if (p.t === t) p.celeb = S.celebrate; }
@@ -819,7 +838,7 @@ function updateBall(dt) {
   const sp = Math.hypot(b.vx, b.vz); if (sp > 0) { const dec = (b.h > .03 ? .4 : 3.4) * dt, k = Math.max(0, sp - dec) / sp; b.vx *= k; b.vz *= k; }
   if (S.celebrate > 0) { b.z = clamp(b.z, -(FZ + GDEP - .3), FZ + GDEP - .3); b.x = clamp(b.x, -GWID / 2 + .3, GWID / 2 - .3); return; }
   if (!S.pen && Math.abs(b.z) > FZ && Math.abs(b.x) < GWID / 2 - .1 && b.h < GHEI) { goalScored(b.z > 0 ? 1 : 0); return; }
-  if (S.kind === 'fk' || S.pen) { if (Math.abs(b.x) > FX + 6 || Math.abs(b.z) > FZ + 6) { b.vx = b.vz = 0; } return; }
+  if (S.pen) { if (Math.abs(b.x) > FX + 6 || Math.abs(b.z) > FZ + 6) { b.vx = b.vz = 0; } return; }
   if (Math.abs(b.x) > FX) { startSetPiece('throw', 1 - b.last, b.x > 0 ? FX - .6 : -FX + .6, clamp(b.z, -FZ + 3, FZ - 3)); return; }
   if (Math.abs(b.z) > FZ) { const def = b.z > 0 ? 0 : 1; if (b.last === def) startCorner(1 - def, b.x > 0 ? 1 : -1); else startSetPiece('goalkick', def, 0, 0); }
 }
@@ -846,6 +865,7 @@ function moveKeeper(p, dt) {
 function movePlayer(p, dt) {
   if (p.role === 'gk') { moveKeeper(p, dt); return; }
   if (S.throwIn && p === S.throwIn.taker) { p.hasT = false; p.spd *= .8; return; }
+  if (p.seek > S.t && !ball.owner && !ball.kin && Math.hypot(ball.x - p.x, ball.z - p.z) < 3.2 && Math.hypot(ball.vx, ball.vz) < 9) { p.tx = ball.x; p.tz = ball.z; p.hasT = true; p.manual = S.t + .4; }  // receptor de un pase: va a por el balón
   if (p.header) { if (!p.header.hold) { p.header.t += dt; const pr = clamp(p.header.t / p.header.dur, 0, 1); p.jump = Math.sin(Math.PI * pr) * .8; if (pr >= 1) { p.header = null; p.jump = 0; } } p.spd = 0; return; }
   if (p.stun > 0) { p.stun -= dt; p.hasT = false; p.spd *= .8; return; }
   if (p.skill) { skillStep(p, dt); return; }
@@ -881,6 +901,17 @@ function pickups() {
 }
 
 /* ====================== IA ====================== */
+function segDist(px, pz, ax, az, bx, bz) { const dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz || 1, t = clamp(((px - ax) * dx + (pz - az) * dz) / l2, 0, 1); return Math.hypot(px - (ax + dx * t), pz - (az + dz * t)); }
+// La CPU chuta siempre que huele peligro: cerca de la portería, con camino libre, o presionada dentro de zona de tiro
+function aiWantsShot(o, opp, dGoal, pressed) {
+  if (!pastHalf(o) || S.t - (o.gotT || 0) < .3) return false;
+  const gz = attZ(o.t), range = o.type === 'hulk' ? 28 : 23; if (dGoal > range) return false;
+  const lane = !opp.some((q) => q.role !== 'gk' && segDist(q.x, q.z, o.x, o.z, 0, gz) < .95 * (q.scale || 1));
+  let pr = dGoal < 9 ? .95 : dGoal < 15 ? (lane ? .85 : .5) : (lane ? .6 : .2);
+  if (pressed && dGoal < 19) pr = Math.max(pr, .75);
+  if (bodyMode(o, 0, gz) === 'back' && dGoal > 6) pr *= .3;
+  return Math.random() < pr;
+}
 function aiThink(t, dt) {
   const A = ai[t]; A.timer -= dt; if (A.timer > 0) return; A.timer = DIFF[S.diff].think + Math.random() * .08;
   const team = players.filter((p) => p.t === t && p.role !== 'gk'), opp = players.filter((p) => p.t !== t), dirZ = t === 1 ? 1 : -1, gz = attZ(t), o = ball.owner, own = o && o.t === t;
@@ -890,10 +921,10 @@ function aiThink(t, dt) {
   if (own && o.role !== 'gk' && !(S.throwIn && S.throwIn.taker === o)) {
     const dGoal = Math.abs(o.z - gz), pressed = opp.some((q) => q.role !== 'gk' && Math.hypot(q.x - o.x, q.z - o.z) < 3.2);
     if (o.type === 'dribble' && pressed && !o.skill && (o.skillCD || 0) <= 0 && Math.random() < .45) skillFor(o, { x: o.fx, z: o.fz });
-    if (dGoal < (o.type === 'hulk' ? 28 : 15) && pastHalf(o) && Math.random() < .07) { const gk = opp.find((q) => q.role === 'gk'), side = gk.x < 0 ? 1 : -1, tx = clamp(side * rnd(1.4, 3.1) + gauss() * DIFF[S.diff].err * .8 * (o.type === 'sniper' ? .35 : 1), -4.4, 4.4); launchShot(o, tx, rnd(.4, 1.9), rnd(-.2, .2), false); }
+    if (aiWantsShot(o, opp, dGoal, pressed)) { const gk = opp.find((q) => q.role === 'gk'), side = gk.x < 0 ? 1 : -1, tx = clamp(side * rnd(1.4, 3.1) + gauss() * DIFF[S.diff].err * .8 * (o.type === 'sniper' ? .35 : 1), -4.4, 4.4); launchShot(o, tx, rnd(.4, 1.9), rnd(-.2, .2), false); }
     else if (pressed || Math.random() < .12) {
       const mates = team.filter((m) => m !== o && (m.z - o.z) * dirZ > -2.5 && Math.hypot(m.x - o.x, m.z - o.z) > 6 && Math.hypot(m.x - o.x, m.z - o.z) < 30 && !opp.some((q) => q.role !== 'gk' && Math.hypot(q.x - m.x, q.z - m.z) < 4.2));
-      if (mates.length && (pressed || Math.random() < .5)) { mates.sort((a, b) => (b.z - a.z) * dirZ); const m = mates[0]; kickBall(o, m.x - o.x, m.z - o.z, clamp(Math.hypot(m.x - o.x, m.z - o.z) * 1.5 + 9, 12, 22)); }
+      if (mates.length && (pressed || Math.random() < .5)) { mates.sort((a, b) => (b.z - a.z) * dirZ); const m = mates[0], mv = mateVel(m); passTo(o, m, Math.hypot(m.x - o.x, m.z - o.z) > 11 && mv[1] * dirZ > 2 && Math.random() < .45); }
       else mark(o, o.x + (0 - o.x) * .35, gz - dirZ * 7);
     } else mark(o, o.x + (0 - o.x) * .35 + gauss(), gz - dirZ * 7);
   }
@@ -966,18 +997,42 @@ function doClear(c, dir) {
   c.lock = .45; c.kickT = .3; c.fx = dx / dd; c.fz = dz / dd; sfx.kick(); toast('¡DESPEJE!', .7);
   const mates = players.filter((q) => q.t === c.t && q.role !== 'gk' && q !== c && (q.z - c.z) * sg > 0).sort((a, b) => Math.hypot(a.x - tx, a.z - tz) - Math.hypot(b.x - tx, b.z - tz)); if (mates[0]) { mates[0].tx = tx; mates[0].tz = tz; mates[0].hasT = true; mates[0].manual = S.t + 2.2; }
 }
+/* ---- PASES: al pie y al espacio ---- */
+const BALL_DEC = 3.4;
+function mateVel(m) { // velocidad con la que se mueve un compañero
+  let vx = 0, vz = 0; const top = m.sp || 7.2;
+  if (m.hasT) { const dx = m.tx - m.x, dz = m.tz - m.z, l = Math.hypot(dx, dz); if (l > .6) { const v = Math.min(top, Math.max(m.spd || 0, top * .75)); vx = dx / l * v; vz = dz / l * v; } }
+  else if ((m.spd || 0) > 1) { vx = m.fx * m.spd; vz = m.fz * m.spd; }
+  return [vx, vz];
+}
+// through=false: pase al pie, el balón llega a los pies del compañero (aunque corra). through=true: filtrante al hueco, justo donde llegará él.
+function passTo(c, m, through) {
+  const [vx, vz] = mateVel(m), top = m.sp || 7.2, sg = Math.sign(attZ(c.t)); let tx, tz, v0;
+  if (through) {
+    let dx = vx, dz = vz, l = Math.hypot(dx, dz);
+    if (l < 1) { dx = (0 - m.x) * .12; dz = sg; l = Math.hypot(dx, dz); }
+    dx /= l; dz /= l; const lead = clamp(7 + Math.min(l, top) * .6, 6, 11);
+    tx = clamp(m.x + dx * lead, -FX + 1.5, FX - 1.5); tz = clamp(m.z + dz * lead, -FZ + 3, FZ - 3);
+    const T = Math.max(.6, Math.hypot(tx - m.x, tz - m.z) / top), d = Math.max(1, Math.hypot(tx - c.x, tz - c.z) - .85);
+    v0 = (d + .5 * BALL_DEC * T * T) / T;
+  } else {
+    const ve = Math.hypot(vx, vz) > 1 ? 9 : 6;  // si corre, el balón llega algo más vivo para no quedarse atrás
+    let T = .6; for (let i = 0; i < 6; i++) { tx = m.x + vx * T; tz = m.z + vz * T; const d = Math.max(1, Math.hypot(tx - c.x, tz - c.z) - .85); T = (-ve + Math.sqrt(ve * ve + 2 * BALL_DEC * d)) / BALL_DEC; }
+    tx = clamp(tx, -FX + 1, FX - 1); tz = clamp(tz, -FZ + 1, FZ - 1); v0 = ve + BALL_DEC * T;
+  }
+  kickBall(c, tx - c.x, tz - c.z, clamp(v0, 9, 25));
+  const vl = Math.hypot(vx, vz); if (!through && vl > 1) { m.tx = clamp(tx + vx / vl * 4, -FX + 1, FX - 1); m.tz = clamp(tz + vz / vl * 4, -FZ + 1, FZ - 1); } else { m.tx = tx; m.tz = tz; }  // si corre, atraviesa el punto de encuentro sin frenar
+  m.hasT = true; m.manual = S.t + (through ? 2.2 : 1.4); m.seek = S.t + (through ? 2.6 : 2.0);
+}
 function actPass() {
   const c = S.ctrl; if (!ctrlOk() || !c || ball.owner !== c) return; const m = pickMate(c, kbDir(), false); if (!m) return;
-  const lx = m.hasT ? (m.tx - m.x) * .3 : 0, lz = m.hasT ? (m.tz - m.z) * .3 : 0, dx = m.x + lx - c.x, dz = m.z + lz - c.z;
-  kickBall(c, dx, dz, clamp(Math.sqrt(2 * 3.4 * Math.hypot(dx, dz) + 64), 10, 21)); toast('PASE', .35);
+  passTo(c, m, false); toast('PASE', .35);
 }
 function actThrough() {
-  const c = S.ctrl; if (!ctrlOk() || !c || ball.owner !== c) return; const d = kbDir();
+  const c = S.ctrl; if (!ctrlOk() || !c || ball.owner !== c) return; const d = kbDir(), sg = Math.sign(attZ(c.t));
   let cand = myField().filter((m) => m !== c && Math.hypot(m.x - c.x, m.z - c.z) > 5); if (d) cand = cand.filter((m) => Math.abs(wrapA(Math.atan2(m.z - c.z, m.x - c.x) - Math.atan2(d.z, d.x))) < 1.25);
-  cand.sort((a, b) => a.z - b.z); const m = cand[0] || pickMate(c, d, true); if (!m) return;
-  const tx = clamp(m.x + (d ? d.x * 2.5 : 0), -FX + 2.5, FX - 2.5), tz = clamp(m.z - 6, -FZ + 4.5, FZ - 4.5), dx = tx - c.x, dz = tz - c.z, dd = Math.hypot(dx, dz) || 1;
-  kickBall(c, dx, dz, clamp(Math.sqrt(2 * 3.4 * dd + 6.5 * 6.5), 11, 17));
-  m.tx = tx; m.tz = tz; m.hasT = true; m.manual = S.t + 2.2; toast('FILTRANTE', .5);
+  cand.sort((a, b) => (b.z - a.z) * sg); const m = cand[0] || pickMate(c, d, true); if (!m) return;
+  passTo(c, m, true); toast('FILTRANTE', .45);
 }
 function actSprint() {
   const c = S.ctrl; if (!ctrlOk() || !c || ball.owner !== c || (c.sprintCD || 0) > 0) return;
@@ -1069,7 +1124,7 @@ function humanThrow(dir) {
 function applyDrag(p, g, moved, team) {
   if (S.mode !== 'play' || S.paused || S.aim || S.celebrate > 0 || ball.kin) return;
   if (S.throwIn && S.human[S.throwIn.team] && p === S.throwIn.taker && ball.owner === p && moved > 22) { const k = planKick3D(p, g[0], g[1]); if (k && k.mate) throwBall(p, k.mate); else { const l = Math.hypot(g[0] - p.x, g[1] - p.z) || 1; humanThrow({ x: (g[0] - p.x) / l, z: (g[1] - p.z) / l }); } return; }
-  if (p && ball.owner === p && moved > 22) { const k = planKick3D(p, g[0], g[1]); if (k) { if (k.kind === 'shot') enterAim(p, false); else if (k.kind === 'clear') doClear(p, { x: k.dx, z: k.dz }); else kickBall(p, k.dx, k.dz, k.speed); } return; }
+  if (p && ball.owner === p && moved > 22) { const k = planKick3D(p, g[0], g[1]); if (k) { if (k.kind === 'shot') enterAim(p, false); else if (k.kind === 'clear') doClear(p, { x: k.dx, z: k.dz }); else if (k.mate) passTo(p, k.mate, false); else kickBall(p, k.dx, k.dz, k.speed); } return; }
   let mover = p; if (!mover) { let best = null, bd = 1e9; for (const q of players) { if (q.role === 'gk' || q.t !== team) continue; const dd = Math.hypot(q.x - g[0], q.z - g[1]); if (dd < bd) { bd = dd; best = q; } } mover = best; }
   if (mover) { mover.tx = clamp(g[0], -FX + .6, FX - .6); mover.tz = clamp(g[1], -FZ + .6, FZ - .6); mover.hasT = true; mover.manual = S.t + 2.2; taps.push({ x: mover.tx, z: mover.tz, life: .6 }); }
 }
@@ -1078,12 +1133,12 @@ function applyDrag(p, g, moved, team) {
 /* ====================== PARADAS: CÓRNER, REBOTE Y "ALCANCE" ====================== */
 function afterSave(k) {
   const b = ball, s = Math.sign(k.p2[2]), team = k.team; sfx.save(); shotResult(k.direct ? 'portero' : 'parada'); k.keeper.lock = .7;
-  if (S.pen || S.kind === 'fk') { if (k.outcome === 'catch') { b.owner = k.keeper; k.keeper.hold = 1.1; b.last = k.keeper.t; } else { b.vz = -s * rnd(5, 8); b.vx = rnd(-5, 5); b.vh = rnd(2.5, 4.5); b.last = k.keeper.t; } return; }
+  if (S.pen) { if (k.outcome === 'catch') { b.owner = k.keeper; k.keeper.hold = 1.1; b.last = k.keeper.t; } else { b.vz = -s * rnd(5, 8); b.vx = rnd(-5, 5); b.vh = rnd(2.5, 4.5); b.last = k.keeper.t; } return; }
   if (Math.random() < .5) { startCorner(team, k.p2[0] >= 0 ? 1 : -1); return; }
   b.vz = -s * rnd(5, 8); b.vx = rnd(-5, 5); b.vh = rnd(2.5, 4.5); b.last = k.keeper.t; tryReach(k);
 }
 function tryReach(k) {
-  if (S.pen || S.kind === 'fk') return; const team = k.team, gz = k.p2[2], sg = Math.sign(gz);
+  if (S.pen) return; const team = k.team, gz = k.p2[2], sg = Math.sign(gz);
   const cands = players.filter((q) => q.t === team && q.role !== 'gk' && Math.abs(q.x) < 10 && (gz - q.z) * sg > 0 && (gz - q.z) * sg < 10); if (!cands.length) return;
   const ql = k.q !== undefined ? k.q : .5, prog = S.kind === 'match' ? clamp((150 - S.time) / 150, 0, 1) : 0, spd = Math.min(4.2, (2.6 - 1.5 * ql) * (1 + .6 * prog));
   if (S.human[team]) { S.reach = { team, cands, bar: { v: 0, dir: 1, spd }, t: 0 }; S.ts = .15; toast('¡REBOTE!', .8); }
@@ -1120,16 +1175,16 @@ function crossGeom(p0, tx, ty, ez, bend, loft, kind) {
 function launchCross(p, tx, ty, bend, ez, ok, loft) {
   const kind = (S.corner && S.corner.kind) || 'corner', b = ball, p0 = [b.x, .22 + b.h, b.z], g = crossGeom(p0, tx, ty, ez, bend, loft, kind), T = Math.max(kind === 'throw' ? .8 : kind === 'goalkick' ? 1.1 : .9, g.D / (kind === 'throw' ? 13 : kind === 'goalkick' ? 19 : 17));
   const k = { p0, c: g.c, p2: g.p2, T, t: 0, shooter: p, team: p.t, blockU: null, outcome: ok ? 'crossOK' : 'crossFail', keeper: null, free: true, lastP: p0.slice(), cross: true, sp: kind };
-  b.owner = null; b.kin = k; b.last = p.t; b.sid++; p.kickT = .3; p.lock = .6; sfx.kick(); S.shot = { team: p.t, x: b.x, z: b.z, free: true, p }; S.corner = null; S.shotCamT = T + 1; S.aim = null; hintShow(false);
+  b.owner = null; b.kin = k; b.last = p.t; b.sid++; p.kickT = .3; p.lock = .6; sfx.kick(); S.shot = { team: p.t, x: b.x, z: b.z, free: true, p }; S.corner = null; S.shotCamT = 0; S.aim = null; hintShow(false);
   const samples = []; for (let i = 0; i <= 28; i++) samples.push(bez(k, i / 28)); pathFx = { pts: samples, life: T + .9, T }; if (NET.host && S.pvp) NET.shotFx = ['shot', samples.map((q) => q.map((v) => Math.round(v * 100) / 100)), T];
   if (ok && kind === 'corner') powerFx(1, p.x, p.z);
 }
 function startHeader(k) {
   const team = k.team, tx = k.p2[0], tz = k.p2[2], sg = Math.sign(attZ(team));
   const head = players.filter((q) => q.t === team && q.role !== 'gk' && q !== k.shooter).sort((a, b) => Math.hypot(a.x - tx, a.z - tz) - Math.hypot(b.x - tx, b.z - tz))[0] || k.shooter;
-  head.x = tx; head.z = tz; head.fx = 0; head.fz = sg; head.hasT = false; head.header = { t: .4, dur: .9, hold: true }; head.jump = .8; head.lock = 0; head.shield = 3;
-  ball.kin = null; ball.owner = head; ball.last = team; ball.vx = ball.vz = ball.vh = 0; ball.sid++; updateBall(0); toast('¡CABEZAZO!', .8); crowdEv('gasp');
-  if (S.human[team]) enterAim(head, false); else S.headAI = { p: head, t: .8 };
+  head.x = tx; head.z = tz; head.fx = 0; head.fz = sg; head.hasT = false; head.header = { t: 0, dur: .55, hold: false }; head.jump = .6; head.lock = 0; head.shield = 1.2;
+  ball.kin = null; ball.owner = head; ball.last = team; ball.vx = ball.vz = ball.vh = 0; ball.sid++; updateBall(0); toast('¡GANA EL BALÓN!', .8); crowdEv('gasp');
+  S.headAI = null; if (S.human[team] && S.kbActive) setCtrl(head);
 }
 function receiveAt(k) {
   const team = k.team, tx = k.p2[0], tz = k.p2[2], m = players.filter((q) => q.t === team && q.role !== 'gk' && q !== k.shooter).sort((a, b) => Math.hypot(a.x - tx, a.z - tz) - Math.hypot(b.x - tx, b.z - tz))[0] || k.shooter;
@@ -1239,25 +1294,7 @@ function aimFinish() {
 const PFX = { shake: 0, ring: null, trailOn: 0, trail: [], jx: 0, jy: 0, jz: 0 };
 function powerFxVisual(lvl, x, z) { PFX.lvl = lvl; PFX.shake = .4 * lvl; PFX.ring = { x, z, t: 0, lvl }; PFX.trailOn = lvl; PFX.trail = []; }
 function powerFx(lvl, x, z) { powerFxVisual(lvl, x, z); sfx.power(); if (lvl >= 1) toast('¡CAÑONAZO!', .6); if (NET.host && S.pvp) NET.ev.push(['pw', lvl, x, z]); }
-/* ====================== FALTAS, APUNTADO Y RETO DE TIROS LIBRES ====================== */
-function startFreeKick(team, x, z) {
-  x = clamp(x, -FX + 2, FX - 2); const gz = attZ(team); z = clamp(z, -FZ + 3, FZ - 3);
-  const dg = Math.hypot(x, gz - z), dx = (0 - x) / (dg || 1), dz = (gz - z) / (dg || 1);
-  const mine = players.filter((p) => p.t === team && p.role !== 'gk'), theirs = players.filter((p) => p.t !== team && p.role !== 'gk');
-  const kicker = mine.slice().sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z))[0];
-  kicker.x = x - dx * 1.0 + dz * .9; kicker.z = z - dz * 1.0 - dx * .9; kicker.fx = dx; kicker.fz = dz; kicker.hasT = false;
-  ball.owner = null; ball.kin = null; ball.x = x; ball.z = z; ball.h = 0; ball.vx = ball.vz = ball.vh = 0; ball.last = team; ball.sid++;
-  const rest = mine.filter((p) => p !== kicker);
-  rest.forEach((p, i) => { p.x = clamp(rnd(-9, 9), -FX + 1, FX - 1); p.z = gz - Math.sign(gz) * rnd(8, 15); p.hasT = false; p.fx = 0; p.fz = Math.sign(gz); });
-  const wall = []; const nWall = dg <= 34 ? Math.min(3, theirs.length) : 0; const dw = Math.min(8, dg * .45);
-  theirs.forEach((p, i) => { p.hasT = false; if (i < nWall) { const off = (i - (nWall - 1) / 2) * .85; p.x = x + dx * dw + (-dz) * off; p.z = z + dz * dw + dx * off; p.fx = -dx; p.fz = -dz; wall.push(p); } else { p.x = clamp(rnd(-6, 6), -FX + 1, FX - 1); p.z = gz - Math.sign(gz) * rnd(3, 9); p.fx = 0; p.fz = -Math.sign(gz); } });
-  for (const p of players) { p.lock = 0; p.shield = 0; p.tcd = 0; p.dive = null; p.jump = 0; p.roll = 0; p.celeb = 0; p.slide = null; p.out = 0; p.pressT = 0; }
-  S.throwIn = null;
-  const gk = players.find((p) => p.t !== team && p.role === 'gk'); gk.x = clamp(-dx * 0 + (x * -.12), -1.5, 1.5); gk.z = ownZ(1 - team) - Math.sign(ownZ(1 - team)) * 1.8;
-  S.setp = { team, kicker, wall, ai: !S.human[team], timer: 1.6, free: true };
-  if (dg > 34) { ball.owner = kicker; kicker.fx = dx; kicker.fz = dz; S.setp = null; S.freeze = .6; return; }
-  if (S.human[team]) enterAim(kicker, true);
-}
+/* ====================== APUNTADO ====================== */
 function shotCamFor(p, free, bx = ball.x, bz = ball.z) {
   const gz = attZ(p.t), dx = 0 - bx, dz = gz - bz, D = Math.hypot(dx, dz) || 1, ux = dx / D, uz = dz / D, asp = VW / VH, k = asp < 1 ? Math.min(1.5, 1.05 / asp) : 1;
   const back = (free ? 9 : 11) * k, h = (free ? 3.5 : 5.4) * (asp < 1 ? 1.25 : 1), lx = -uz * 1.9, lz = ux * 1.9;
@@ -1274,12 +1311,6 @@ function shotFromPath(path) {
   return { tx, ty, bend, loft: S.aim.loft || 0 };
 }
 function aimFire(sh, mods) { const p = S.aim.p, free = S.aim.free; launchShot(p, sh.tx, sh.ty, sh.bend, free, mods); }
-function fkNext() {
-  const f = S.fk; f.n++; f.waiting = 0; S.celebrate = 0; S.scorer = null;
-  if (f.n > f.total) { endMatch(); return; }
-  const ang = rnd(-.85, .85), d = rnd(18, 26), x = Math.sin(ang) * d, z = -FZ + Math.cos(ang) * d;
-  createPlayers(); S.fk = f; startFreeKick(0, x, z);
-}
 for (const k of Object.keys(sfx)) { const f = sfx[k]; sfx[k] = function () { if (NET.host && S.pvp) NET.ev.push(['s', k]); return f.apply(null, arguments); }; }
 const SMALL_TOAST = ['¡EL PORTERO TE LA QUITA!', '¡CÓRNER!', '¡DESPEJADO!', '¡ALCANCE!', '¡NO LLEGAS!', '¡REBOTE!', '¡CABEZAZO!', '¡DESPEJE!', '¡SIN FUERZA!', '¡CAÑONAZO!', '¡GIRO!', '¡BICICLETA!', '¡SOMBRERO!', '¡REGATE!', '¡PERFECTO!', '¡PASA A UN COMPAÑERO!', 'PASE', 'CENTRO', 'FILTRANTE', 'PRESIONAR', '¡ENTRADA!', '¡SALE EL PORTERO!', 'MUY LEJOS'];
 function toast(msg, sec) { if (NET.host && S.pvp) NET.ev.push(['t', msg, sec]); const t = $('#toast'); t.textContent = msg; t.classList.toggle('small', SMALL_TOAST.includes(msg)); t.classList.add('on'); S.toastT = sec || 1.2; }
@@ -1292,7 +1323,6 @@ function step(dt) {
   for (const q of parts) { q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.vy -= 5 * dt; q.vx *= .995; q.r += dt * 4; q.r2 += dt * 3; q.life -= dt; if (q.y < .05) { q.y = .05; q.vy = 0; q.vx *= .9; q.vz *= .9; } } parts = parts.filter((q) => q.life > 0);
   for (let i = taps.length - 1; i >= 0; i--) { taps[i].life -= dt; if (taps[i].life <= 0) taps.splice(i, 1); }
   if (S.shotCamT > 0) S.shotCamT -= dt;
-  if (S.kind === 'fk') { stepFK(dt); return; }
   if (S.pen) { stepPen(dt); return; }
   if (S.corner && S.corner.ai) { const C = S.corner; C.t -= dt; for (const q of players) { if (q.role === 'gk') moveKeeper(q, dt); else q.spd *= .8; } updateBall(dt); if (C.t <= 0) { const di = ['easy', 'normal', 'hard'].indexOf(S.diff); if (C.kind === 'corner') launchCross(C.kicker, rnd(-3, 3), 2.1, rnd(-.2, .2), C.spotZ, Math.random() < ([.4, .5, .6][di] || .5), 0); else { const m = nearestFreeMate(C.kicker); launchCross(C.kicker, m.x, 2, rnd(-.1, .1), m.z, Math.random() < ([.55, .7, .8][di] || .7), 0); } } return; }
   if (S.headAI) { const H = S.headAI; H.t -= dt; for (const q of players) { if (q.role === 'gk') moveKeeper(q, dt); else if (q !== H.p) q.spd *= .8; } updateBall(dt); if (H.t <= 0) { S.headAI = null; const gk = players.find((q) => q.t !== H.p.t && q.role === 'gk'), side = gk.x < 0 ? 1 : -1; launchShot(H.p, clamp(side * rnd(1.2, 3.1) + gauss() * DIFF[S.diff].err, -4.4, 4.4), rnd(.5, 1.9), rnd(-.2, .2), false, { spd: 1, header: true }); } return; }
@@ -1308,27 +1338,18 @@ function step(dt) {
   separate(); pickups(); updateBall(dt); pickups();
   ownerCheck();
 }
-function ownerCheck() { const o = ball.owner; if (o !== S.prevOwner) { if (o && o.type === 'dribble') o.immuneT = 5; S.prevOwner = o; } }
-function stepFK(dt) {
-  const f = S.fk;
-  for (const p of players) { if (p.role === 'gk') moveKeeper(p, dt); else p.spd *= .8; }
-  updateBall(dt);
-  if (S.celebrate > 0) { S.celebrate -= dt; if (S.celebrate <= 0) fkNext(); return; }
-  if (f.waiting > 0) { f.waiting -= dt; if (f.waiting <= 0) fkNext(); }
-  if (S.freeze > 0) S.freeze -= dt;
-}
+function ownerCheck() { const o = ball.owner; if (o !== S.prevOwner) { if (o && o.type === 'dribble') o.immuneT = 5; if (o) o.gotT = S.t; S.prevOwner = o; } }
 function endMatch() {
   S.mode = 'end'; sfx.end(); crowdEv('end'); hintShow(false); S.aim = null;
   let title, score, msg; S.final = S.pen ? S.pen.sc.slice() : S.score.slice(); const penTxt = S.pen ? '  (pen. ' + S.pen.sc[0] + '–' + S.pen.sc[1] + ')' : '';
-  if (S.kind === 'fk') { const g = S.fk.goals; score = g + ' / ' + S.fk.total; title = g === 5 ? '🏆 ¡PERFECTO!' : g >= 3 ? '⚽ ¡GRAN TIRADOR!' : g >= 1 ? '👍 NO ESTÁ MAL' : '😅 SIGUE PRACTICANDO'; msg = 'Goles de tiro libre. Tip: curva el trazo para rodear la barrera.'; $('#fkinfo').style.display = 'none'; }
-  else { const a = S.final[0], b = S.final[1]; score = S.score[0] + ' – ' + S.score[1] + penTxt; if (NET.host && S.pvp) NET.ev.push(['end', S.score[0], S.score[1], S.pen ? S.pen.sc[0] : -1, S.pen ? S.pen.sc[1] : -1]); if (S.pvp) { title = a > b ? '🏆 ¡HAS GANADO!' : '😞 HAS PERDIDO'; msg = 'Partido online 1 contra 1.'; } else if (S.tour && S.tour.inMatch) { title = a > b ? '✅ ¡CLASIFICADO!' : '❌ ELIMINADO'; msg = a > b ? '¡Pasas a la siguiente ronda!' : 'Has caído en ' + S.tour.roundName.toLowerCase() + '.'; } else if (S.human[0] && !S.human[1]) { title = a > b ? '🏆 ¡VICTORIA!' : '😞 DERROTA'; msg = a > b ? '¡Gran partido! Prueba una dificultad mayor.' : 'Casi. Mueve a tus jugadores y busca el pase antes de chutar.'; } else { title = a > b ? '🔵 GANA AZUL' : '🔴 GANA ROJO'; msg = 'Partido de demostración.'; } }
+  { const a = S.final[0], b = S.final[1]; score = S.penOnly ? S.final[0] + ' – ' + S.final[1] + ' (penaltis)' : S.score[0] + ' – ' + S.score[1] + penTxt; if (NET.host && S.pvp) NET.ev.push(['end', S.score[0], S.score[1], S.pen ? S.pen.sc[0] : -1, S.pen ? S.pen.sc[1] : -1]); if (S.pvp) { title = a > b ? '🏆 ¡HAS GANADO!' : '😞 HAS PERDIDO'; msg = 'Partido online 1 contra 1.'; } else if (S.tour && S.tour.inMatch) { title = a > b ? '✅ ¡CLASIFICADO!' : '❌ ELIMINADO'; msg = a > b ? '¡Pasas a la siguiente ronda!' : 'Has caído en ' + S.tour.roundName.toLowerCase() + '.'; } else if (S.human[0] && !S.human[1]) { title = a > b ? '🏆 ¡VICTORIA!' : '😞 DERROTA'; msg = a > b ? '¡Gran partido! Prueba una dificultad mayor.' : 'Casi. Mueve a tus jugadores y busca el pase antes de chutar.'; } else { title = a > b ? '🔵 GANA AZUL' : '🔴 GANA ROJO'; msg = 'Partido de demostración.'; } }
+  if (S.penOnly) msg = 'Partida de penaltis. ' + (S.final[0] > S.final[1] ? '¡Buen pulso! Prueba otra tanda.' : 'Sigue practicando: barras en el verde y atento como portero.');
   $('#bAgain').textContent = S.tour && S.tour.inMatch ? 'Continuar' : 'Revancha';
   $('#endTitle').textContent = title; $('#endScore').textContent = score; $('#endMsg').textContent = msg; $('#endov').classList.remove('hidden');
 }
 function hudUpdate() {
-  $('#scA').textContent = S.score[0]; $('#scB').textContent = S.score[1];
+  const pv = S.penOnly && S.pen ? S.pen.sc : S.score; $('#scA').textContent = pv[0]; $('#scB').textContent = pv[1];
   const c = $('#clock'); if (S.golden) { c.textContent = 'GOL DE ORO'; c.classList.add('gold'); } else { c.classList.remove('gold'); const s = Math.ceil(S.time); c.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-  if (S.kind === 'fk' && S.fk) $('#fkinfo').textContent = 'Tiro ' + Math.min(S.fk.n, S.fk.total) + ' / ' + S.fk.total + ' · Goles ' + S.fk.goals;
   hudExtra();
 }
 
@@ -1497,7 +1518,7 @@ function netBind() {
   if (NET.snapCh) NET.snapCh.onmessage = (e) => netOnMsg(JSON.parse(e.data));
 }
 function netLost() { const wasPlaying = NET.open && (S.pvp || $('#netov').classList.contains('hidden') === false); NET.open = false; netLeave(); if (wasPlaying) { toMenu(); netBanner('El rival se ha desconectado.'); } }
-function netLeave() { try { if (NET.ctl) { NET.ctl.onclose = null; NET.ctl.close(); } if (NET.snapCh) NET.snapCh.close(); if (NET.pc) { NET.pc.onconnectionstatechange = null; NET.pc.close(); } } catch (e) {} Object.assign(NET, { pc: null, ctl: null, snapCh: null, hello: null, snaps: [], open: false, role: null, host: false, guest: false, ev: [] }); $('#netStart').style.display = 'none'; }
+function netLeave() { try { if (NET.poll) clearInterval(NET.poll); if (NET.hintT) clearTimeout(NET.hintT); NET.poll = null; NET.hintT = null; NET.room = null; if (NET.ctl) { NET.ctl.onclose = null; NET.ctl.close(); } if (NET.snapCh) NET.snapCh.close(); if (NET.pc) { NET.pc.onconnectionstatechange = null; NET.pc.close(); } } catch (e) {} Object.assign(NET, { pc: null, ctl: null, snapCh: null, hello: null, snaps: [], open: false, role: null, host: false, guest: false, ev: [] }); $('#netStart').style.display = 'none'; }
 /* ---- anfitrión ---- */
 async function netHostCreate() {
   netLeave(); NET.role = 'host'; netStatus('Preparando…'); $('#hostCode').value = ''; $('#hostAns').value = '';
@@ -1506,7 +1527,7 @@ async function netHostCreate() {
   $('#hostCode').value = await pack({ type: 'offer', sdp: pc.localDescription.sdp }); netStatus('Manda el código a tu amigo y espera su respuesta.');
 }
 async function netHostAccept(code) {
-  try { const o = await unpack(code); if (o.type !== 'answer') throw new Error('Ese código no es una respuesta'); await NET.pc.setRemoteDescription({ type: 'answer', sdp: o.sdp }); netStatus('Conectando…'); } catch (e) { netStatus('⚠️ ' + e.message); }
+  try { const o = await unpack(code); if (o.type !== 'answer') throw new Error('Ese código no es una respuesta'); await NET.pc.setRemoteDescription({ type: 'answer', sdp: o.sdp }); netStatus('Conectando…'); netConnHint(); } catch (e) { netStatus('⚠️ ' + e.message); }
 }
 function netHostStart() {
   const gc = PALETTE[(NET.hello && NET.hello.col) || 0]; NET.host = true; NET.ev = [];
@@ -1516,12 +1537,48 @@ function netHostStart() {
 }
 function netRematch() { netHostStart(); }
 /* ---- invitado ---- */
-async function netGuestJoin(code) {
-  try { netLeave(); NET.role = 'guest'; const o = await unpack(code); if (o.type !== 'offer') throw new Error('Ese código no es de un anfitrión');
+async function netGuestJoin(code, room) {
+  try { netLeave(); NET.role = 'guest'; NET.room = room || null; const o = await unpack(code); if (o.type !== 'offer') throw new Error('Ese código no es de un anfitrión');
     const pc = netPc(); pc.ondatachannel = (e) => { if (e.channel.label === 'ctl') { NET.ctl = e.channel; } else NET.snapCh = e.channel; if (NET.ctl) netBind(); };
     await pc.setRemoteDescription({ type: 'offer', sdp: o.sdp }); await pc.setLocalDescription(await pc.createAnswer()); netStatus('Generando respuesta…'); await waitIce(pc, 5000);
-    $('#guestAns').value = await pack({ type: 'answer', sdp: pc.localDescription.sdp }); netStatus('Manda esta respuesta al anfitrión. En cuanto la pegue, se conectará.');
+    const ans = await pack({ type: 'answer', sdp: pc.localDescription.sdp });
+    if (room) { await roomPost(roomTopic(room, 'a'), ans); netStatus('Conectando con tu amigo…'); netConnHint(); }
+    else { $('#guestAns').value = ans; netStatus('Manda esta respuesta al anfitrión. En cuanto la pegue, se conectará.'); }
   } catch (e) { netStatus('⚠️ ' + e.message); }
+}
+/* ---- salas con código corto: el juego intercambia los datos de conexión por un buzón público (ntfy.sh); la partida va directa entre los dos ---- */
+const NTFY = 'https://ntfy.sh/', ROOM_CH = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const roomTopic = (code, k) => 'match3d-' + code.toLowerCase() + '-' + k;
+const roomErr = (e) => (!e.message || /fetch|network|load failed/i.test(e.message)) ? 'No consigo contactar con el servicio de salas (¿sin internet?)' : e.message;
+async function roomPost(topic, text) { const r = await fetch(NTFY + topic, { method: 'POST', body: text }); if (!r.ok) throw new Error('El servicio de salas no responde (' + r.status + ')'); }
+async function roomGet(topic) {
+  const r = await fetch(NTFY + topic + '/json?poll=1&since=all'); if (!r.ok) throw new Error('El servicio de salas no responde (' + r.status + ')');
+  let last = null; for (const ln of (await r.text()).split('\n')) { if (!ln.trim()) continue; try { const j = JSON.parse(ln); if (j.event === 'message' && typeof j.message === 'string' && j.message.indexOf('M3D') === 0) last = j.message; } catch (e) {} } return last;
+}
+function netConnHint() { if (NET.hintT) clearTimeout(NET.hintT); NET.hintT = setTimeout(() => { if (!NET.open && NET.pc) netStatus('Sigue sin conectar… Probad con la misma wifi, sin VPN, o los dos con datos móviles. Si no, usad la conexión manual (abajo).'); }, 20000); }
+async function netQuickCreate() {
+  netLeave(); NET.role = 'host'; const code = Array.from({ length: 6 }, () => ROOM_CH[(Math.random() * ROOM_CH.length) | 0]).join(''); NET.room = code;
+  $('#roomCode').textContent = '······'; netStatus('Preparando la sala…');
+  try {
+    const pc = netPc(); NET.ctl = pc.createDataChannel('ctl'); NET.snapCh = pc.createDataChannel('snap', { ordered: false, maxRetransmits: 0 }); netBind();
+    await pc.setLocalDescription(await pc.createOffer()); await waitIce(pc, 5000);
+    await roomPost(roomTopic(code, 'o'), await pack({ type: 'offer', sdp: pc.localDescription.sdp }));
+    if (NET.room !== code) return;
+    $('#roomCode').textContent = code; netStatus('Sala creada. Dile el código a tu amigo y espera a que entre…');
+    let fails = 0; NET.poll = setInterval(async () => {
+      try { const m = await roomGet(roomTopic(code, 'a')); fails = 0; if (m && NET.room === code) { clearInterval(NET.poll); NET.poll = null; await netHostAccept(m); } }
+      catch (e) { if (++fails === 3) netStatus('⚠️ No consigo contactar con el servicio de salas. Comprueba tu conexión o usa la conexión manual (abajo).'); }
+    }, 1500);
+  } catch (e) { netStatus('⚠️ ' + roomErr(e) + ' · Prueba la conexión manual (abajo).'); }
+}
+async function netQuickJoin(raw) {
+  const code = (raw || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (code.length !== 6) { netStatus('El código tiene 6 letras o números.'); return; }
+  netLeave(); netStatus('Buscando la sala…');
+  try {
+    let offer = null; for (let i = 0; i < 4 && !offer; i++) { offer = await roomGet(roomTopic(code, 'o')); if (!offer) await sleep(1000); }
+    if (!offer) { netStatus('No encuentro esa sala. Revisa el código y que tu amigo haya pulsado «Crear partida».'); return; }
+    await netGuestJoin(offer, code);
+  } catch (e) { netStatus('⚠️ ' + roomErr(e) + ' · Prueba la conexión manual (abajo).'); }
 }
 /* ---- mensajes ---- */
 function netOnMsg(m) {
@@ -1629,13 +1686,22 @@ function guestAction(code) {
 }
 function guestDrag(d, g, moved) { netSend({ t: 'drag', pi: d.p ? (players.indexOf(d.p) + 5) % 10 : -1, gx: -g[0], gz: -g[1], moved }); }
 /* ---- sala (interfaz) ---- */
-function netShow(step) { $('#netStep0').style.display = step === 0 ? 'flex' : 'none'; $('#netHost').style.display = step === 'host' ? 'flex' : 'none'; $('#netGuest').style.display = step === 'guest' ? 'flex' : 'none'; }
+function netShow(step) { for (const [id, k] of [['#netStep0', 0], ['#netHost', 'host'], ['#netGuest', 'guest'], ['#mHost', 'mhost'], ['#mGuest', 'mguest']]) $(id).style.display = step === k ? 'flex' : 'none'; }
 const copyTxt = (id) => { const el = $(id); el.select(); try { navigator.clipboard.writeText(el.value); } catch (e) { document.execCommand('copy'); } };
-$('#bNet').addEventListener('click', () => { audio(); $('#menu').classList.add('hidden'); $('#netov').classList.remove('hidden'); netShow(0); netStatus(''); });
-$('#netCreate').addEventListener('click', () => { netShow('host'); netHostCreate(); });
-$('#netJoin').addEventListener('click', () => { netShow('guest'); netStatus('Pega el código del anfitrión.'); });
+const inviteText = () => 'Juega conmigo a Match 3D ⚽\nCódigo de sala: ' + NET.room + (/^https?:/.test(location.protocol) ? '\n' + location.origin + location.pathname + '?sala=' + NET.room : '\n(Abre el juego → Online → Unirme con código)');
+function openNet() { $('#menu').classList.add('hidden'); $('#netov').classList.remove('hidden'); netShow(0); netStatus(''); $('#netStart').style.display = 'none'; }
+$('#bNet').addEventListener('click', () => { audio(); openNet(); });
+$('#netCreate').addEventListener('click', () => { netShow('host'); netQuickCreate(); });
+$('#netJoin').addEventListener('click', () => { netShow('guest'); netStatus('Escribe el código que te ha dado tu amigo.'); setTimeout(() => $('#roomInput').focus(), 50); });
+$('#roomJoin').addEventListener('click', () => netQuickJoin($('#roomInput').value));
+$('#roomInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') netQuickJoin($('#roomInput').value); });
+$('#roomCopy').addEventListener('click', () => { if (!NET.room) return; try { navigator.clipboard.writeText(inviteText()); netStatus('📋 Invitación copiada. Pégala en vuestro chat.'); } catch (e) {} });
+$('#roomShare').addEventListener('click', () => { if (!NET.room) return; if (navigator.share) navigator.share({ title: 'Match 3D', text: inviteText() }).catch(() => {}); else { try { navigator.clipboard.writeText(inviteText()); netStatus('📋 Invitación copiada. Pégala en vuestro chat.'); } catch (e) {} } });
+$('#mCreate').addEventListener('click', () => { netShow('mhost'); netHostCreate(); });
+$('#mJoin').addEventListener('click', () => { netShow('mguest'); netStatus('Pega el código del anfitrión.'); });
 $('#hostCopy').addEventListener('click', () => copyTxt('#hostCode')); $('#guestCopy').addEventListener('click', () => copyTxt('#guestAns'));
 $('#hostConnect').addEventListener('click', () => netHostAccept($('#hostAns').value)); $('#guestJoinBtn').addEventListener('click', () => netGuestJoin($('#guestCode').value));
+{ const sala = new URLSearchParams(location.search).get('sala'); if (sala) { openNet(); netShow('guest'); $('#roomInput').value = sala.toUpperCase().slice(0, 6); netQuickJoin(sala); } }
 $('#netStart').addEventListener('click', () => { audio(); $('#netov').classList.add('hidden'); netHostStart(); });
 $('#netBack').addEventListener('click', () => { netLeave(); $('#netov').classList.add('hidden'); $('#menu').classList.remove('hidden'); });
 
@@ -1715,7 +1781,7 @@ ovc.addEventListener('pointerdown', (e) => {
   if (S.reach) { if (S.reach.team === 0) reachLock(); return; }
   if (S.gkMode) { if (gkMine()) gkLock(); return; }
   if (S.aim) { if (!aimMine() || S.aim.warm > 0) return; if (S.aim.phase !== 'aim') { barLock(); return; } S.aim.drawing = true; S.aim.path = [q]; return; }
-  if (S.kind === 'fk' || S.celebrate > 0 || S.freeze > 0 && S.kind !== 'match') return;
+  if (S.celebrate > 0 || S.freeze > 0 && S.kind !== 'match') return;
   let sel = null, bd = 62; for (const p of players) { if (p.role === 'gk' || !S.human[p.t] || (S.pvp && p.t !== 0)) continue; const d = Math.hypot(p.sx - q.x, p.sy - q.y); if (d < bd) { bd = d; sel = p; } }
   drags.set(e.pointerId, { p: sel, sx: q.x, sy: q.y, x: q.x, y: q.y });
 });
@@ -1807,22 +1873,9 @@ function drawLoftGauge() {
 }
 
 
-// Qué pasará con el tiro según adónde apuntas: palo, portero, defensa, fuera o puerta abierta
-function predictOutcome(p, sh, pts) {
-  for (let i = 3; i < pts.length - 1; i++) { const P = pts[i]; for (const q of players) { if (q === p || q.role === 'gk') continue; if (Math.hypot(P[0] - q.x, P[2] - q.z) < .55 * (q.scale || 1) && P[1] < 1.85 * (q.scale || 1)) return { k: 'defensa', label: 'DEFENSA EN EL CAMINO', col: '#cfd8e6' }; } }
-  const dF = frameDist(sh.tx, sh.ty), inside = Math.abs(sh.tx) < GWID / 2 && sh.ty > 0 && sh.ty < GHEI, gk = players.find((q) => q.t !== p.t && q.role === 'gk');
-  if (dF < .5) return { k: 'palo', label: dF < .12 ? '¡PALO!' : 'CASI AL PALO', col: '#ffd23f' };
-  if (!inside) return { k: 'fuera', label: 'FUERA', col: '#ff6b6b' };
-  if (gk && Math.abs(sh.tx - gk.x) < .75 && sh.ty < 2.1) return { k: 'portero', label: 'AL PORTERO', col: '#6aa7ff' };
-  return { k: 'gol', label: 'PUERTA LIBRE', col: '#5dff9a' };
-}
-function drawAimTarget(pts, sh) {
-  const e = pts[pts.length - 1], s2 = project(e[0], e[1], e[2]), a = S.aim, p = a.p; if (!s2) return;
-  const po = a.corner ? null : predictOutcome(p, sh, pts), col = po ? po.col : '#ffd23f';
-  octx.strokeStyle = col; octx.lineWidth = 4; octx.beginPath(); octx.arc(s2[0], s2[1], 14, 0, Math.PI * 2); octx.moveTo(s2[0] - 22, s2[1]); octx.lineTo(s2[0] - 8, s2[1]); octx.moveTo(s2[0] + 8, s2[1]); octx.lineTo(s2[0] + 22, s2[1]); octx.moveTo(s2[0], s2[1] - 22); octx.lineTo(s2[0], s2[1] - 8); octx.moveTo(s2[0], s2[1] + 8); octx.lineTo(s2[0], s2[1] + 22); octx.stroke();
-  const txt = (t, x, y, c) => { octx.font = '800 13px system-ui,sans-serif'; octx.textAlign = 'center'; octx.lineWidth = 4; octx.strokeStyle = 'rgba(0,0,0,.75)'; octx.fillStyle = c; octx.strokeText(t, x, y); octx.fillText(t, x, y); };
-  if (po) txt(po.label, s2[0], s2[1] - 26, col);
-  if (!a.corner && !a.free) { const bm = bodyMode(p, sh.tx, attZ(p.t)); if (bm !== 'front') { const ps = project(p.x, 2.6 * (p.scale || 1), p.z); if (ps) txt(bm === 'back' ? '👟 TACO · poca fuerza' : '↪ DE LADO · más efecto', ps[0], ps[1], bm === 'back' ? '#ff9f3a' : '#9bd1ff'); } }
+function drawAimTarget(pts) {
+  const e = pts[pts.length - 1], s2 = project(e[0], e[1], e[2]); if (!s2) return;
+  octx.strokeStyle = '#ffd23f'; octx.lineWidth = 4; octx.beginPath(); octx.arc(s2[0], s2[1], 14, 0, Math.PI * 2); octx.moveTo(s2[0] - 22, s2[1]); octx.lineTo(s2[0] - 8, s2[1]); octx.moveTo(s2[0] + 8, s2[1]); octx.lineTo(s2[0] + 22, s2[1]); octx.moveTo(s2[0], s2[1] - 22); octx.lineTo(s2[0], s2[1] - 8); octx.moveTo(s2[0], s2[1] + 8); octx.lineTo(s2[0], s2[1] + 22); octx.stroke();
 }
 /* ====================== BOTONES TÁCTILES (D y altura del tiro) ====================== */
 const touchCarrier = () => { const o = ball.owner; if (o && o.t === 0 && o.role !== 'gk') return o; return players.filter((q) => q.t === 0 && q.role !== 'gk').sort((a, b) => Math.hypot(a.x - ball.x, a.z - ball.z) - Math.hypot(b.x - ball.x, b.z - ball.z))[0]; };
@@ -1901,8 +1954,8 @@ document.addEventListener('fullscreenchange', () => { resize(); grabFocus(); set
 setInterval(() => { $('#focusmsg').style.display = (S.mode === 'play' && !S.paused && !document.hasFocus()) ? 'block' : 'none'; }, 500);
 
 /* ====================== INTERFAZ ====================== */
-document.querySelectorAll('[data-play]').forEach((b) => b.addEventListener('click', () => { audio(); const m = b.dataset.play; startMatch(m === 'fk' ? 'fk' : 'match', m === 'fk' ? 'normal' : m); }));
-$('#bAgain').addEventListener('click', () => { audio(); if (S.tour && S.tour.inMatch) { tourAfterMatch(); return; } if (S.pvp && NET.host) { netRematch(); return; } startMatch(S.kind, S.diff); });
+document.querySelectorAll('[data-play]').forEach((b) => b.addEventListener('click', () => { audio(); const m = b.dataset.play; if (m === 'pen') startMatch('match', 'normal', { penOnly: true }); else startMatch('match', m); }));
+$('#bAgain').addEventListener('click', () => { audio(); if (S.tour && S.tour.inMatch) { tourAfterMatch(); return; } if (S.pvp && NET.host) { netRematch(); return; } startMatch(S.kind, S.diff, S.penOnly ? { penOnly: true } : undefined); });
 function toMenu() { netLeave(); S.pvp = false; S.tour = null; $('#tourov').classList.add('hidden'); S.mode = 'menu'; S.paused = false; S.aim = null; S.opp = null; hintShow(false); $('#endov').classList.add('hidden'); $('#pauseov').classList.add('hidden'); $('#menu').classList.remove('hidden'); $('#board').style.display = 'flex'; $('#fkinfo').style.display = 'none'; $('#toast').classList.remove('on'); crowdLevel(.06); createPlayers(); applyColors(null); }
 $('#bMenu').addEventListener('click', toMenu); $('#bQuit').addEventListener('click', toMenu); $('#tourMenu').addEventListener('click', toMenu);
 $('#bPause').addEventListener('click', () => { if (S.mode !== 'play' || S.pvp) return; S.paused = !S.paused; $('#pauseov').classList.toggle('hidden', !S.paused); });
@@ -1913,7 +1966,7 @@ document.addEventListener('contextmenu', (e) => e.preventDefault());
 window.addEventListener('resize', resize);
 if (initGL()) {
   resize(); createPlayers(); buildSwatches(); buildFields(); buildTeams(); applyColors(null); requestAnimationFrame(frame);
-  window.__g = { S, get players() { return players; }, get ball() { return ball; }, get cam() { return cam; }, musicBar, gkBarUpdate, reachBarUpdate, reachLock, startCorner, startHeader, tryReach, afterSave, PFX, predictOutcome, bodyMode, frameDist, touchD, kbAimUpdate, skillFor, startSetPiece, tourStart, applyColors, TEAM, TEAMSEL, TYPES, applyTeamCfg, startPenalties, penNext, setField, THEMES, NET, CTX, withTeam, applyDrag, startMatch, step, enterAim, aimFire, gkLock, aimConfirm, barLock, barUpdate, barZone, CR, crowdEv, crowdUpdate, audio, launchShot, kbAction, kbOn, setCtrl, actSlide, actSwitch, actGKOut, actPress, actShoot, actPass, actThrough, actSprint, doClear, kbDir, shotFromPath, startFreeKick, project, DIFF, planKick3D };
+  window.__g = { S, get players() { return players; }, get ball() { return ball; }, get cam() { return cam; }, musicBar, gkBarUpdate, reachBarUpdate, reachLock, startCorner, startHeader, tryReach, afterSave, PFX, desiredCam, bodyMode, frameDist, passTo, kickBall, mateVel, touchD, kbAimUpdate, skillFor, startSetPiece, tourStart, applyColors, TEAM, TEAMSEL, TYPES, applyTeamCfg, startPenalties, penNext, setField, THEMES, NET, CTX, withTeam, applyDrag, startMatch, step, enterAim, aimFire, gkLock, aimConfirm, barLock, barUpdate, barZone, CR, crowdEv, crowdUpdate, audio, launchShot, kbAction, kbOn, setCtrl, actSlide, actSwitch, actGKOut, actPress, actShoot, actPass, actThrough, actSprint, doClear, kbDir, shotFromPath, project, DIFF, planKick3D };
   if (/[?&]demo=1/.test(location.search)) startMatch('demo', 'normal');
 }
 
