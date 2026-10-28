@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SOCRATES: EL CAMINO DE LA SABIDURÍA</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#1a1410;font-family:Georgia,'Palatino Linotype',serif;color:#fff;user-select:none;-webkit-user-select:none}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+#fade{position:fixed;inset:0;background:#000;opacity:1;pointer-events:none;z-index:50}
+.hide{display:none!important}
+#floats{position:fixed;inset:0;pointer-events:none;z-index:6;overflow:hidden}
+.fl{position:absolute;left:0;top:0;font-weight:800;font-size:15px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;white-space:nowrap;padding:2px 8px;border-radius:10px;background:rgba(20,14,40,.55)}
+.fl.good{color:#aaffc8;background:rgba(10,60,30,.6)} .fl.ask{color:#ffe27a;font-style:italic} .fl.box{color:#ffe9b0;font-size:13px} .fl.fuse{font-size:34px;color:#ffd23a;background:rgba(150,10,0,.75);border-radius:50%;min-width:48px;text-align:center}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:5}
+#hud>div{position:absolute;text-shadow:0 2px 0 #000}
+#hudL{left:12px;top:10px} #amph{display:flex;gap:3px} #hudReg{font-size:12px;opacity:.9;margin-top:4px;letter-spacing:.5px}
+#hudC{left:50%;top:8px;transform:translateX(-50%);text-align:center} #lvName{font-size:15px;font-weight:700} #prog{width:min(40vw,260px);height:7px;background:rgba(0,0,0,.5);border-radius:5px;margin:6px auto 0;overflow:hidden;border:1px solid rgba(255,255,255,.3)} #progBar{display:block;height:100%;width:0;background:linear-gradient(90deg,#e8a43a,#ffe27a)}
+#hudR{right:12px;top:10px;text-align:right;font-size:16px;font-weight:700;line-height:1.5} #hudR b{color:#ffe27a}
+#kairos{position:fixed;left:50%;top:70px;transform:translateX(-50%);font-size:44px;font-weight:900;color:#ffe27a;text-shadow:0 3px 0 #5a2a90,0 0 14px #b07aff;z-index:7;pointer-events:none}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);max-width:min(88vw,640px);text-align:center;font-style:italic;font-size:19px;padding:10px 18px;background:rgba(30,20,10,.78);border:2px solid #c9a24a;border-radius:14px;opacity:0;transition:.35s;z-index:7;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#hint{position:fixed;left:50%;top:92px;transform:translateX(-50%) translateY(-10px);max-width:min(90vw,620px);text-align:center;font-size:16px;font-weight:700;padding:9px 16px;background:rgba(10,40,60,.82);border:2px solid #7fd0ff;border-radius:12px;opacity:0;transition:.3s;z-index:7;pointer-events:none}
+#hint.show{opacity:1;transform:translateX(-50%)}
+#prompt{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.7);border:2px solid #ffe27a;color:#ffe27a;padding:6px 16px;border-radius:20px;font-weight:800;z-index:7;pointer-events:none}
+#dialog{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);width:min(92vw,760px);min-height:120px;background:linear-gradient(#2b1f12,#1a120a);border:3px solid #c9a24a;border-radius:16px;padding:14px 20px;z-index:20;box-shadow:0 10px 40px #000}
+#dlgWho{font-weight:900;color:#ffe27a;font-size:18px;margin-bottom:6px;letter-spacing:.5px} #dlgTxt{font-size:19px;line-height:1.4;white-space:pre-wrap;min-height:54px} #dlgHint{text-align:right;font-size:12px;color:#c9a24a}
+.ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;z-index:30;background:rgba(18,10,4,.78);padding:16px;overflow:auto;text-align:center}
+#menu{background:radial-gradient(ellipse at 50% 35%,rgba(40,20,5,.35),rgba(12,6,2,.8))}
+h1{margin:0;font-size:clamp(22px,min(6.2vw,8vh),58px);letter-spacing:2px;color:#ffe9b0;text-shadow:0 4px 0 #7a4a10,0 0 30px #e8a43a;line-height:1.08}
+.sub{font-style:italic;font-size:clamp(14px,2.6vw,22px);color:#f3d9a0;margin:0 0 8px}
+h2{margin:0;color:#ffe9b0;text-shadow:0 3px 0 #7a4a10;font-size:clamp(24px,5vw,40px)}
+.meander{width:min(80vw,420px);height:14px;background:repeating-linear-gradient(90deg,#c9a24a 0 10px,transparent 10px 14px,#c9a24a 14px 18px,transparent 18px 28px);opacity:.8;border-top:2px solid #c9a24a;border-bottom:2px solid #c9a24a}
+.btn{font:inherit;font-weight:800;font-size:clamp(15px,2.6vw,19px);padding:11px 24px;min-width:230px;border-radius:12px;border:3px solid #7a4a10;background:linear-gradient(#f4c75a,#d9992a);color:#3a1d05;cursor:pointer;box-shadow:0 4px 0 #6a3a08,0 6px 14px rgba(0,0,0,.5)}
+.btn:hover{filter:brightness(1.1)} .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6a3a08}
+.btn.alt{background:linear-gradient(#7fd0ff,#3a8fd0);border-color:#12466e;color:#06223a;box-shadow:0 4px 0 #0c3252} .btn.ghost{background:rgba(255,255,255,.12);color:#ffe9b0;border-color:#c9a24a;box-shadow:none} .btn:disabled{cursor:default}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center}
+#map .grid,#mapBody{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;width:min(96vw,1000px);text-align:left}
+.world{background:rgba(255,235,180,.1);border:2px solid #c9a24a;border-radius:14px;padding:12px 14px}.world h3{margin:0 0 4px;color:#ffe27a;font-size:17px}.world p{margin:0 0 8px;font-size:13.5px;opacity:.92}.world em{opacity:.7;font-size:13px}.world.lock{opacity:.55;filter:grayscale(.5)}
+.btn.lvl{min-width:0;width:100%;font-size:15px;padding:8px 12px;text-align:left}.btn.lvl small{display:block;font-weight:600;font-size:12px;margin-top:2px;color:#4a2a08}
+#galTabs{display:flex;gap:8px}#galTabs button{font:inherit;font-weight:700;padding:7px 16px;border-radius:10px;border:2px solid #c9a24a;background:rgba(255,255,255,.1);color:#ffe9b0;cursor:pointer}#galTabs button.on{background:#c9a24a;color:#2a1608}
+#galBody{display:grid;gap:10px;width:min(94vw,820px);text-align:left;max-height:56vh;overflow:auto;padding:4px}
+.gi{background:rgba(255,235,180,.1);border:2px solid #c9a24a;border-radius:12px;padding:10px 14px}.gi q{font-size:18px;color:#ffe9b0;font-style:italic;display:block}.gi small,.gi b{display:block}.gi small{opacity:.85;font-size:13px;margin-top:3px}.gi b{color:#ffe27a;font-size:17px}.gi.lock{opacity:.5}
+.opt{display:flex;gap:12px;align-items:center;justify-content:space-between;width:min(88vw,360px);font-size:17px}.opt input[type=range]{width:160px}
+#vAmph{display:flex;gap:10px;justify-content:center}#vRank{font-size:64px;font-weight:900;color:#ffe27a;text-shadow:0 4px 0 #7a4a10;line-height:1}
+#vStats{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;width:min(90vw,460px);text-align:left;font-size:16px}#vStats div{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,226,122,.35);padding:2px 0}#vStats b{color:#ffe27a}
+#vGoals{font-size:14px;text-align:left;opacity:.95}#vPhrase{font-style:italic;max-width:min(90vw,560px);font-size:17px;color:#f3d9a0}
+#story{background:#0c0805;z-index:40}#story p{max-width:min(90vw,620px);font-size:clamp(15px,2.8vw,21px);line-height:1.5;margin:4px 0;color:#f3d9a0}#story .inc{font-size:clamp(20px,4vw,32px);color:#ffe9b0;font-style:italic;text-shadow:0 0 22px #e8a43a;margin:14px 0}
+#loading{background:#0c0805;z-index:45}#loadT{font-size:clamp(20px,4vw,34px);color:#ffe9b0;font-weight:800}#loadP{font-style:italic;color:#f3d9a0;max-width:min(88vw,560px);font-size:18px}
+#riddle{background:rgba(10,6,20,.85)}#riddleQ{font-size:22px;max-width:min(90vw,560px);color:#ffe27a;margin-bottom:6px}#riddleO{display:flex;flex-direction:column;gap:10px;max-width:min(92vw,560px)}#riddleO .btn{text-align:left;min-width:0;font-size:16px}
+#touch{position:fixed;inset:0;z-index:8;pointer-events:none}#joy{position:absolute;left:18px;bottom:18px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);pointer-events:auto;touch-action:none}#joyK{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,226,122,.7)}
+.tb{position:absolute;width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(0,0,0,.4);color:#fff;font:800 13px Georgia;pointer-events:auto;touch-action:none}.tb.on{background:rgba(232,164,58,.8)}
+#tbJump{right:20px;bottom:30px;width:78px;height:78px}#tbSpin{right:108px;bottom:20px}#tbSlide{right:20px;bottom:122px}#tbAct{right:98px;bottom:98px;width:52px;height:52px}#tbRun{left:160px;bottom:30px;width:56px;height:56px}
+@media (max-height:560px){.btn{padding:7px 18px;font-size:15px;min-width:200px}.ov{gap:8px}.meander{height:9px}}
+.ov>:first-child{margin-top:auto}.ov>:last-child{margin-bottom:auto}
+@media (max-width:640px){#hudR{font-size:13px}#amph svg{width:17px;height:24px}#lvName{font-size:12px}}
+</style></head><body>
+<canvas id="gl"></canvas><div id="floats"></div>
+<div id="hud" class="hide"><div id="hudL"><div id="amph"></div><div id="hudReg"></div></div><div id="hudC"><div id="lvName"></div><div id="prog"><i id="progBar"></i></div></div><div id="hudR"><div>Óbolos <b id="coinN">0</b></div><div>Pergaminos <b id="scrN">0/3</b></div><div>Tiempo <b id="timeN">0:00</b></div><div>Puntos <b id="scoreN">0</b></div></div></div>
+<div id="kairos" class="hide"></div><div id="toast"></div><div id="hint"></div><div id="prompt" class="hide"></div>
+<div id="dialog" class="hide"><div id="dlgWho"></div><div id="dlgTxt"></div><div id="dlgHint"></div></div>
+<div id="touch" class="hide"><div id="joy"><div id="joyK"></div></div><button class="tb" id="tbRun">Correr</button><button class="tb" id="tbSlide">Desliz.</button><button class="tb" id="tbSpin">Girar</button><button class="tb" id="tbJump">Saltar</button><button class="tb" id="tbAct">E</button></div>
+<div id="menu" class="ov"><div class="meander"></div><h1>SOCRATES:<br>EL CAMINO DE LA SABIDURÍA</h1><p class="sub">«La filosofía es un deporte de riesgo».</p><div class="col"><button class="btn" id="bNew">Nueva aventura</button><button class="btn alt" id="bCont">Continuar</button><button class="btn alt" id="bLevels">Selección de niveles</button><button class="btn ghost" id="bGal">Galería filosófica</button><button class="btn ghost" id="bOpts">Opciones</button></div><div class="meander"></div></div>
+<div id="story" class="ov hide"><p>Hades ha descubierto que los atenienses están dejando de pensar por sí mismos.</p><p>Los sofistas han robado los Pergaminos de la Verdad y los han repartido por el mundo griego.</p><p>Solo un hombre incómodo, barbudo y con sandalias puede recuperarlos… haciendo preguntas.</p><p class="inc">Un sofista crea una plataforma falsa mediante un argumento engañoso.</p><button class="btn" id="stGo">Comenzar</button></div>
+<div id="map" class="ov hide"><h2>Selección de niveles</h2><div id="mapBody"></div><button class="btn ghost" id="mapBack">Volver</button></div>
+<div id="gallery" class="ov hide"><h2>Galería filosófica</h2><div id="galTabs"><button data-t="insc">Inscripciones</button><button data-t="chars">Personajes</button><button data-t="misc">Colección</button></div><div id="galBody"></div><button class="btn ghost" id="galBack">Volver</button></div>
+<div id="opts" class="ov hide"><h2>Opciones</h2><label class="opt">Música <input type="range" id="optMus" min="0" max="100"></label><label class="opt">Efectos <input type="range" id="optSfx" min="0" max="100"></label><label class="opt">Controles táctiles <input type="checkbox" id="optTouch"></label><p class="sub" style="max-width:420px">WASD mover · Espacio saltar (doble salto desbloqueable) · Shift correr · C o Ctrl deslizarse/agacharse · J o clic atacar · E interactuar · Esc pausa</p><button class="btn ghost" id="optReset">Borrar progreso</button><button class="btn" id="optBack">Volver</button></div>
+<div id="pause" class="ov hide"><h2>Pausa</h2><div class="col"><button class="btn" id="pResume">Continuar</button><button class="btn alt" id="pRestart">Reiniciar nivel</button><button class="btn ghost" id="pOpts">Opciones</button><button class="btn ghost" id="pMenu">Menú principal</button></div></div>
+<div id="victory" class="ov hide"><h2 id="vTitle"></h2><div class="sub" id="vSub"></div><div id="vAmph"></div><div id="vRank"></div><div id="vStats"></div><div id="vGoals"></div><div id="vPhrase"></div><div class="col"><button class="btn" id="vMap">Selección de niveles</button><button class="btn ghost" id="vRetry">Repetir nivel</button></div></div>
+<div id="defeat" class="ov hide"><h2>Has caído</h2><div id="dPhrase" class="sub"></div><div id="dInfo"></div><button class="btn" id="dGo">Volver a la estatua</button></div>
+<div id="loading" class="ov hide"><div id="loadT"></div><div class="meander"></div><div id="loadP"></div></div>
+<div id="riddle" class="ov hide"><h2>Caja de Platón</h2><div id="riddleQ"></div><div id="riddleO"></div></div>
+<div id="fade"></div>
+<script>
+'use strict';
+/* ====================== MOTOR WEBGL MÍNIMO (sin dependencias) ====================== */
+const $ = (s) => document.querySelector(s);
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v), lerp = (a, b, t) => a + (b - a) * t, rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
+const cv = $('#gl'), gl = cv.getContext('webgl', { antialias: true, alpha: false });
+const M4 = {
+  id: () => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
+  mul(a, b) { const o = new Float32Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; },
+  T(x, y, z) { const m = M4.id(); m[12] = x; m[13] = y; m[14] = z; return m; },
+  S(x, y, z) { const m = M4.id(); m[0] = x; m[5] = y; m[10] = z; return m; },
+  RX(a) { const m = M4.id(), c = Math.cos(a), s = Math.sin(a); m[5] = c; m[6] = s; m[9] = -s; m[10] = c; return m; },
+  RY(a) { const m = M4.id(), c = Math.cos(a), s = Math.sin(a); m[0] = c; m[2] = -s; m[8] = s; m[10] = c; return m; },
+  RZ(a) { const m = M4.id(), c = Math.cos(a), s = Math.sin(a); m[0] = c; m[1] = s; m[4] = -s; m[5] = c; return m; },
+  // T * RY * RX * RZ * S
+  trs(x, y, z, rx, ry, rz, sx, sy, sz) { let m = M4.mul(M4.T(x, y, z), M4.RY(ry || 0)); if (rx) m = M4.mul(m, M4.RX(rx)); if (rz) m = M4.mul(m, M4.RZ(rz)); return M4.mul(m, M4.S(sx, sy, sz)); },
+  // proyección con X espejado: con la cámara mirando a +Z, el +X del mundo queda a la DERECHA de la pantalla
+  persp(fov, asp, n, f) { const t = 1 / Math.tan(fov / 2), m = new Float32Array(16); m[0] = -t / asp; m[5] = t; m[10] = (f + n) / (n - f); m[11] = -1; m[14] = 2 * f * n / (n - f); return m; },
+  look(e, a, up) {
+    let zx = e[0] - a[0], zy = e[1] - a[1], zz = e[2] - a[2], l = Math.hypot(zx, zy, zz) || 1; zx /= l; zy /= l; zz /= l;
+    let xx = up[1] * zz - up[2] * zy, xy = up[2] * zx - up[0] * zz, xz = up[0] * zy - up[1] * zx; l = Math.hypot(xx, xy, xz) || 1; xx /= l; xy /= l; xz /= l;
+    const yx = zy * xz - zz * xy, yy = zz * xx - zx * xz, yz = zx * xy - zy * xx;
+    return new Float32Array([xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, -(xx * e[0] + xy * e[1] + xz * e[2]), -(yx * e[0] + yy * e[1] + yz * e[2]), -(zx * e[0] + zy * e[1] + zz * e[2]), 1]);
+  },
+};
+const VS = `attribute vec3 aP;attribute vec3 aN;attribute vec2 aUV;uniform mat4 uVP,uM;uniform vec3 uTile;varying vec3 vN,vW;varying vec2 vUV;
+void main(){vec4 w=uM*vec4(aP,1.0);vW=w.xyz;vN=(uM*vec4(aN,0.0)).xyz;vec3 an=abs(aN);vec2 sc=an.y>.5?uTile.xz:(an.x>.5?uTile.zy:uTile.xy);vUV=aUV*sc;gl_Position=uVP*w;}`;
+const FS = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec3 vN,vW;varying vec2 vUV;uniform vec4 uCol;uniform sampler2D uTex;uniform float uUseTex,uEmis,uRim,uFx,uTime;uniform vec3 uSun,uLD,uAmbT,uAmbB,uFog,uCam,uSkyT,uSkyB;uniform vec2 uFogR;
+void main(){
+ if(uFx>2.5){float h=normalize(vW-uCam).y;gl_FragColor=vec4(mix(uSkyB,uSkyT,smoothstep(-.02,.55,h)),1.0);return;}
+ vec4 b=uCol;if(uUseTex>.5)b*=texture2D(uTex,vUV);
+ vec3 N=normalize(vN),V=normalize(uCam-vW);
+ float nl=max(dot(N,uLD),0.0);
+ vec3 amb=mix(uAmbB,uAmbT,N.y*.5+.5);
+ vec3 c=b.rgb*(amb+uSun*nl)+uRim*pow(1.0-max(dot(N,V),0.0),2.5)*vec3(1.0,.93,.7)+b.rgb*uEmis;
+ float a=b.a;
+ if(uFx>.5&&uFx<1.5){float s=step(.5,fract(vW.y*5.0+vW.x*2.0+vW.z*2.0+uTime*1.2));a*=.32+.28*s+.14*sin(uTime*8.0);c+=vec3(.4,.32,.08)*s;}
+ if(uFx>1.5&&uFx<2.5){float w=sin(vW.x*.6+uTime*.9)*sin(vW.z*.5-uTime*.7);c*=.85+.15*w;c+=vec3(.05,.08,.1)*step(.92,w);}
+ float d=length(vW-uCam);c=mix(c,uFog,clamp((d-uFogR.x)/(uFogR.y-uFogR.x),0.,1.));
+ if(a<.02)discard;
+ gl_FragColor=vec4(c,a);}`;
+const prog = gl.createProgram();
+for (const [t, src] of [[gl.VERTEX_SHADER, VS], [gl.FRAGMENT_SHADER, FS]]) { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); gl.attachShader(prog, s); }
+gl.bindAttribLocation(prog, 0, 'aP'); gl.bindAttribLocation(prog, 1, 'aN'); gl.bindAttribLocation(prog, 2, 'aUV'); gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(prog));
+const U = {}; for (const n of ['uVP', 'uM', 'uTile', 'uCol', 'uTex', 'uUseTex', 'uEmis', 'uRim', 'uFx', 'uTime', 'uSun', 'uLD', 'uAmbT', 'uAmbB', 'uFog', 'uCam', 'uSkyT', 'uSkyB', 'uFogR']) U[n] = gl.getUniformLocation(prog, n);
+gl.useProgram(prog); gl.enableVertexAttribArray(0); gl.enableVertexAttribArray(1); gl.enableVertexAttribArray(2);
+
+function mkMesh(P, N, UV, I) {
+  const n = P.length / 3, d = new Float32Array(n * 8);
+  for (let i = 0; i < n; i++) { d[i * 8] = P[i * 3]; d[i * 8 + 1] = P[i * 3 + 1]; d[i * 8 + 2] = P[i * 3 + 2]; d[i * 8 + 3] = N[i * 3]; d[i * 8 + 4] = N[i * 3 + 1]; d[i * 8 + 5] = N[i * 3 + 2]; d[i * 8 + 6] = UV[i * 2]; d[i * 8 + 7] = UV[i * 2 + 1]; }
+  const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, d, gl.STATIC_DRAW);
+  const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(I), gl.STATIC_DRAW);
+  return { vb, ib, n: I.length };
+}
+function buildBox() {
+  const faces = [[[1, 0, 0], [0, 0, -1], [0, 1, 0]], [[-1, 0, 0], [0, 0, 1], [0, 1, 0]], [[0, 1, 0], [1, 0, 0], [0, 0, -1]], [[0, -1, 0], [1, 0, 0], [0, 0, 1]], [[0, 0, 1], [1, 0, 0], [0, 1, 0]], [[0, 0, -1], [-1, 0, 0], [0, 1, 0]]];
+  const P = [], N = [], UV = [], I = [];
+  faces.forEach(([n, u, v], f) => { for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { P.push(n[0] * .5 + u[0] * a * .5 + v[0] * b * .5, n[1] * .5 + u[1] * a * .5 + v[1] * b * .5, n[2] * .5 + u[2] * a * .5 + v[2] * b * .5); N.push(...n); UV.push(a * .5 + .5, b * .5 + .5); } I.push(f * 4, f * 4 + 1, f * 4 + 2, f * 4, f * 4 + 2, f * 4 + 3); });
+  return mkMesh(P, N, UV, I);
+}
+function buildCyl(r0, r1, hang, seg) {
+  seg = seg || 14; const P = [], N = [], UV = [], I = [], y0 = hang ? -1 : 0, y1 = hang ? 0 : 1, sl = (r0 - r1);
+  for (let i = 0; i <= seg; i++) { const a = i / seg * TAU, c = Math.cos(a), s = Math.sin(a); P.push(c * r0, y0, s * r0, c * r1, y1, s * r1); const l = Math.hypot(1, sl); N.push(c / l, sl / l, s / l, c / l, sl / l, s / l); UV.push(i / seg, 0, i / seg, 1); if (i < seg) I.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2); }
+  for (const [y, r, ny] of [[y1, r1, 1], [y0, r0, -1]]) { if (r <= 0) continue; const b = P.length / 3; P.push(0, y, 0); N.push(0, ny, 0); UV.push(.5, .5); for (let i = 0; i <= seg; i++) { const a = i / seg * TAU; P.push(Math.cos(a) * r, y, Math.sin(a) * r); N.push(0, ny, 0); UV.push(.5 + Math.cos(a) * .5, .5 + Math.sin(a) * .5); if (i < seg) I.push(b, b + 1 + i, b + 2 + i); } }
+  return mkMesh(P, N, UV, I);
+}
+function buildSphere(la, lo) {
+  la = la || 10; lo = lo || 14; const P = [], N = [], UV = [], I = [];
+  for (let i = 0; i <= la; i++) for (let j = 0; j <= lo; j++) { const th = i / la * Math.PI, ph = j / lo * TAU, x = Math.sin(th) * Math.cos(ph), y = Math.cos(th), z = Math.sin(th) * Math.sin(ph); P.push(x, y, z); N.push(x, y, z); UV.push(j / lo, i / la); }
+  for (let i = 0; i < la; i++) for (let j = 0; j < lo; j++) { const a = i * (lo + 1) + j, b = a + lo + 1; I.push(a, b, a + 1, b, b + 1, a + 1); }
+  return mkMesh(P, N, UV, I);
+}
+function buildDisc(seg) { seg = seg || 24; const P = [0, 0, 0], N = [0, 1, 0], UV = [.5, .5], I = []; for (let i = 0; i <= seg; i++) { const a = i / seg * TAU; P.push(Math.cos(a), 0, Math.sin(a)); N.push(0, 1, 0); UV.push(.5 + Math.cos(a) * .5, .5 + Math.sin(a) * .5); if (i < seg) I.push(0, i + 1, i + 2); } return mkMesh(P, N, UV, I); }
+function buildQuad() { return mkMesh([-.5, -.5, 0, .5, -.5, 0, .5, .5, 0, -.5, .5, 0], [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1], [0, 0, 1, 0, 1, 1, 0, 1], [0, 1, 2, 0, 2, 3]); }
+function buildPrism() { // prisma triangular (frontón): base y 0..., ápice y=1, ancho x ±.5, profundidad z ±.5
+  const P = [], N = [], UV = [], I = []; const add = (pts, n) => { const b = P.length / 3; for (const p of pts) { P.push(...p); N.push(...n); UV.push(p[0] + .5, p[1]); } I.push(b, b + 1, b + 2); if (pts.length === 4) I.push(b, b + 2, b + 3); };
+  add([[-.5, 0, .5], [.5, 0, .5], [0, 1, .5]], [0, 0, 1]); add([[-.5, 0, -.5], [.5, 0, -.5], [0, 1, -.5]], [0, 0, -1]);
+  add([[-.5, 0, .5], [0, 1, .5], [0, 1, -.5], [-.5, 0, -.5]], [-.8, .6, 0]); add([[.5, 0, .5], [0, 1, .5], [0, 1, -.5], [.5, 0, -.5]], [.8, .6, 0]); add([[-.5, 0, .5], [.5, 0, .5], [.5, 0, -.5], [-.5, 0, -.5]], [0, -1, 0]);
+  return mkMesh(P, N, UV, I);
+}
+const MB = buildBox(), MS = buildSphere(), MD = buildDisc(), MQ = buildQuad(), MPR = buildPrism(), _cyl = {};
+const MC = (r0, r1, hang) => { const k = r0 + '_' + r1 + '_' + (hang ? 1 : 0); return _cyl[k] || (_cyl[k] = buildCyl(r0, r1, hang)); };
+
+/* ---- texturas generadas por código ---- */
+function mkTex(w, h, fn) { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); fn(x, w, h); const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c); const p2 = (w & (w - 1)) === 0 && (h & (h - 1)) === 0; if (p2) { gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT); } else { gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); } gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); return t; }
+const _lab = {};
+function labelTex(txt, bg, fg) { const k = txt + bg + fg; return _lab[k] || (_lab[k] = mkTex(256, 64, (x, w, h) => { x.fillStyle = bg; x.beginPath(); x.roundRect ? x.roundRect(2, 2, w - 4, h - 4, 16) : x.rect(2, 2, w - 4, h - 4); x.fill(); x.strokeStyle = fg; x.lineWidth = 4; x.stroke(); x.fillStyle = fg; x.font = 'bold 30px Georgia,serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, w / 2, h / 2 + 2); })); }
+
+/* ---- cola de dibujo ---- */
+const Q = { op: [], tr: [] }; let VP = M4.id(), CAMP = [0, 0, 0], SCR = [1, 1];
+function draw(mesh, M, col, o) { const e = { mesh, M, col, o: o || null }; if (o && ((o.a !== undefined && o.a < 1) || o.fx === 1)) Q.tr.push(e); else Q.op.push(e); }
+let _lastMesh = null;
+function drawNow(e) {
+  const m = e.mesh, o = e.o || {}, c = e.col;
+  if (m !== _lastMesh) { gl.bindBuffer(gl.ARRAY_BUFFER, m.vb); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.ib); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 32, 0); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 32, 12); gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 32, 24); _lastMesh = m; }
+  gl.uniformMatrix4fv(U.uM, false, e.M); gl.uniform4f(U.uCol, (c >> 16 & 255) / 255, (c >> 8 & 255) / 255, (c & 255) / 255, o.a === undefined ? 1 : o.a);
+  if (o.tex) { gl.bindTexture(gl.TEXTURE_2D, o.tex); gl.uniform1f(U.uUseTex, 1); } else gl.uniform1f(U.uUseTex, 0);
+  gl.uniform1f(U.uEmis, o.emis || 0); gl.uniform1f(U.uRim, o.rim || 0); gl.uniform1f(U.uFx, o.fx || 0);
+  const t = o.tile; gl.uniform3f(U.uTile, t ? t[0] : 1, t ? t[1] : 1, t ? t[2] : 1);
+  gl.drawElements(gl.TRIANGLES, m.n, gl.UNSIGNED_SHORT, 0);
+}
+function hexv(h) { return [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255]; }
+function resizeGL() { const dpr = Math.min(window.devicePixelRatio || 1, 1.5), w = Math.floor(innerWidth * dpr), h = Math.floor(innerHeight * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } SCR = [innerWidth, innerHeight]; }
+function renderFrame(cam, th, time) {
+  resizeGL(); gl.viewport(0, 0, cv.width, cv.height); const f = hexv(th.fog); gl.clearColor(f[0], f[1], f[2], 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  const P = M4.persp(cam.fov || 1.05, cv.width / cv.height, .3, 600), V = M4.look([cam.x, cam.y, cam.z], [cam.tx, cam.ty, cam.tz], [0, 1, 0]); VP = M4.mul(P, V); CAMP = [cam.x, cam.y, cam.z];
+  gl.useProgram(prog); gl.uniformMatrix4fv(U.uVP, false, VP); gl.uniform1f(U.uTime, time); gl.uniform3f(U.uCam, cam.x, cam.y, cam.z);
+  gl.uniform3fv(U.uSun, hexv(th.sun)); const ld = th.ld, ll = Math.hypot(...ld); gl.uniform3f(U.uLD, ld[0] / ll, ld[1] / ll, ld[2] / ll);
+  gl.uniform3fv(U.uAmbT, hexv(th.ambT)); gl.uniform3fv(U.uAmbB, hexv(th.ambB)); gl.uniform3fv(U.uFog, f); gl.uniform2f(U.uFogR, th.fogR[0], th.fogR[1]); gl.uniform3fv(U.uSkyT, hexv(th.skyT)); gl.uniform3fv(U.uSkyB, hexv(th.skyB));
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.activeTexture(gl.TEXTURE0); gl.uniform1i(U.uTex, 0);
+  gl.depthMask(false); _lastMesh = null; drawNow({ mesh: MS, M: M4.mul(M4.T(cam.x, cam.y, cam.z), M4.S(300, 300, 300)), col: 0xffffff, o: { fx: 3 } }); gl.depthMask(true);
+  for (const e of Q.op) drawNow(e);
+  gl.depthMask(false); const dd = (e) => { const m = e.M; return (m[12] - cam.x) ** 2 + (m[13] - cam.y) ** 2 + (m[14] - cam.z) ** 2; };
+  Q.tr.sort((a, b) => dd(b) - dd(a)); for (const e of Q.tr) drawNow(e); gl.depthMask(true);
+  Q.op.length = 0; Q.tr.length = 0;
+}
+function project(x, y, z) { const m = VP, cx = m[0] * x + m[4] * y + m[8] * z + m[12], cy = m[1] * x + m[5] * y + m[9] * z + m[13], cw = m[3] * x + m[7] * y + m[11] * z + m[15]; if (cw <= .1) return null; return [(cx / cw * .5 + .5) * SCR[0], (1 - (cy / cw * .5 + .5)) * SCR[1], cw]; }
+
+/* ====================== TEXTURAS Y MODELOS PROCEDURALES ====================== */
+const TX = {};
+function meander(x, w, h, col, th, y0) { x.strokeStyle = col; x.lineWidth = th; x.beginPath(); const s = th * 2.2; let px = 4; x.moveTo(px, y0 + s); while (px < w - 8) { x.lineTo(px, y0); x.lineTo(px + s, y0); x.lineTo(px + s, y0 + s * .66); x.lineTo(px + s * .33, y0 + s * .66); x.lineTo(px + s * .33, y0 + s * .33); x.lineTo(px + s * .66, y0 + s * .33); px += s * 1.4; x.moveTo(px, y0 + s); } x.stroke(); }
+function frame(x, w, h, fill, edge, t) { x.fillStyle = edge; x.fillRect(0, 0, w, h); x.fillStyle = fill; x.fillRect(t, t, w - 2 * t, h - 2 * t); }
+function initTextures() {
+  TX.stone = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#cdb78f'; x.fillRect(0, 0, w, h); for (let i = 0; i < 260; i++) { x.fillStyle = `rgba(${90 + Math.random() * 60 | 0},${75 + Math.random() * 50 | 0},50,.12)`; x.fillRect(Math.random() * w, Math.random() * h, 3, 3); } x.strokeStyle = '#8f7a55'; x.lineWidth = 3; x.strokeRect(1, 1, w - 2, h - 2); x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h / 2); x.moveTo(0, h / 2); x.lineTo(w, h / 2); x.moveTo(w / 4, h / 2); x.lineTo(w / 4, h); x.stroke(); });
+  TX.marble = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#f1ece0'; x.fillRect(0, 0, w, h); x.strokeStyle = 'rgba(120,130,150,.35)'; x.lineWidth = 1.5; for (let i = 0; i < 5; i++) { x.beginPath(); x.moveTo(Math.random() * w, 0); x.bezierCurveTo(Math.random() * w, h * .3, Math.random() * w, h * .6, Math.random() * w, h); x.stroke(); } x.strokeStyle = '#bdb5a0'; x.lineWidth = 3; x.strokeRect(1, 1, w - 2, h - 2); });
+  TX.wall = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#b39a74'; x.fillRect(0, 0, w, h); x.strokeStyle = '#7d6847'; x.lineWidth = 3; for (let r = 0; r < 4; r++) { x.strokeRect(-2 + (r % 2) * 32, r * 32, 64, 32); x.strokeRect(62 + (r % 2) * 32, r * 32, 64, 32); } meander(x, w, h, '#6b5535', 3, 6); });
+  TX.gold = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#e9d18a'; x.fillRect(0, 0, w, h); x.strokeStyle = '#b88a1c'; x.lineWidth = 6; x.strokeRect(3, 3, w - 6, h - 6); x.lineWidth = 2; x.strokeRect(14, 14, w - 28, h - 28); meander(x, w, h, '#9a6f10', 3, 52); });
+  TX.ill = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#f6e7a0'; x.fillRect(0, 0, w, h); x.strokeStyle = '#d9a82b'; x.lineWidth = 4; x.setLineDash([10, 8]); x.strokeRect(5, 5, w - 10, h - 10); x.setLineDash([]); x.fillStyle = '#b88a1c'; x.font = 'bold 70px Georgia'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', w / 2, h / 2 + 4); });
+  const box = (k, fn) => { TX[k] = mkTex(128, 128, fn); };
+  box('wood', (x, w, h) => { frame(x, w, h, '#c98c4b', '#6f411c', 12); x.strokeStyle = '#8a5a2a'; x.lineWidth = 3; for (let i = 1; i < 4; i++) { x.beginPath(); x.moveTo(12 + i * 26, 12); x.lineTo(12 + i * 26, h - 12); x.stroke(); } x.strokeStyle = '#7a4a22'; x.lineWidth = 9; x.beginPath(); x.moveTo(14, 14); x.lineTo(w - 14, h - 14); x.moveTo(w - 14, 14); x.lineTo(14, h - 14); x.stroke(); x.fillStyle = '#3a2410'; for (const [a, b] of [[8, 8], [w - 8, 8], [8, h - 8], [w - 8, h - 8]]) { x.beginPath(); x.arc(a, b, 3, 0, TAU); x.fill(); } });
+  box('ceramic', (x, w, h) => { frame(x, w, h, '#d9693f', '#3b1a0e', 10); meander(x, w, h, '#3b1a0e', 3, 14); meander(x, w, h, '#3b1a0e', 3, h - 30); x.fillStyle = '#2a120a'; x.beginPath(); x.ellipse(w / 2, h / 2 + 4, 20, 26, 0, 0, TAU); x.fill(); x.fillRect(w / 2 - 7, h / 2 - 30, 14, 14); x.lineWidth = 5; x.strokeStyle = '#2a120a'; x.beginPath(); x.arc(w / 2 - 24, h / 2 - 6, 9, Math.PI * .5, Math.PI * 1.5); x.arc(w / 2 + 24, h / 2 - 6, 9, -Math.PI * .5, Math.PI * .5); x.stroke(); });
+  box('bounce', (x, w, h) => { frame(x, w, h, '#2fbf9f', '#0c5f55', 12); x.strokeStyle = '#fff'; x.lineWidth = 8; x.beginPath(); x.moveTo(30, 100); for (let i = 0; i < 5; i++) { x.lineTo(98, 90 - i * 14); x.lineTo(30, 83 - i * 14); } x.stroke(); x.fillStyle = '#fff'; x.font = 'bold 34px Georgia'; x.textAlign = 'center'; x.fillText('?', w / 2, 36); });
+  box('check', (x, w, h) => { frame(x, w, h, '#e6c25a', '#7a5a10', 10); x.fillStyle = '#5b3d08'; x.font = 'bold 24px Georgia'; x.textAlign = 'center'; x.fillText('ΓΝΩΘΙ', w / 2, 50); x.fillText('ΣΕΑΥΤΟΝ', w / 2, 82); meander(x, w, h, '#7a5a10', 2.5, 96); });
+  box('cicuta', (x, w, h) => { x.fillStyle = '#1a1a1a'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffd400'; for (let i = -8; i < 20; i++) { x.beginPath(); x.moveTo(i * 14, 0); x.lineTo(i * 14 + 8, 0); x.lineTo(i * 14 - 20 + 8 + 20, h); x.lineTo(i * 14 - 20 + 20 - 8 + 8, h); x.closePath(); } for (let i = -3; i < 14; i++) { x.beginPath(); x.moveTo(i * 20, 0); x.lineTo(i * 20 + 10, 0); x.lineTo(i * 20 - 30, h); x.lineTo(i * 20 - 40, h); x.closePath(); x.fill(); } const g = x.createRadialGradient(w / 2, h / 2, 6, w / 2, h / 2, 56); g.addColorStop(0, '#b6ff4a'); g.addColorStop(1, '#1f8f2a'); x.fillStyle = g; x.fillRect(14, 14, w - 28, h - 28); x.strokeStyle = '#0d4a14'; x.lineWidth = 3; x.strokeRect(14, 14, w - 28, h - 28); x.fillStyle = '#f2f7d8'; x.beginPath(); x.arc(w / 2, h / 2 - 6, 22, 0, TAU); x.fill(); x.fillRect(w / 2 - 13, h / 2 + 10, 26, 14); x.fillStyle = '#0d2a0d'; x.beginPath(); x.arc(w / 2 - 9, h / 2 - 8, 6, 0, TAU); x.arc(w / 2 + 9, h / 2 - 8, 6, 0, TAU); x.fill(); x.fillRect(w / 2 - 1.5, h / 2 + 2, 3, 6); x.fillRect(w / 2 - 8, h / 2 + 15, 3, 9); x.fillRect(w / 2 + 5, h / 2 + 15, 3, 9); x.strokeStyle = '#0d4a14'; x.lineWidth = 5; x.beginPath(); x.moveTo(24, h - 24); x.lineTo(w - 24, h - 40); x.moveTo(24, h - 40); x.lineTo(w - 24, h - 24); x.stroke(); });
+  box('tnt', (x, w, h) => { frame(x, w, h, '#d6342a', '#6e0f0a', 8); x.fillStyle = '#f4efe2'; x.fillRect(10, 44, w - 20, 40); x.fillStyle = '#1b1b1b'; x.font = 'bold 36px Georgia'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('TNT', w / 2, 65); x.fillStyle = '#ffd23a'; x.beginPath(); x.moveTo(64, 8); x.lineTo(50, 34); x.lineTo(62, 34); x.lineTo(54, 42); x.lineTo(78, 24); x.lineTo(66, 24); x.closePath(); x.fill(); x.fillStyle = '#7a1008'; for (let i = 0; i < 4; i++) x.fillRect(16 + i * 26, 96, 14, 22); });
+  box('aporia', (x, w, h) => { frame(x, w, h, '#f08a1c', '#6b3a05', 10); x.strokeStyle = '#4a2503'; x.lineWidth = 6; x.beginPath(); for (let a = 0; a < 14; a += .1) { const r = 4 + a * 3.2; x.lineTo(64 + Math.cos(a) * r, 60 + Math.sin(a) * r); } x.stroke(); x.fillStyle = '#4a2503'; x.font = 'bold 15px Georgia'; x.textAlign = 'center'; x.fillText('ΑΠΟΡΙΑ', w / 2, h - 14); });
+  box('kairos', (x, w, h) => { frame(x, w, h, '#8a5bd6', '#3d2078', 10); x.strokeStyle = '#fff'; x.lineWidth = 6; x.beginPath(); x.arc(64, 64, 34, 0, TAU); x.stroke(); x.beginPath(); x.moveTo(64, 64); x.lineTo(64, 40); x.moveTo(64, 64); x.lineTo(82, 72); x.stroke(); x.fillStyle = '#fff'; x.font = 'bold 14px Georgia'; x.textAlign = 'center'; x.fillText('ΚΑΙΡΟΣ', 64, 118); });
+  box('platon', (x, w, h) => { frame(x, w, h, '#2f6fe0', '#e8c14a', 10); x.fillStyle = '#ffe28a'; x.font = 'bold 80px Georgia'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Φ', w / 2, h / 2 + 4); });
+  box('arist', (x, w, h) => { frame(x, w, h, '#f1ead2', '#b8892a', 10); x.strokeStyle = '#6b4c10'; x.lineWidth = 5; x.beginPath(); x.moveTo(64, 30); x.lineTo(64, 92); x.moveTo(28, 44); x.lineTo(100, 44); x.moveTo(36, 44); x.lineTo(24, 66); x.lineTo(48, 66); x.closePath(); x.moveTo(92, 44); x.lineTo(80, 66); x.lineTo(104, 66); x.closePath(); x.moveTo(44, 96); x.lineTo(84, 96); x.stroke(); x.fillStyle = '#6b4c10'; x.font = 'bold 13px Georgia'; x.textAlign = 'center'; x.fillText('ΜΕΣΟΝ', 64, 118); });
+  box('dioge', (x, w, h) => { frame(x, w, h, '#7b5530', '#2b1a0a', 10); x.fillStyle = '#3a3a3a'; x.fillRect(10, 28, w - 20, 10); x.fillRect(10, 88, w - 20, 10); x.fillStyle = '#ffd86b'; x.beginPath(); x.arc(64, 62, 14, 0, TAU); x.fill(); x.strokeStyle = '#2b1a0a'; x.lineWidth = 4; x.stroke(); x.fillStyle = '#2b1a0a'; x.fillRect(60, 40, 8, 6); });
+  box('rio', (x, w, h) => { frame(x, w, h, '#3cc7e6', '#0b6d86', 8); x.strokeStyle = '#fff'; x.lineWidth = 6; for (let r = 0; r < 3; r++) { x.beginPath(); for (let i = 0; i <= 100; i += 4) x.lineTo(14 + i, 36 + r * 30 + Math.sin(i * .12 + r) * 8); x.stroke(); } });
+  TX.shield = mkTex(256, 128, (x, w, h) => { x.fillStyle = '#7a8088'; x.fillRect(0, 0, w, h); x.strokeStyle = '#2b2f36'; x.lineWidth = 10; x.strokeRect(5, 5, w - 10, h - 10); x.fillStyle = '#ffd24a'; x.font = 'bold 34px Georgia'; x.textAlign = 'center'; x.fillText('YO TENGO', w / 2, 52); x.fillText('RAZÓN', w / 2, 96); });
+  TX.board = mkTex(128, 64, (x, w, h) => { x.fillStyle = '#e8d9ae'; x.fillRect(0, 0, w, h); x.strokeStyle = '#7a5a2a'; x.lineWidth = 5; x.strokeRect(3, 3, w - 6, h - 6); x.fillStyle = '#5b3d08'; x.font = 'bold 20px Georgia'; x.textAlign = 'center'; x.fillText('ΑΘΗΝΑΙ', w / 2, 40); });
+}
+
+/* ---- humanoide articulado (Sócrates, sofistas, estatuas, personajes) ---- */
+const HC = () => MC(1, 1, true);
+const STY = {
+  soc: { sc: .88, skin: 0xe9b88a, tunic: 0xf4ecd2, belt: 0xb02a2a, mantle: 0x2a6fdb, hair: 0xd9d9d9, beard: 0xf2f2f2, sandal: 0x7a4a22, nose: 0xd98a62, brow: 0x555555, smirk: 1, belly: 1.1 },
+  sofista: { sc: .92, skin: 0xefc29a, tunic: 0x7a3fb0, belt: 0xe0b73a, mantle: 0xe0b73a, hair: 0x3a2a1a, beard: 0x2a1a10, sandal: 0xe0b73a, nose: 0xe0a07a, brow: 0x2a1a10, hat: 'sofista', scroll: 1, smirk: 1, nosey: 1.5 },
+  veloz: { sc: .88, skin: 0xefc29a, tunic: 0xf08a1c, belt: 0xffffff, mantle: 0xffd23a, hair: 0x7a3a10, beard: 0x7a3a10, sandal: 0xffffff, nose: 0xe0a07a, brow: 0x3a1a05, hat: 'pluma', smirk: 1, nosey: 1.2 },
+  dogma: { sc: 1.05, skin: 0xd9a98a, tunic: 0x6a7078, belt: 0x333a44, mantle: 0x4a5058, hair: 0x555555, beard: 0x555555, sandal: 0x333a44, nose: 0xc98a6a, brow: 0x111111, hat: 'casco', angry: 1, belly: 1.2 },
+  falacia: { sc: .9, skin: 0xe8e0f0, tunic: 0xcc3355, belt: 0xffffff, mantle: 0x992244, hair: 0xffffff, beard: 0xffffff, sandal: 0x222222, nose: 0xe8e0f0, brow: 0x222222, hat: 'mascara', smirk: 1 },
+  maestro: { sc: 1.5, skin: 0xefc29a, tunic: 0xb0182c, belt: 0xffd23a, mantle: 0xffd23a, hair: 0xffffff, beard: 0xffffff, sandal: 0xffd23a, nose: 0xe0a07a, brow: 0x2a1a10, hat: 'maestro', scroll: 2, smirk: 1, nosey: 1.5 },
+  platon: { sc: .88, skin: 0xefc29a, tunic: 0xffffff, belt: 0x2a6fdb, mantle: 0xdfe8ff, hair: 0x8a6a4a, beard: 0x8a6a4a, sandal: 0x7a4a22, nose: 0xe0a07a, brow: 0x5a3a1a, scroll: 1, belly: .8 },
+  diog: { sc: .86, skin: 0xd9a47a, tunic: 0x8a7a5a, belt: 0x4a3a22, mantle: 0x6b5a3a, hair: 0x9a9a9a, beard: 0x9a9a9a, sandal: 0x4a3a22, nose: 0xc98a62, brow: 0x666666, lamp: 1, belly: .7, smirk: 1 },
+  statue: { sc: .95, skin: 0xcfc8b8, tunic: 0xd9d2c2, belt: 0xbfb7a4, mantle: 0xc8c0ae, hair: 0xcfc8b8, beard: 0xd9d2c2, sandal: 0xbfb7a4, nose: 0xc5bdab, brow: 0xa8a090, belly: 1.1, rim: .15 },
+};
+function drawHuman(B, st, po) {
+  po = po || {}; const sc = st.sc || 1, cr = po.crouch || 0, die = po.die || 0, fl = po.flash || 0, alpha = po.a === undefined ? 1 : po.a;
+  let R = M4.mul(B, M4.S(sc, sc * (1 - cr * .34), sc));
+  if (die) R = M4.mul(R, M4.mul(M4.T(0, .3 * die, -.3 * die), M4.RX(-1.45 * die)));
+  const sp = po.sp || 0, ph = po.ph || 0, air = po.air || 0, spin = po.spin || 0, win = po.win || 0, talk = po.talk || 0, sw = Math.sin(ph) * sp, bob = Math.abs(Math.cos(ph)) * .07 * sp;
+  const lean = (po.lean || 0) + (cr ? .45 : 0) + sp * .1, hipY = .72 + bob;
+  const oo = { rim: st.rim === undefined ? .3 : st.rim, emis: fl, a: alpha };
+  const o2 = (extra) => Object.assign({}, oo, extra);
+  const H = (par, mesh, x, y, z, rx, ry, rz, sx, sy, sz, col, o) => draw(mesh, M4.mul(par, M4.trs(x, y, z, rx, ry, rz, sx, sy, sz)), col, o || oo);
+  const T = M4.mul(R, M4.mul(M4.T(0, hipY, 0), M4.RX(lean)));
+  // piernas y sandalias
+  const legL = air ? -.85 : -sw * .95, legR = air ? .5 : sw * .95;
+  for (const [sx, ang] of [[-.14, legL], [.14, legR]]) { const F = M4.mul(R, M4.trs(sx, hipY, 0, ang, 0, 0, 1, 1, 1)); H(F, HC(), 0, 0, 0, 0, 0, 0, .1, .72, .1, st.skin); H(F, MB, 0, -.72, .07, 0, 0, 0, .2, .09, .36, st.sandal); }
+  // túnica (falda), cinturón, torso, capa
+  H(R, MC(.5, .34, false), 0, .3, 0, 0, 0, 0, 1, .6 + (st.belly || 1) * .03, 1, st.tunic);
+  H(T, MS, 0, .26, .05, 0, 0, 0, .42 * (st.belly || 1), .36, .4 * (st.belly || 1), st.tunic);
+  H(T, MC(.44, .44, false), 0, .1, 0, 0, 0, 0, 1.02 * (st.belly || 1), .1, 1.02 * (st.belly || 1), st.belt);
+  H(T, MS, 0, .58, 0, 0, 0, 0, .4, .26, .32, st.tunic);
+  H(T, MB, 0, .38, -.36, 0, 0, 0, .78, .95, .1, st.mantle);
+  H(T, MB, 0, .46, .34, 0, 0, -.55, .95, .17, .1, st.mantle);
+  // brazos
+  const aL = air ? -2.5 : sw * .85 + .1, aR = air ? -2.2 : -sw * .85 + .1;
+  for (const [sx, ang, k] of [[-.43, aL, -1], [.43, aR, 1]]) {
+    let ax = ang, az = 0.12 * -k * -1; if (spin) { ax = 0; az = 1.45 * k; } else if (win && k === 1) { ax = -3 + Math.sin(po.t * 9) * .3; az = .2; } else if (talk && k === 1) { ax = -1.1 + Math.sin(po.t * 5) * .5; az = .3; }
+    const F = M4.mul(T, M4.trs(sx, .62, 0, ax, 0, az, 1, 1, 1)); H(F, HC(), 0, 0, 0, 0, 0, 0, .085, .52, .085, st.sleeve === undefined ? st.skin : st.sleeve); H(F, MS, 0, -.54, 0, 0, 0, 0, .1, .1, .1, st.skin);
+    if (k === 1 && st.scroll) H(F, MC(.09, .09, false), 0, -.56, .02, 1.57, 0, 0, 1, .55 * (st.scroll === 2 ? 2 : 1), 1, 0xf5ecc8);
+    if (k === 1 && st.lamp) { H(F, HC(), 0, -.54, .05, 0, 0, 0, .02, .5, .02, 0x5a4a2a); H(F, MS, 0, -1.08, .05, 0, 0, 0, .12, .14, .12, 0xffe27a, { emis: .9 }); }
+  }
+  // cabeza
+  const Hd = M4.mul(T, M4.trs(0, .86, .02, po.nod || 0, po.look || 0, 0, 1, 1, 1)), ns = st.nosey || 1;
+  H(Hd, MS, 0, 0, 0, 0, 0, 0, .34, .37, .34, st.skin);
+  H(Hd, MS, -.3, .06, -.04, 0, 0, 0, .1, .14, .1, st.hair); H(Hd, MS, .3, .06, -.04, 0, 0, 0, .1, .14, .1, st.hair); H(Hd, MS, 0, .02, -.3, 0, 0, 0, .27, .2, .12, st.hair);
+  H(Hd, MS, 0, -.3, .1, 0, 0, 0, .31, .26, .26, st.beard); H(Hd, MS, 0, -.13, .3, 0, 0, 0, .15, .045, .05, st.beard);
+  H(Hd, MS, 0, -.01, .33, 0, 0, 0, .085 * ns, .1 * ns, .1 * ns, st.nose);
+  for (const k of [-1, 1]) { H(Hd, MS, k * .13, .1, .28, 0, 0, 0, .07, .07, .06, 0xffffff); H(Hd, MS, k * .13, .1, .33, 0, 0, 0, .035, .035, .03, 0x111111); H(Hd, MS, k * .34, 0, 0, 0, 0, 0, .06, .08, .06, st.skin); }
+  const brow = st.angry ? [.35, .35] : [.28, -.2]; H(Hd, MB, -.13, .2 + (st.angry ? 0 : 0), .3, 0, 0, brow[0], .17, .045, .05, st.brow); H(Hd, MB, .13, .2 + (st.angry ? 0 : .035), .3, 0, 0, -brow[1], .17, .045, .05, st.brow);
+  if (st.smirk || po.mouth) H(Hd, MB, po.mouth ? 0 : .04, -.17, .3, 0, 0, po.mouth ? 0 : .22, po.mouth ? .13 : .13, po.mouth ? .1 : .03, .03, 0x4a1a1a);
+  const hat = st.hat; if (hat === 'sofista') { H(Hd, MC(.3, .22, false), 0, .3, 0, 0, 0, 0, 1, .4, 1, 0xe0b73a); H(Hd, MC(.4, .4, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0x7a3fb0); } else if (hat === 'pluma') { H(Hd, MC(.3, .3, false), 0, .26, 0, 0, 0, 0, 1, .12, 1, 0xffffff); H(Hd, MB, .2, .5, -.1, .3, 0, -.4, .05, .35, .2, 0xff5533); } else if (hat === 'casco') { H(Hd, MS, 0, .1, 0, 0, 0, 0, .39, .36, .39, 0x8a9098); H(Hd, MB, 0, .42, 0, 0, 0, 0, .06, .16, .4, 0xb02a2a); } else if (hat === 'maestro') { H(Hd, MC(.36, .24, false), 0, .3, 0, 0, 0, 0, 1, .75, 1, 0xffd23a); H(Hd, MC(.48, .48, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0xb0182c); } else if (hat === 'mascara') { H(Hd, MB, 0, .02, .34, 0, 0, 0, .5, .56, .06, 0xffffff); H(Hd, MB, -.13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); H(Hd, MB, .13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); }
+}
+function drawShadow(x, y, z, r, a) { draw(MD, M4.trs(x, y + .03, z, 0, 0, 0, r, 1, r), 0x000000, { a: a === undefined ? .35 : a }); }
+
+/* ---- utilería y escenario ---- */
+const shade = (c, k) => { const r = clamp((c >> 16 & 255) * k, 0, 255) | 0, g = clamp((c >> 8 & 255) * k, 0, 255) | 0, b = clamp((c & 255) * k, 0, 255) | 0; return r << 16 | g << 8 | b; };
+function drawColumn(x, y, z, h, r, col) { col = col || 0xf0e8d6; draw(MB, M4.trs(x, y + .15, z, 0, 0, 0, r * 2.6, .3, r * 2.6), shade(col, .92)); draw(MC(1, .9, false), M4.trs(x, y + .3, z, 0, 0, 0, r, h - .6, r), col, { tex: null }); draw(MB, M4.trs(x, y + h - .15, z, 0, 0, 0, r * 2.7, .3, r * 2.7), shade(col, .92)); }
+function drawTemple(x, y, z, w, d, h, rot) {
+  const B = M4.mul(M4.T(x, y, z), M4.RY(rot || 0)), n = Math.max(3, Math.round(w / 2.6)), st = 0xe6dcc3;
+  const part = (m, px, py, pz, sx, sy, sz, c, o) => draw(m, M4.mul(B, M4.trs(px, py, pz, 0, 0, 0, sx, sy, sz)), c, o);
+  for (let i = 0; i < 3; i++) part(MB, 0, .25 + i * .5, 0, w + 2 - i * 1.0, .5, d + 2 - i * 1.0, st - i * 0x050505, { tex: TX.marble, tile: [(w + 2) / 4, .25, (d + 2) / 4] });
+  for (let i = 0; i < n; i++) { const px = -w / 2 + .9 + i * ((w - 1.8) / (n - 1)); for (const pz of [-d / 2 + .9, d / 2 - .9]) part(MC(.5, .42, false), px, 1.5, pz, 1, h, 1, 0xf3ecdc); }
+  part(MB, 0, 1.5 + h, 0, w + .4, .7, d + .4, 0xe9dfc6, { tex: TX.marble, tile: [w / 4, .3, d / 4] });
+  part(MPR, 0, 2.2 + h, 0, w + .6, h * .32, d + .6, 0xd9a05a);
+  part(MB, 0, 1.5 + h * .5, 0, w - 1.4, h, d - 1.4, 0xcdbf9c);
+}
+function drawTree(x, y, z, s, kind) {
+  if (kind === 'cypress') { draw(MC(1, 0, false), M4.trs(x, y, z, 0, 0, 0, .8 * s, 5 * s, .8 * s), 0x2f6b3a, { rim: .1 }); return; }
+  draw(MC(.28, .2, false), M4.trs(x, y, z, 0, 0, 0, s, 2 * s, s), 0x6b4a2a); for (const [dx, dy, dz, k] of [[0, 2.4, 0, 1.3], [.8, 2.0, .3, 1], [-.7, 2.1, -.3, 1]]) draw(MS, M4.trs(x + dx * s, y + dy * s, z + dz * s, 0, 0, 0, k * s * 1.1, k * s * .8, k * s * 1.1), kind === 'dry' ? 0x9a9a4a : 0x7a9a58, { rim: .15 });
+}
+function drawStall(x, y, z, rot, c1) {
+  const B = M4.mul(M4.T(x, y, z), M4.RY(rot || 0)), p = (m, px, py, pz, sx, sy, sz, c, o) => draw(m, M4.mul(B, M4.trs(px, py, pz, 0, 0, 0, sx, sy, sz)), c, o);
+  for (const [a, b] of [[-1.3, -.8], [1.3, -.8], [-1.3, .8], [1.3, .8]]) p(MC(.07, .07, false), a, 0, b, 1, 2.2, 1, 0x7a5a3a);
+  for (let i = 0; i < 6; i++) p(MB, -1.25 + i * .5, 2.25, 0, .5, .08, 2.0, i % 2 ? 0xf4ecd2 : c1);
+  p(MB, 0, .55, .2, 2.4, .12, 1.0, 0x9a6a3a); p(MB, 0, .27, .2, 2.2, .54, .9, 0x7a4a22);
+  for (let i = 0; i < 4; i++) p(MS, -.9 + i * .6, .78, .2, .2, .2, .2, [0xd9452a, 0xe8b02a, 0x6ab04a, 0xd98a2a][i]);
+}
+function drawAmphoraBig(x, y, z, s, col) { draw(MS, M4.trs(x, y + .6 * s, z, 0, 0, 0, .45 * s, .6 * s, .45 * s), col); draw(MC(.17, .22, false), M4.trs(x, y + 1.1 * s, z, 0, 0, 0, s, .5 * s, s), col); for (const k of [-1, 1]) draw(MS, M4.trs(x + k * .24 * s, y + 1.25 * s, z, 0, 0, 0, .06 * s, .16 * s, .06 * s), shade(col, .8)); }
+function drawCoin(x, y, z, t, a) { draw(MC(.28, .28, false), M4.trs(x, y + .1 * Math.sin(t * 3 + x), z, Math.PI / 2, t * 3 + x, 0, 1, .07, 1), 0xffc928, { emis: .35, rim: .5 }); }
+function drawScroll(x, y, z, t) { const Bm = M4.mul(M4.T(x, y + .12 * Math.sin(t * 2), z), M4.RY(t * 1.4)); draw(MC(.17, .17, false), M4.mul(Bm, M4.trs(0, -.35, 0, 0, 0, 1.57, 1, .8, 1)), 0xf7efcf, { emis: .3, rim: .6 }); draw(MC(.19, .19, false), M4.mul(Bm, M4.trs(-.28, -.35, 0, 0, 0, 1.57, 1, .1, 1)), 0xb02a2a, { emis: .2 }); draw(MC(.19, .19, false), M4.mul(Bm, M4.trs(.28, -.35, 0, 0, 0, 1.57, 1, .1, 1)), 0xb02a2a, { emis: .2 }); draw(MD, M4.trs(x, y + .02, z, 0, 0, 0, .8 + .1 * Math.sin(t * 4), 1, .8 + .1 * Math.sin(t * 4)), 0xfff2a0, { a: .35, emis: 1 }); draw(MS, M4.trs(x, y, z, 0, 0, 0, .75, .75, .75), 0xfff2a0, { a: .16, emis: 1 }); }
+function drawAmphoraItem(x, y, z, t) { drawAmphoraBig(x, y + .08 * Math.sin(t * 3), z, .5, 0x3a7bd5); }
+function drawGem(x, y, z, t, col) { draw(MB, M4.trs(x, y + .1 * Math.sin(t * 3), z, .6, t * 2, .6, .32, .32, .32), col, { emis: .6, rim: .8 }); }
+function drawFeather(x, y, z, t) { draw(MB, M4.trs(x, y + .12 * Math.sin(t * 2), z, 0, t * 2, .6, .06, .62, .2), 0xffffff, { emis: .5, rim: .6 }); draw(MS, M4.trs(x, y, z, 0, 0, 0, .7, .7, .7), 0xffffff, { a: .18, emis: 1 }); }
+function drawMaskItem(x, y, z, t) { draw(MB, M4.trs(x, y + .1 * Math.sin(t * 2), z, 0, t * 1.6, 0, .5, .56, .1), 0xf0f0f0, { emis: .3 }); }
+function drawBoxTex(b, t) {
+  const sx = b.sx, sy = b.sy, sz = b.sz; let col = 0xffffff, o = { tex: TX[b.tex], rim: .15, tile: [1, 1, 1] }, s = [sx, sy, sz], by = b.y + sy / 2;
+  if (b.type === 'bounce') { const k = b.sq > 0 ? 1 - .25 * Math.sin(b.sq * 12) : 1; s = [sx * (2 - k), sy * k, sz * (2 - k)]; }
+  if (b.type === 'cicuta') { o.emis = .18 + .14 * Math.sin(t * 5 + b.x * 2); by += .02 * Math.sin(t * 4 + b.z); if (b.state === 'fuse') { o.emis = .9; } }
+  if ((b.type === 'tnt' || b.type === 'aporia') && b.state === 'fuse') { o.emis = (Math.floor(b.t * 6) % 2) * .8; const k = 1 + .06 * Math.sin(t * 30); s = [sx * k, sy * k, sz * k]; }
+  if (b.type === 'check') o.emis = b.active ? .7 : .15; if (b.type === 'kairos') o.emis = .2 + .2 * Math.sin(t * 4);
+  if (b.type === 'rio') { const ph = b.ph; if (ph === 1) o.a = .45 + .3 * Math.sin(t * 25); o.emis = .2; }
+  if (b.type === 'platon') o.emis = .25 + .15 * Math.sin(t * 3);
+  draw(MB, M4.trs(b.x, by, b.z, 0, 0, 0, s[0], s[1], s[2]), col, o);
+}
+function drawStatue(s, t) { const Bm = M4.T(s.x, s.y + 1.0, s.z); draw(MB, M4.trs(s.x, s.y + .5, s.z, 0, 0, 0, 1.6, 1.0, 1.6), 0xcfc6b0, { tex: TX.marble, tile: [.5, .3, .5] }); drawHuman(M4.mul(Bm, M4.RY(Math.PI)), STY.statue, { t, lean: 0, win: 0 }); if (s.active) { draw(MD, M4.trs(s.x, s.y + 1.06, s.z, 0, 0, 0, 1.3 + .1 * Math.sin(t * 4), 1, 1.3 + .1 * Math.sin(t * 4)), 0x7dff9a, { a: .5, emis: 1 }); draw(MS, M4.trs(s.x, s.y + 2.7, s.z, 0, 0, 0, .9, .9, .9), 0x7dff9a, { a: .18, emis: 1 }); } }
+function drawBrazier(h, on, t) { draw(MC(.35, .5, false), M4.trs(h.x, h.y, h.z, 0, 0, 0, 1, .7, 1), 0x3a2a1a); draw(MC(.55, .4, false), M4.trs(h.x, h.y + .7, h.z, 0, 0, 0, 1, .25, 1), 0x6a4a2a); if (on) { for (let i = 0; i < 3; i++) draw(MC(.32 - i * .08, 0, false), M4.trs(h.x, h.y + .9 + i * .15, h.z, 0, t * 5 + i, 0, 1, 1.9 - i * .35 + .25 * Math.sin(t * 20 + i), 1), [0xff5a1a, 0xff9a2a, 0xffe27a][i], { emis: 1, a: .9 }); } else draw(MS, M4.trs(h.x, h.y + .95, h.z, 0, 0, 0, .2, .12, .2), 0xff6a2a, { emis: .8 }); }
+function drawGate(g, t) { const x = g.x, y = g.y, z = g.z; for (const k of [-1, 1]) draw(MB, M4.trs(x + k * 2.6, y + 2.5, z, 0, 0, 0, 1.2, 5, 1.2), 0xe9dfc6, { tex: TX.marble, tile: [.4, 2, .4] }); draw(MB, M4.trs(x, y + 5.3, z, 0, 0, 0, 7, 1.1, 1.4), 0xe0d3b0, { tex: TX.marble, tile: [3, .4, .6] }); draw(MPR, M4.trs(x, y + 5.85, z, 0, 0, 0, 7.6, 1.5, 1.6), 0xd9a05a); if (g.open) { draw(MQ, M4.trs(x, y + 2.4, z, 0, 0, 0, 4, 4.8, 1), 0xfff0b0, { a: .55 + .15 * Math.sin(t * 4), emis: 1 }); draw(MS, M4.trs(x, y + 2.4, z, 0, 0, 0, 1.6, 2.4, 1.6), 0xffe9a0, { a: .25, emis: 1 }); } else draw(MB, M4.trs(x, y + 2.4, z, 0, 0, 0, 4, 4.8, .5), 0x6a5a45, { tex: TX.wall, tile: [2, 2.4, .3] }); }
+
+/* ====================== AUDIO SINTETIZADO (sin archivos) ====================== */
+const AU = {
+  ctx: null, mus: .5, sfxV: .8, tr: null, mg: null, sg: null, noise: null,
+  init() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+    const c = this.ctx; this.mg = c.createGain(); this.sg = c.createGain(); this.mg.connect(c.destination); this.sg.connect(c.destination); this.setVol(this.mus, this.sfxV);
+    const b = c.createBuffer(1, c.sampleRate, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; this.noise = b;
+  },
+  setVol(m, s) { this.mus = m; this.sfxV = s; if (this.mg) { this.mg.gain.value = m * .5; this.sg.gain.value = s * .8; } },
+  tone(f, d, type, vol, o) { // o: {f2: frecuencia final, at: ataque, dst: destino, delay}
+    const c = this.ctx; if (!c) return; o = o || {}; const t0 = c.currentTime + (o.delay || 0), os = c.createOscillator(), g = c.createGain();
+    os.type = type || 'sine'; os.frequency.setValueAtTime(f, t0); if (o.f2) os.frequency.exponentialRampToValueAtTime(Math.max(20, o.f2), t0 + d);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol || .3, t0 + (o.at || .008)); g.gain.exponentialRampToValueAtTime(.0001, t0 + d);
+    os.connect(g); g.connect(o.dst || this.sg); os.start(t0); os.stop(t0 + d + .05);
+  },
+  noiseB(d, vol, f0, f1, type, o) {
+    const c = this.ctx; if (!c) return; o = o || {}; const t0 = c.currentTime + (o.delay || 0), s = c.createBufferSource(), g = c.createGain(), fl = c.createBiquadFilter();
+    s.buffer = this.noise; s.loop = true; fl.type = type || 'lowpass'; fl.frequency.setValueAtTime(f0, t0); fl.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + d);
+    g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + d); s.connect(fl); fl.connect(g); g.connect(o.dst || this.sg); s.start(t0); s.stop(t0 + d + .05);
+  },
+  sfx(n, p) {
+    if (!this.ctx) return; p = p || 1; const T = (f, d, ty, v, o) => this.tone(f, d, ty, v, o);
+    switch (n) {
+      case 'jump': T(300, .14, 'square', .12, { f2: 620 }); break;
+      case 'djump': T(420, .14, 'square', .12, { f2: 900 }); break;
+      case 'land': this.noiseB(.1, .25, 500, 80); break;
+      case 'spin': this.noiseB(.28, .22, 600, 2400, 'bandpass'); break;
+      case 'slide': this.noiseB(.4, .15, 900, 200, 'bandpass'); break;
+      case 'break': this.noiseB(.22, .45, 3000, 300); T(220, .18, 'triangle', .25, { f2: 90 }); break;
+      case 'clay': this.noiseB(.18, .4, 4500, 800); T(700, .1, 'triangle', .2, { f2: 300 }); break;
+      case 'coin': T(880 * p, .09, 'square', .12); T(1320 * p, .14, 'square', .12, { delay: .07 }); break;
+      case 'scroll': [523, 659, 784, 1047].forEach((f, i) => T(f, .3, 'triangle', .25, { delay: i * .09 })); break;
+      case 'bounce': T(180, .3, 'sine', .35, { f2: 760 }); break;
+      case 'fizz': this.noiseB(.3, .18, 6000, 1500, 'highpass'); break;
+      case 'tick': T(1400, .04, 'square', .1); break;
+      case 'boom': this.noiseB(.8, .7, 1800, 60); T(90, .6, 'sine', .6, { f2: 30 }); break;
+      case 'hurt': T(420, .3, 'sawtooth', .22, { f2: 120 }); break;
+      case 'die': T(500, .8, 'sine', .3, { f2: 50 }); this.noiseB(.5, .2, 800, 80); break;
+      case 'check': [392, 494, 587, 784].forEach((f, i) => T(f, .25, 'triangle', .25, { delay: i * .08 })); break;
+      case 'gate': [196, 247, 294].forEach((f) => T(f, 1.0, 'sawtooth', .1, { at: .1 })); break;
+      case 'win': [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => T(f, .32, 'triangle', .28, { delay: i * .13 })); break;
+      case 'boss': [330, 262, 196].forEach((f, i) => T(f, .5, 'sawtooth', .16, { delay: i * .16, f2: f * .5 })); break;
+      case 'speak': T(260 + Math.random() * 120, .05, 'square', .06); break;
+      case 'ill': T(1000, .5, 'sine', .12, { f2: 1500, at: .2 }); T(1010, .5, 'sine', .1, { f2: 1520, at: .2, delay: .05 }); break;
+      case 'ui': T(660, .06, 'triangle', .15); break;
+      case 'poof': this.noiseB(.25, .3, 2500, 400, 'bandpass'); T(300, .2, 'triangle', .2, { f2: 600 }); break;
+    }
+  },
+  /* ---- música generativa ---- */
+  TH: { menu: { root: 146.8, sc: [0, 2, 3, 5, 7, 9, 10], bpm: 84 }, w1: { root: 146.8, sc: [0, 2, 4, 7, 9, 12, 14], bpm: 108 }, boss: { root: 110, sc: [0, 1, 4, 5, 7, 8, 11], bpm: 138 }, side: { root: 164.8, sc: [0, 2, 3, 7, 8, 12, 14], bpm: 116 } },
+  music(name) {
+    if (this.tr) { clearInterval(this.tr); this.tr = null; } this.cur = name; if (!name || !this.ctx) return;
+    const th = this.TH[name] || this.TH.w1, c = this.ctx; let step = 0, next = c.currentTime + .1, deg = 2; const beat = 60 / th.bpm / 2;
+    const f = (d, oct) => th.root * Math.pow(2, th.sc[((d % 7) + 7) % 7] / 12 + Math.floor(d / 7) + (oct || 0));
+    this.tr = setInterval(() => {
+      if (!this.ctx) return; while (next < c.currentTime + .3) {
+        const t = next - c.currentTime;
+        if (step % 16 === 0) { for (const k of [0, 4]) this.tone(f(k, -1), beat * 15, 'sawtooth', .05, { delay: t, at: .3, dst: this.mg }); }
+        if (step % 4 === 0) this.tone(f(step % 16 < 8 ? 0 : 3, -1), beat * 1.9, 'triangle', .22, { delay: t, dst: this.mg });
+        if (Math.random() < (name === 'boss' ? .85 : .62)) { deg = clamp(deg + [-2, -1, -1, 1, 1, 2][(Math.random() * 6) | 0], -2, 9); const fr = f(deg, 0); this.tone(fr, beat * 1.6, 'triangle', .26, { delay: t, at: .004, dst: this.mg }); this.tone(fr * 2, beat * .9, 'sine', .06, { delay: t, at: .004, dst: this.mg }); }
+        if (step % 4 === 0 || (name === 'boss' && step % 2 === 0)) this.noiseB(.06, .12, 900, 400, 'bandpass', { delay: t, dst: this.mg });
+        step++; next += beat;
+      }
+    }, 120);
+  },
+};
+
+/* ====================== TEXTOS: FRASES, DIÁLOGOS, INSCRIPCIONES ====================== */
+// Frases ORIGINALES del juego (no son citas históricas ni se atribuyen a Sócrates como hechos)
+const PH = {
+  start: ['Solo sé que este salto no será fácil.', 'Antes de avanzar, deberíamos preguntarnos qué significa avanzar.', 'Una vida sin saltos no merece ser jugada.', 'Si el camino fuera fácil, no necesitaría preguntas.', 'Empecemos por lo evidente: hay un precipicio.', 'Todo gran viaje comienza con una pregunta incómoda.'],
+  box: ['He destruido una opinión. Ahora necesito examinarla.', 'La madera ha hablado. Y no ha presentado buenos argumentos.', 'Conócete a ti mismo. Y mira dónde pisas.', 'Otra caja, otra certeza que no resistía un golpe.', 'Examinemos el contenido, ya que el continente no se defendió.', 'Una caja cerrada es una hipótesis sin probar.', 'Si me golpeas con una pregunta, te devolveré otra.', 'No juzgues una caja por su tapa.'],
+  death: ['Sé que no sé saltar.', 'La ignorancia es peligrosa. El vacío, todavía más.', 'Debo examinar esta caída.', 'Una caída no es una refutación definitiva.', 'Ese argumento era sólido. Lo malo es que yo no.', 'He aprendido algo: ahí no se pisa.', 'Cada error es una pregunta bien formulada por el suelo.', 'Volvamos a empezar, que la duda es gratis.'],
+  hurt: ['¡Eso ha sido una objeción contundente!', 'Auch. ¿Eso contaba como argumento?', 'Mi ánfora de sabiduría tiene una grieta.'],
+  sophist: ['Hablas muy bien, pero has caído muy rápido.', 'La persuasión no sustituye a la verdad.', 'Argumento refutado. Siguiente pregunta.', 'Tu elocuencia era mayor que tus cimientos.', 'Un buen discurso no sostiene un mal razonamiento.'],
+  complete: ['La sabiduría consiste en saber cuándo saltar.', 'He aprendido más de este camino que de cien discursos.', 'La virtud también requiere buenos reflejos.', 'Un nivel menos, mil preguntas más.', 'No sé si he llegado, pero sé que he pasado.'],
+  secret: ['La verdad estaba escondida detrás de esa columna.', 'El conocimiento recompensa a quien observa.', 'No todos los tesoros son materiales.', 'Lo importante rara vez está en el camino principal.', 'La curiosidad tiene muy buen sentido de la orientación.'],
+  bounce: ['¿Qué es un salto?', '¿Subir es avanzar?', '¿Quién rebota: yo o la pregunta?', '¿Se llega más alto dudando?', '¿Y si la caja también me interroga?', '¿Qué busca quien salta?', '¿Es la altura una virtud?'],
+  scroll: ['Pergamino de la Verdad recuperado.', 'Un fragmento de verdad vuelve a casa.', 'Los sofistas lo ocultaron; la curiosidad lo halló.'],
+  tips: ['Las ilusiones brillan y parpadean. Lo sólido no necesita convencerte.', 'Una caja de cicuta nunca se rompe con un golpe: se esquiva.', 'Saltar sobre la caja TNT activa su cuenta atrás. Aléjate.', 'La caja de Aristóteles pide un salto ni corto ni largo.', 'Los dogmáticos son duros por delante. Por detrás son de papel.', 'Deslízate bajo los dinteles bajos con C o Ctrl.', 'Mantén Espacio pulsado para saltar más alto.', 'Las estatuas de Sócrates guardan tu progreso.'],
+};
+const pick = (a) => a[(Math.random() * a.length) | 0];
+// Citas históricas verificables / tradición documentada (se muestran con su fuente en la galería)
+const INSC = {
+  conocete: { t: 'Conócete a ti mismo.', src: 'Máxima inscrita en el templo de Apolo en Delfos (Pausanias, Descripción de Grecia, X, 24, 1).', k: 'hist' },
+  examen: { t: 'Una vida sin examen no merece ser vivida.', src: 'Platón, Apología de Sócrates, 38a (puesta en boca de Sócrates en el juicio).', k: 'hist' },
+  medio: { t: 'La virtud es un término medio entre dos extremos.', src: 'Aristóteles, Ética a Nicómaco, II, 6 (paráfrasis).', k: 'hist' },
+  fluye: { t: 'Todo fluye, nada permanece.', src: 'Resumen tardío de Heráclito; Platón (Crátilo, 402a) lo expone así. No es una cita literal.', k: 'attr' },
+  lampara: { t: 'Busco a un hombre.', src: 'Anécdota de Diógenes con la lámpara a plena luz del día (Diógenes Laercio, VI, 41). Tradición, no cita verificable.', k: 'attr' },
+  nada: { t: 'Nada en exceso.', src: 'Máxima délfica, citada por Platón (Protágoras, 343b).', k: 'hist' },
+};
+const CHARS = {
+  socrates: ['Sócrates', 'El filósofo ateniense. Barba, túnica, sandalias y una ironía letal: convierte cualquier conversación en un interrogatorio.'],
+  platon: ['Platón', 'Discípulo de Sócrates. Aparece para explicar el mundo de las Ideas… y para regalar habilidades.'],
+  diogenes: ['Diógenes', 'El cínico del barril. Aparece en lugares inesperados con consejos absurdamente sensatos.'],
+  sofista: ['Sofista', 'Maestro de la retórica de pago. Camina de un lado a otro intentando convencerte de que te rindas.'],
+  dogmatico: ['Dogmático', 'Escudo enorme con la inscripción «YO TENGO RAZÓN». Inmune a lo que viene de frente.'],
+  falacia: ['Falacia ambulante', 'Cambia de color y de argumento. Cada color es una falacia distinta.'],
+  veloz: ['Sofista veloz', 'Habla tan rápido que no da tiempo a refutarlo… salvo que calcules el salto.'],
+  maestro: ['Maestro sofista', 'Jefe del ágora. Sus discursos son proyectiles y sus pausas, su debilidad.'],
+};
+const FALL = [['Ad hominem', 0xd63b3b], ['Falso dilema', 0x3b7fd6], ['Hombre de paja', 0xd6b43b], ['Apelación a la autoridad', 0x8a3bd6]];
+const DLG = {
+  intro: [
+    { w: 'Sofista', t: 'Esta plataforma es perfectamente sólida. Mi argumento es impecable.', ev: 'plank' },
+    { w: 'Sócrates', t: '¿Y qué entiendes tú por «sólida»?' },
+    { w: 'Sofista', t: 'Pues… lo que sostiene. Evidentemente.' },
+    { w: 'Sócrates', t: 'Entonces no te importará pisarla tú primero.' },
+    { w: 'Sofista', t: 'Faltaría más. Observa mi seguridad…', ev: 'walk' },
+    { w: 'Sócrates', t: 'Hablas muy bien, pero has caído muy rápido.', ev: 'after' },
+  ],
+  diog: [
+    { w: 'Diógenes', t: '¿Buscas la verdad?' }, { w: 'Sócrates', t: 'Sí.' }, { w: 'Diógenes', t: 'Pues deja de pisarla mientras miras al cielo.' },
+    { w: 'Diógenes', t: 'Consejo gratis: lo que brilla y parpadea, miente. Y si ves monedas esparcidas por un precipicio, desconfía… pero a veces merece la pena.' },
+  ],
+  platon0: [{ w: 'Platón', t: 'Maestro, ¿qué es la justicia?' }, { w: 'Sócrates', t: 'Antes de responder, dime qué entiendes por justicia.' }, { w: 'Platón', t: '¿Y si no lo sé?' }, { w: 'Sócrates', t: 'Entonces ya tenemos un buen punto de partida.' }],
+  platon1: [
+    { w: 'Platón', t: 'Has recuperado el pergamino y refutado al maestro del ágora. Las sombras de la caverna no se disipan solas.' },
+    { w: 'Sócrates', t: 'Lo sé. Pero siempre se disipan más rápido cuando alguien hace la pregunta correcta.' },
+    { w: 'Platón', t: 'Toma esto: la forma ideal del salto. Te permitirá saltar por segunda vez en el aire.' }, { w: 'Sócrates', t: '¿Un doble salto? Qué manera tan elegante de admitir que me equivoqué la primera vez.' },
+  ],
+  boss0: [{ w: 'Maestro sofista', t: '¡Alto! Nadie cruza mi ágora sin escuchar mi discurso de tres horas.' }, { w: 'Sócrates', t: 'Prometo escucharte… si primero respondes a unas preguntas.' }, { w: 'Maestro sofista', t: '¡Imposible! ¡Mis argumentos son proyectiles!' }],
+  boss1: [{ w: 'Maestro sofista', t: 'Mi retórica… mi elocuencia… ¡se desvanece!' }, { w: 'Sócrates', t: 'Solo era aire con buena dicción. ¿Puedo hacerte otra pregunta?' }, { w: 'Maestro sofista', t: '¡NO! Me voy a una conferencia lejos de aquí.' }],
+  riddle: { q: 'Platón pregunta: ¿qué es mejor para una ciudad?', o: ['Que sus ciudadanos aparenten ser sabios.', 'Que sus ciudadanos examinen lo que creen saber.', 'Que nadie pregunte nada para evitar discusiones.'], ok: 1, win: 'Platón: «Exacto. Aquí tienes un fragmento de conocimiento».', lose: 'Platón: «Piénsalo mejor. Puedes volver a intentarlo».' },
+};
+const WORLDS = [
+  { n: 'Atenas y el ágora', d: 'Calles, mercado y templo de Atenea. Aquí aprendes a saltar, a romper opiniones y a desconfiar de lo que brilla.', lv: [{ id: '1-1', n: 'El ágora de las falacias' }] },
+  { n: 'El bosque de Heráclito', d: 'Plataformas que cambian sin parar y un río que nunca es el mismo.', lv: [] },
+  { n: 'El laberinto de Platón', d: 'Sombras engañosas, pasillos secretos y plataformas invisibles.', lv: [] },
+  { n: 'La academia de Aristóteles', d: 'Lógica, distancias y cajas que exigen el orden correcto.', lv: [] },
+  { n: 'El inframundo de Hades', d: 'Lava estilizada, Caronte y un guardián mitológico.', lv: [] },
+  { n: 'El tribunal de Atenas', d: 'La culminación: una competición retórica contra Gorgias.', lv: [] },
+];
+
+/* ====================== NIVEL 1-1: EL ÁGORA DE LAS FALACIAS ====================== */
+const BOXTEX = { wood: 'wood', ceramic: 'ceramic', bounce: 'bounce', check: 'check', cicuta: 'cicuta', tnt: 'tnt', aporia: 'aporia', kairos: 'kairos', platon: 'platon', arist: 'arist', dioge: 'dioge', rio: 'rio' };
+function mkRng(seed) { let s = seed; return () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
+function buildL11() {
+  const L = { id: '1-1', name: 'El ágora de las falacias', region: 'Atenas y el ágora', goalZ: 270, par: 210, music: 'w1', solids: [], ills: [], boxes: [], items: [], enemies: [], statues: [], npcs: [], tablets: [], triggers: [], camZones: [], braziers: [], props: [], gate: { x: 0, y: 0, z: 270, open: false }, spawn: { x: 0, y: 0, z: -6 },
+    theme: { sun: 0xffe2b0, ld: [-.45, .85, -.3], ambT: 0x9fb2c8, ambB: 0x8d7d62, fog: 0xe9d6b0, fogR: [70, 200], skyT: 0x4d8fe3, skyB: 0xf6dcae } };
+  const S = (x0, x1, z0, z1, top, style, depth, o) => { depth = depth === undefined ? 4 : depth; const s = Object.assign({ x0, x1, y0: top - depth, y1: top, z0, z1, style: style || 'path' }, o || {}); L.solids.push(s); return s; };
+  const MP = (x0, x1, z0, z1, mov) => { const s = S(x0, x1, z0, z1, 0, 'marble', 1.2); s.mov = mov; s.b = { x0, x1, y0: s.y0, y1: s.y1, z0, z1 }; return s; };
+  const box = (type, x, y, z, o) => { const b = Object.assign({ type, x, y, z, sx: 1, sy: 1, sz: 1, alive: true, state: 'idle', t: 0, tex: BOXTEX[type], sq: 0, drop: {} }, o || {}); L.boxes.push(b); return b; };
+  const coin = (x, y, z) => L.items.push({ k: 'coin', x, y, z, got: false });
+  const cl = (x0, y0, z0, x1, y1, z1, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? 0 : i / (n - 1); coin(lerp(x0, x1, t), lerp(y0, y1, t), lerp(z0, z1, t)); } };
+  const arc = (x0, z0, x1, z1, h, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? .5 : i / (n - 1); coin(lerp(x0, x1, t), .8 + Math.sin(t * Math.PI) * h, lerp(z0, z1, t)); } };
+  const item = (k, x, y, z, o) => L.items.push(Object.assign({ k, x, y, z, got: false }, o || {}));
+  const en = (type, x, y, z, o) => L.enemies.push(Object.assign({ type, x, y, z, alive: true, yaw: 0, ph: Math.random() * 6, t: 0, dir: 1, shoot: 2 + Math.random() * 2, turn: 2 }, o || {}));
+  const statue = (x, z, id) => { L.statues.push({ x, y: 0, z, id, active: false }); S(x - .8, x + .8, z - .8, z + .8, 1, 'ped', 1); };
+  const hint = (z0, z1, text, o) => L.triggers.push(Object.assign({ z0, z1, hint: text, done: false }, o || {}));
+
+  /* ---- A. EL ÁGORA: salida, tutorial, sofista, dintel bajo ---- */
+  S(-4, 4, -10, 2, 0); S(-4, 4, 6.5, 48.5, 0);
+  L.ills.push({ x0: -1.2, x1: 1.2, y0: -.3, y1: 0, z0: 2, z1: 6.5, grp: 'intro', a: 0, real: false });
+  hint(-5.5, -3, 'Muévete con W A S D · Shift para correr', { id: 'h1' }); hint(-2.5, .5, 'Espacio: saltar (mantenlo pulsado para saltar más alto)', { id: 'h2' });
+  L.npcs.push({ id: 'diog', type: 'diog', x: -3, y: 0, z: 14, yaw: 1.3, dlg: 'diog' }); box('platon', 3.2, 0, 14, { drop: { gem: 'Conocimiento' } });
+  hint(8, 12, 'J o clic izquierdo: ataque giratorio. Rompe cajas y refuta sofistas', { id: 'h3' }); hint(15, 17, 'También puedes romper las cajas de madera saltando sobre ellas', { id: 'h4' });
+  for (const x of [-1, 0, 1]) box('wood', x, 0, 18, { drop: { coins: 3 } });
+  box('wood', 0, 0, 22, { drop: { coins: 3 } }); box('wood', 0, 1, 22, { drop: { coins: 5 } });
+  cl(-2.5, .8, 11, -2.5, .8, 16, 4); cl(2.5, .8, 16, 2.5, .8, 22, 5); arc(-1.5, 23, 1.5, 29, 1.2, 5);
+  S(-2.5, 2.5, 25, 28, .9, 'marble', .9);
+  en('sofista', 0, 0, 31, { ax: 'x', a: -3, b: 3, spd: 1.8 }); hint(29, 31, 'Cuidado con los sofistas: salta sobre ellos o golpéalos', { id: 'h5' });
+  L.tablets.push({ x: 3.4, y: 0, z: 30, id: 'conocete' });
+  hint(33.5, 35, 'C o Ctrl: deslizarse bajo los dinteles bajos', { id: 'h6' });
+  S(-4, -2, 36, 37.5, 4, 'wall', 4); S(2, 4, 36, 37.5, 4, 'wall', 4); S(-2, 2, 36, 37.5, 3.2, 'wall', 2.2);
+  cl(0, .5, 34.5, 0, .5, 39.5, 6);
+  statue(-3, 44, 's1'); hint(41, 43, 'Las estatuas de Sócrates guardan tu progreso', { id: 'h7' });
+  en('falacia', 0, 0, 41, { ax: 'x', a: -3, b: 3, spd: 1.9 });
+  box('ceramic', 2.4, 0, 46, { drop: { amph: 1 } }); cl(-2, .8, 45, 2, .8, 48, 4);
+
+  /* ---- B. HUECOS: rebote (Mayéutica), Aristóteles y un dogmático ---- */
+  S(-2, 2, 50, 54, 0); S(-4, -1, 58, 61, 0); S(1, 4, 64, 67, 0); S(-4, 4, 71, 86, 0);
+  hint(52, 56, 'Caja Mayéutica: rebota sobre ella. Mantén Espacio para llegar más alto', { id: 'h8' });
+  box('bounce', -2.5, 0, 59.5);
+  S(-7.5, -4, 57, 62, 4.4, 'marble', 1); item('scroll', -5.7, 5.3, 59.5, { id: 0 }); box('ceramic', -6.6, 4.4, 61.2, { drop: { mask: 'comedia' } }); cl(-5.5, 5.2, 57.8, -5.5, 5.2, 58.4, 2);
+  arc(0, 50, -2.5, 58, 1.4, 5); arc(2.5, 62, 2.5, 70, 1.4, 5);
+  S(2.6, 4, 72.5, 74.5, 1.1, 'marble', 1.1); S(2.6, 4, 74.5, 76.5, 2.2, 'marble', 2.2); S(1.6, 4, 76.5, 80, 3.3, 'marble', 3.3);
+  box('arist', -.4, 0, 78.5, { sx: 1.8, sz: 1.8, drop: { scroll: 1 } }); hint(73, 77, 'Caja de Aristóteles: ni demasiado ni demasiado poco. Déjate caer desde la plataforma alta', { id: 'h9' });
+  cl(2.8, 4.1, 77, 2.8, 4.1, 79, 3); L.tablets.push({ x: -3.5, y: 0, z: 73.5, id: 'examen' });
+  en('dogma', 0, 0, 83, { ax: 'x', a: -3, b: 3, spd: 1.2 }); cl(-3, .8, 85, 3, .8, 85, 4);
+
+  /* ---- C. PASILLO DE CICUTA, TNT Y PLATAFORMAS MÓVILES ---- */
+  S(-1.6, 1.6, 86, 106, 0); S(-2.2, -1.6, 86, 106, 1, 'wall', 1); S(1.6, 2.2, 86, 106, 1, 'wall', 1);
+  hint(86, 88, 'Cicuta: explota al contacto y no se rompe a golpes. ¡Esquívala!', { id: 'h10' });
+  box('cicuta', -1.05, 0, 90); box('cicuta', 1.05, 0, 94); box('cicuta', -1.05, 0, 98); box('cicuta', -1.05, 0, 102); box('cicuta', 1.05, 0, 102);
+  cl(.4, .8, 87, .4, .8, 89, 3); cl(-.4, .8, 91, -.4, .8, 93, 3); cl(.4, .8, 95, .4, .8, 97, 3); cl(0, .8, 99, 0, .8, 104, 4);
+  S(-4, 4, 106, 126, 0); statue(-3, 108.5, 's2');
+  hint(108, 111, 'TNT: salta sobre ella, aléjate y deja que la ira de los dioses despeje el camino', { id: 'h11' });
+  box('tnt', 0, 0, 112.5); for (let i = 0; i < 8; i++) for (let y = 0; y < 3; y++) box('cicuta', -3.5 + i, y, 116);
+  box('ceramic', 0, 0, 120, { drop: { scroll: 2 } }); box('wood', -2, 0, 120, { drop: { coins: 4 } }); box('wood', 2, 0, 120, { drop: { coins: 4 } });
+  cl(-3, .8, 108, -3, .8, 111, 3); cl(3, .8, 108, 3, .8, 111, 3);
+  const mp1 = MP(-2, 2, 128, 131.5, { ax: 'x', amp: 2.5, per: 4.6, ph: 0 }), mp2 = MP(-2, 2, 133.5, 137, { ax: 'x', amp: 2.5, per: 4.6, ph: Math.PI });
+  hint(125, 127, 'Plataformas móviles: calcula el momento del salto', { id: 'h12' });
+  box('cicuta', 0, 0, 129.75, { par: mp1, ox: 1.15 }); box('wood', 0, 0, 135.25, { par: mp2, ox: -1.0, drop: { coins: 4 } });
+  cl(0, 1.6, 126.5, 0, 1.6, 128, 2); cl(0, 1.6, 132, 0, 1.6, 133, 2);
+
+  /* ---- D. EL ABISMO DE LAS ILUSIONES (el sofista y su argumento engañoso) ---- */
+  S(-4, 4, 141, 150, 0); S(-8, -4, 143, 148, 0); en('caster', -6.4, 0, 145.5, { yaw: 1.57 });
+  box('check', 2.5, 0, 143.5, { drop: {} });
+  L.triggers.push({ z0: 142, z1: 146, id: 'chasm', done: false });
+  for (let r = 0; r < 6; r++) { const zc = 153.5 + r * 4, realLeft = r % 2 === 0; for (const sd of [-1, 1]) { const x0 = sd < 0 ? -3.7 : 1.1, real = (sd < 0) === realLeft, o = { x0, x1: x0 + 2.6, z0: zc - 1.2, z1: zc + 1.2 }; if (real) S(o.x0, o.x1, o.z0, o.z1, 0, 'gold', .8, { grp: 'chasm' }); else L.ills.push({ x0: o.x0, x1: o.x1, y0: -.3, y1: 0, z0: o.z0, z1: o.z1, grp: 'chasm', a: 0, real: false }); } }
+  S(-10, -7.4, 158, 161, 0, 'gold', .8, { grp: 'chasm' }); item('feather', -8.7, .9, 159.5, { id: 'pluma' }); arc(-3.5, 161.2, -8, 159.8, 1.6, 4);
+  cl(-2.4, .8, 152.5, -2.4, .8, 154.5, 2); cl(2.4, .8, 156.5, 2.4, .8, 158.5, 2); cl(-2.4, .8, 160.5, -2.4, .8, 162.5, 2);
+  hint(146.2, 149, 'Lo que brilla y parpadea no sostiene. Observa… o refuta al sofista', { id: 'h13', delay: 2.5 });
+  S(-4, 4, 176.5, 191, 0); L.tablets.push({ x: 3.4, y: 0, z: 180, id: 'nada' });
+
+  /* ---- E. SECCIÓN LATERAL: KAIROS, HERÁCLITO Y UN BRASERO ---- */
+  S(-2, 2, 191, 201, 0); L.camZones.push({ z0: 190, z1: 236.5, mode: 'side', lockX: 0 }); hint(190, 192, 'Cámara lateral: avanza hacia la derecha', { id: 'h14' });
+  box('kairos', 0, 0, 193.2); hint(192, 194, 'Caja Kairos: rómpela y llega a la meta dorada antes de que acabe el tiempo', { id: 'h15' });
+  box('dioge', 0, 0, 196); L.braziers.push({ x: 0, y: 0, z: 198.8, per: 3.2, dur: 1.7, ph: 0 });
+  for (let i = 0; i < 3; i++) box('rio', 0, -.6, 203 + i * 2.3, { sx: 1.8, sy: .6, sz: 1.8, cyc: 3.8, off: i * 1.15 });
+  L.tablets.push({ x: 0, y: 0, z: 200.3, id: 'fluye' });
+  S(-2, 2, 208.5, 211.5, 0); MP(-1.5, 1.5, 215, 218, { ax: 'z', amp: 3.2, per: 5.2, ph: 0 }); S(-2, 2, 223.5, 238, 0);
+  cl(0, 1, 193.5, 0, 1, 195.2, 2); cl(0, 2.2, 197.4, 0, 2.2, 200, 3); cl(0, 1.4, 203, 0, 1.4, 207, 4); cl(0, 1.2, 209, 0, 1.2, 211, 2); cl(0, 1.2, 213, 0, 1.2, 222, 5); cl(0, 1, 224, 0, 1, 227, 3);
+  en('veloz', 0, 0, 230, { ax: 'z', a: 226.5, b: 235, spd: 5.5 });
+  L.kairos = { start: 193.2, goal: 229, time: 17 };
+  S(-4, 4, 236, 240, 0, 'path'); statue(-3, 237.8, 's3');
+
+  /* ---- F. LA ARENA DEL MAESTRO SOFISTA ---- */
+  L.camZones.push({ z0: 238, z1: 280, mode: 'behind', wide: true });
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const t = S(-10 + c * 5, -5 + c * 5, 240 + r * 5, 245 + r * 5, 0, 'tile', 1.5, { tile: true, r, c, gone: false, tm: 0 }); }
+  S(-10.7, -10, 240, 262, 1.2, 'wall', 1.2); S(10, 10.7, 240, 262, 1.2, 'wall', 1.2);
+  S(-6, 6, 260, 276, 0, 'path'); L.triggers.push({ z0: 240.2, z1: 244, id: 'boss', done: false }); L.triggers.push({ z0: 262, z1: 266, id: 'platon', done: false });
+  L.npcs.push({ id: 'platon', type: 'platon', x: 3.6, y: 0, z: 265, yaw: -1.57, dlg: 'platon1' });
+  en('maestro', 0, 2.2, 257, { boss: true, hp: 3, phase: 0 });
+  L.tournTiles = true;
+
+  /* ---- decorado: islas con columnas, árboles, puestos del mercado y templos ---- */
+  const rng = mkRng(77);
+  for (let z = -8; z <= 278; z += 12) for (const sd of [-1, 1]) {
+    const x = sd * (10.5 + rng() * 3.5), w = 6 + rng() * 3, k = (z / 12 + (sd > 0 ? 1 : 0) | 0) % 5;
+    L.props.push({ t: 'island', x, y: 0, z, w, d: w });
+    if (k === 0) { L.props.push({ t: 'column', x: x - 1.5, y: 0, z: z - 1.5, h: 5 }); L.props.push({ t: 'column', x: x + 1.5, y: 0, z: z - 1.5, h: 5 }); L.props.push({ t: 'column', x: x + 1.5, y: 0, z: z + 1.5, h: 3.2 }); }
+    else if (k === 1) L.props.push({ t: 'tree', x, y: 0, z, s: 1 + rng() * .5, kind: 'olive' });
+    else if (k === 2 && z < 60) L.props.push({ t: 'stall', x, y: 0, z, rot: sd > 0 ? 1.57 : -1.57, c: [0xd9452a, 0x2a8fd6, 0xe8b02a][(rng() * 3) | 0] });
+    else if (k === 3) { L.props.push({ t: 'tree', x: x - 1, y: 0, z, s: 1, kind: 'cypress' }); L.props.push({ t: 'tree', x: x + 1.5, y: 0, z: z + 1, s: .8, kind: 'cypress' }); }
+    else L.props.push({ t: 'amph', x, y: 0, z, s: 1.1 + rng() * .6, c: [0xc8693a, 0x3a7bd5, 0xd9a02a][(rng() * 3) | 0] });
+  }
+  for (let z = 10; z < 280; z += 70) { L.props.push({ t: 'temple', x: -46, y: -6, z, w: 22, d: 14, h: 8, rot: 0 }); L.props.push({ t: 'temple', x: 52, y: -6, z: z + 30, w: 18, d: 12, h: 7, rot: 0 }); }
+  for (let z = -40; z < 320; z += 38) for (const sd of [-1, 1]) L.props.push({ t: 'hill', x: sd * (95 + rng() * 40), y: -14, z, s: 22 + rng() * 14 });
+  for (let i = 0; i < 18; i++) L.props.push({ t: 'cloud', x: (rng() - .5) * 260, y: 38 + rng() * 25, z: -20 + rng() * 320, s: 6 + rng() * 8 });
+  L.totalCoins = L.items.filter((i) => i.k === 'coin').length + L.boxes.reduce((a, b) => a + (b.drop.coins || 0), 0);
+  L.totalEnemies = L.enemies.length; L.totalScrolls = 3;
+  return L;
+}
+const LEVELS = { '1-1': { id: '1-1', build: buildL11, name: 'El ágora de las falacias', region: 'Atenas y el ágora' } };
+
+/* ====================== ESTADO Y LÓGICA ====================== */
+const SAVE_KEY = 'socrates_camino_v1';
+const defSave = () => ({ v: 1, levels: {}, dj: false, obolos: 0, masks: [], insc: [], chars: ['socrates'], opts: { mus: .5, sfx: .8, touch: false }, seenIntro: false, last: null });
+function loadSave() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && s.v === 1) return Object.assign(defSave(), s, { opts: Object.assign(defSave().opts, s.opts || {}) }); } catch (e) {} return defSave(); }
+function writeSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
+let save = loadSave();
+const BN = { wood: 'Opinión común', ceramic: 'Duda metódica', bounce: 'Mayéutica', kairos: 'Kairos', check: 'Conócete a ti mismo', aporia: 'Aporía', cicuta: 'La condena de Sócrates', tnt: 'Ira de los dioses', platon: 'El mundo de las Ideas', arist: 'El justo medio', dioge: 'La autosuficiencia', rio: 'El río' };
+const G = { mode: 'boot', lv: null, p: null, cols: [], parts: [], floats: [], projs: [], cam: { x: 0, y: 6, z: -8, tx: 0, ty: 1, tz: 4, fov: 1.05 }, t: 0, shake: 0, camY: 0, cp: null, boss: null, kairos: null, dlg: null, cine: null, stats: null, chasm: { active: false, t: 0, dispelled: false }, dio: null, deathT: 0, coinChain: 0, coinT: 0, preview: true, lid: '1-1', tick: 0, intro: null, bossDead: false, hintT: 0, tileT: 3 };
+const KEYS = {}, PRESS = {};
+const D2 = (a, b) => Math.hypot(a.x - b.x, a.z - b.z), wrapA = (a) => { while (a > Math.PI) a -= TAU; while (a < -Math.PI) a += TAU; return a; };
+
+/* ---- UI básica ---- */
+const flEl = $('#floats');
+function floater(txt, x, y, z, cls, life) { const el = document.createElement('div'); el.className = 'fl ' + (cls || ''); el.textContent = txt; flEl.appendChild(el); const f = { el, x, y, z, life: life || 1.6, max: life || 1.6 }; G.floats.push(f); return f; }
+let toastT = 0, hintTm = 0;
+function say(txt, dur) { const e = $('#toast'); e.textContent = txt; e.classList.add('show'); toastT = dur || 3.2; }
+function hintShow(txt, dur) { const e = $('#hint'); e.textContent = txt; e.classList.add('show'); hintTm = dur || 4; }
+function showOv(id) { $('#' + id).classList.remove('hide'); } function hideOv(id) { $('#' + id).classList.add('hide'); }
+function hideAllOv() { for (const id of ['menu', 'map', 'gallery', 'opts', 'pause', 'victory', 'defeat', 'loading', 'story']) hideOv(id); }
+
+/* ---- Entrada ---- */
+let TJ = { x: 0, z: 0 };
+addEventListener('keydown', (e) => {
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.code) && (G.mode === 'play' || G.mode === 'dialog')) e.preventDefault();
+  if (!e.repeat) PRESS[e.code] = true; KEYS[e.code] = true; AU.init();
+  if (e.code === 'Escape' || e.code === 'KeyP') togglePause();
+});
+addEventListener('keyup', (e) => { KEYS[e.code] = false; });
+addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; if (G.mode === 'play') togglePause(); });
+addEventListener('mousedown', (e) => { AU.init(); if (G.mode === 'play' && e.button === 0 && !e.target.closest('button,#touch,.ov')) PRESS.ClickSpin = true; if ((G.mode === 'dialog') && !e.target.closest('button')) PRESS.Advance = true; });
+function readInput() {
+  const k = KEYS; let x = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0) + TJ.x, z = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0) + TJ.z, l = Math.hypot(x, z); if (l > 1) { x /= l; z /= l; }
+  return { x, z, run: !!(k.ShiftLeft || k.ShiftRight || TJ.run), jump: !!(k.Space || TJ.jump), crouch: !!(k.KeyC || k.ControlLeft || k.ControlRight || TJ.crouch) };
+}
+
+/* ---- Partida y nivel ---- */
+function newPlayer(x, y, z) { return { x, y, z, vx: 0, vy: 0, vz: 0, yaw: 0, hp: 3, onGround: false, ground: null, coyote: 0, jbuf: 0, spinT: 0, spinCD: 0, spinId: 0, slideT: 0, sdx: 0, sdz: 1, crouch: false, h: 1.7, inv: 0, flash: 0, lock: 0, dead: false, deadT: 0, voidDeath: false, ph: 0, dj: false, jumped: false, peak: y, lastGroundY: y, t: 0, win: false, spinAng: 0 }; }
+function startLevel(id, preview) {
+  const def = LEVELS[id], lv = def.build(); G.lv = lv; G.lid = id; G.preview = !!preview; G.t = 0; G.projs = []; G.parts = []; flEl.innerHTML = ''; G.floats = [];
+  for (const s of lv.solids) { if (s.mov) { s.ox = s.oy = s.oz = 0; s.dx = s.dy = s.dz = 0; } }
+  for (const b of lv.boxes) { b.x0 = b.x - b.sx / 2; b.x1 = b.x + b.sx / 2; b.y0 = b.y; b.y1 = b.y + b.sy; b.z0 = b.z - b.sz / 2; b.z1 = b.z + b.sz / 2; b.ph = 0; }
+  G.chasm = { active: false, t: 0, dispelled: false }; G.kairos = null; G.dio = null; G.boss = null; G.bossDead = false; G.dlg = null; G.cine = null; G.intro = null; G.coinChain = 0; G.tileT = 3;
+  G.stats = { coins: 0, scrolls: [false, false, false], deaths: 0, kills: 0, secret: false, kairos: false, gems: [], masks: [], t: 0, score: 0, dj: false };
+  G.cp = { x: lv.spawn.x, y: lv.spawn.y, z: lv.spawn.z, id: 'start' }; G.p = newPlayer(lv.spawn.x, lv.spawn.y, lv.spawn.z); G.camY = 0;
+  G.fade = 1; $('#kairos').classList.add('hide'); $('#prompt').classList.add('hide'); $('#toast').classList.remove('show'); $('#hint').classList.remove('show');
+  if (!preview) { G.mode = 'play'; AU.music(lv.music); hideAllOv(); $('#hud').classList.remove('hide'); if (!save.seenIntro) startIntro(); else say(pick(PH.start), 3.5); updHUD(true); }
+  snapCam();
+}
+function restartLevel() { hideAllOv(); startLevel(G.lid, false); }
+
+/* ---- Colisiones ---- */
+function camZone(z) { for (const c of G.lv.camZones) if (z >= c.z0 && z <= c.z1) return c; return null; }
+function updMoving(dt) {
+  for (const s of G.lv.solids) { if (!s.mov) continue; const m = s.mov, o = m.amp * Math.sin(TAU * G.t / m.per + m.ph), px = s.x0, py = s.y0, pz = s.z0; const ax = m.ax;
+    s.x0 = s.b.x0 + (ax === 'x' ? o : 0); s.x1 = s.b.x1 + (ax === 'x' ? o : 0); s.y0 = s.b.y0 + (ax === 'y' ? o : 0); s.y1 = s.b.y1 + (ax === 'y' ? o : 0); s.z0 = s.b.z0 + (ax === 'z' ? o : 0); s.z1 = s.b.z1 + (ax === 'z' ? o : 0);
+    s.dx = s.x0 - px; s.dy = s.y0 - py; s.dz = s.z0 - pz; if (G.tick < 2) s.dx = s.dy = s.dz = 0; }
+}
+function buildCols() {
+  const c = G.cols; c.length = 0; const lv = G.lv;
+  for (const s of lv.solids) { if (s.grp === 'chasm' && !G.chasm.active) continue; if (s.tile && s.st === 2) continue; c.push(s); }
+  for (const b of lv.boxes) {
+    if (!b.alive) continue; if (b.par) { const q = b.par; b.x = (q.x0 + q.x1) / 2 + (b.ox || 0); b.y = q.y1; b.z = (q.z0 + q.z1) / 2 + (b.oz || 0); }
+    if (b.type === 'rio') { const m = ((G.t + b.off) % b.cyc + b.cyc) % b.cyc; b.ph = m < 2.3 ? 0 : (m < 2.9 ? 1 : 2); if (b.ph === 2) continue; }
+    b.x0 = b.x - b.sx / 2; b.x1 = b.x + b.sx / 2; b.y0 = b.y; b.y1 = b.y + b.sy; b.z0 = b.z - b.sz / 2; b.z1 = b.z + b.sz / 2; c.push(b);
+  }
+}
+const OVL = (c, p, r, h) => c.x0 < p.x + r - 1e-4 && c.x1 > p.x - r + 1e-4 && c.y0 < p.y + h - 1e-4 && c.y1 > p.y + 1e-4 && c.z0 < p.z + r - 1e-4 && c.z1 > p.z - r + 1e-4;
+function canStand(p) { const r = .33; for (const c of G.cols) if (c.x0 < p.x + r && c.x1 > p.x - r && c.z0 < p.z + r && c.z1 > p.z - r && c.y0 < p.y + 1.7 && c.y1 > p.y + .85 + 1e-3 && c.y0 >= p.y + .5) return false; return true; }
+function groundAt(x, z, y) { let best = -99; for (const c of G.cols) if (x > c.x0 && x < c.x1 && z > c.z0 && z < c.z1 && c.y1 <= y + .5 && c.y1 > best) best = c.y1; return best; }
+function movePlayer(dt) {
+  const p = G.p, r = .33; let dx = p.vx * dt, dy = p.vy * dt, dz = p.vz * dt; const n = Math.min(12, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) / .22) || 1); dx /= n; dy /= n; dz /= n; let landed = null, landVy = 0;
+  for (let i = 0; i < n; i++) {
+    p.x += dx; if (dx) for (const c of G.cols) if (OVL(c, p, r, p.h)) { if (c.y1 - p.y <= .3 && c.y1 > p.y + 1e-4 && !c.type) { p.y = c.y1; continue; } p.x = dx > 0 ? c.x0 - r - 1e-3 : c.x1 + r + 1e-3; p.vx = 0; }
+    p.z += dz; if (dz) for (const c of G.cols) if (OVL(c, p, r, p.h)) { if (c.y1 - p.y <= .3 && c.y1 > p.y + 1e-4 && !c.type) { p.y = c.y1; continue; } p.z = dz > 0 ? c.z0 - r - 1e-3 : c.z1 + r + 1e-3; p.vz = 0; }
+    p.y += dy; if (dy !== 0) for (const c of G.cols) if (OVL(c, p, r, p.h)) {
+      if (dy < 0) { if (!landed || c.y1 > landed.y1) { landed = c; landVy = p.vy; } p.y = c.y1; p.vy = 0; dy = 0; }
+      else { p.y = c.y0 - p.h - 1e-3; p.vy = Math.min(p.vy, 0); dy = 0; if (c.type) bumpBox(c); }
+    }
+    if (p.y > p.peak) p.peak = p.y;
+  }
+  return landed ? { c: landed, vy: landVy } : null;
+}
+function carry(p) { const g = p.ground; if (!g) return; const m = g.mov ? g : (g.par || null); if (m && m.mov) { p.x += m.dx; p.y += m.dy; p.z += m.dz; } }
+
+/* ---- Jugador ---- */
+function updPlayer(dt) {
+  const p = G.p, lv = G.lv, inp = readInput(); p.t += dt;
+  if (p.dead) { p.deadT += dt; if (!p.voidDeath) { p.vy -= 30 * dt; const g = groundAt(p.x, p.z, p.y + .6); p.y = Math.max(g, p.y + p.vy * dt); if (p.y <= g) p.vy = 0; } return; }
+  if (p.win) { p.vx *= .9; p.vz *= .9; return; }
+  p.inv = Math.max(0, p.inv - dt); p.flash = Math.max(0, p.flash - dt); p.lock = Math.max(0, p.lock - dt); p.spinCD -= dt; p.coyote -= dt; p.jbuf -= dt;
+  const zn = camZone(p.z), side = zn && zn.mode === 'side';
+  let mx = p.lock > 0 ? 0 : inp.x, mz = p.lock > 0 ? 0 : inp.z, wx = side ? 0 : mx, wz = side ? mx : mz;
+  // deslizar / agacharse
+  const hsp = Math.hypot(p.vx, p.vz);
+  if ((PRESS.KeyC || PRESS.ControlLeft || PRESS.ControlRight) && p.onGround && p.slideT <= 0 && hsp > 3 && p.lock <= 0) { p.slideT = .62; const l = hsp || 1; p.sdx = p.vx / l; p.sdz = p.vz / l; AU.sfx('slide'); }
+  p.crouch = p.onGround && inp.crouch && p.slideT <= 0 && hsp < 3.2;
+  const low = p.crouch || p.slideT > 0 || (p.h < 1.7 && !canStand(p)); p.h = low ? .85 : 1.7;
+  // salto
+  if (PRESS.Space) p.jbuf = .13;
+  if (p.jbuf > 0 && p.coyote > 0 && p.lock <= 0) { p.vy = 14.2; p.coyote = 0; p.jbuf = 0; p.onGround = false; p.jumped = true; p.slideT = 0; AU.sfx('jump'); dust(p.x, p.y, p.z, 5); }
+  else if (p.jbuf > 0 && save.dj && !p.dj && !p.onGround && p.coyote <= 0 && p.lock <= 0) { p.vy = 12.6; p.dj = true; p.jbuf = 0; p.jumped = true; AU.sfx('djump'); ring(p.x, p.y + .2, p.z); }
+  if (p.jumped && p.vy > 6 && !inp.jump) { p.vy = 6; p.jumped = false; }
+  // ataque giratorio
+  if ((PRESS.KeyJ || PRESS.KeyK || PRESS.ClickSpin) && p.spinCD <= 0 && p.slideT <= 0 && !p.crouch && p.lock <= 0) { p.spinT = .45; p.spinCD = .55; p.spinId++; AU.sfx('spin'); }
+  if (p.spinT > 0) { p.spinT -= dt; p.spinAng = (1 - Math.max(0, p.spinT) / .45) * TAU * 2; spinHit(); }
+  // velocidad horizontal
+  let sp = inp.run ? 11.5 : 8.5; if (p.crouch) sp = 3.4; if (p.spinT > 0) sp *= .92;
+  let tvx = wx * sp, tvz = wz * sp;
+  if (p.slideT > 0) { const k = p.slideT / .62, ss = lerp(6, 14, k); tvx = p.sdx * ss; tvz = p.sdz * ss; p.slideT -= dt; if (p.slideT <= 0 && !canStand(p)) p.slideT = .05; }
+  const acc = (p.slideT > 0 ? 220 : p.onGround ? 90 : 42) * dt; p.vx += clamp(tvx - p.vx, -acc, acc); p.vz += clamp(tvz - p.vz, -acc, acc);
+  if (p.lock <= 0 && (wx || wz) && p.slideT <= 0) p.yaw += wrapA(Math.atan2(wx, wz) - p.yaw) * Math.min(1, 16 * dt); else if (p.slideT > 0) p.yaw = Math.atan2(p.sdx, p.sdz);
+  p.ph += Math.hypot(p.vx, p.vz) * dt * .62;
+  p.vy -= (p.vy < 0 ? 46 : 38) * dt; if (p.vy < -32) p.vy = -32;
+  carry(p); const wasG = p.onGround; p.onGround = false;
+  const land = movePlayer(dt);
+  if (land) {
+    const c = land.c; let bounced = false; p.ground = c;
+    if (c.type) { const r = landOnBox(c, land.vy); if (r) { p.vy = r.vy; p.jumped = false; bounced = true; p.onGround = false; p.ground = null; } }
+    if (!bounced) { p.onGround = true; p.coyote = .12; p.jumped = false; p.dj = false; p.lastGroundY = p.y; if (!wasG && land.vy < -6) { AU.sfx('land'); dust(p.x, p.y, p.z, 4); } p.peak = p.y; }
+  } else { p.ground = null; }
+  if (side) { p.x += (zn.lockX - p.x) * Math.min(1, 10 * dt); p.vx = 0; }
+  checkCicuta();
+  if (p.y < -14 && !p.dead) die(true);
+}
+function hurt(kx, kz, why) { const p = G.p; if (p.dead || p.inv > 0 || p.win || G.cine) return; p.hp--; AU.sfx('hurt'); G.shake = .35; p.inv = 1.8; p.flash = .4; if (p.hp <= 0) { die(false); return; } p.lock = .28; p.vx = (kx || 0) * 7; p.vz = (kz || 0) * 7; p.vy = 8; p.slideT = 0; say(pick(PH.hurt), 2.4); updHUD(); }
+function die(voidD) { const p = G.p; if (p.dead) return; p.dead = true; p.deadT = 0; p.voidDeath = !!voidD; p.hp = 0; G.stats.deaths++; AU.sfx('die'); G.kairos = null; $('#kairos').classList.add('hide'); updHUD(); }
+function respawn() {
+  const p = newPlayer(G.cp.x, G.cp.y, G.cp.z); p.hp = 3; G.p = p; G.projs = []; for (const b of G.lv.boxes) if (b.alive && (b.state === 'fuse')) { b.state = 'idle'; b.t = 0; if (b.fl) { b.fl.life = 0; b.fl = null; } }
+  if (G.boss && !G.bossDead) { const e = G.boss; e.mode = 'float'; e.x = 0; e.z = 257; e.y = 2.3; e.t = 0; e.shoot = 2; e.orate = 6; }
+  G.mode = 'play'; hideOv('defeat'); G.fade = 1; G.camY = G.cp.y; snapCam(); say('Desde la última estatua. «Conócete a ti mismo»… y a tus caídas.', 3); updHUD(true);
+}
+function setCheckpoint(x, y, z, id) { if (G.cp.id === id) return; G.cp = { x, y, z, id }; AU.sfx('check'); floater('Punto de control', x, y + 2.6, z, 'good', 1.8); say('Progreso guardado.', 2); }
+
+/* ---- Ataque giratorio ---- */
+function spinHit() {
+  const p = G.p, lv = G.lv;
+  for (const b of lv.boxes) { if (!b.alive || b.spunBy === p.spinId) continue; if (b.type === 'cicuta' || b.type === 'rio') continue;
+    const dx = Math.max(b.x0 - p.x, 0, p.x - b.x1), dz = Math.max(b.z0 - p.z, 0, p.z - b.z1); if (Math.hypot(dx, dz) < 1.55 && b.y1 > p.y - .2 && b.y0 < p.y + 1.7) { b.spunBy = p.spinId; spinBox(b); } }
+  for (const pr of G.projs) if (!pr.dead && Math.hypot(pr.x - p.x, pr.z - p.z) < 1.8 && Math.abs(pr.y - (p.y + .9)) < 1.6) { pr.dead = true; burst(pr.x, pr.y, pr.z, 8, 0xffe9a0, 4); AU.sfx('tick'); G.stats.score += 20; }
+}
+function spinBox(b) {
+  switch (b.type) {
+    case 'wood': breakBox(b, 'spin'); break; case 'ceramic': breakBox(b, 'spin'); break; case 'kairos': breakBox(b, 'spin'); startKairos(); break; case 'dioge': breakBox(b, 'spin'); startDio(); break;
+    case 'aporia': if (b.state === 'idle') { b.state = 'fuse'; b.t = 2; AU.sfx('tick'); b.fl = floater('2', b.x, b.y + 1.6, b.z, 'fuse', 9); } break;
+    case 'check': activateCheckBox(b); break; case 'platon': openRiddle(b); break;
+    case 'arist': floater('No es la acción adecuada', b.x, b.y + 1.5, b.z, '', 1.4); break;
+    case 'bounce': b.sq = .4; AU.sfx('bounce'); break; case 'tnt': floater('La ira divina solo despierta saltando', b.x, b.y + 1.5, b.z, '', 1.6); break;
+  }
+}
+function activateCheckBox(b) { if (!b.active) { b.active = true; setCheckpoint(b.x, b.y1 + .1, b.z, 'cb' + b.x + '_' + b.z); } }
+function bumpBox(b) { if (b.type === 'wood') breakBox(b, 'head'); }
+
+/* ---- Cajas ---- */
+function landOnBox(b, vy) {
+  const p = G.p, held = !!(KEYS.Space || TJ.jump);
+  switch (b.type) {
+    case 'wood': breakBox(b, 'jump'); return { vy: held ? 15.5 : 11 };
+    case 'bounce': b.sq = .45; AU.sfx('bounce'); floater(pick(PH.bounce), b.x, b.y + 1.8, b.z, 'ask', 1.5); return { vy: held ? 23 : 17.5 };
+    case 'tnt': if (b.state === 'idle') { b.state = 'fuse'; b.t = 3; AU.sfx('tick'); b.fl = floater('3', b.x, b.y + 1.7, b.z, 'fuse', 9); } return { vy: 11 };
+    case 'aporia': if (b.state === 'idle') { b.state = 'fuse'; b.t = 2; AU.sfx('tick'); b.fl = floater('2', b.x, b.y + 1.7, b.z, 'fuse', 9); } return { vy: 11 };
+    case 'kairos': breakBox(b, 'jump'); startKairos(); return { vy: 11 };
+    case 'dioge': breakBox(b, 'jump'); startDio(); return { vy: 11 };
+    case 'check': activateCheckBox(b); return null;
+    case 'arist': { const fall = p.peak - b.y1; if (fall >= 1.8 && fall <= 3.6) { breakBox(b, 'jump'); floater('¡Justo medio!', b.x, b.y1 + 1.2, b.z, 'good', 1.8); return { vy: 9 }; } floater(fall < 1.8 ? 'Te has quedado corto' : 'Te has pasado', b.x, b.y1 + 1.4, b.z, '', 1.6); return fall >= 3.6 ? { vy: 10 } : null; }
+  }
+  return null;
+}
+function breakBox(b, how) {
+  b.alive = false; const col = { wood: 0xc98c4b, ceramic: 0xd9693f, check: 0xe6c25a, kairos: 0x8a5bd6, dioge: 0x7b5530, arist: 0xf1ead2, platon: 0x2f6fe0, bounce: 0x2fbf9f, aporia: 0xf08a1c, tnt: 0xd6342a, cicuta: 0x4cd04a }[b.type] || 0xcccccc;
+  burst(b.x, b.y + b.sy / 2, b.z, 14, col, 5); AU.sfx(b.type === 'ceramic' ? 'clay' : 'break'); G.shake = Math.max(G.shake, .12);
+  const d = b.drop || {}, ox = b.x, oy = b.y + .55, oz = b.z;
+  for (let i = 0; i < (d.coins || 0); i++) { const a = i / d.coins * TAU; G.lv.items.push({ k: 'coin', x: ox + Math.cos(a) * .7, y: oy + .3, z: oz + Math.sin(a) * .7, got: false, spawned: true }); }
+  if (d.amph) G.lv.items.push({ k: 'amph', x: ox, y: oy + .3, z: oz, got: false }); if (d.scroll !== undefined) G.lv.items.push({ k: 'scroll', x: ox, y: oy + .5, z: oz, id: d.scroll === 1 && b.type === 'arist' ? 1 : d.scroll, got: false });
+  if (d.mask) G.lv.items.push({ k: 'mask', x: ox, y: oy + .4, z: oz, id: d.mask, got: false }); if (d.gem) G.lv.items.push({ k: 'gem', x: ox, y: oy + .4, z: oz, id: d.gem, got: false });
+  floater(BN[b.type], b.x, b.y + 1.5, b.z, 'box', 1.3); if (how !== 'blast' && Math.random() < .22) say(pick(PH.box), 3);
+  if (b.fl) { b.fl.life = 0; b.fl = null; } G.stats.score += 5;
+}
+function checkCicuta() {
+  const p = G.p, m = .12, r = .33; if (p.dead) return;
+  for (const b of G.lv.boxes) { if (!b.alive || b.type !== 'cicuta' || b.state !== 'idle') continue; if (b.x0 - m < p.x + r && b.x1 + m > p.x - r && b.y0 - m < p.y + p.h && b.y1 + m > p.y && b.z0 - m < p.z + r && b.z1 + m > p.z - r) { AU.sfx('fizz'); const kx = p.x - b.x, kz = p.z - b.z, l = Math.hypot(kx, kz) || 1; b.alive = false; blast(b.x, b.y + .5, b.z, 1.8, b, 0); hurt(kx / l, kz / l, 'cicuta'); } }
+}
+function blast(x, y, z, r, src, delay) {
+  const green = src && src.type === 'cicuta'; burst(x, y, z, green ? 20 : 34, green ? 0x7dff4a : 0xffa02a, green ? 6 : 9); burst(x, y, z, 10, 0x333333, 4); AU.sfx('boom'); G.shake = Math.max(G.shake, green ? .3 : .6); ring(x, y, z, green ? 0x7dff4a : 0xffa02a, r);
+  const p = G.p; if (!p.dead && Math.hypot(p.x - x, p.y + .85 - y, p.z - z) < r + .3) { const kx = p.x - x, kz = p.z - z, l = Math.hypot(kx, kz) || 1; hurt(kx / l, kz / l, 'blast'); }
+  for (const b of G.lv.boxes) { if (!b.alive || b === src) continue; if (Math.hypot(b.x - x, b.y + b.sy / 2 - y, b.z - z) > r + .5) continue;
+    if (b.type === 'cicuta' || b.type === 'tnt' || b.type === 'aporia') { if (b.state !== 'fuse') { b.state = 'fuse'; b.t = b.type === 'cicuta' ? .14 : .3; b.chain = true; } } else if (b.type !== 'check' && b.type !== 'rio') breakBox(b, 'blast'); }
+  for (const e of G.lv.enemies) if (e.alive && !e.boss && Math.hypot(e.x - x, e.z - z) < r + .5 && Math.abs(e.y - y) < 3) killEnemy(e, 'blast');
+}
+function updBoxes(dt) {
+  for (const b of G.lv.boxes) { if (!b.alive) continue; if (b.sq > 0) b.sq -= dt;
+    if (b.state === 'fuse') { const prev = b.t; b.t -= dt; if (b.type !== 'cicuta') { if (Math.ceil(prev) !== Math.ceil(b.t) && b.t > 0) AU.sfx('tick'); if (b.fl) b.fl.el.textContent = Math.max(1, Math.ceil(b.t)); }
+      if (b.t <= 0) { b.alive = false; if (b.fl) { b.fl.life = 0; b.fl = null; } if (b.type === 'cicuta') blast(b.x, b.y + .5, b.z, 1.9, b, 0); else blast(b.x, b.y + .5, b.z, b.type === 'tnt' ? 4.0 : 3.2, b, 0); } }
+    if (b.fl) { b.fl.x = b.x; b.fl.y = b.y + 1.7; b.fl.z = b.z; b.fl.life = 9; } }
+}
+
+/* ---- Objetos ---- */
+function updItems(dt) {
+  const p = G.p, lv = G.lv; if (p.dead || p.win) return; G.coinT -= dt; if (G.coinT <= 0) G.coinChain = 0;
+  for (const it of lv.items) { if (it.got || it.hide) continue; const dx = it.x - p.x, dz = it.z - p.z; if (Math.abs(dx) < .85 && Math.abs(dz) < .85 && it.y - (p.y + .9) > -1.7 && it.y - (p.y + .9) < 1.5) collect(it); }
+  if (G.dio && p.z >= G.dio.end) { for (const it of lv.items) if (it.hide) it.hide = false; if (!G.dio.fail) { G.stats.score += 500; G.stats.gems.push('Templanza'); floater('¡Autosuficiencia! +500 y gema de Templanza', p.x, p.y + 2.5, p.z, 'good', 2.6); AU.sfx('scroll'); say('Quien nada recoge, nada pierde… y puntúa.', 3.4); } G.dio = null; }
+}
+function collect(it) {
+  it.got = true; const p = G.p, st = G.stats; if (G.dio && it.k !== 'coin') G.dio.fail = true;
+  switch (it.k) {
+    case 'coin': st.coins++; st.score += 10; G.coinChain++; G.coinT = 1.1; AU.sfx('coin', 1 + Math.min(.7, G.coinChain * .045)); if (G.dio) G.dio.fail = true; break;
+    case 'scroll': st.scrolls[it.id] = true; st.score += 500; AU.sfx('scroll'); floater('Pergamino de la Verdad ' + st.scrolls.filter(Boolean).length + '/3', it.x, it.y + 1.2, it.z, 'good', 2.4); say(pick(PH.scroll), 3.4); burst(it.x, it.y, it.z, 18, 0xfff2a0, 6); break;
+    case 'amph': p.hp = Math.min(5, p.hp + 1); AU.sfx('scroll'); floater('+1 ánfora de sabiduría', it.x, it.y + 1, it.z, 'good', 1.8); break;
+    case 'gem': st.gems.push(it.id); st.score += 300; AU.sfx('scroll'); floater('Gema: ' + it.id, it.x, it.y + 1, it.z, 'good', 2); break;
+    case 'feather': st.secret = true; st.score += 800; AU.sfx('scroll'); floater('Pluma de Platón: ¡secreto!', it.x, it.y + 1.2, it.z, 'good', 2.6); say(pick(PH.secret), 3.6); burst(it.x, it.y, it.z, 22, 0xffffff, 6); break;
+    case 'mask': st.masks.push(it.id); st.score += 300; AU.sfx('scroll'); floater('Máscara teatral: ' + it.id, it.x, it.y + 1, it.z, 'good', 2.2); break;
+  }
+  updHUD();
+}
+function startDio() { const lv = G.lv; G.dio = { end: 222, fail: false }; for (const it of lv.items) if (it.k === 'coin' && !it.got && it.z > 196 && it.z < 222) it.hide = true; floater('Las monedas se esfuman… ¿serás autosuficiente?', G.p.x, G.p.y + 2.6, G.p.z, '', 2.6); }
+function startKairos() { if (G.kairos) return; G.kairos = { t: G.lv.kairos.time }; $('#kairos').classList.remove('hide'); AU.sfx('boss'); say('¡Kairos! Llega a la meta dorada antes de que se acabe el tiempo.', 3); }
+function updKairos(dt) {
+  const k = G.kairos; if (!k) return; const p = G.p; k.t -= dt; $('#kairos').textContent = Math.max(0, k.t).toFixed(1) + ' s';
+  if (p.z >= G.lv.kairos.goal && !p.dead) { G.kairos = null; $('#kairos').classList.add('hide'); G.stats.kairos = true; G.stats.gems.push('Justicia'); G.stats.score += 700; AU.sfx('win'); floater('¡Kairos superado! Gema de Justicia', p.x, p.y + 2.6, p.z, 'good', 2.8); say('Llegué a tiempo. El tiempo, al fin, también era una pregunta.', 3.4); updHUD(); }
+  else if (k.t <= 0) { G.kairos = null; $('#kairos').classList.add('hide'); say('El kairos pasó… Vuelve a la caja y reintenta.', 3.2); AU.sfx('hurt'); const b = G.lv.boxes.find((q) => q.type === 'kairos'); if (b) { b.alive = true; b.state = 'idle'; } }
+}
+
+/* ---- Enemigos ---- */
+const RK = { S: 4, A: 3, B: 2, C: 1 };
+const WORDS = ['¡Sofisma!', 'Falso dilema', 'Ad hominem', '¡Es obvio!', 'Todos lo dicen', 'Confía en mí', 'Por tradición'];
+function fireProj(e, spread, spd) { const p = G.p; let dx = p.x - e.x, dz = p.z - e.z, dy = p.y + .9 - (e.y + 1.6), l = Math.hypot(dx, dy, dz) || 1; dx /= l; dy /= l; dz /= l; const s = spd || 6.5, a = Math.atan2(dx, dz) + (spread || 0), h = Math.hypot(dx, dz); G.projs.push({ x: e.x, y: e.y + 1.6, z: e.z, vx: Math.sin(a) * h * s, vy: dy * s * .6, vz: Math.cos(a) * h * s, life: 5, word: pick(WORDS), dead: false }); AU.sfx('speak'); }
+function updProjs(dt) { const p = G.p; for (const q of G.projs) { if (q.dead) continue; q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.life -= dt; if (q.life <= 0) q.dead = true; if (!p.dead && Math.hypot(q.x - p.x, q.z - p.z) < .6 && Math.abs(q.y - (p.y + .9)) < .9) { q.dead = true; hurt(q.vx * .1, q.vz * .1, 'arg'); } } G.projs = G.projs.filter((q) => !q.dead); }
+function killEnemy(e, how) {
+  if (!e.alive) return; e.alive = false; e.dead = .6; G.stats.kills++; G.stats.score += 100; burst(e.x, e.y + 1, e.z, 14, 0xe8d8ff, 5); AU.sfx('poof');
+  const txt = { sofista: 'Argumento refutado', veloz: 'Retórica demasiado veloz', dogma: 'Un dogma menos', caster: 'Ilusión disipada', falacia: FALL[e.fal || 0][0] }[e.type] || 'Refutado';
+  floater(txt, e.x, e.y + 2.4, e.z, 'good', 1.8); if (Math.random() < .5) say(pick(PH.sophist), 3);
+  if (e.type === 'caster') dispel();
+}
+function dispel() { for (const i of G.lv.ills) if (i.grp === 'chasm') burst((i.x0 + i.x1) / 2, 0, (i.z0 + i.z1) / 2, 6, 0xf6e7a0, 3); G.chasm.dispelled = true; if (!G.chasm.active) G.chasm.active = true; G.chasm.t = Math.max(G.chasm.t, 1.2); say('Sin argumento no hay ilusión: solo queda lo sólido.', 3.4); }
+function updEnemies(dt) {
+  const p = G.p, lv = G.lv;
+  for (const e of lv.enemies) {
+    if (e.boss) continue; if (!e.alive) { if (e.dead > 0) e.dead -= dt; continue; }
+    e.t += dt; e.ph += dt * (e.type === 'veloz' ? 13 : 6);
+    if (e.type === 'caster') { e.yaw = Math.atan2(p.x - e.x, p.z - e.z); e.shoot -= dt; if (e.shoot <= 0 && D2(e, p) < 14 && !p.dead && G.chasm.active) { fireProj(e, 0, 5.5); e.shoot = rnd(3.2, 4.4); } }
+    else {
+      if (e.pause > 0) e.pause -= dt; else { e[e.ax] += e.dir * e.spd * dt; if (e[e.ax] > e.b) { e[e.ax] = e.b; e.dir = -1; } if (e[e.ax] < e.a) { e[e.ax] = e.a; e.dir = 1; } }
+      e.turn -= dt; if (e.turn <= 0) { if (Math.random() < .55 && e.type !== 'dogma') { if (e.type === 'veloz') e.pause = .4; e.dir *= -1; } e.turn = rnd(2, 4.5); }
+      const ty = e.ax === 'x' ? (e.dir > 0 ? Math.PI / 2 : -Math.PI / 2) : (e.dir > 0 ? 0 : Math.PI); e.yaw += wrapA(ty - e.yaw) * Math.min(1, 10 * dt);
+      if (e.type === 'falacia') e.fal = Math.floor(e.t / 2.2) % 4;
+      if ((e.type === 'sofista' || e.type === 'falacia') && !p.dead) { e.shoot -= dt; if (e.shoot <= 0 && D2(e, p) < 12 && Math.abs(e.z - p.z) < 12) { fireProj(e, 0, 5.5); e.shoot = rnd(3, 4.5); } }
+    }
+    enemyContact(e);
+  }
+  for (const e of lv.enemies) if (e.boss && e.mode) { /* el jefe se gestiona aparte */ }
+}
+function enemyContact(e) {
+  const p = G.p; if (p.dead || p.win) return; const dx = p.x - e.x, dz = p.z - e.z, d = Math.hypot(dx, dz) || .001, dy = p.y - e.y, eh = e.type === 'dogma' ? 1.9 : 1.75, er = .55;
+  if (p.spinT > 0 && d < 1.9 && dy > -1.4 && dy < 1.9) {
+    if (e.type === 'dogma') { const fx = Math.sin(e.yaw), fz = Math.cos(e.yaw); if ((dx * fx + dz * fz) / d > .25) { p.spinT = 0; p.vx = dx / d * 7; p.vz = dz / d * 7; AU.sfx('tick'); floater('¡Bloqueado! Ataca por detrás', e.x, e.y + 2.3, e.z, '', 1.4); return; } }
+    killEnemy(e, 'spin'); return;
+  }
+  if (d < er + .33 && dy > -1.5 && dy < eh) { if (p.vy < -1 && p.y > e.y + eh * .5) { killEnemy(e, 'stomp'); p.vy = (KEYS.Space ? 14 : 10.5); p.jumped = false; p.coyote = 0; p.onGround = false; return; } if (p.inv <= 0) hurt(dx / d, dz / d, 'enemy'); }
+}
+/* ---- Jefe: el Maestro sofista ---- */
+function startBoss() { const e = G.lv.enemies.find((q) => q.boss); if (!e || !e.alive) return; G.boss = e; e.mode = 'idle'; dialog(DLG.boss0, () => { e.mode = 'float'; e.t = 0; e.shoot = 2; e.orate = 5; AU.music('boss'); AU.sfx('boss'); say('¡Aprovecha sus pausas! Golpéalo cuando se detenga a discursear.', 4); }); if (!save.chars.includes('maestro')) { save.chars.push('maestro'); writeSave(); } }
+function updBoss(dt) {
+  const e = G.boss; if (!e || G.bossDead || !e.mode || e.mode === 'idle') return; const p = G.p, ph = 3 - e.hp; e.t += dt; e.ph += dt * 4;
+  const spd = [.8, 1.1, 1.4][ph], shootInt = [2.6, 2.1, 1.6][ph];
+  if (e.mode === 'float') { e.x = Math.sin(e.t * spd) * 7.5; e.z = 257 + Math.sin(e.t * spd * .5) * 1.5; e.y = 2.3 + .25 * Math.sin(e.t * 3); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; e.shoot -= dt; e.orate -= dt;
+    if (e.shoot <= 0 && !p.dead) { const n = ph === 0 ? 3 : 5; for (let i = 0; i < n; i++) fireProj(e, (i - (n - 1) / 2) * .22, 6 + ph); e.shoot = shootInt; }
+    if (e.orate <= 0) { e.mode = 'orate'; e.t = 0; e.sx = e.x; e.sz = e.z; floater('¡Voy a discursear!', e.x, e.y + 3, e.z, 'ask', 1.6); AU.sfx('boss'); } }
+  else if (e.mode === 'orate') { const k = Math.min(1, e.t / .8); e.x = lerp(e.sx, 0, k); e.z = lerp(e.sz, 253, k); e.y = lerp(2.3, .1, k); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 3.4) { e.mode = 'float'; e.t = 0; e.orate = 7 - ph; e.shoot = 1.2; } }
+  else if (e.mode === 'hurt') { e.y += dt * 3; e.yaw += dt * 8; if (e.t > 1.3) { e.mode = 'float'; e.t = 0; e.shoot = 1.2; e.orate = 5.5 - ph * .6; } }
+  else if (e.mode === 'dying') { e.y += dt * 2.5; e.yaw += dt * 10; if (e.t > 2.2) { e.mode = 'gone'; bossDefeated(); } return; }
+  // contacto
+  if (p.dead || p.win || e.mode === 'hurt') return; const dx = p.x - e.x, dz = p.z - e.z, d = Math.hypot(dx, dz) || .001, dy = p.y - e.y, vuln = e.mode === 'orate' && e.y < 1.2;
+  if (p.spinT > 0 && d < 2.4 && dy > -1.4 && dy < 2.4) { if (vuln) bossHit(e); else if (e.hitCD === undefined || G.t > e.hitCD) { e.hitCD = G.t + 1; floater('Solo se refuta cuando se detiene', e.x, e.y + 3.2, e.z, '', 1.4); } return; }
+  if (d < 1.2 && dy > -1.5 && dy < 3.2) { if (p.vy < -1 && p.y > e.y + 1.8) { if (vuln) bossHit(e); else floater('Aún no… ¡espera su pausa!', e.x, e.y + 3.2, e.z, '', 1.4); p.vy = 12; p.jumped = false; p.coyote = 0; return; } if (p.inv <= 0) hurt(dx / d, dz / d, 'boss'); }
+}
+function bossHit(e) { e.hp--; e.mode = e.hp <= 0 ? 'dying' : 'hurt'; e.t = 0; AU.sfx('boom'); G.shake = .5; burst(e.x, e.y + 2, e.z, 24, 0xffd23a, 8); G.stats.score += 400; G.projs = []; floater(e.hp > 0 ? '¡Contraargumento!' : '¡Argumento refutado!', e.x, e.y + 3.4, e.z, 'good', 2); if (e.hp > 0) say(['Tu primera premisa tenía una grieta.', 'Y tu segunda no era mejor.'][2 - e.hp] || '', 3); }
+function bossDefeated() { G.bossDead = true; G.lv.enemies.find((q) => q.boss).alive = false; G.stats.kills++; AU.music('w1'); for (const t of G.lv.solids) if (t.tile) { t.st = 0; t.tm = 0; } dialog(DLG.boss1, () => { G.lv.gate.open = true; AU.sfx('gate'); say('La puerta del Templo de Atenea se ha abierto.', 3.5); G.lv.items.push({ k: 'coin', x: 0, y: 1, z: 255, got: false }); }); }
+function updTiles(dt) {
+  const e = G.boss; if (!e || G.bossDead || (e.mode !== 'float' && e.mode !== 'orate' && e.mode !== 'hurt')) return; const ph = 3 - e.hp; if (ph < 1) return;
+  G.tileT -= dt; const tiles = G.lv.solids.filter((s) => s.tile);
+  if (G.tileT <= 0) { G.tileT = 4.2 - ph * .8; const cand = tiles.filter((s) => s.r >= 1 && !s.st), n = ph === 1 ? 3 : 5; for (let i = 0; i < n && cand.length; i++) { const t = cand.splice((Math.random() * cand.length) | 0, 1)[0]; t.st = 1; t.tm = 1.3; } AU.sfx('ill'); }
+  for (const t of tiles) { if (!t.st) continue; t.tm -= dt; if (t.tm <= 0) { if (t.st === 1) { t.st = 2; t.tm = 3.4; } else { t.st = 0; } } }
+}
+/* ---- Peligros y disparadores ---- */
+function updHazards(dt) { const p = G.p; if (p.dead) return; for (const h of G.lv.braziers) { const m = ((G.t + h.ph) % h.per + h.per) % h.per; h.lit = m < h.dur; if (h.lit && Math.hypot(h.x - p.x, h.z - p.z) < .95 && p.y < h.y + 1.9) hurt(0, -1, 'fuego'); } }
+function updTriggers(dt) {
+  const p = G.p, lv = G.lv; if (p.dead) return;
+  for (const tr of lv.triggers) { if (tr.done) continue; if (p.z >= tr.z0 && p.z <= tr.z1) {
+    if (tr.id === 'boss') { tr.done = true; if (!G.bossDead) startBoss(); }
+    else if (tr.id === 'chasm') { tr.done = true; const c = lv.enemies.find((q) => q.type === 'caster'); if (c && c.alive) { c.talking = true; dialog([{ w: 'Sofista', t: 'Estas plataformas son perfectamente sólidas. Fíate de mí.', ev: 'chasm' }, { w: 'Sócrates', t: 'Qué curioso: hoy todo el mundo me pide que confíe.' }], () => { c.talking = false; }); } else G.chasm.active = true; }
+    else if (tr.id === 'platon') { if (G.bossDead && !tr.done2) { tr.done = true; if (!save.chars.includes('platon')) save.chars.push('platon'); dialog(DLG.platon1, () => { save.dj = true; G.stats.dj = true; writeSave(); floater('¡Doble salto desbloqueado!', G.p.x, G.p.y + 2.6, G.p.z, 'good', 3); AU.sfx('win'); }); } }
+    else if (tr.hint) { if (tr.delay && !tr.t0) { tr.t0 = G.t; } if (!tr.delay || G.t - tr.t0 > tr.delay) { tr.done = true; hintShow(tr.hint, 5); } } } }
+  if (G.chasm.active) G.chasm.t += dt;
+  for (const s of lv.statues) if (!s.active && Math.hypot(s.x - p.x, s.z - p.z) < 2.3 && p.y < s.y + 1.5) { s.active = true; setCheckpoint(s.x > 0 ? s.x - 3 : s.x + 3.4, s.y, s.z, s.id); }
+  if (!G.bossDead && p.z > 260 && lv.enemies.some((q) => q.boss && q.alive)) { p.z = 260; p.vz = Math.min(p.vz, 0); }
+  if (!lv.gate.open && p.z > lv.goalZ - 1) p.z = lv.goalZ - 1;
+  if (lv.gate.open && p.z >= lv.goalZ - .4 && !p.win && !p.dead) finishLevel();
+}
+/* ---- Interacción, diálogos y escena ---- */
+function nearInteract() { const p = G.p, lv = G.lv; let best = null, bd = 2.1; for (const n of lv.npcs) { const d = Math.hypot(n.x - p.x, n.z - p.z); if (d < bd) { bd = d; best = { k: 'npc', o: n, t: 'Hablar con ' + (n.type === 'diog' ? 'Diógenes' : 'Platón') }; } } for (const t of lv.tablets) { const d = Math.hypot(t.x - p.x, t.z - p.z); if (d < bd) { bd = d; best = { k: 'tab', o: t, t: 'Leer inscripción' }; } } return best; }
+function doInteract(it) {
+  if (it.k === 'tab') { const I = INSC[it.o.id]; if (!save.insc.includes(it.o.id)) { save.insc.push(it.o.id); writeSave(); G.stats.score += 150; } dialog([{ w: 'Inscripción antigua', t: '«' + I.t + '»\n' + (I.k === 'hist' ? 'Cita histórica · ' : 'Tradición/atribución · ') + I.src, noSfx: true }]); }
+  else { const n = it.o; if (!save.chars.includes(n.type === 'diog' ? 'diogenes' : 'platon')) { save.chars.push(n.type === 'diog' ? 'diogenes' : 'platon'); writeSave(); } dialog(n.type === 'diog' ? DLG.diog : DLG.platon0); }
+}
+function dialog(lines, onEnd) { G.dlg = { lines, i: 0, onEnd, c: 0, prev: G.mode === 'dialog' ? 'play' : G.mode, block: 0 }; G.mode = 'dialog'; $('#dialog').classList.remove('hide'); dlgLine(); }
+function dlgLine() { const d = G.dlg, l = d.lines[d.i]; d.c = 0; d.block = l.block || 0; $('#dlgWho').textContent = l.w; $('#dlgTxt').textContent = ''; $('#dlgHint').textContent = ''; if (l.ev) cineEvent(l.ev); }
+function updDialog(dt) {
+  const d = G.dlg; if (!d) return; const l = d.lines[d.i], full = l.t.length; d.block = Math.max(0, d.block - dt);
+  if (d.c < full) { const pc = Math.floor(d.c); d.c = Math.min(full, d.c + 55 * dt); if (Math.floor(d.c) !== pc && Math.floor(d.c) % 3 === 0 && !l.noSfx) AU.sfx('speak'); $('#dlgTxt').textContent = l.t.slice(0, Math.floor(d.c)); }
+  else { $('#dlgTxt').textContent = l.t; $('#dlgHint').textContent = d.block > 0 ? '' : '▶ Espacio / clic'; }
+  if (PRESS.Space || PRESS.Enter || PRESS.KeyE || PRESS.Advance) { if (d.c < full) d.c = full; else if (d.block <= 0) { d.i++; if (d.i >= d.lines.length) { const f = d.onEnd, pm = d.prev; G.dlg = null; $('#dialog').classList.add('hide'); G.mode = pm === 'dialog' ? 'play' : pm; if (f) f(); } else dlgLine(); } }
+}
+function startIntro() { G.intro = { x: 0, y: 0, z: 9.4, yaw: Math.PI, state: 'idle', t: 0, vy: 0, a: 1 }; dialog(DLG.intro, () => { G.intro = null; save.seenIntro = true; writeSave(); say(pick(PH.start), 3.2); }); }
+function cineEvent(ev) {
+  if (ev === 'plank') { for (const i of G.lv.ills) if (i.grp === 'intro') { i.fade = 0; i.on = true; } AU.sfx('ill'); }
+  else if (ev === 'walk' && G.intro) { G.intro.state = 'walk'; G.intro.t = 0; }
+  else if (ev === 'chasm') { G.chasm.active = true; G.chasm.t = 0; AU.sfx('ill'); }
+}
+function updScene(dt) {
+  G.shake = Math.max(0, G.shake - dt * 1.4); toastT -= dt; if (toastT <= 0) $('#toast').classList.remove('show'); hintTm -= dt; if (hintTm <= 0) $('#hint').classList.remove('show');
+  for (const q of G.parts) { q.life -= dt; q.vy -= (q.g === undefined ? 14 : q.g) * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; } G.parts = G.parts.filter((q) => q.life > 0);
+  for (const f of G.floats) f.life -= dt; for (let i = G.floats.length - 1; i >= 0; i--) if (G.floats[i].life <= 0) { G.floats[i].el.remove(); G.floats.splice(i, 1); }
+  for (const i of G.lv.ills) { if (i.grp === 'intro') { if (i.on) i.fade = Math.min(1, (i.fade || 0) + dt / 1.2); } }
+  const I = G.intro; if (I) { I.t += dt; if (I.state === 'walk') { I.z -= 2.4 * dt; if (I.z < 6.2 && I.state === 'walk') { I.state = 'fall'; I.vy = 0; } } else if (I.state === 'fall') { I.vy -= 30 * dt; I.y += I.vy * dt; I.z -= 1.2 * dt; if (I.y < -14 && !I.splash) { I.splash = true; burst(I.x, -13, I.z, 30, 0xbfe8ff, 8); AU.sfx('poof'); I.state = 'gone'; for (const i of G.lv.ills) if (i.grp === 'intro') i.on = false; } } }
+  for (const i of G.lv.ills) if (i.grp === 'intro' && !i.on && i.fade > 0) i.fade = Math.max(0, i.fade - dt / 0.8);
+}
+function burst(x, y, z, n, col, sp) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, e = Math.random() * 1.2 - .1, s = rnd(.4, 1) * (sp || 5); G.parts.push({ x, y, z, vx: Math.cos(a) * s, vy: e * s + 2, vz: Math.sin(a) * s, life: rnd(.4, .9), col, sz: rnd(.07, .17) }); } }
+function dust(x, y, z, n) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU; G.parts.push({ x, y: y + .1, z, vx: Math.cos(a) * 1.6, vy: rnd(.3, 1.2), vz: Math.sin(a) * 1.6, life: .35, col: 0xe8dcc0, sz: .1, g: 2 }); } }
+function ring(x, y, z, col, r) { for (let i = 0; i < 18; i++) { const a = i / 18 * TAU; G.parts.push({ x, y, z, vx: Math.cos(a) * (r || 2.5) * 2, vy: .5, vz: Math.sin(a) * (r || 2.5) * 2, life: .4, col: col || 0xfff2a0, sz: .1, g: 0 }); } }
+function togglePause() { if (G.mode === 'play') { G.mode = 'paused'; showOv('pause'); AU.sfx('ui'); } else if (G.mode === 'paused') { G.mode = 'play'; hideOv('pause'); } }
+function finishLevel() {
+  const p = G.p, st = G.stats, lv = G.lv; p.win = true; AU.sfx('win'); AU.music(null); const allS = st.scrolls.every(Boolean), amph = 1 + (allS ? 1 : 0) + ((st.secret || st.kairos) ? 1 : 0), rank = amph === 3 ? (st.t <= lv.par ? 'S' : 'A') : (amph === 2 ? 'B' : 'C');
+  st.amph = amph; st.rank = rank; const old = save.levels[G.lid] || {}; save.levels[G.lid] = { done: true, amph: Math.max(old.amph || 0, amph), time: old.time ? Math.min(old.time, st.t) : st.t, coins: Math.max(old.coins || 0, st.coins), scrolls: lv.totalScrolls ? st.scrolls.map((s, i) => s || !!(old.scrolls && old.scrolls[i])) : [], secret: !!(old.secret || st.secret || st.kairos), rank: (RK[old.rank] || 0) > RK[rank] ? old.rank : rank };
+  save.obolos += st.coins; for (const m of st.masks) if (!save.masks.includes(m)) save.masks.push(m); save.last = G.lid; writeSave();
+  setTimeout(() => { if (G.mode !== 'play') return; G.mode = 'victory'; fillVictory(); showOv('victory'); $('#hud').classList.add('hide'); }, 1900);
+}
+
+/* ====================== RENDER, CÁMARA, INTERFAZ Y BUCLE ====================== */
+G.bbYaw = 0;
+function snapCam() { if (G.p) camTarget(0, true); }
+function camTarget(dt, snap) {
+  const p = G.p, cam = G.cam, zn = camZone(p.z), base = p.lastGroundY + Math.max(0, (p.y - p.lastGroundY) * .35);
+  G.camY = snap ? base : lerp(G.camY, base, 1 - Math.exp(-4 * dt)); const by = G.camY; let ex, ey, ez, lx, ly, lz;
+  if (zn && zn.mode === 'side') { ex = zn.lockX + 12.5; ey = by + 3.6; ez = p.z + 2; lx = zn.lockX; ly = by + 1.5; lz = p.z + 2; }
+  else if (zn && zn.wide) { ex = p.x * .4; ey = by + 8.4; ez = p.z - 10.5; lx = p.x * .5; ly = by + .4; lz = p.z + 4.5; }
+  else { ex = p.x * .55; ey = by + 4.7; ez = p.z - 8.8; lx = p.x * .8; ly = by + 1; lz = p.z + 4.6 + Math.min(3, Math.abs(p.vz) * .22); }
+  const f = snap ? 1 : 1 - Math.exp(-6 * dt); cam.x += (ex - cam.x) * f; cam.y += (ey - cam.y) * f; cam.z += (ez - cam.z) * f; cam.tx += (lx - cam.tx) * f; cam.ty += (ly - cam.ty) * f; cam.tz += (lz - cam.tz) * f; cam.fov = zn && zn.wide ? 1.12 : 1.05;
+  G.bbYaw = Math.atan2(cam.tx - cam.x, cam.tz - cam.z);
+}
+function previewCam() { const cam = G.cam, t = G.t, z = 8 + (t * 3.2) % 230; cam.x = Math.sin(t * .15) * 7; cam.y = 7 + Math.sin(t * .3); cam.z = z - 9; cam.tx = 0; cam.ty = 1; cam.tz = z + 6; cam.fov = 1.05; G.bbYaw = Math.atan2(cam.tx - cam.x, cam.tz - cam.z); }
+
+/* ---- dibujo ---- */
+function drawSolid(s, a) {
+  const w = s.x1 - s.x0, h = s.y1 - s.y0, d = s.z1 - s.z0, tex = { path: TX.stone, marble: TX.marble, wall: TX.wall, gold: TX.gold, tile: TX.marble }[s.style] || TX.stone, o = { tex, tile: [Math.max(.3, w / 2.2), Math.max(.3, h / 2.2), Math.max(.3, d / 2.2)], rim: .04 };
+  if (a < 1) o.a = a; draw(MB, M4.trs((s.x0 + s.x1) / 2, (s.y0 + s.y1) / 2, (s.z0 + s.z1) / 2, 0, 0, 0, w, h, d), s.style === 'gold' ? 0xffffff : 0xffffff, o);
+}
+function drawEnemy(e) {
+  if (!e.alive) { if (e.dead > 0 && !e.boss) { const k = e.dead / .6; drawHuman(M4.mul(M4.T(e.x, e.y, e.z), M4.mul(M4.RY(e.yaw), M4.S(1 + (1 - k) * .4, k * .4 + .05, 1 + (1 - k) * .4))), STY[e.type === 'dogma' ? 'dogma' : 'sofista'], { a: k, sp: 0 }); } return; }
+  const B = M4.mul(M4.T(e.x, e.y, e.z), M4.RY(e.yaw)), po = { ph: e.ph, sp: e.pause > 0 ? 0 : 1, t: G.t };
+  if (e.type === 'sofista') { po.talk = 1; drawHuman(B, STY.sofista, po); }
+  else if (e.type === 'veloz') { po.lean = .45; drawHuman(B, STY.veloz, po); }
+  else if (e.type === 'falacia') { const c = FALL[e.fal || 0][1]; drawHuman(B, Object.assign({}, STY.falacia, { tunic: c, mantle: shade(c, .75), belt: shade(c, 1.3) }), po); }
+  else if (e.type === 'dogma') { drawHuman(B, STY.dogma, po); draw(MB, M4.mul(B, M4.trs(0, 1.05, .8, 0, 0, 0, 1.55, 1.5, .2)), 0xffffff, { tex: TX.shield, rim: .2 }); }
+  else if (e.type === 'caster') { po.sp = 0; po.talk = 1; drawHuman(B, STY.sofista, po); draw(MS, M4.trs(e.x, e.y + 2.6 + .1 * Math.sin(G.t * 3), e.z, 0, 0, 0, .35, .35, .35), 0xffe27a, { emis: 1, a: .8 }); if (G.chasm.active && !G.chasm.dispelled) draw(MD, M4.trs(e.x, e.y + .04, e.z, 0, 0, 0, 1.1 + .15 * Math.sin(G.t * 5), 1, 1.1 + .15 * Math.sin(G.t * 5)), 0xffe27a, { a: .35, emis: 1 }); }
+  drawShadow(e.x, e.y, e.z, .7, .3);
+}
+function drawBoss(e) {
+  if (!e.alive && e.mode !== 'dying' && e.mode !== 'gone') return; if (e.mode === 'gone') return;
+  const B = M4.mul(M4.T(e.x, e.y, e.z), M4.RY(e.yaw)), po = { ph: e.ph, sp: .2, t: G.t, talk: e.mode === 'orate' || e.mode === 'float' ? 1 : 0, mouth: e.mode === 'orate' ? 1 : 0, flash: e.mode === 'hurt' || e.mode === 'dying' ? (Math.floor(G.t * 14) % 2) : 0, air: 0 };
+  drawHuman(B, STY.maestro, po);
+  draw(MB, M4.mul(B, M4.trs(0, -.08, 0, 0, 0, 0, 3.2, .14, 2.2)), 0xb0182c, { emis: .15, rim: .3 }); draw(MB, M4.mul(B, M4.trs(0, -.02, 0, 0, 0, 0, 3.4, .06, 2.4)), 0xffd23a, { emis: .3 });
+  if (e.mode === 'orate' && e.y < 1.2) draw(MS, M4.trs(e.x, e.y + 1.8, e.z, 0, 0, 0, 2.6, 2.9, 2.6), 0xffd23a, { a: .16 + .08 * Math.sin(G.t * 9), emis: 1 });
+  drawShadow(e.x, 0, e.z, 1.5, .3);
+}
+function drawPlayer() {
+  const p = G.p, spd = Math.hypot(p.vx, p.vz), yaw = p.yaw + (p.spinT > 0 ? p.spinAng : 0);
+  const po = { ph: p.ph, sp: p.onGround ? Math.min(1, spd / 9) : 0, air: !p.onGround && !p.dead && !p.win, spin: p.spinT > 0, crouch: p.h < 1 ? 1 : 0, t: G.t, flash: p.flash > 0 ? .9 : 0, win: p.win, die: p.dead ? Math.min(1, p.deadT * 2.2) : 0, lean: p.slideT > 0 ? .9 : 0 };
+  if (p.inv > 0 && !p.dead && Math.floor(G.t * 18) % 2 === 0) po.a = .35;
+  drawHuman(M4.mul(M4.T(p.x, p.y, p.z), M4.RY(yaw)), STY.soc, po);
+  const g = groundAt(p.x, p.z, p.y + .4); if (g > -50 && !(p.dead && p.voidDeath)) drawShadow(p.x, g, p.z, .62 * (1 - clamp((p.y - g) / 9, 0, .75)), .4);
+  if (p.spinT > 0) { const k = p.spinT / .45; draw(MD, M4.trs(p.x, p.y + .9, p.z, 0, 0, 0, 1.9, 1, 1.9), 0xfff0a0, { a: .22 * k + .1, emis: 1 }); draw(MD, M4.trs(p.x, p.y + .5, p.z, 0, 0, 0, 1.5, 1, 1.5), 0xffffff, { a: .14, emis: 1 }); }
+  if (p.slideT > 0) dust(p.x, p.y, p.z, 1);
+}
+function drawScene() {
+  const lv = G.lv, t = G.t, cam = G.cam, cz = cam.z, nz = (a, b) => b > cz - 45 && a < cz + 100;
+  draw(MD, M4.trs(cam.x, -14, cam.z, 0, 0, 0, 700, 1, 700), 0x2f86b8, { fx: 2 });
+  for (const pr of lv.props) {
+    if (pr.t === 'hill' || pr.t === 'temple' || pr.t === 'cloud') { if (!nz(pr.z - 40, pr.z + 40)) continue; } else if (!nz(pr.z - 6, pr.z + 6)) continue;
+    switch (pr.t) {
+      case 'island': draw(MB, M4.trs(pr.x, -2, pr.z, 0, 0, 0, pr.w, 4, pr.d), 0xffffff, { tex: TX.stone, tile: [pr.w / 2.2, 1.8, pr.d / 2.2] }); break;
+      case 'column': drawColumn(pr.x, pr.y, pr.z, pr.h, .45); break; case 'tree': drawTree(pr.x, pr.y, pr.z, pr.s, pr.kind); break;
+      case 'stall': drawStall(pr.x, pr.y, pr.z, pr.rot, pr.c); break; case 'amph': drawAmphoraBig(pr.x, pr.y, pr.z, pr.s, pr.c); break; case 'temple': drawTemple(pr.x, pr.y, pr.z, pr.w, pr.d, pr.h, pr.rot); break;
+      case 'hill': draw(MS, M4.trs(pr.x, pr.y, pr.z, 0, 0, 0, pr.s * 1.6, pr.s, pr.s * 1.6), 0x7f9a6a, { rim: .1 }); break;
+      case 'cloud': draw(MS, M4.trs(pr.x + Math.sin(t * .03 + pr.z) * 3, pr.y, pr.z, 0, 0, 0, pr.s * 1.8, pr.s * .55, pr.s), 0xffffff, { a: .85, emis: .6 }); break;
+    }
+  }
+  for (const s of lv.solids) {
+    if (s.style === 'ped' || !nz(s.z0, s.z1)) continue; let a = 1;
+    if (s.grp === 'chasm') { if (!G.chasm.active) continue; a = clamp((G.chasm.t - (s.z0 - 150) / 24) / .7, 0, 1); if (a <= 0) continue; }
+    if (s.tile) { if (s.st === 2) { draw(MB, M4.trs((s.x0 + s.x1) / 2, -.1, (s.z0 + s.z1) / 2, 0, 0, 0, s.x1 - s.x0, .2, s.z1 - s.z0), 0xf6e7a0, { tex: TX.ill, fx: 1, a: .5, tile: [2, 1, 2] }); continue; } if (s.st === 1 && Math.floor(t * 12) % 2 === 0) a = .4; }
+    drawSolid(s, a);
+  }
+  for (const i of lv.ills) {
+    let a = 0; if (i.grp === 'intro') a = i.fade || 0; else if (i.grp === 'chasm') { if (!G.chasm.active || G.chasm.dispelled) continue; a = clamp((G.chasm.t - (i.z0 - 150) / 24) / .7, 0, 1); } if (a <= 0 || !nz(i.z0, i.z1)) continue;
+    draw(MB, M4.trs((i.x0 + i.x1) / 2, -.15, (i.z0 + i.z1) / 2, 0, 0, 0, i.x1 - i.x0, .3, i.z1 - i.z0), 0xffffff, { tex: TX.ill, fx: 1, a, tile: [(i.x1 - i.x0) / 2.4, 1, (i.z1 - i.z0) / 2.4] });
+  }
+  for (const b of lv.boxes) { if (!b.alive || !nz(b.z, b.z)) continue; if (b.type === 'rio' && b.ph === 2) { draw(MB, M4.trs(b.x, b.y + b.sy / 2, b.z, 0, 0, 0, b.sx, b.sy, b.sz), 0xffffff, { tex: TX.rio, fx: 1, a: .35 }); continue; } drawBoxTex(b, t); }
+  for (const it of lv.items) { if (it.got || it.hide || !nz(it.z, it.z)) continue; switch (it.k) { case 'coin': drawCoin(it.x, it.y, it.z, t); break; case 'scroll': drawScroll(it.x, it.y, it.z, t); break; case 'amph': drawAmphoraItem(it.x, it.y, it.z, t); break; case 'gem': drawGem(it.x, it.y, it.z, t, it.id === 'Justicia' ? 0xff5a5a : it.id === 'Templanza' ? 0x5affb0 : 0x5aa8ff); break; case 'feather': drawFeather(it.x, it.y, it.z, t); break; case 'mask': drawMaskItem(it.x, it.y, it.z, t); break; } }
+  for (const s of lv.statues) if (nz(s.z, s.z)) drawStatue(s, t);
+  for (const n of lv.npcs) if (nz(n.z, n.z)) { const B = M4.mul(M4.T(n.x, n.y, n.z), M4.RY(n.yaw)); if (n.type === 'diog') { draw(MC(.62, .62, false), M4.trs(n.x + Math.sin(n.yaw + 1.57) * .1, 0, n.z - .9, 0, 0, 0, 1, 1.3, 1), 0x8a5a2c, { rim: .1 }); draw(MC(.64, .64, false), M4.trs(n.x, .25, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); draw(MC(.64, .64, false), M4.trs(n.x, .95, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); } drawHuman(B, STY[n.type === 'diog' ? 'diog' : 'platon'], { t, talk: Math.sin(t * .8) > .6 ? 1 : 0 }); drawShadow(n.x, n.y, n.z, .7, .3); }
+  for (const tb of lv.tablets) if (nz(tb.z, tb.z)) { draw(MB, M4.trs(tb.x, .75, tb.z, 0, .3, 0, .9, 1.5, .25), 0xffffff, { tex: TX.board, tile: [1, 1, 1], rim: .2 }); if (!save.insc.includes(tb.id)) draw(MS, M4.trs(tb.x, 1.9 + .1 * Math.sin(t * 3), tb.z, 0, 0, 0, .15, .15, .15), 0xffe27a, { emis: 1 }); }
+  for (const h of lv.braziers) if (nz(h.z, h.z)) drawBrazier(h, h.lit, t);
+  drawGate(lv.gate, t);
+  if (G.intro) { const I = G.intro; drawHuman(M4.mul(M4.T(I.x, I.y, I.z), M4.RY(I.yaw)), STY.sofista, { t, talk: I.state === 'idle' ? 1 : 0, sp: I.state === 'walk' ? 1 : 0, ph: I.t * 6, air: I.state === 'fall', flash: 0 }); if (I.state !== 'fall' && I.state !== 'gone') drawShadow(I.x, I.y, I.z, .7, .3); }
+  for (const e of lv.enemies) { if (e.boss) { if (nz(e.z - 10, e.z + 10)) drawBoss(e); } else if (nz(e.z, e.z)) drawEnemy(e); }
+  for (const q of G.projs) { draw(MQ, M4.trs(q.x, q.y, q.z, 0, G.bbYaw, 0, 1.5, .38, 1), 0xffffff, { tex: labelTex(q.word, '#3a1d5c', '#ffe27a'), emis: .5, a: .98 }); }
+  for (const q of G.parts) { const k = clamp(q.life / .5, 0, 1); draw(MB, M4.trs(q.x, q.y, q.z, 0, 0, 0, q.sz * (.4 + k), q.sz * (.4 + k), q.sz * (.4 + k)), q.col, { emis: .6 }); }
+  if (G.p && !G.preview) drawPlayer();
+  if (G.kairos) draw(MD, M4.trs(0, .06, lv.kairos.goal, 0, 0, 0, 2.2, 1, 2.2), 0xffe27a, { a: .55, emis: 1 });
+  else if (lv.kairos && !G.stats.kairos) draw(MD, M4.trs(0, .05, lv.kairos.goal, 0, 0, 0, 1.6, 1, 1.6), 0xffe27a, { a: .18, emis: 1 });
+}
+function updFloaters() { for (const f of G.floats) { const pr = project(f.x, f.y, f.z); if (!pr) { f.el.style.display = 'none'; continue; } f.el.style.display = 'block'; const k = 1 - f.life / f.max; f.el.style.transform = `translate(${pr[0]}px,${pr[1] - k * 36}px) translate(-50%,-50%)`; f.el.style.opacity = clamp(f.life / .4, 0, 1); } }
+
+/* ---- HUD ---- */
+const AMPH = (on) => `<svg viewBox="0 0 24 32" width="22" height="30"><path d="M8 2h8v4c0 2 5 4 5 12 0 7-4 12-9 12s-9-5-9-12c0-8 5-10 5-12z" fill="${on ? '#e8a43a' : '#3b3b3b'}" stroke="#5a3a10" stroke-width="1.5"/><path d="M12 8v18" stroke="${on ? '#f8d88a' : '#555'}" stroke-width="1.5"/></svg>`;
+const fmtT = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+const HUDC = { hp: -1, coins: -1, scr: -1, t: '', prog: -1, sc: -1 };
+function updHUD(force) {
+  const p = G.p, st = G.stats, lv = G.lv; if (!p || !st || G.preview) return; if (force) { HUDC.hp = HUDC.coins = HUDC.scr = HUDC.sc = -1; HUDC.t = ''; $('#hudReg').textContent = lv.region; $('#lvName').textContent = '1-1 · ' + lv.name; }
+  const hp = Math.max(0, p.hp); if (HUDC.hp !== hp) { HUDC.hp = hp; let h = ''; for (let i = 0; i < Math.max(3, hp); i++) h += AMPH(i < hp); $('#amph').innerHTML = h; }
+  if (HUDC.coins !== st.coins) { HUDC.coins = st.coins; $('#coinN').textContent = st.coins + '/' + lv.totalCoins; }
+  const sc = st.scrolls.filter(Boolean).length; if (HUDC.scr !== sc) { HUDC.scr = sc; $('#scrN').textContent = sc + '/3'; }
+  const tt = fmtT(st.t); if (HUDC.t !== tt) { HUDC.t = tt; $('#timeN').textContent = tt; }
+  const pr = Math.round(clamp(p.z / lv.goalZ, 0, 1) * 100); if (HUDC.prog !== pr) { HUDC.prog = pr; $('#progBar').style.width = pr + '%'; }
+  if (HUDC.sc !== st.score) { HUDC.sc = st.score; $('#scoreN').textContent = st.score; }
+}
+function updPlay(dt) {
+  const p = G.p;
+  if (!p.dead || p.deadT < 1.3) { updMoving(dt); buildCols(); updPlayer(dt); updBoxes(dt); updEnemies(dt); updBoss(dt); updTiles(dt); updProjs(dt); updHazards(dt); updItems(dt); updTriggers(dt); updKairos(dt); if (!p.dead && !p.win) G.stats.t += dt;
+    const it = nearInteract(), pe = $('#prompt'); if (it && !p.dead && !p.win) { pe.textContent = 'E · ' + it.t; pe.classList.remove('hide'); if (PRESS.KeyE) doInteract(it); } else pe.classList.add('hide'); }
+  updScene(dt); camTarget(dt, false); updHUD();
+  if (p.dead && p.deadT > 1.3 && G.mode === 'play') { G.mode = 'defeat'; $('#dPhrase').textContent = '«' + pick(PH.death) + '»'; $('#dInfo').textContent = 'Caídas en este nivel: ' + G.stats.deaths; showOv('defeat'); $('#prompt').classList.add('hide'); }
+}
+function stepGame(dt) {
+  G.t += dt; G.tick++; const m = G.mode;
+  if (m === 'play') updPlay(dt);
+  else if (m === 'dialog') { updScene(dt); updDialog(dt); if (G.p) camTarget(dt, false); updHUD(); }
+  else if (m === 'defeat') { updScene(dt); if (PRESS.Space || PRESS.Enter) respawn(); }
+  else if (m === 'victory' || m === 'riddle') { updScene(dt); }
+  else if (m !== 'paused' && G.lv) { updScene(dt); previewCam(); }
+  G.fade = Math.max(0, G.fade - dt * 1.6); $('#fade').style.opacity = G.fade; for (const k in PRESS) PRESS[k] = false;
+}
+function renderAll() {
+  if (!G.lv) return; const cam = Object.assign({}, G.cam); if (G.shake > 0) { cam.x += (Math.random() - .5) * G.shake * .6; cam.y += (Math.random() - .5) * G.shake * .6; }
+  drawScene(); renderFrame(cam, G.lv.theme, G.t); updFloaters();
+}
+
+/* ---- Pantallas ---- */
+function fillVictory() {
+  const st = G.stats, lv = G.lv, allS = st.scrolls.every(Boolean), ok = (b) => b ? '✔' : '✘';
+  $('#vTitle').textContent = 'Nivel completado'; $('#vSub').textContent = lv.name;
+  $('#vAmph').innerHTML = [1, 2, 3].map((i) => AMPH(i <= st.amph).replace('width="22" height="30"', 'width="54" height="72"')).join(''); $('#vRank').textContent = st.rank;
+  $('#vStats').innerHTML = `<div><b>Tiempo</b><span>${fmtT(st.t)}${st.t <= lv.par ? ' (bajo el par)' : ''}</span></div><div><b>Óbolos</b><span>${st.coins}/${lv.totalCoins}</span></div><div><b>Pergaminos</b><span>${st.scrolls.filter(Boolean).length}/3</span></div><div><b>Muertes</b><span>${st.deaths}</span></div><div><b>Enemigos refutados</b><span>${st.kills}/${lv.totalEnemies}</span></div><div><b>Secretos</b><span>${(st.secret ? 1 : 0) + (st.kairos ? 1 : 0)}/2</span></div><div><b>Puntos</b><span>${st.score}</span></div>`;
+  $('#vGoals').innerHTML = `<div>${ok(true)} 1ª ánfora · completar el nivel</div><div>${ok(allS)} 2ª ánfora · los 3 pergaminos</div><div>${ok(st.secret || st.kairos)} 3ª ánfora · la Pluma de Platón o el desafío Kairos</div>`;
+  $('#vPhrase').textContent = '«' + pick(PH.complete) + '»'; if (st.dj) $('#vPhrase').textContent += '  ·  Habilidad nueva: doble salto.';
+}
+function buildMap() {
+  let h = ''; WORLDS.forEach((w, i) => { h += `<div class="world${w.lv.length ? '' : ' lock'}"><h3>Mundo ${i + 1} · ${w.n}</h3><p>${w.d}</p>`; if (w.lv.length) for (const l of w.lv) { const r = save.levels[l.id]; h += `<button class="btn lvl" data-lv="${l.id}">${l.id} · ${l.n}<small>${r ? [1, 2, 3].map((k) => k <= r.amph ? '🏺' : '▫').join('') + ' · ' + r.rank + ' · ' + fmtT(r.time) : 'Sin completar'}</small></button>`; } else h += '<em>Próximamente (todavía no disponible)</em>'; h += '</div>'; });
+  $('#mapBody').innerHTML = h; document.querySelectorAll('#mapBody .lvl').forEach((b) => b.addEventListener('click', () => { AU.init(); AU.sfx('ui'); beginLevel(b.dataset.lv); }));
+}
+function buildGallery(tab) {
+  document.querySelectorAll('#galTabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === tab)); let h = '';
+  if (tab === 'insc') for (const k in INSC) { const I = INSC[k], got = save.insc.includes(k); h += got ? `<div class="gi"><q>${I.t}</q><small>${I.k === 'hist' ? 'Cita histórica' : 'Tradición / atribución'} · ${I.src}</small></div>` : `<div class="gi lock"><q>???</q><small>Encuentra la inscripción en el nivel (E para leerla).</small></div>`; }
+  else if (tab === 'chars') for (const k in CHARS) { const got = save.chars.includes(k); h += got ? `<div class="gi"><b>${CHARS[k][0]}</b><small>${CHARS[k][1]}</small></div>` : `<div class="gi lock"><b>???</b><small>Aún no lo has encontrado.</small></div>`; }
+  else { h += `<div class="gi"><b>Óbolos acumulados</b><small>${save.obolos}</small></div><div class="gi"><b>Máscaras teatrales</b><small>${save.masks.length ? save.masks.join(', ') : 'Ninguna todavía'}</small></div><div class="gi"><b>Habilidades</b><small>Movimiento básico, salto, ataque giratorio${save.dj ? ', doble salto' : ''}</small></div><div class="gi"><b>Frases originales del juego</b><small>${Object.values(PH).reduce((a, b) => a + b.length, 0)} frases (no son citas históricas ni se atribuyen a Sócrates como hechos).</small></div>`; }
+  $('#galBody').innerHTML = h;
+}
+function beginLevel(id) { hideAllOv(); $('#hud').classList.add('hide'); $('#loadT').textContent = LEVELS[id].region + ' · ' + LEVELS[id].name; $('#loadP').textContent = pick(PH.tips); showOv('loading'); AU.music(null); clearTimeout(G.loadTm); G.loadTm = setTimeout(() => { hideOv('loading'); startLevel(id, false); }, 1300); }
+function toMenu() { hideAllOv(); $('#hud').classList.add('hide'); $('#dialog').classList.add('hide'); $('#kairos').classList.add('hide'); $('#prompt').classList.add('hide'); G.mode = 'menu'; startLevel('1-1', true); showOv('menu'); AU.music('menu'); refreshMenu(); }
+function refreshMenu() { const has = Object.keys(save.levels).length > 0 || save.seenIntro; $('#bCont').disabled = !has; $('#bCont').style.opacity = has ? 1 : .45; }
+function wireUI() {
+  const on = (id, fn) => $('#' + id).addEventListener('click', () => { AU.init(); AU.sfx('ui'); fn(); });
+  on('bNew', () => { save.seenIntro = false; hideAllOv(); showOv('story'); });
+  on('stGo', () => beginLevel('1-1'));
+  on('bCont', () => { buildMap(); hideAllOv(); showOv('map'); });
+  on('bLevels', () => { buildMap(); hideAllOv(); showOv('map'); });
+  on('bGal', () => { buildGallery('insc'); hideAllOv(); showOv('gallery'); }); on('bOpts', () => { fillOpts(); G.optBack = 'menu'; hideAllOv(); showOv('opts'); });
+  on('mapBack', () => toMenu()); on('galBack', () => toMenu());
+  document.querySelectorAll('#galTabs button').forEach((b) => b.addEventListener('click', () => { AU.sfx('ui'); buildGallery(b.dataset.t); }));
+  on('pResume', () => togglePause()); on('pRestart', () => restartLevel()); on('pOpts', () => { fillOpts(); G.optBack = 'pause'; hideOv('pause'); showOv('opts'); }); on('pMenu', () => toMenu());
+  on('optBack', () => { hideOv('opts'); if (G.optBack === 'pause') showOv('pause'); else showOv('menu'); });
+  $('#optMus').addEventListener('input', (e) => { save.opts.mus = e.target.value / 100; AU.setVol(save.opts.mus, save.opts.sfx); writeSave(); });
+  $('#optSfx').addEventListener('input', (e) => { save.opts.sfx = e.target.value / 100; AU.setVol(save.opts.mus, save.opts.sfx); writeSave(); }); $('#optSfx').addEventListener('change', () => AU.sfx('coin'));
+  $('#optTouch').addEventListener('change', (e) => { save.opts.touch = e.target.checked; writeSave(); setTouch(); });
+  on('optReset', () => { if (confirm('¿Borrar todo el progreso guardado?')) { save = defSave(); writeSave(); AU.setVol(save.opts.mus, save.opts.sfx); fillOpts(); refreshMenu(); } });
+  on('vMap', () => { G.mode = 'menu'; buildMap(); hideAllOv(); showOv('map'); AU.music('menu'); startLevel('1-1', true); }); on('vRetry', () => restartLevel());
+  on('dGo', () => respawn());
+}
+function fillOpts() { $('#optMus').value = save.opts.mus * 100; $('#optSfx').value = save.opts.sfx * 100; $('#optTouch').checked = !!save.opts.touch; }
+/* ---- Caja de Platón: prueba intelectual ---- */
+function openRiddle(b) {
+  const R = DLG.riddle; G.riddleBox = b; G.prevR = G.mode; G.mode = 'riddle'; $('#riddleQ').textContent = R.q; let h = '';
+  R.o.forEach((t, i) => { h += `<button class="btn alt" data-i="${i}">${t}</button>`; }); h += '<button class="btn ghost" data-i="-1">Ahora no</button>'; $('#riddleO').innerHTML = h; showOv('riddle');
+  document.querySelectorAll('#riddleO button').forEach((el) => el.addEventListener('click', () => { const i = +el.dataset.i; AU.sfx('ui'); hideOv('riddle'); G.mode = 'play'; if (i < 0) return; if (i === R.ok) { breakBox(G.riddleBox, 'riddle'); say(R.win, 4); AU.sfx('scroll'); } else { say(R.lose, 3.6); AU.sfx('hurt'); } }));
+}
+/* ---- Controles táctiles ---- */
+function setTouch() { const on = save.opts.touch || ('ontouchstart' in window && navigator.maxTouchPoints > 0); $('#touch').classList.toggle('hide', !on); }
+function wireTouch() {
+  const joy = $('#joy'), knob = $('#joyK'); let id = null, cx = 0, cy = 0;
+  const mv = (e) => { const dx = e.clientX - cx, dy = e.clientY - cy, l = Math.min(1, Math.hypot(dx, dy) / 46), a = Math.atan2(dy, dx); TJ.x = Math.cos(a) * l; TJ.z = -Math.sin(a) * l; knob.style.transform = `translate(${Math.cos(a) * l * 38}px,${Math.sin(a) * l * 38}px)`; };
+  joy.addEventListener('pointerdown', (e) => { id = e.pointerId; joy.setPointerCapture(id); const r = joy.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2; mv(e); AU.init(); });
+  joy.addEventListener('pointermove', (e) => { if (e.pointerId === id) mv(e); }); const up = (e) => { if (e.pointerId === id) { id = null; TJ.x = TJ.z = 0; knob.style.transform = ''; } }; joy.addEventListener('pointerup', up); joy.addEventListener('pointercancel', up);
+  const btn = (el, down, upf) => { $('#' + el).addEventListener('pointerdown', (e) => { e.preventDefault(); AU.init(); down(); }); const u = () => upf && upf(); $('#' + el).addEventListener('pointerup', u); $('#' + el).addEventListener('pointerleave', u); $('#' + el).addEventListener('pointercancel', u); };
+  btn('tbJump', () => { PRESS.Space = true; TJ.jump = true; }, () => { TJ.jump = false; }); btn('tbSpin', () => { PRESS.ClickSpin = true; }); btn('tbSlide', () => { PRESS.KeyC = true; TJ.crouch = true; }, () => { TJ.crouch = false; }); btn('tbAct', () => { PRESS.KeyE = true; PRESS.Advance = true; }); btn('tbRun', () => { TJ.run = !TJ.run; $('#tbRun').classList.toggle('on', TJ.run); });
+}
+/* ---- arranque ---- */
+let lastTs = 0, accT = 0;
+function frame(ts) { requestAnimationFrame(frame); const dt = Math.min(.1, (ts - lastTs) / 1000 || 0); lastTs = ts; accT += dt; let n = 0; while (accT >= 1 / 60 && n++ < 6) { stepGame(1 / 60); accT -= 1 / 60; } if (n >= 6) accT = 0; renderAll(); }
+function boot() {
+  initTextures(); AU.mus = save.opts.mus; AU.sfxV = save.opts.sfx; wireUI(); wireTouch(); setTouch(); startLevel('1-1', true); G.mode = 'menu'; showOv('menu'); refreshMenu(); G.fade = 1; requestAnimationFrame(frame);
+}
+window.__g = { G, TJ, get save() { return save; }, KEYS, PRESS, startLevel, stepGame, sim(n) { for (let i = 0; i < n; i++) stepGame(1 / 60); }, killEnemy, hurt, die, respawn, collect, breakBox, finishLevel, startBoss, dialog, AU, LEVELS, buildCols, camZone, blast, toMenu, beginLevel, groundAt, camTarget, bossHit, updMoving };
+boot();
+
+</script></body></html>

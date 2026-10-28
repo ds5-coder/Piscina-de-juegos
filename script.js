@@ -942,6 +942,23 @@ const games = [
     image: "assets/game-covers/futbol_trincheras.png",
     previewUrl: "games/match_3d.html",
     playUrl: "games/match_3d.html"
+  },
+  {
+    id: 48,
+    title: "Sócrates: el camino de la sabiduría",
+    category: "Educativo",
+    collection: "Filosofía",
+    subcollection: "Filosofía antigua",
+    mode: "Plataformas",
+    duration: "15 min",
+    description:
+      "Una aventura de plataformas por la Grecia clásica: Sócrates recupera los Pergaminos de la Verdad que los sofistas han robado, haciendo preguntas.",
+    longDescription:
+      "Un juego de plataformas en el que corres, saltas y esquivas trampas por el Ágora de Atenas y otros mundos, derrotas sofistas con preguntas y desbloqueas una galería de personajes e inscripciones filosóficas.",
+    gradient: "linear-gradient(135deg, rgba(60,140,210,0.92), rgba(230,180,70,0.85))",
+    image: "assets/game-covers/socrates_agora.png",
+    previewUrl: "games/socrates_camino_sabiduria.html",
+    playUrl: "games/socrates_camino_sabiduria.html"
   }
 ];
 
@@ -1003,7 +1020,8 @@ const gameTranslations = {
     44: { title: "The Kiss (Rodin)", description: "Explore Auguste Rodin's sculpture point by point: Paolo and Francesca, the contrast of textures and marble as skin (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'The Kiss' (conceived in 1882, in marble 1888-1898), between Realism, Symbolism and sculptural Impressionism." },
     45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." },
     46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." },
-    47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." }
+    47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." },
+    48: { title: "Socrates: the Path of Wisdom", description: "A platform adventure through classical Greece: Socrates recovers the Scrolls of Truth stolen by the sophists, by asking questions.", longDescription: "A platformer where you run, jump and dodge traps through the Athenian Agora and other worlds, defeat sophists with questions and unlock a gallery of philosophical characters and inscriptions." }
   }
 };
 
