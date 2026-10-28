@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>SOCRATES: EL CAMINO DE LA SABIDURÍA</title>
+<title>EL CAMINO DE LA FILOSOFÍA</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#1a1410;font-family:Georgia,'Palatino Linotype',serif;color:#fff;user-select:none;-webkit-user-select:none}
@@ -54,15 +54,15 @@ h2{margin:0;color:#ffe9b0;text-shadow:0 3px 0 #7a4a10;font-size:clamp(24px,5vw,4
 @media (max-width:640px){#hudR{font-size:13px}#amph svg{width:17px;height:24px}#lvName{font-size:12px}}
 </style></head><body>
 <canvas id="gl"></canvas><div id="floats"></div>
-<div id="hud" class="hide"><div id="hudL"><div id="amph"></div><div id="hudReg"></div></div><div id="hudC"><div id="lvName"></div><div id="prog"><i id="progBar"></i></div></div><div id="hudR"><div>Óbolos <b id="coinN">0</b></div><div>Pergaminos <b id="scrN">0/3</b></div><div>Tiempo <b id="timeN">0:00</b></div><div>Puntos <b id="scoreN">0</b></div></div></div>
+<div id="hud" class="hide"><div id="hudL"><div id="amph"></div><div id="hudReg"></div></div><div id="hudC"><div id="lvName"></div><div id="prog"><i id="progBar"></i></div></div><div id="hudR"><div><span id="coinL">Óbolos</span> <b id="coinN">0</b></div><div>Pergaminos <b id="scrN">0/3</b></div><div>Tiempo <b id="timeN">0:00</b></div><div>Puntos <b id="scoreN">0</b></div></div></div>
 <div id="kairos" class="hide"></div><div id="toast"></div><div id="hint"></div><div id="prompt" class="hide"></div>
 <div id="dialog" class="hide"><div id="dlgWho"></div><div id="dlgTxt"></div><div id="dlgHint"></div></div>
 <div id="touch" class="hide"><div id="joy"><div id="joyK"></div></div><button class="tb" id="tbRun">Correr</button><button class="tb" id="tbSlide">Desliz.</button><button class="tb" id="tbSpin">Girar</button><button class="tb" id="tbJump">Saltar</button><button class="tb" id="tbAct">E</button></div>
-<div id="menu" class="ov"><div class="meander"></div><h1>SOCRATES:<br>EL CAMINO DE LA SABIDURÍA</h1><p class="sub">«La filosofía es un deporte de riesgo».</p><div class="col"><button class="btn" id="bNew">Nueva aventura</button><button class="btn alt" id="bCont">Continuar</button><button class="btn alt" id="bLevels">Selección de niveles</button><button class="btn ghost" id="bGal">Galería filosófica</button><button class="btn ghost" id="bOpts">Opciones</button></div><div class="meander"></div></div>
-<div id="story" class="ov hide"><p>Hades ha descubierto que los atenienses están dejando de pensar por sí mismos.</p><p>Los sofistas han robado los Pergaminos de la Verdad y los han repartido por el mundo griego.</p><p>Solo un hombre incómodo, barbudo y con sandalias puede recuperarlos… haciendo preguntas.</p><p class="inc">Un sofista crea una plataforma falsa mediante un argumento engañoso.</p><button class="btn" id="stGo">Comenzar</button></div>
+<div id="menu" class="ov"><div class="meander"></div><h1>EL CAMINO<br>DE LA FILOSOFÍA</h1><p class="sub">«La filosofía es un deporte de riesgo».</p><div class="col"><button class="btn" id="bNew">Nueva aventura</button><button class="btn alt" id="bCont">Continuar</button><button class="btn alt" id="bLevels">Selección de niveles</button><button class="btn ghost" id="bGal">Galería filosófica</button><button class="btn ghost" id="bOpts">Opciones</button></div><div class="meander"></div></div>
+<div id="story" class="ov hide"><p>Hace unos 2600 años, en un puerto jónico llamado Mileto, alguien se atrevió a dejar de decir «lo quisieron los dioses».</p><p>Y preguntó, por primera vez, de qué está hecho todo.</p><p>Después vendrían Sócrates, Platón, Aristóteles… y veintiséis siglos de preguntas incómodas.</p><p class="inc">Este es el camino de la filosofía.</p><button class="btn" id="stGo">Comenzar</button></div>
 <div id="map" class="ov hide"><h2>Selección de niveles</h2><div id="mapBody"></div><button class="btn ghost" id="mapBack">Volver</button></div>
 <div id="gallery" class="ov hide"><h2>Galería filosófica</h2><div id="galTabs"><button data-t="insc">Inscripciones</button><button data-t="chars">Personajes</button><button data-t="misc">Colección</button></div><div id="galBody"></div><button class="btn ghost" id="galBack">Volver</button></div>
-<div id="opts" class="ov hide"><h2>Opciones</h2><label class="opt">Música <input type="range" id="optMus" min="0" max="100"></label><label class="opt">Efectos <input type="range" id="optSfx" min="0" max="100"></label><label class="opt">Controles táctiles <input type="checkbox" id="optTouch"></label><p class="sub" style="max-width:420px">WASD mover · Espacio saltar (doble salto desbloqueable) · Shift correr · C o Ctrl deslizarse/agacharse · J o clic atacar · E interactuar · Esc pausa</p><button class="btn ghost" id="optReset">Borrar progreso</button><button class="btn" id="optBack">Volver</button></div>
+<div id="opts" class="ov hide"><h2>Opciones</h2><label class="opt">Música <input type="range" id="optMus" min="0" max="100"></label><label class="opt">Efectos <input type="range" id="optSfx" min="0" max="100"></label><label class="opt">Controles táctiles <input type="checkbox" id="optTouch"></label><p class="sub" style="max-width:420px">Flechas mover · A correr (mantener) · Espacio saltar (doble salto desbloqueable) · C o Ctrl deslizarse/agacharse · D o clic atacar · E interactuar · Esc pausa</p><button class="btn ghost" id="optReset">Borrar progreso</button><button class="btn" id="optBack">Volver</button></div>
 <div id="pause" class="ov hide"><h2>Pausa</h2><div class="col"><button class="btn" id="pResume">Continuar</button><button class="btn alt" id="pRestart">Reiniciar nivel</button><button class="btn ghost" id="pOpts">Opciones</button><button class="btn ghost" id="pMenu">Menú principal</button></div></div>
 <div id="victory" class="ov hide"><h2 id="vTitle"></h2><div class="sub" id="vSub"></div><div id="vAmph"></div><div id="vRank"></div><div id="vStats"></div><div id="vGoals"></div><div id="vPhrase"></div><div class="col"><button class="btn" id="vMap">Selección de niveles</button><button class="btn ghost" id="vRetry">Repetir nivel</button></div></div>
 <div id="defeat" class="ov hide"><h2>Has caído</h2><div id="dPhrase" class="sub"></div><div id="dInfo"></div><button class="btn" id="dGo">Volver a la estatua</button></div>
@@ -217,6 +217,13 @@ function initTextures() {
   box('dioge', (x, w, h) => { frame(x, w, h, '#7b5530', '#2b1a0a', 10); x.fillStyle = '#3a3a3a'; x.fillRect(10, 28, w - 20, 10); x.fillRect(10, 88, w - 20, 10); x.fillStyle = '#ffd86b'; x.beginPath(); x.arc(64, 62, 14, 0, TAU); x.fill(); x.strokeStyle = '#2b1a0a'; x.lineWidth = 4; x.stroke(); x.fillStyle = '#2b1a0a'; x.fillRect(60, 40, 8, 6); });
   box('rio', (x, w, h) => { frame(x, w, h, '#3cc7e6', '#0b6d86', 8); x.strokeStyle = '#fff'; x.lineWidth = 6; for (let r = 0; r < 3; r++) { x.beginPath(); for (let i = 0; i <= 100; i += 4) x.lineTo(14 + i, 36 + r * 30 + Math.sin(i * .12 + r) * 8); x.stroke(); } });
   TX.shield = mkTex(256, 128, (x, w, h) => { x.fillStyle = '#7a8088'; x.fillRect(0, 0, w, h); x.strokeStyle = '#2b2f36'; x.lineWidth = 10; x.strokeRect(5, 5, w - 10, h - 10); x.fillStyle = '#ffd24a'; x.font = 'bold 34px Georgia'; x.textAlign = 'center'; x.fillText('YO TENGO', w / 2, 52); x.fillText('RAZÓN', w / 2, 96); });
+  TX.wicker = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#c9a15a'; x.fillRect(0, 0, w, h); for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { x.fillStyle = (r + c) % 2 ? '#a77c3a' : '#dcb56e'; x.fillRect(c * 16 + 1, r * 16 + 1, 14, 14); } x.strokeStyle = '#6b4a1c'; x.lineWidth = 2; for (let i = 0; i <= 8; i++) { x.beginPath(); x.moveTo(i * 16, 0); x.lineTo(i * 16, h); x.moveTo(0, i * 16); x.lineTo(w, i * 16); x.stroke(); } });
+  TX.pithos = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#c8693a'; x.fillRect(0, 0, w, h); x.fillStyle = '#e08a58'; x.fillRect(0, 0, w, 10); x.fillStyle = '#1e0f08'; x.fillRect(0, 36, w, 26); x.fillRect(0, 84, w, 10); x.fillStyle = '#c8693a'; for (let i = 0; i < 8; i++) { x.beginPath(); x.arc(i * 16 + 8, 49, 6, 0, TAU); x.fill(); } meander(x, w, h, '#c8693a', 2, 98); });
+  TX.kylix = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#c06a3c'; x.fillRect(0, 0, w, h); x.fillStyle = '#1e0f08'; x.fillRect(0, 10, w, 12); x.fillRect(0, 104, w, 12); x.fillStyle = '#f2f7d8'; x.beginPath(); x.arc(64, 60, 24, 0, TAU); x.fill(); x.fillRect(52, 74, 24, 16); x.fillStyle = '#1e0f08'; x.beginPath(); x.arc(54, 56, 7, 0, TAU); x.arc(74, 56, 7, 0, TAU); x.fill(); x.fillRect(61, 66, 6, 7); for (let i = 0; i < 3; i++) x.fillRect(54 + i * 8, 80, 3, 9); x.strokeStyle = '#2fa84a'; x.lineWidth = 4; x.beginPath(); x.moveTo(8, 100); x.quadraticCurveTo(24, 70, 36, 96); x.moveTo(120, 100); x.quadraticCurveTo(104, 70, 92, 96); x.stroke(); });
+  TX.hazard = mkTex(64, 64, (x, w, h) => { x.fillStyle = '#1a1a1a'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffd400'; for (let i = -4; i < 8; i++) { x.beginPath(); x.moveTo(i * 16, 0); x.lineTo(i * 16 + 8, 0); x.lineTo(i * 16 + 8 + 64, h); x.lineTo(i * 16 + 64, h); x.closePath(); x.fill(); } });
+  TX.qamph = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#a81c2c'; x.fillRect(0, 0, w, h); x.fillStyle = '#1e0f08'; x.fillRect(0, 14, w, 10); x.fillRect(0, 104, w, 10); x.fillStyle = '#ffe27a'; x.font = 'bold 84px Georgia'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', w / 2, h / 2 + 4); x.strokeStyle = '#ffe27a'; x.lineWidth = 3; x.beginPath(); x.arc(64, 64, 46, 0, TAU); x.stroke(); });
+  TX.barrel = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#8a5a2c'; x.fillRect(0, 0, w, h); x.strokeStyle = '#5a3a18'; x.lineWidth = 3; for (let i = 0; i < 9; i++) { x.beginPath(); x.moveTo(i * 16, 0); x.lineTo(i * 16, h); x.stroke(); } x.fillStyle = '#3a3a3a'; x.fillRect(0, 22, w, 10); x.fillRect(0, 96, w, 10); });
+  TX.shieldB = mkTex(128, 128, (x, w, h) => { x.fillStyle = '#b8863a'; x.fillRect(0, 0, w, h); for (let r = 60; r > 6; r -= 12) { x.strokeStyle = r % 24 ? '#7a5418' : '#e8c06a'; x.lineWidth = 5; x.beginPath(); x.arc(64, 64, r, 0, TAU); x.stroke(); } x.fillStyle = '#e8c06a'; x.beginPath(); x.arc(64, 64, 10, 0, TAU); x.fill(); });
   TX.board = mkTex(128, 64, (x, w, h) => { x.fillStyle = '#e8d9ae'; x.fillRect(0, 0, w, h); x.strokeStyle = '#7a5a2a'; x.lineWidth = 5; x.strokeRect(3, 3, w - 6, h - 6); x.fillStyle = '#5b3d08'; x.font = 'bold 20px Georgia'; x.textAlign = 'center'; x.fillText('ΑΘΗΝΑΙ', w / 2, 40); });
 }
 
@@ -231,6 +238,15 @@ const STY = {
   maestro: { sc: 1.5, skin: 0xefc29a, tunic: 0xb0182c, belt: 0xffd23a, mantle: 0xffd23a, hair: 0xffffff, beard: 0xffffff, sandal: 0xffd23a, nose: 0xe0a07a, brow: 0x2a1a10, hat: 'maestro', scroll: 2, smirk: 1, nosey: 1.5 },
   platon: { sc: .88, skin: 0xefc29a, tunic: 0xffffff, belt: 0x2a6fdb, mantle: 0xdfe8ff, hair: 0x8a6a4a, beard: 0x8a6a4a, sandal: 0x7a4a22, nose: 0xe0a07a, brow: 0x5a3a1a, scroll: 1, belly: .8 },
   diog: { sc: .86, skin: 0xd9a47a, tunic: 0x8a7a5a, belt: 0x4a3a22, mantle: 0x6b5a3a, hair: 0x9a9a9a, beard: 0x9a9a9a, sandal: 0x4a3a22, nose: 0xc98a62, brow: 0x666666, lamp: 1, belly: .7, smirk: 1 },
+  tales: { sc: .88, skin: 0xe3b080, tunic: 0xeaf4ff, belt: 0x2a7fd6, mantle: 0x3a9fe0, hair: 0xc8c8c8, beard: 0xdcdcdc, sandal: 0x7a4a22, nose: 0xd68a62, brow: 0x666666, smirk: 1, belly: .9 },
+  anaximandro: { sc: .88, skin: 0xe8b88a, tunic: 0xd8d4c4, belt: 0x6a7a8a, mantle: 0x8fa3b8, hair: 0x7a6a5a, beard: 0x8a7a6a, sandal: 0x6a4a2a, nose: 0xd98a62, brow: 0x4a3a2a, scroll: 1 },
+  pitagoras: { sc: .88, skin: 0xefc29a, tunic: 0xffffff, belt: 0xe0b73a, mantle: 0xf4eefc, hair: 0xe8e8e8, beard: 0xefefef, sandal: 0xe0b73a, nose: 0xe0a07a, brow: 0x8a8a8a, hat: 'turbante', belly: .8 },
+  heraclito: { sc: .88, skin: 0xd9a47a, tunic: 0x7a4a2a, belt: 0x3a2a18, mantle: 0xe8631a, hair: 0x5a3a22, beard: 0x5a3a22, sandal: 0x3a2a18, nose: 0xc98a62, brow: 0x2a1a10, angry: 1 },
+  mito: { sc: .95, skin: 0xb8c8c8, tunic: 0x2a4a58, belt: 0x6ad0c8, mantle: 0x1c3440, hair: 0x223a44, beard: 0x223a44, sandal: 0x1c3440, nose: 0xa8b8b8, brow: 0x0a1a20, hat: 'capucha', hood: 0x1c3440, angry: 1 },
+  meleto: { sc: 1.3, skin: 0xf0c8a0, tunic: 0x4a9a5a, belt: 0xe0b73a, mantle: 0x2a6a3a, hair: 0x6a4a2a, beard: 0x6a4a2a, sandal: 0x6a4a2a, nose: 0xe0a07a, brow: 0x3a2a1a, hat: 'laurel', smirk: 1, scroll: 1 },
+  anito: { sc: 1.4, skin: 0xd9a47a, tunic: 0x7a1a2a, belt: 0xe0b73a, mantle: 0xe0b73a, hair: 0x2a2a2a, beard: 0x2a2a2a, sandal: 0xe0b73a, nose: 0xc98a62, brow: 0x111111, hat: 'sofista', angry: 1, belly: 1.3 },
+  licon: { sc: 1.4, skin: 0xefc29a, tunic: 0xf4eee0, belt: 0x3a5a9a, mantle: 0x3a5a9a, hair: 0xcfcfcf, beard: 0xe8e8e8, sandal: 0xe0b73a, nose: 0xe0a07a, brow: 0x666666, hat: 'turbante', smirk: 1, nosey: 1.4 },
+  criton: { sc: .88, skin: 0xd9a47a, tunic: 0xcfc4a8, belt: 0x8a6a3a, mantle: 0x8a7a5a, hair: 0x6a4a2a, beard: 0x6a4a2a, sandal: 0x6a4a2a, nose: 0xc98a62, brow: 0x4a3a2a, belly: .9 },
   statue: { sc: .95, skin: 0xcfc8b8, tunic: 0xd9d2c2, belt: 0xbfb7a4, mantle: 0xc8c0ae, hair: 0xcfc8b8, beard: 0xd9d2c2, sandal: 0xbfb7a4, nose: 0xc5bdab, brow: 0xa8a090, belly: 1.1, rim: .15 },
 };
 function drawHuman(B, st, po) {
@@ -270,7 +286,7 @@ function drawHuman(B, st, po) {
   for (const k of [-1, 1]) { H(Hd, MS, k * .13, .1, .28, 0, 0, 0, .07, .07, .06, 0xffffff); H(Hd, MS, k * .13, .1, .33, 0, 0, 0, .035, .035, .03, 0x111111); H(Hd, MS, k * .34, 0, 0, 0, 0, 0, .06, .08, .06, st.skin); }
   const brow = st.angry ? [.35, .35] : [.28, -.2]; H(Hd, MB, -.13, .2 + (st.angry ? 0 : 0), .3, 0, 0, brow[0], .17, .045, .05, st.brow); H(Hd, MB, .13, .2 + (st.angry ? 0 : .035), .3, 0, 0, -brow[1], .17, .045, .05, st.brow);
   if (st.smirk || po.mouth) H(Hd, MB, po.mouth ? 0 : .04, -.17, .3, 0, 0, po.mouth ? 0 : .22, po.mouth ? .13 : .13, po.mouth ? .1 : .03, .03, 0x4a1a1a);
-  const hat = st.hat; if (hat === 'sofista') { H(Hd, MC(.3, .22, false), 0, .3, 0, 0, 0, 0, 1, .4, 1, 0xe0b73a); H(Hd, MC(.4, .4, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0x7a3fb0); } else if (hat === 'pluma') { H(Hd, MC(.3, .3, false), 0, .26, 0, 0, 0, 0, 1, .12, 1, 0xffffff); H(Hd, MB, .2, .5, -.1, .3, 0, -.4, .05, .35, .2, 0xff5533); } else if (hat === 'casco') { H(Hd, MS, 0, .1, 0, 0, 0, 0, .39, .36, .39, 0x8a9098); H(Hd, MB, 0, .42, 0, 0, 0, 0, .06, .16, .4, 0xb02a2a); } else if (hat === 'maestro') { H(Hd, MC(.36, .24, false), 0, .3, 0, 0, 0, 0, 1, .75, 1, 0xffd23a); H(Hd, MC(.48, .48, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0xb0182c); } else if (hat === 'mascara') { H(Hd, MB, 0, .02, .34, 0, 0, 0, .5, .56, .06, 0xffffff); H(Hd, MB, -.13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); H(Hd, MB, .13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); }
+  const hat = st.hat; if (hat === 'sofista') { H(Hd, MC(.3, .22, false), 0, .3, 0, 0, 0, 0, 1, .4, 1, 0xe0b73a); H(Hd, MC(.4, .4, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0x7a3fb0); } else if (hat === 'pluma') { H(Hd, MC(.3, .3, false), 0, .26, 0, 0, 0, 0, 1, .12, 1, 0xffffff); H(Hd, MB, .2, .5, -.1, .3, 0, -.4, .05, .35, .2, 0xff5533); } else if (hat === 'casco') { H(Hd, MS, 0, .1, 0, 0, 0, 0, .39, .36, .39, 0x8a9098); H(Hd, MB, 0, .42, 0, 0, 0, 0, .06, .16, .4, 0xb02a2a); } else if (hat === 'maestro') { H(Hd, MC(.36, .24, false), 0, .3, 0, 0, 0, 0, 1, .75, 1, 0xffd23a); H(Hd, MC(.48, .48, false), 0, .3, 0, 0, 0, 0, 1, .05, 1, 0xb0182c); } else if (hat === 'laurel') { for (let i = 0; i < 9; i++) { const a2 = i / 9 * TAU; H(Hd, MS, Math.cos(a2) * .33, .2 + Math.sin(a2 * 2) * .02, Math.sin(a2) * .33, 0, 0, 0, .09, .05, .09, 0x4a9a2a); } } else if (hat === 'capucha') { H(Hd, MS, 0, .08, -.06, 0, 0, 0, .44, .44, .42, st.hood); H(Hd, MS, 0, 0, .3, 0, 0, 0, .2, .2, .06, 0x0a1214); H(Hd, MS, -.12, .08, .34, 0, 0, 0, .05, .05, .03, 0x6ad0c8, { emis: 1 }); H(Hd, MS, .12, .08, .34, 0, 0, 0, .05, .05, .03, 0x6ad0c8, { emis: 1 }); } else if (hat === 'turbante') { H(Hd, MS, 0, .3, 0, 0, 0, 0, .4, .22, .4, 0xf4eefc); } else if (hat === 'mascara') { H(Hd, MB, 0, .02, .34, 0, 0, 0, .5, .56, .06, 0xffffff); H(Hd, MB, -.13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); H(Hd, MB, .13, .1, .38, 0, 0, 0, .12, .1, .03, 0x111111); }
 }
 function drawShadow(x, y, z, r, a) { draw(MD, M4.trs(x, y + .03, z, 0, 0, 0, r, 1, r), 0x000000, { a: a === undefined ? .35 : a }); }
 
@@ -305,14 +321,43 @@ function drawGem(x, y, z, t, col) { draw(MB, M4.trs(x, y + .1 * Math.sin(t * 3),
 function drawFeather(x, y, z, t) { draw(MB, M4.trs(x, y + .12 * Math.sin(t * 2), z, 0, t * 2, .6, .06, .62, .2), 0xffffff, { emis: .5, rim: .6 }); draw(MS, M4.trs(x, y, z, 0, 0, 0, .7, .7, .7), 0xffffff, { a: .18, emis: 1 }); }
 function drawMaskItem(x, y, z, t) { draw(MB, M4.trs(x, y + .1 * Math.sin(t * 2), z, 0, t * 1.6, 0, .5, .56, .1), 0xf0f0f0, { emis: .3 }); }
 function drawBoxTex(b, t) {
-  const sx = b.sx, sy = b.sy, sz = b.sz; let col = 0xffffff, o = { tex: TX[b.tex], rim: .15, tile: [1, 1, 1] }, s = [sx, sy, sz], by = b.y + sy / 2;
-  if (b.type === 'bounce') { const k = b.sq > 0 ? 1 - .25 * Math.sin(b.sq * 12) : 1; s = [sx * (2 - k), sy * k, sz * (2 - k)]; }
-  if (b.type === 'cicuta') { o.emis = .18 + .14 * Math.sin(t * 5 + b.x * 2); by += .02 * Math.sin(t * 4 + b.z); if (b.state === 'fuse') { o.emis = .9; } }
-  if ((b.type === 'tnt' || b.type === 'aporia') && b.state === 'fuse') { o.emis = (Math.floor(b.t * 6) % 2) * .8; const k = 1 + .06 * Math.sin(t * 30); s = [sx * k, sy * k, sz * k]; }
-  if (b.type === 'check') o.emis = b.active ? .7 : .15; if (b.type === 'kairos') o.emis = .2 + .2 * Math.sin(t * 4);
-  if (b.type === 'rio') { const ph = b.ph; if (ph === 1) o.a = .45 + .3 * Math.sin(t * 25); o.emis = .2; }
-  if (b.type === 'platon') o.emis = .25 + .15 * Math.sin(t * 3);
-  draw(MB, M4.trs(b.x, by, b.z, 0, 0, 0, s[0], s[1], s[2]), col, o);
+  const o0 = { rim: .15 }, P = (mesh, x, y, z, sx, sy, sz, col, o, rx, ry, rz) => draw(mesh, M4.trs(b.x + x, b.y + y, b.z + z, rx || 0, ry || 0, rz || 0, sx, sy, sz), col, o || o0);
+  switch (b.type) {
+    case 'wood': // cesta de mimbre con olivas
+      P(MC(.5, .42, false), 0, 0, 0, 1, .86, 1, 0xffffff, { tex: TX.wicker, tile: [2, 1, 2], rim: .15 }); P(MC(.53, .53, false), 0, .84, 0, 1, .12, 1, 0x8a5a22); P(MD, 0, .93, 0, .42, 1, .42, 0x2a1a0a);
+      for (const [x, z] of [[-.15, .05], [.12, -.1], [.05, .16]]) P(MS, x, .98, z, .1, .08, .1, 0x6a8a2a, { rim: .3 }); return;
+    case 'ceramic': // pithos de arcilla con friso de figuras negras
+      P(MC(.28, .32, false), 0, 0, 0, 1, .1, 1, 0xa8522a); P(MS, 0, .46, 0, .5, .45, .5, 0xffffff, { tex: TX.pithos, rim: .2 }); P(MC(.2, .27, false), 0, .78, 0, 1, .18, 1, 0xc8693a); P(MC(.33, .3, false), 0, .94, 0, 1, .06, 1, 0x1e0f08); return;
+    case 'bounce': { // escudo hoplita sobre pedestal de mármol (Mayéutica) o surtidor de agua (skin: fuente)
+      const k = b.sq > 0 ? Math.sin(b.sq * 12) : 0;
+      if (b.skin === 'fuente') { P(MC(.5, .55, false), 0, 0, 0, 1, .55, 1, 0xffffff, { tex: TX.marble, tile: [1, .5, 1] }); P(MD, 0, .55, 0, .46, 1, .46, 0x5ad0ff, { emis: .5 }); P(MC(.18, .1, false), 0, .55, 0, 1, .55 + .45 * Math.abs(Math.sin(t * 6 + b.x)) + k * .3, 1, 0x7fe0ff, { a: .6, emis: .8 }); P(MS, 0, 1.15 + k * .2, 0, .24, .24, .24, 0xbff2ff, { a: .7, emis: 1 }); return; }
+      P(MC(.42, .46, false), 0, 0, 0, 1, .86, 1, 0xffffff, { tex: TX.marble, tile: [1, .5, 1] }); P(MC(.66, .62, false), 0, .86 - k * .08, 0, 1, .12, 1, 0xffffff, { tex: TX.shieldB, emis: .12 + .1 * k, rim: .4 }); P(MS, 0, .99 - k * .08, 0, .17, .08, .17, 0xe8c06a, { emis: .3 }); return; }
+    case 'check': // herma con la inscripción délfica
+      P(MB, 0, .4, 0, .78, .8, .78, 0xffffff, { tex: TX.check, emis: b.active ? .6 : .12, rim: .2 }); P(MS, 0, .92, 0, .24, .24, .24, b.active ? 0xfff2b0 : 0xe8e0cc, { emis: b.active ? .6 : 0 }); return;
+    case 'cicuta': { // copa (kylix) de cicuta: líquido verde brillante, calavera y franjas de peligro
+      const fz = b.state === 'fuse', e = fz ? 1 : .35 + .2 * Math.sin(t * 5 + b.x * 2);
+      P(MC(.42, .42, false), 0, 0, 0, 1, .08, 1, 0x1a1a1a); P(MC(.2, .3, false), 0, .06, 0, 1, .44, 1, 0xffffff, { tex: TX.hazard, tile: [1, 1, 1], rim: .2 });
+      P(MC(.4, .64, false), 0, .5, 0, 1, .36, 1, 0xffffff, { tex: TX.kylix, rim: .25, emis: e * .15 }); for (const sx of [-1, 1]) P(MS, sx * .68, .7, 0, .1, .1, .2, 0x1e0f08);
+      P(MD, 0, .84, 0, .58, 1, .58, 0x7dff3a, { emis: 1 }); P(MS, 0, .8, 0, .95, .65, .95, 0x7dff3a, { a: .1 + .05 * Math.sin(t * 6), emis: 1 });
+      for (let i = 0; i < 4; i++) { const k = ((t * .55 + i * .25 + b.z) % 1); P(MS, Math.sin(i * 2 + t) * .22, .9 + k * .9, Math.cos(i * 3 + t) * .22, .1 * (1 - k * .5), .1 * (1 - k * .5), .1 * (1 - k * .5), 0x9dff5a, { a: .6 * (1 - k), emis: 1 }); } return; }
+    case 'tnt': { // ánfora de la Aporía: interrogante dorado y chispas cuando se activa
+      const fz = b.state === 'fuse', em = fz ? (Math.floor(b.t * 6) % 2) * .9 : .25 + .12 * Math.sin(t * 4), k = fz ? 1 + .05 * Math.sin(t * 30) : 1;
+      P(MC(.18, .13, false), 0, 0, 0, k, .12, k, 0x6a1018); P(MS, 0, .42, 0, .38 * k, .4 * k, .38 * k, 0xffffff, { tex: TX.qamph, emis: em, rim: .25 }); P(MC(.2, .14, false), 0, .72, 0, k, .27, k, 0xa81c2c, { emis: em * .5 }); P(MC(.2, .2, false), 0, .97, 0, k, .06, k, 0x1e0f08);
+      for (const sx of [-1, 1]) P(MS, sx * .29, .82, 0, .05, .14, .05, 0x1e0f08);
+      if (fz) for (let i = 0; i < 3; i++) P(MS, Math.sin(t * 20 + i) * .12, 1.06 + Math.abs(Math.sin(t * 17 + i * 2)) * .3, Math.cos(t * 20 + i) * .12, .06, .06, .06, 0xffe27a, { emis: 1 }); return; }
+    case 'kairos': { // clepsidra (reloj de agua)
+      const lv = .55 + .3 * Math.sin(t * 1.5 + 1);
+      P(MB, 0, .1, 0, .9, .2, .9, 0xffffff, { tex: TX.marble, tile: [.5, .2, .5] }); P(MC(.4, .3, false), 0, .2, 0, 1, .75, 1, 0xa8d8ff, { a: .4, emis: .2 }); P(MC(.36, .28, false), 0, .22, 0, 1, .55 * lv, 1, 0x3a9fff, { emis: .5, a: .8 }); P(MC(.12, .12, false), .3, .55, 0, 1, .4, 1, 0x8a5a22, { rim: .2 }, 0, 0, -1.2); P(MS, 0, .96, 0, .22, .1, .22, 0xc9a24a, { emis: .3 }); return; }
+    case 'dioge': // barril de Diógenes con su lámpara
+      P(MC(.5, .5, false), 0, 0, 0, 1, .92, 1, 0xffffff, { tex: TX.barrel, tile: [1, 1, 1], rim: .15 }); P(MC(.52, .52, false), 0, .2, 0, 1, .06, 1, 0x3a3a3a); P(MC(.52, .52, false), 0, .66, 0, 1, .06, 1, 0x3a3a3a); P(MS, 0, 1.0, 0, .12, .14, .12, 0xffe27a, { emis: 1 }); P(MC(.02, .02, false), 0, .92, 0, 1, .1, 1, 0x5a4a2a); return;
+    case 'arist': // altar con balanza dorada
+      P(MB, 0, .43, 0, 1, .86, 1, 0xffffff, { tex: TX.marble, tile: [.5, .4, .5], rim: .15 }); P(MB, 0, .94, 0, 1.06, .12, 1.06, 0xffffff, { tex: TX.gold, tile: [.6, .2, .6] }); P(MB, 0, 1.12, 0, .6, .04, .05, 0xc9a24a, { emis: .3 }); for (const sx of [-1, 1]) P(MS, sx * .3, 1.06, 0, .08, .04, .08, 0xe8c06a, { emis: .3 }); return;
+    case 'platon': // estela de mármol azul con la Φ de la Academia
+      P(MB, 0, .5, 0, .92, 1, .92, 0xffffff, { tex: TX.platon, emis: .25 + .15 * Math.sin(t * 3), rim: .2 }); return;
+    case 'rio': { // el río de Heráclito: bloque de agua que cambia
+      const o = { tex: TX.rio, rim: .15, tile: [1, 1, 1], emis: .2 }; if (b.ph === 1) o.a = .45 + .3 * Math.sin(t * 25); P(MB, 0, b.sy / 2, 0, b.sx, b.sy, b.sz, 0xffffff, o); return; }
+  }
+  P(MB, 0, b.sy / 2, 0, b.sx, b.sy, b.sz, 0xffffff, { tex: TX[b.tex], rim: .15 });
 }
 function drawStatue(s, t) { const Bm = M4.T(s.x, s.y + 1.0, s.z); draw(MB, M4.trs(s.x, s.y + .5, s.z, 0, 0, 0, 1.6, 1.0, 1.6), 0xcfc6b0, { tex: TX.marble, tile: [.5, .3, .5] }); drawHuman(M4.mul(Bm, M4.RY(Math.PI)), STY.statue, { t, lean: 0, win: 0 }); if (s.active) { draw(MD, M4.trs(s.x, s.y + 1.06, s.z, 0, 0, 0, 1.3 + .1 * Math.sin(t * 4), 1, 1.3 + .1 * Math.sin(t * 4)), 0x7dff9a, { a: .5, emis: 1 }); draw(MS, M4.trs(s.x, s.y + 2.7, s.z, 0, 0, 0, .9, .9, .9), 0x7dff9a, { a: .18, emis: 1 }); } }
 function drawBrazier(h, on, t) { draw(MC(.35, .5, false), M4.trs(h.x, h.y, h.z, 0, 0, 0, 1, .7, 1), 0x3a2a1a); draw(MC(.55, .4, false), M4.trs(h.x, h.y + .7, h.z, 0, 0, 0, 1, .25, 1), 0x6a4a2a); if (on) { for (let i = 0; i < 3; i++) draw(MC(.32 - i * .08, 0, false), M4.trs(h.x, h.y + .9 + i * .15, h.z, 0, t * 5 + i, 0, 1, 1.9 - i * .35 + .25 * Math.sin(t * 20 + i), 1), [0xff5a1a, 0xff9a2a, 0xffe27a][i], { emis: 1, a: .9 }); } else draw(MS, M4.trs(h.x, h.y + .95, h.z, 0, 0, 0, .2, .12, .2), 0xff6a2a, { emis: .8 }); }
@@ -349,6 +394,7 @@ const AU = {
       case 'slide': this.noiseB(.4, .15, 900, 200, 'bandpass'); break;
       case 'break': this.noiseB(.22, .45, 3000, 300); T(220, .18, 'triangle', .25, { f2: 90 }); break;
       case 'clay': this.noiseB(.18, .4, 4500, 800); T(700, .1, 'triangle', .2, { f2: 300 }); break;
+      case 'drip': T(720 * p, .1, 'sine', .22, { f2: 280 * p }); T(1400 * p, .05, 'sine', .08, { delay: .02 }); break;
       case 'coin': T(880 * p, .09, 'square', .12); T(1320 * p, .14, 'square', .12, { delay: .07 }); break;
       case 'scroll': [523, 659, 784, 1047].forEach((f, i) => T(f, .3, 'triangle', .25, { delay: i * .09 })); break;
       case 'bounce': T(180, .3, 'sine', .35, { f2: 760 }); break;
@@ -387,82 +433,191 @@ const AU = {
 };
 
 /* ====================== TEXTOS: FRASES, DIÁLOGOS, INSCRIPCIONES ====================== */
-// Frases ORIGINALES del juego (no son citas históricas ni se atribuyen a Sócrates como hechos)
+// Frases ORIGINALES del juego (no son citas históricas ni se atribuyen a los filósofos como hechos)
 const PH = {
-  start: ['Solo sé que este salto no será fácil.', 'Antes de avanzar, deberíamos preguntarnos qué significa avanzar.', 'Una vida sin saltos no merece ser jugada.', 'Si el camino fuera fácil, no necesitaría preguntas.', 'Empecemos por lo evidente: hay un precipicio.', 'Todo gran viaje comienza con una pregunta incómoda.'],
-  box: ['He destruido una opinión. Ahora necesito examinarla.', 'La madera ha hablado. Y no ha presentado buenos argumentos.', 'Conócete a ti mismo. Y mira dónde pisas.', 'Otra caja, otra certeza que no resistía un golpe.', 'Examinemos el contenido, ya que el continente no se defendió.', 'Una caja cerrada es una hipótesis sin probar.', 'Si me golpeas con una pregunta, te devolveré otra.', 'No juzgues una caja por su tapa.'],
-  death: ['Sé que no sé saltar.', 'La ignorancia es peligrosa. El vacío, todavía más.', 'Debo examinar esta caída.', 'Una caída no es una refutación definitiva.', 'Ese argumento era sólido. Lo malo es que yo no.', 'He aprendido algo: ahí no se pisa.', 'Cada error es una pregunta bien formulada por el suelo.', 'Volvamos a empezar, que la duda es gratis.'],
+  start: ['Solo sé que este salto no será fácil.', 'Antes de avanzar, deberíamos preguntarnos qué significa avanzar.', 'Una vida sin saltos no merece ser jugada.', 'Si el camino fuera fácil, no necesitaría preguntas.', 'Empecemos por lo evidente: hay un precipicio.', 'Todo gran viaje comienza con una pregunta incómoda.', 'Querefonte preguntó al oráculo. Yo, como no sé nada, preguntaré a todos.', 'No cobro por enseñar. Tampoco por saltar.'],
+  box: ['He destruido una opinión. Ahora necesito examinarla.', 'La arcilla ha hablado. Y no ha presentado buenos argumentos.', 'Conócete a ti mismo. Y mira dónde pisas.', 'Otra cesta, otra certeza que no resistía un golpe.', 'Examinemos el contenido, ya que el continente no se defendió.', 'Una vasija cerrada es una hipótesis sin probar.', 'Si me golpeas con una pregunta, te devolveré otra.', 'No juzgues una vasija por su cuello.'],
+  death: ['Sé que no sé saltar.', 'La ignorancia es peligrosa. El vacío, todavía más.', 'Debo examinar esta caída.', 'Una caída no es una refutación definitiva.', 'Ese argumento era sólido. Lo malo es que yo no.', 'He aprendido algo: ahí no se pisa.', 'Cada error es una pregunta bien formulada por el suelo.', 'Volvamos a empezar, que la duda es gratis.', 'Soy un tábano que pica a Atenas… y hoy el suelo me ha picado a mí.'],
   hurt: ['¡Eso ha sido una objeción contundente!', 'Auch. ¿Eso contaba como argumento?', 'Mi ánfora de sabiduría tiene una grieta.'],
-  sophist: ['Hablas muy bien, pero has caído muy rápido.', 'La persuasión no sustituye a la verdad.', 'Argumento refutado. Siguiente pregunta.', 'Tu elocuencia era mayor que tus cimientos.', 'Un buen discurso no sostiene un mal razonamiento.'],
-  complete: ['La sabiduría consiste en saber cuándo saltar.', 'He aprendido más de este camino que de cien discursos.', 'La virtud también requiere buenos reflejos.', 'Un nivel menos, mil preguntas más.', 'No sé si he llegado, pero sé que he pasado.'],
+  coin: ['¡Un soborno! Los sofistas cobraban. Yo no.', 'Aceptar dinero por enseñar es dejar de ser maestro.', 'Esa moneda pesa más que una ánfora de sabiduría.', 'Lo que se compra con óbolos no es la verdad.', 'El sofista cobra por convencer; yo no he cobrado nunca por preguntar.'],
+  sophist: ['Hablas muy bien, pero has caído muy rápido.', 'La persuasión no sustituye a la verdad.', 'Argumento refutado. Siguiente pregunta.', 'Tu elocuencia era mayor que tus cimientos.', 'Un buen discurso no sostiene un mal razonamiento.', 'Los sofistas cobran por convencer. Yo me conformo con preguntar gratis.'],
+  complete: ['La sabiduría consiste en saber cuándo saltar.', 'He aprendido más de este camino que de cien discursos.', 'La virtud también requiere buenos reflejos.', 'Un nivel menos, mil preguntas más.', 'No sé si he llegado, pero sé que he pasado.', 'Nadie obra mal a sabiendas: yo solo tropecé por ignorar dónde pisaba.', 'He salido del ágora más pobre de óbolos y más rico de preguntas: justo como me gusta.'],
+  complete1: ['El principio de todo… y aún nos quedan veintiséis siglos para ponernos de acuerdo.', 'Primera lección de filosofía: todo tiene una explicación. Segunda: no será la que esperabas.', 'Hemos cambiado «lo quisieron los dioses» por «veamos de qué está hecho». Un buen comienzo.', 'Tales, el agua, Anaximandro, el ápeiron… y yo con los pies mojados.', 'Ninguna hipótesis ha ganado. Eso, precisamente, es la filosofía.'],
+  complete3: ['Condenado, sí. Refutado, no.', 'Quien teme a la muerte supone que sabe lo que es. Yo prefiero preguntar.', 'La cicuta mató al hombre; las preguntas siguen vivas.', 'Críton, le debemos un gallo a Asclepio. Págaselo y no lo olvides.'],
   secret: ['La verdad estaba escondida detrás de esa columna.', 'El conocimiento recompensa a quien observa.', 'No todos los tesoros son materiales.', 'Lo importante rara vez está en el camino principal.', 'La curiosidad tiene muy buen sentido de la orientación.'],
-  bounce: ['¿Qué es un salto?', '¿Subir es avanzar?', '¿Quién rebota: yo o la pregunta?', '¿Se llega más alto dudando?', '¿Y si la caja también me interroga?', '¿Qué busca quien salta?', '¿Es la altura una virtud?'],
+  bounce: ['¿Qué es la valentía? (Laques)', '¿Qué es un verdadero amigo? (Lisis)', '¿Qué es el amor? (Banquete)', '¿Hay que obedecer una ley injusta? (Critón)', '¿Qué es la sabiduría? (Apología)', '¿Se llega más alto dudando?', '¿Quién rebota: yo o la pregunta?'],
   scroll: ['Pergamino de la Verdad recuperado.', 'Un fragmento de verdad vuelve a casa.', 'Los sofistas lo ocultaron; la curiosidad lo halló.'],
-  tips: ['Las ilusiones brillan y parpadean. Lo sólido no necesita convencerte.', 'Una caja de cicuta nunca se rompe con un golpe: se esquiva.', 'Saltar sobre la caja TNT activa su cuenta atrás. Aléjate.', 'La caja de Aristóteles pide un salto ni corto ni largo.', 'Los dogmáticos son duros por delante. Por detrás son de papel.', 'Deslízate bajo los dinteles bajos con C o Ctrl.', 'Mantén Espacio pulsado para saltar más alto.', 'Las estatuas de Sócrates guardan tu progreso.'],
+  tips: ['Las ilusiones brillan y parpadean. Lo sólido no necesita convencerte.', 'Una copa de cicuta nunca se rompe con un golpe: se esquiva.', 'Pisar el ánfora de la Aporía activa su cuenta atrás. Aléjate.', 'El altar de Aristóteles pide un salto ni corto ni largo.', 'Los dogmáticos son duros por delante. Por detrás son de papel.', 'Deslízate bajo los dinteles bajos con C o Ctrl.', 'Mantén Espacio pulsado para saltar más alto.', 'Las estatuas guardan tu progreso.', 'En el nivel de Sócrates las monedas son sobornos: esquívalas o perderás una ánfora.', 'Primero la ironía (dudar); después la mayéutica (dar a luz la verdad).', 'Los objetos con una flecha dorada encima se rompen con D o saltándoles encima.'],
+  tales: ['Mira las estrellas… pero también el suelo, que ya me caí una vez en un pozo.', 'Si todo es agua, ¿por qué me hundo al saltar?', 'Los dioses no mandan las crecidas: las explica el río.', 'Un olivar bien previsto vale más que mil oráculos.'],
 };
 const pick = (a) => a[(Math.random() * a.length) | 0];
-// Citas históricas verificables / tradición documentada (se muestran con su fuente en la galería)
+// Mensajes de MUERTE según la causa (y su filosofía) y de DAÑO leve
+const MSG = {
+  fire: ['El fuego no será el principio de todo, pero seguro es mi fin.', 'Heráclito decía que todo es fuego. Yo ya soy ceniza: el argumento es sólido.', 'Todo fluye… y yo me he ido por la chimenea.', 'Pregunta de examen: ¿arché o barbacoa?'],
+  water: ['El agua no será el principio de todo, pero seguro es mi fin.', 'Tales decía que todo viene del agua. Yo vuelvo a ella antes de lo previsto.', 'Sé nadar. En teoría. La teoría me ha fallado.', 'Hipótesis: todo es agua. Conclusión: estoy empapado y sin argumentos.'],
+  air: ['El aire no será el principio de todo, pero seguro es mi fin… y mi caída.', 'Anaxímenes decía que todo es aire. Yo he sido pura rarefacción.', 'El aire me ha dejado sin aliento… y sin suelo.', 'Condensación: el suelo. Rarefacción: yo.'],
+  cicuta: ['Esta copa ya me la sirvieron una vez. Tampoco la quiero repetida.', 'La cicuta: la única respuesta que no admite réplica.', 'No era vino. Debí hacer una pregunta antes de brindar.'],
+  blast: ['La pregunta era tan buena que me ha estallado en la cara.', 'Aporía: no sé qué ha pasado, pero ha sido muy ruidoso.', 'Una duda demasiado cerca puede ser peligrosa.'],
+  enemy: ['Me han refutado a base de golpes: argumento bajo pero eficaz.', 'Hablar con un sofista siempre acaba mal… o caro.', 'He perdido la discusión y la salud.'],
+  arg: ['Me han lanzado una moneda. Y encima no era mía.', 'Un soborno al vuelo: lo he esquivado… a medias.', 'Me han pagado con dinero y con razón: no he cobrado nada.'],
+  bribe: ['Aceptar dinero por enseñar… ya soy sofista y aun así estoy muerto.', 'Me han matado a base de óbolos: la peor forma de cobrar.'],
+  boss: ['Ha sido un debate duro: el contrincante tenía más bolsillo que razón.', 'Perdí el argumento. Volveré con mejores preguntas.'],
+  void: PH.death,
+};
+const HMSG = {
+  cicuta: ['¡Esta copa tenía algo más que vino!', 'Auch: la cicuta no admite réplica… pero sí perdona una vez.'],
+  blast: ['La pregunta ha estallado: ¡demasiado cerca!', 'Eso era una duda explosiva.'],
+  enemy: ['Un sofista me ha ganado por contundencia. Qué poco filosófico.', '¡Mi razón esperaba otro tipo de ataque!'],
+  arg: ['¡Me han tirado una moneda a la cara! Qué argumento tan contante y sonante.', 'Acepto la moneda… como proyectil, no como pago.'],
+  boss: ['¡Buen golpe! Ahora me toca preguntar a mí.', 'Esa objeción dolía.'],
+};
+// Citas históricas verificables o tradición documentada (se muestran con su fuente en la galería)
 const INSC = {
   conocete: { t: 'Conócete a ti mismo.', src: 'Máxima inscrita en el templo de Apolo en Delfos (Pausanias, Descripción de Grecia, X, 24, 1).', k: 'hist' },
   examen: { t: 'Una vida sin examen no merece ser vivida.', src: 'Platón, Apología de Sócrates, 38a (puesta en boca de Sócrates en el juicio).', k: 'hist' },
+  oraculo: { t: 'Nadie es más sabio que Sócrates.', src: 'Respuesta del oráculo de Delfos a Querefonte, según Platón, Apología, 21a.', k: 'hist' },
+  tabano: { t: 'Soy como un tábano que despierta a un caballo grande y perezoso: Atenas.', src: 'Paráfrasis de la imagen del tábano en Platón, Apología, 30e.', k: 'hist' },
+  intelectual: { t: 'Nadie hace el mal voluntariamente.', src: 'Tesis socrática (intelectualismo moral) transmitida por Platón, p. ej. Protágoras 345d-e y Gorgias 509e.', k: 'attr' },
+  leyes: { t: 'Respetar las leyes de la ciudad, incluso cuando nos condenan, es parte de ser justo.', src: 'Paráfrasis del discurso de las Leyes de Atenas en Platón, Critón, 50a-54d.', k: 'hist' },
+  gallo: { t: 'Críton, le debemos un gallo a Asclepio. Págaselo y no lo olvides.', src: 'Últimas palabras de Sócrates según Platón, Fedón, 118a.', k: 'hist' },
   medio: { t: 'La virtud es un término medio entre dos extremos.', src: 'Aristóteles, Ética a Nicómaco, II, 6 (paráfrasis).', k: 'hist' },
-  fluye: { t: 'Todo fluye, nada permanece.', src: 'Resumen tardío de Heráclito; Platón (Crátilo, 402a) lo expone así. No es una cita literal.', k: 'attr' },
+  fluye: { t: 'Nadie se baña dos veces en el mismo río.', src: 'Atribuida a Heráclito (Platón, Crátilo, 402a, la resume así). No es una cita literal, sino un resumen antiguo de su pensamiento.', k: 'attr' },
   lampara: { t: 'Busco a un hombre.', src: 'Anécdota de Diógenes con la lámpara a plena luz del día (Diógenes Laercio, VI, 41). Tradición, no cita verificable.', k: 'attr' },
   nada: { t: 'Nada en exceso.', src: 'Máxima délfica, citada por Platón (Protágoras, 343b).', k: 'hist' },
+  agua: { t: 'El agua es el principio de todas las cosas.', src: 'Atribuida a Tales de Mileto por Aristóteles (Metafísica, I, 3, 983b). No se conserva ningún escrito de Tales.', k: 'attr' },
+  dioses: { t: 'Todas las cosas están llenas de dioses.', src: 'Atribuida a Tales por Aristóteles (Sobre el alma, I, 5, 411a). Una de las frases más famosas —y más misteriosas— de Tales.', k: 'attr' },
+  apeiron: { t: 'El principio de todas las cosas es lo ilimitado (ápeiron).', src: 'Atribuida a Anaximandro por la tradición doxográfica (Aristóteles, Simplicio). Solo se conserva un breve fragmento literal.', k: 'attr' },
+  numero: { t: 'Todas las cosas son número.', src: 'Doctrina de los pitagóricos según Aristóteles (Metafísica, I, 5, 985b).', k: 'attr' },
+  atomos: { t: 'Por convención hay lo dulce y lo amargo; en realidad, solo átomos y vacío.', src: 'Fragmento de Demócrito citado por Sexto Empírico (DK 68 B9). Traducción libre.', k: 'attr' },
 };
 const CHARS = {
-  socrates: ['Sócrates', 'El filósofo ateniense. Barba, túnica, sandalias y una ironía letal: convierte cualquier conversación en un interrogatorio.'],
-  platon: ['Platón', 'Discípulo de Sócrates. Aparece para explicar el mundo de las Ideas… y para regalar habilidades.'],
+  tales: ['Tales de Mileto', 'Considerado el primer filósofo: sostuvo que el principio (arché) de todo es el agua. También midió pirámides y predijo un eclipse… y, según la anécdota, se cayó a un pozo mirando las estrellas.'],
+  anaximandro: ['Anaximandro', 'Discípulo de Tales. Dibujó un mapa del mundo y puso el ápeiron, lo indeterminado, como principio de todas las cosas.'],
+  pitagoras: ['Pitágoras', 'Para él todo es número y el universo, armonía. Sus seguidores unían la ciencia y la religión.'],
+  heraclito: ['Heráclito de Éfeso', 'Todo cambia: nadie se baña dos veces en el mismo río. Para él el arché es el fuego.'],
+  mito: ['El Mito', 'Explicaciones sagradas e incuestionables del mundo. La filosofía nace al preguntarles por qué.'],
+  arche: ['El Arché', 'El principio de todas las cosas. Cada filósofo propuso uno distinto: agua, ápeiron, aire, fuego, número, átomos…'],
+  socrates: ['Sócrates', 'No cobraba por enseñar ni escribió nada. Usaba la ironía y la mayéutica. Murió bebiendo cicuta tras ser condenado en 399 a. C.'],
+  platon: ['Platón', 'Discípulo de Sócrates. Fundó la Academia y propuso el mundo de las Ideas.'],
   diogenes: ['Diógenes', 'El cínico del barril. Aparece en lugares inesperados con consejos absurdamente sensatos.'],
   sofista: ['Sofista', 'Maestro de la retórica de pago. Camina de un lado a otro intentando convencerte de que te rindas.'],
   dogmatico: ['Dogmático', 'Escudo enorme con la inscripción «YO TENGO RAZÓN». Inmune a lo que viene de frente.'],
   falacia: ['Falacia ambulante', 'Cambia de color y de argumento. Cada color es una falacia distinta.'],
   veloz: ['Sofista veloz', 'Habla tan rápido que no da tiempo a refutarlo… salvo que calcules el salto.'],
-  maestro: ['Maestro sofista', 'Jefe del ágora. Sus discursos son proyectiles y sus pausas, su debilidad.'],
+  maestro: ['Maestro sofista', 'Jefe del ágora. Sus discursos son proyectiles y sus proyectiles, monedas.'],
+  meleto: ['Meleto', 'Joven poeta que acusó a Sócrates de corromper a la juventud y de no creer en los dioses.'],
+  anito: ['Anito', 'Político y curtidor, el acusador más poderoso. Defendía el orgullo de la ciudad.'],
+  licon: ['Licón', 'Orador que acusó a Sócrates en nombre de los oradores.'],
+  criton: ['Critón', 'Amigo fiel de Sócrates. Intentó que escapara de la prisión.'],
 };
 const FALL = [['Ad hominem', 0xd63b3b], ['Falso dilema', 0x3b7fd6], ['Hombre de paja', 0xd6b43b], ['Apelación a la autoridad', 0x8a3bd6]];
 const DLG = {
   intro: [
-    { w: 'Sofista', t: 'Esta plataforma es perfectamente sólida. Mi argumento es impecable.', ev: 'plank' },
-    { w: 'Sócrates', t: '¿Y qué entiendes tú por «sólida»?' },
+    { w: 'Sofista', t: 'Contempla, ciudadano: una plataforma tan sólida que ni el mismo Zeus la atravesaría. Mi argumento es impecable… y solo cuesta tres óbolos.', ev: 'plank' },
+    { w: 'Sócrates', t: 'Qué fortuna la mía: un sabio que me regala la verdad. Dime, oh maestro, ¿qué entiendes tú por «sólida»?' },
     { w: 'Sofista', t: 'Pues… lo que sostiene. Evidentemente.' },
-    { w: 'Sócrates', t: 'Entonces no te importará pisarla tú primero.' },
-    { w: 'Sofista', t: 'Faltaría más. Observa mi seguridad…', ev: 'walk' },
+    { w: 'Sócrates', t: 'Evidentemente. ¿Y esto que brilla y parpadea sostiene… o solo convence?' },
+    { w: 'Sofista', t: '¡Las dos cosas!' },
+    { w: 'Sócrates', t: 'Admirable. Pisa tú primero y así me enseñas la verdad con el ejemplo.' },
+    { w: 'Sofista', t: 'Faltaría más. Observa mi seguridad…', ev: 'walk', block: 2.6 },
     { w: 'Sócrates', t: 'Hablas muy bien, pero has caído muy rápido.', ev: 'after' },
   ],
   diog: [
-    { w: 'Diógenes', t: '¿Buscas la verdad?' }, { w: 'Sócrates', t: 'Sí.' }, { w: 'Diógenes', t: 'Pues deja de pisarla mientras miras al cielo.' },
-    { w: 'Diógenes', t: 'Consejo gratis: lo que brilla y parpadea, miente. Y si ves monedas esparcidas por un precipicio, desconfía… pero a veces merece la pena.' },
+    { w: 'Diógenes', t: '¿Buscas la verdad?' }, { w: 'Sócrates', t: 'Qué va, sabio de barril: busco un camino. Pero si la verdad quiere acompañarme, que se ponga a la cola.' }, { w: 'Diógenes', t: 'Pues deja de pisarla mientras miras al cielo.' },
+    { w: 'Sócrates', t: 'Qué lucidez la tuya, viviendo en una vasija con vistas.' },
+    { w: 'Diógenes', t: 'Consejo gratis, como tú: las monedas que andan sueltas por ahí son sobornos de sofista. Cada una que cojas te cuesta una ánfora. Y lo que brilla y parpadea, miente.' },
+    { w: 'Sócrates', t: 'Cuánta generosidad en un hombre sin posesiones. Casi me dan ganas de pagarte… y entonces romperías tu propio consejo.' },
   ],
-  platon0: [{ w: 'Platón', t: 'Maestro, ¿qué es la justicia?' }, { w: 'Sócrates', t: 'Antes de responder, dime qué entiendes por justicia.' }, { w: 'Platón', t: '¿Y si no lo sé?' }, { w: 'Sócrates', t: 'Entonces ya tenemos un buen punto de partida.' }],
+  platon0: [{ w: 'Platón', t: 'Maestro, ¿qué es la justicia?' }, { w: 'Sócrates', t: 'Antes de responder, joven prodigio, dime tú qué entiendes por justicia.' }, { w: 'Platón', t: '¿Y si no lo sé?' }, { w: 'Sócrates', t: 'Estupendo: ya sabemos lo mismo. Empecemos a no saberlo juntos.' }],
   platon1: [
-    { w: 'Platón', t: 'Has recuperado el pergamino y refutado al maestro del ágora. Las sombras de la caverna no se disipan solas.' },
-    { w: 'Sócrates', t: 'Lo sé. Pero siempre se disipan más rápido cuando alguien hace la pregunta correcta.' },
-    { w: 'Platón', t: 'Toma esto: la forma ideal del salto. Te permitirá saltar por segunda vez en el aire.' }, { w: 'Sócrates', t: '¿Un doble salto? Qué manera tan elegante de admitir que me equivoqué la primera vez.' },
+    { w: 'Platón', t: 'Has recuperado el pergamino y refutado al maestro del ágora sin aceptar un solo óbolo. Eso sí que es ser maestro.' },
+    { w: 'Sócrates', t: 'Qué sorpresa que te sorprendas, Platón. ¿Acaso dudabas de que un pobre ignorante pudiera lograrlo?' },
+    { w: 'Platón', t: 'Toma esto: la forma ideal del salto. Te permitirá saltar por segunda vez en el aire.' }, { w: 'Sócrates', t: '¿Un doble salto? Qué elegante manera de admitir que me equivoqué la primera vez.' },
   ],
-  boss0: [{ w: 'Maestro sofista', t: '¡Alto! Nadie cruza mi ágora sin escuchar mi discurso de tres horas.' }, { w: 'Sócrates', t: 'Prometo escucharte… si primero respondes a unas preguntas.' }, { w: 'Maestro sofista', t: '¡Imposible! ¡Mis argumentos son proyectiles!' }],
-  boss1: [{ w: 'Maestro sofista', t: 'Mi retórica… mi elocuencia… ¡se desvanece!' }, { w: 'Sócrates', t: 'Solo era aire con buena dicción. ¿Puedo hacerte otra pregunta?' }, { w: 'Maestro sofista', t: '¡NO! Me voy a una conferencia lejos de aquí.' }],
+  boss0: [{ w: 'Maestro sofista', t: '¡Alto! Nadie cruza mi ágora sin pagar mi discurso de tres horas: cien óbolos.' }, { w: 'Sócrates', t: 'Cien óbolos por tres horas… debes de ser muy sabio. Dime, ¿vale más la sabiduría que las monedas, o menos?' }, { w: 'Maestro sofista', t: '¡Imposible! ¡Mis argumentos son proyectiles… y mis proyectiles son monedas!' }, { w: 'Sócrates', t: 'Ah, hablas con el bolsillo. Qué elocuente.' }],
+  boss1: [{ w: 'Maestro sofista', t: 'Mi retórica… mi elocuencia… ¡se desvanece!' }, { w: 'Sócrates', t: 'No te angusties: yo no te he enseñado nada. La verdad ya estaba dentro de ti; yo solo te ayudé a parirla.' }, { w: 'Maestro sofista', t: '¿Parirla? ¡Como hacía tu madre, la partera!' }, { w: 'Sócrates', t: 'Exacto. Y también sin cobrar. Con tu permiso, tengo pergaminos que buscar.' }],
   riddle: { q: 'Platón pregunta: ¿qué es mejor para una ciudad?', o: ['Que sus ciudadanos aparenten ser sabios.', 'Que sus ciudadanos examinen lo que creen saber.', 'Que nadie pregunte nada para evitar discusiones.'], ok: 1, win: 'Platón: «Exacto. Aquí tienes un fragmento de conocimiento».', lose: 'Platón: «Piénsalo mejor. Puedes volver a intentarlo».' },
+  // ---- Nivel 1: Mileto ----
+  anaximandro: [
+    { w: 'Anaximandro', t: 'Maestro Tales, ¿sigues con eso de que todo es agua?' }, { w: 'Tales', t: 'Claro. Piénsalo: hasta tú eres mayormente agua.' },
+    { w: 'Anaximandro', t: 'Pues yo digo que el principio es el ápeiron: lo ilimitado, lo indeterminado.' }, { w: 'Tales', t: '¿Un principio indeterminado? Vaya, uno que ni tú sabes explicar.' },
+    { w: 'Anaximandro', t: 'Exacto: por eso es indeterminado. ¿Ves qué bien encaja?' }, { w: 'Tales', t: '…Dibuja el mapa y calla, anda.' },
+  ],
+  pitagoras: [
+    { w: 'Pitágoras', t: '¡Tales! Todo es número, y el universo, una música que no oímos de tanto oírla.' }, { w: 'Tales', t: 'Yo solo oigo mis tripas, que dicen que es hora de comer.' },
+    { w: 'Pitágoras', t: 'Qué casualidad: una quinta perfecta es 2:3, y tu estómago acaba de afinarla.' }, { w: 'Tales', t: '¿Y esa puerta?' },
+    { w: 'Pitágoras', t: 'Escucha mi sinfonía de seis notas y repítela pisando las placas. Si desafinas, la armonía cambia. Es muy suya, la armonía.' },
+  ],
+  heraclito: [
+    { w: 'Heráclito', t: 'Nadie se baña dos veces en el mismo río…' }, { w: 'Tales', t: 'Yo ni me baño una vez: soy de secano. Digo… de agua.' },
+    { w: 'Heráclito', t: 'Todo fluye y todo es fuego.' }, { w: 'Tales', t: 'Pues mi agua apaga tu fuego en tres segundos.' },
+    { w: 'Heráclito', t: 'Ah, el conflicto de los opuestos. Por eso eres mi mejor enemigo.' },
+  ],
+  m_boss0: [
+    { w: 'El Arché', t: 'Soy el principio de todas las cosas. Humildemente: el mejor.' }, { w: 'Tales', t: 'Qué casualidad: yo tengo tres hipótesis y ninguna cabe en una vasija.' },
+    { w: 'El Arché', t: 'Os veréis con agua, con aire y con fuego. Y después del golpe, a pensar.' }, { w: 'Tales', t: 'Primero el agua, por favor: soy de ahí, según mis apuntes.' },
+  ],
+  m_boss1: [
+    { w: 'El Arché', t: 'Agua, aire, fuego… ¿quién tenía razón?' }, { w: 'Tales', t: 'Todos un poquito y ninguno del todo. De eso trata filosofar.' },
+    { w: 'Anaximandro', t: 'Y por eso había que dibujar el mapa.' }, { w: 'El Arché', t: 'Esto es muy poco concluyente.' }, { w: 'Tales', t: 'Bienvenido a la filosofía.' },
+  ],
+  m_end: [
+    { w: 'Anaximandro', t: 'Has refutado al mito sin faltarle el respeto: lo has sustituido por una explicación.' }, { w: 'Tales', t: 'Y sin caerme en ningún pozo.' },
+    { w: 'Anaximandro', t: 'Mirando las estrellas, eso sí que es difícil.' }, { w: 'Tales', t: 'Por eso hoy miré el suelo. Las estrellas pueden esperar veintiséis siglos.' },
+  ],
+  // ---- Nivel 3: el tribunal (Apología y Critón) ----
+  t_plat: [{ w: 'Platón', t: 'Maestro, ahí dentro te esperan quinientos jueces y tres acusadores con muy mal genio.' }, { w: 'Sócrates', t: 'Qué público tan entregado: tantos hombres reunidos para escuchar a un ignorante.' }, { w: 'Platón', t: 'Y ninguno ha traído pañuelos.' }, { w: 'Sócrates', t: 'Mejor: así no lloraremos cuando los refute.' }],
+  t_boss0: [
+    { w: 'Meleto', t: 'Sócrates, hijo de Sofronisco: te acuso de corromper a la juventud y de no creer en los dioses de la ciudad.' },
+    { w: 'Sócrates', t: 'Meleto, joven poeta, me conmueve que te preocupe tanto la juventud. Dime: ¿quién la mejora?' }, { w: 'Meleto', t: '¡Las leyes!' },
+    { w: 'Sócrates', t: 'Qué respuesta tan original. ¿Y quién conoce las leyes?' }, { w: 'Meleto', t: '¡Los jueces!' },
+    { w: 'Sócrates', t: '¡Todos los jueces! Qué suerte la de Atenas: todos mejoran a los jóvenes y yo, el único que los corrompe.' },
+  ],
+  t_hit1: [
+    { w: 'Sócrates', t: 'Una duda, Meleto: si yo corrompo a los jóvenes a propósito, ¿por qué iba a perjudicar a quienes viven conmigo?' }, { w: 'Meleto', t: '…¿Sin querer?' },
+    { w: 'Sócrates', t: 'Entonces no me acuses: instrúyeme. Aunque admito que la ironía de que tú me enseñes tiene su encanto.' }, { w: 'Anito', t: '¡Basta de juegos! Yo defiendo el honor de los políticos de Atenas.' },
+    { w: 'Sócrates', t: 'Anito, gloria de curtidores y de gobernantes: ¿qué sabe exactamente un político?' },
+  ],
+  t_hit2: [
+    { w: 'Sócrates', t: 'Interrogué a políticos, poetas y artesanos. Los artesanos sabían su oficio y creían saber de todo; los poetas escribían maravillas sin saber qué decían; y vosotros, los políticos, creéis saber gobernar sin saber explicarlo.' },
+    { w: 'Anito', t: '¡Insolente!' }, { w: 'Sócrates', t: 'Gracias: soy un tábano, y por tu cara diría que has sentido el aguijón.' }, { w: 'Licón', t: 'Yo hablaré en nombre de los oradores.' },
+    { w: 'Sócrates', t: 'Un orador… justo el que necesitaba. Así acabamos antes la sesión.' },
+  ],
+  t_boss1: [
+    { w: 'Licón', t: 'Mi retórica… mi elocuencia… ¡me abandona!' }, { w: 'Sócrates', t: 'No os he enseñado nada: la verdad ya estaba dentro de vosotros. Yo solo os he ayudado a parirla.' },
+    { w: 'Meleto', t: '¡Como hacía tu madre, la partera!' }, { w: 'Sócrates', t: 'Exacto. Y también sin cobrar. Aunque, siendo justos, ella cobraba menos molestias.' },
+  ],
+  t_end: [
+    { w: 'Críton', t: 'Sócrates, tengo a los guardias comprados. Huyamos esta noche.' }, { w: 'Sócrates', t: 'Críton, amigo: tu generosidad solo es comparable a tu falta de argumentos. ¿Por qué debería romper las leyes que me criaron?' },
+    { w: 'Críton', t: '…Porque la sentencia es injusta.' }, { w: 'Sócrates', t: 'Una injusticia no se arregla con otra. Pero sigamos conversando mientras la cicuta se enfría.' },
+    { w: 'Sócrates', t: 'Y, Críton: le debemos un gallo a Asclepio. Págaselo y no lo olvides.', noSfx: false },
+  ],
 };
+// Plan completo de niveles (cada uno con su ambientación y su filósofo principal)
 const WORLDS = [
-  { n: 'Atenas y el ágora', d: 'Calles, mercado y templo de Atenea. Aquí aprendes a saltar, a romper opiniones y a desconfiar de lo que brilla.', lv: [{ id: '1-1', n: 'El ágora de las falacias' }] },
-  { n: 'El bosque de Heráclito', d: 'Plataformas que cambian sin parar y un río que nunca es el mismo.', lv: [] },
-  { n: 'El laberinto de Platón', d: 'Sombras engañosas, pasillos secretos y plataformas invisibles.', lv: [] },
-  { n: 'La academia de Aristóteles', d: 'Lógica, distancias y cajas que exigen el orden correcto.', lv: [] },
-  { n: 'El inframundo de Hades', d: 'Lava estilizada, Caronte y un guardián mitológico.', lv: [] },
-  { n: 'El tribunal de Atenas', d: 'La culminación: una competición retórica contra Gorgias.', lv: [] },
+  { n: 'Los presocráticos · Mileto', d: 'Puerto jónico del siglo VI a. C. Juegas como Tales. Enemigo: el Arché, el principio de todas las cosas.', lv: [{ id: '1', n: 'Mileto: el arché' }] },
+  { n: 'Sócrates · Atenas', d: 'El ágora de las falacias y el tribunal. Juegas como Sócrates y evitas el dinero de los sofistas. Enemigos: la falsa sabiduría y sus acusadores.', lv: [{ id: '2', n: 'El ágora de las falacias' }, { id: '3', n: 'El tribunal: la Apología' }] },
+  { n: 'Platón · La caverna', d: 'La Academia y la Caverna. Enemigo: las sombras (la doxa).', lv: [] },
+  { n: 'Aristóteles · El Liceo', d: 'Jardines peripatéticos. Enemigo: el Motor Inmóvil.', lv: [] },
+  { n: 'Helenismo · Alejandría', d: 'Epicuro, estoicos, cínicos y escépticos. Enemigo: el miedo y la inquietud.', lv: [] },
+  { n: 'Edad Media · El castillo', d: 'Tomás de Aquino bajo un cielo de atardecer. Enemigo: la Hidra de la Doble Verdad.', lv: [] },
+  { n: 'Modernidad · Empirismo, Kant, Hegel, Marx', d: 'De Londres a Königsberg, Jena y las fábricas.', lv: [] },
+  { n: 'Nietzsche · Zaratustra', d: 'Montañas y teatro griego. Enemigo: el dios de la moral cristiana.', lv: [] },
+  { n: 'Siglo XX · Existencialismo y Foucault', d: 'La Nada, el Panóptico y «lo normal».', lv: [] },
 ];
 
 /* ====================== NIVEL 1-1: EL ÁGORA DE LAS FALACIAS ====================== */
 const BOXTEX = { wood: 'wood', ceramic: 'ceramic', bounce: 'bounce', check: 'check', cicuta: 'cicuta', tnt: 'tnt', aporia: 'aporia', kairos: 'kairos', platon: 'platon', arist: 'arist', dioge: 'dioge', rio: 'rio' };
 function mkRng(seed) { let s = seed; return () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
 function buildL11() {
-  const L = { id: '1-1', name: 'El ágora de las falacias', region: 'Atenas y el ágora', goalZ: 270, par: 210, music: 'w1', solids: [], ills: [], boxes: [], items: [], enemies: [], statues: [], npcs: [], tablets: [], triggers: [], camZones: [], braziers: [], props: [], gate: { x: 0, y: 0, z: 270, open: false }, spawn: { x: 0, y: 0, z: -6 },
+  const L = { id: '2', num: '2', hero: 'soc', coinsBad: true, coinLabel: 'Sobornos', complete: PH.complete, hasIntro: true, name: 'El ágora de las falacias', region: 'Sócrates · Atenas', goalZ: 270, par: 210, music: 'w1', solids: [], ills: [], boxes: [], items: [], enemies: [], statues: [], npcs: [], tablets: [], triggers: [], camZones: [], braziers: [], props: [], gate: { x: 0, y: 0, z: 270, open: false }, spawn: { x: 0, y: 0, z: -6 }, wind: [], plates: [], dlg: { boss0: DLG.boss0, boss1: DLG.boss1, end: DLG.platon1, ability: 'dj' },
     theme: { sun: 0xffe2b0, ld: [-.45, .85, -.3], ambT: 0x9fb2c8, ambB: 0x8d7d62, fog: 0xe9d6b0, fogR: [70, 200], skyT: 0x4d8fe3, skyB: 0xf6dcae } };
   const S = (x0, x1, z0, z1, top, style, depth, o) => { depth = depth === undefined ? 4 : depth; const s = Object.assign({ x0, x1, y0: top - depth, y1: top, z0, z1, style: style || 'path' }, o || {}); L.solids.push(s); return s; };
   const MP = (x0, x1, z0, z1, mov) => { const s = S(x0, x1, z0, z1, 0, 'marble', 1.2); s.mov = mov; s.b = { x0, x1, y0: s.y0, y1: s.y1, z0, z1 }; return s; };
   const box = (type, x, y, z, o) => { const b = Object.assign({ type, x, y, z, sx: 1, sy: 1, sz: 1, alive: true, state: 'idle', t: 0, tex: BOXTEX[type], sq: 0, drop: {} }, o || {}); L.boxes.push(b); return b; };
-  const coin = (x, y, z) => L.items.push({ k: 'coin', x, y, z, got: false });
+  const coin = (x, y, z) => L.items.push({ k: L.coinsBad ? 'olive' : 'coin', x, y, z, got: false });
+  const lure = (x, y, z) => L.items.push({ k: 'coin', x, y, z, got: false, lure: true });
+  const mlure = (x, y, z, ax, amp, per, ph) => L.items.push({ k: 'coin', x, y, z, got: false, lure: true, mov: { ax, amp, per, ph } });
   const cl = (x0, y0, z0, x1, y1, z1, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? 0 : i / (n - 1); coin(lerp(x0, x1, t), lerp(y0, y1, t), lerp(z0, z1, t)); } };
   const arc = (x0, z0, x1, z1, h, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? .5 : i / (n - 1); coin(lerp(x0, x1, t), .8 + Math.sin(t * Math.PI) * h, lerp(z0, z1, t)); } };
   const item = (k, x, y, z, o) => L.items.push(Object.assign({ k, x, y, z, got: false }, o || {}));
@@ -473,9 +628,9 @@ function buildL11() {
   /* ---- A. EL ÁGORA: salida, tutorial, sofista, dintel bajo ---- */
   S(-4, 4, -10, 2, 0); S(-4, 4, 6.5, 48.5, 0);
   L.ills.push({ x0: -1.2, x1: 1.2, y0: -.3, y1: 0, z0: 2, z1: 6.5, grp: 'intro', a: 0, real: false });
-  hint(-5.5, -3, 'Muévete con W A S D · Shift para correr', { id: 'h1' }); hint(-2.5, .5, 'Espacio: saltar (mantenlo pulsado para saltar más alto)', { id: 'h2' });
+  hint(-5.5, -3, 'Muévete con las flechas · mantén A para correr', { id: 'h1' }); hint(-2.5, .5, 'Espacio: saltar (mantenlo pulsado para saltar más alto)', { id: 'h2' }); hint(10, 12.5, 'Los sofistas cobraban. Aquí cada moneda que aceptes te quita una ánfora: ¡no aceptes dinero!', { id: 'h0' });
   L.npcs.push({ id: 'diog', type: 'diog', x: -3, y: 0, z: 14, yaw: 1.3, dlg: 'diog' }); box('platon', 3.2, 0, 14, { drop: { gem: 'Conocimiento' } });
-  hint(8, 12, 'J o clic izquierdo: ataque giratorio. Rompe cajas y refuta sofistas', { id: 'h3' }); hint(15, 17, 'También puedes romper las cajas de madera saltando sobre ellas', { id: 'h4' });
+  hint(8, 12, 'D o clic izquierdo: ataque giratorio. Rompe lo que lleve una flecha dorada y refuta a los sofistas', { id: 'h3' }); hint(15, 17, 'Las cestas de mimbre también se rompen saltando sobre ellas', { id: 'h4' });
   for (const x of [-1, 0, 1]) box('wood', x, 0, 18, { drop: { coins: 3 } });
   box('wood', 0, 0, 22, { drop: { coins: 3 } }); box('wood', 0, 1, 22, { drop: { coins: 5 } });
   cl(-2.5, .8, 11, -2.5, .8, 16, 4); cl(2.5, .8, 16, 2.5, .8, 22, 5); arc(-1.5, 23, 1.5, 29, 1.2, 5);
@@ -491,22 +646,22 @@ function buildL11() {
 
   /* ---- B. HUECOS: rebote (Mayéutica), Aristóteles y un dogmático ---- */
   S(-2, 2, 50, 54, 0); S(-4, -1, 58, 61, 0); S(1, 4, 64, 67, 0); S(-4, 4, 71, 86, 0);
-  hint(52, 56, 'Caja Mayéutica: rebota sobre ella. Mantén Espacio para llegar más alto', { id: 'h8' });
+  hint(52, 56, 'Escudo Mayéutica: rebota sobre él. Mantén Espacio para llegar más alto', { id: 'h8' });
   box('bounce', -2.5, 0, 59.5);
   S(-7.5, -4, 57, 62, 4.4, 'marble', 1); item('scroll', -5.7, 5.3, 59.5, { id: 0 }); box('ceramic', -6.6, 4.4, 61.2, { drop: { mask: 'comedia' } }); cl(-5.5, 5.2, 57.8, -5.5, 5.2, 58.4, 2);
   arc(0, 50, -2.5, 58, 1.4, 5); arc(2.5, 62, 2.5, 70, 1.4, 5);
   S(2.6, 4, 72.5, 74.5, 1.1, 'marble', 1.1); S(2.6, 4, 74.5, 76.5, 2.2, 'marble', 2.2); S(1.6, 4, 76.5, 80, 3.3, 'marble', 3.3);
-  box('arist', -.4, 0, 78.5, { sx: 1.8, sz: 1.8, drop: { scroll: 1 } }); hint(73, 77, 'Caja de Aristóteles: ni demasiado ni demasiado poco. Déjate caer desde la plataforma alta', { id: 'h9' });
+  box('arist', -.4, 0, 78.5, { sx: 1.8, sz: 1.8, drop: { scroll: 1 } }); hint(73, 77, 'Altar de Aristóteles: ni demasiado ni demasiado poco. Déjate caer desde la plataforma alta', { id: 'h9' });
   cl(2.8, 4.1, 77, 2.8, 4.1, 79, 3); L.tablets.push({ x: -3.5, y: 0, z: 73.5, id: 'examen' });
   en('dogma', 0, 0, 83, { ax: 'x', a: -3, b: 3, spd: 1.2 }); cl(-3, .8, 85, 3, .8, 85, 4);
 
   /* ---- C. PASILLO DE CICUTA, TNT Y PLATAFORMAS MÓVILES ---- */
   S(-1.6, 1.6, 86, 106, 0); S(-2.2, -1.6, 86, 106, 1, 'wall', 1); S(1.6, 2.2, 86, 106, 1, 'wall', 1);
-  hint(86, 88, 'Cicuta: explota al contacto y no se rompe a golpes. ¡Esquívala!', { id: 'h10' });
+  hint(86, 88, 'Copa de cicuta: explota al contacto y no se rompe a golpes. ¡Esquívala!', { id: 'h10' });
   box('cicuta', -1.05, 0, 90); box('cicuta', 1.05, 0, 94); box('cicuta', -1.05, 0, 98); box('cicuta', -1.05, 0, 102); box('cicuta', 1.05, 0, 102);
   cl(.4, .8, 87, .4, .8, 89, 3); cl(-.4, .8, 91, -.4, .8, 93, 3); cl(.4, .8, 95, .4, .8, 97, 3); cl(0, .8, 99, 0, .8, 104, 4);
   S(-4, 4, 106, 126, 0); statue(-3, 108.5, 's2');
-  hint(108, 111, 'TNT: salta sobre ella, aléjate y deja que la ira de los dioses despeje el camino', { id: 'h11' });
+  hint(108, 111, 'Ánfora de la Aporía: pisa su interrogante, aléjate y deja que la pregunta estalle y despeje el camino', { id: 'h11' });
   box('tnt', 0, 0, 112.5); for (let i = 0; i < 8; i++) for (let y = 0; y < 3; y++) box('cicuta', -3.5 + i, y, 116);
   box('ceramic', 0, 0, 120, { drop: { scroll: 2 } }); box('wood', -2, 0, 120, { drop: { coins: 4 } }); box('wood', 2, 0, 120, { drop: { coins: 4 } });
   cl(-3, .8, 108, -3, .8, 111, 3); cl(3, .8, 108, 3, .8, 111, 3);
@@ -523,14 +678,14 @@ function buildL11() {
   S(-10, -7.4, 158, 161, 0, 'gold', .8, { grp: 'chasm' }); item('feather', -8.7, .9, 159.5, { id: 'pluma' }); arc(-3.5, 161.2, -8, 159.8, 1.6, 4);
   cl(-2.4, .8, 152.5, -2.4, .8, 154.5, 2); cl(2.4, .8, 156.5, 2.4, .8, 158.5, 2); cl(-2.4, .8, 160.5, -2.4, .8, 162.5, 2);
   hint(146.2, 149, 'Lo que brilla y parpadea no sostiene. Observa… o refuta al sofista', { id: 'h13', delay: 2.5 });
-  S(-4, 4, 176.5, 191, 0); L.tablets.push({ x: 3.4, y: 0, z: 180, id: 'nada' });
+  S(-4, 4, 176.5, 191, 0); L.tablets.push({ x: 3.4, y: 0, z: 180, id: 'oraculo' });
 
   /* ---- E. SECCIÓN LATERAL: KAIROS, HERÁCLITO Y UN BRASERO ---- */
   S(-2, 2, 191, 201, 0); L.camZones.push({ z0: 190, z1: 236.5, mode: 'side', lockX: 0 }); hint(190, 192, 'Cámara lateral: avanza hacia la derecha', { id: 'h14' });
-  box('kairos', 0, 0, 193.2); hint(192, 194, 'Caja Kairos: rómpela y llega a la meta dorada antes de que acabe el tiempo', { id: 'h15' });
+  box('kairos', 0, 0, 193.2); hint(192, 194, 'Clepsidra Kairos: rómpela y llega a la meta dorada antes de que se vacíe', { id: 'h15' });
   box('dioge', 0, 0, 196); L.braziers.push({ x: 0, y: 0, z: 198.8, per: 3.2, dur: 1.7, ph: 0 });
   for (let i = 0; i < 3; i++) box('rio', 0, -.6, 203 + i * 2.3, { sx: 1.8, sy: .6, sz: 1.8, cyc: 3.8, off: i * 1.15 });
-  L.tablets.push({ x: 0, y: 0, z: 200.3, id: 'fluye' });
+  L.tablets.push({ x: 0, y: 0, z: 200.3, id: 'tabano' });
   S(-2, 2, 208.5, 211.5, 0); MP(-1.5, 1.5, 215, 218, { ax: 'z', amp: 3.2, per: 5.2, ph: 0 }); S(-2, 2, 223.5, 238, 0);
   cl(0, 1, 193.5, 0, 1, 195.2, 2); cl(0, 2.2, 197.4, 0, 2.2, 200, 3); cl(0, 1.4, 203, 0, 1.4, 207, 4); cl(0, 1.2, 209, 0, 1.2, 211, 2); cl(0, 1.2, 213, 0, 1.2, 222, 5); cl(0, 1, 224, 0, 1, 227, 3);
   en('veloz', 0, 0, 230, { ax: 'z', a: 226.5, b: 235, spd: 5.5 });
@@ -542,10 +697,17 @@ function buildL11() {
   for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const t = S(-10 + c * 5, -5 + c * 5, 240 + r * 5, 245 + r * 5, 0, 'tile', 1.5, { tile: true, r, c, gone: false, tm: 0 }); }
   S(-10.7, -10, 240, 262, 1.2, 'wall', 1.2); S(10, 10.7, 240, 262, 1.2, 'wall', 1.2);
   S(-6, 6, 260, 276, 0, 'path'); L.triggers.push({ z0: 240.2, z1: 244, id: 'boss', done: false }); L.triggers.push({ z0: 262, z1: 266, id: 'platon', done: false });
-  L.npcs.push({ id: 'platon', type: 'platon', x: 3.6, y: 0, z: 265, yaw: -1.57, dlg: 'platon1' });
+  L.npcs.push({ id: 'platon', type: 'platon', x: 3.6, y: 0, z: 265, yaw: -1.57, dlg: 'platon0' });
   en('maestro', 0, 2.2, 257, { boss: true, hp: 3, phase: 0 });
   L.tournTiles = true;
 
+  for (const z of [20, 24, 28, 33]) for (let i = 0; i < 3; i++) mlure(-2 + i * 2, .8, z, 'x', 1.7, 3.0, i * 1.0 + z * .3);
+  mlure(-1.5, .8, 12, 'x', 1.4, 2.6, 0); mlure(1.5, .8, 12, 'x', 1.4, 2.6, 1.3); for (const z of [80, 84]) for (let i = 0; i < 2; i++) mlure(-1.5 + i * 3, .8, z, 'x', 1.4, 2.8, i * 1.4);
+  for (const z of [88, 92, 96, 100]) { mlure(-.7, .8, z, 'z', 1.5, 2.4, z * .2); mlure(.7, .8, z, 'z', 1.5, 2.4, z * .2 + 1.2); }
+  for (const z of [108, 121]) for (let i = 0; i < 3; i++) mlure(-2 + i * 2, .8, z, 'x', 1.8, 3.2, i * 1.1);
+  for (let r = 0; r < 6; r++) lure(r % 2 === 0 ? 2.4 : -2.4, .8, 153.5 + r * 4);
+  for (const z of [194, 200.8, 210, 216, 222]) mlure(0, 1.1, z, 'z', 1.3, 2.2, z * .4);
+  for (const z of [248, 254]) for (let i = 0; i < 2; i++) mlure(-3 + i * 6, .8, z, 'x', 4.5, 4.2, i * 2.1);
   /* ---- decorado: islas con columnas, árboles, puestos del mercado y templos ---- */
   const rng = mkRng(77);
   for (let z = -8; z <= 278; z += 12) for (const sd of [-1, 1]) {
@@ -560,11 +722,130 @@ function buildL11() {
   for (let z = 10; z < 280; z += 70) { L.props.push({ t: 'temple', x: -46, y: -6, z, w: 22, d: 14, h: 8, rot: 0 }); L.props.push({ t: 'temple', x: 52, y: -6, z: z + 30, w: 18, d: 12, h: 7, rot: 0 }); }
   for (let z = -40; z < 320; z += 38) for (const sd of [-1, 1]) L.props.push({ t: 'hill', x: sd * (95 + rng() * 40), y: -14, z, s: 22 + rng() * 14 });
   for (let i = 0; i < 18; i++) L.props.push({ t: 'cloud', x: (rng() - .5) * 260, y: 38 + rng() * 25, z: -20 + rng() * 320, s: 6 + rng() * 8 });
-  L.totalCoins = L.items.filter((i) => i.k === 'coin').length + L.boxes.reduce((a, b) => a + (b.drop.coins || 0), 0);
+  L.totalCoins = L.items.filter((i) => i.k === 'coin').length;
   L.totalEnemies = L.enemies.length; L.totalScrolls = 3;
   return L;
 }
-const LEVELS = { '1-1': { id: '1-1', build: buildL11, name: 'El ágora de las falacias', region: 'Atenas y el ágora' } };
+
+
+/* ====================== NIVEL 1: MILETO, EL ARCHÉ (Tales y los presocráticos) ====================== */
+function buildL1() {
+  const L = { id: '1', num: '1', hero: 'tales', coinLabel: 'Gotas', coinStyle: 'gota', complete: PH.complete1, jets: [], name: 'Mileto: el arché', region: 'Los presocráticos · Mileto', goalZ: 270, par: 200, music: 'w1', seaCol: 0x1f9fc0, solids: [], ills: [], boxes: [], items: [], enemies: [], statues: [], npcs: [], tablets: [], triggers: [], camZones: [], braziers: [], props: [], wind: [], plates: [], gate: { x: 0, y: 0, z: 270, open: false }, spawn: { x: 0, y: 0, z: -6 },
+    theme: { sun: 0xfff0d0, ld: [-.4, .9, -.4], ambT: 0xa8c8e8, ambB: 0x9aa078, fog: 0xcfe6f0, fogR: [80, 230], skyT: 0x2f8fe8, skyB: 0xdff0f8 }, dlg: { boss0: DLG.m_boss0, boss1: DLG.m_boss1, end: DLG.m_end, ability: null } };
+  const S = (x0, x1, z0, z1, top, style, depth, o) => { depth = depth === undefined ? 4 : depth; const s = Object.assign({ x0, x1, y0: top - depth, y1: top, z0, z1, style: style || 'path' }, o || {}); L.solids.push(s); return s; };
+  const MPB = (x0, x1, z0, z1, mov) => { const s = S(x0, x1, z0, z1, 0, 'boat', 1.0); s.mov = mov; s.b = { x0, x1, y0: s.y0, y1: s.y1, z0, z1 }; return s; };
+  const box = (type, x, y, z, o) => { const b = Object.assign({ type, x, y, z, sx: 1, sy: 1, sz: 1, alive: true, state: 'idle', t: 0, tex: BOXTEX[type], sq: 0, drop: {} }, o || {}); L.boxes.push(b); return b; };
+  const coin = (x, y, z) => L.items.push({ k: 'coin', x, y, z, got: false });
+  const cl = (x0, y0, z0, x1, y1, z1, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? 0 : i / (n - 1); coin(lerp(x0, x1, t), lerp(y0, y1, t), lerp(z0, z1, t)); } };
+  const arc = (x0, z0, x1, z1, h, n) => { for (let i = 0; i < n; i++) { const t = n === 1 ? .5 : i / (n - 1); coin(lerp(x0, x1, t), .8 + Math.sin(t * Math.PI) * h, lerp(z0, z1, t)); } };
+  const item = (k, x, y, z, o) => L.items.push(Object.assign({ k, x, y, z, got: false }, o || {}));
+  const en = (type, x, y, z, o) => L.enemies.push(Object.assign({ type, x, y, z, alive: true, yaw: 0, ph: Math.random() * 6, t: 0, dir: 1, shoot: 2 + Math.random() * 2, turn: 2 }, o || {}));
+  const hint = (z0, z1, text, o) => L.triggers.push(Object.assign({ z0, z1, hint: text, done: false }, o || {}));
+  const statue = (x, z, id) => { L.statues.push({ x, y: 0, z, id, active: false }); S(x - .8, x + .8, z - .8, z + .8, 1, 'ped', 1); };
+  /* A. El puerto */
+  S(-4, 4, -10, 48.5, 0); hint(-5.5, -3, 'Muévete con las flechas · mantén A para correr', { id: 'h1' }); hint(-2.5, .5, 'Espacio: saltar (mantenlo pulsado para saltar más alto)', { id: 'h2' });
+  L.npcs.push({ id: 'anaximandro', type: 'anaximandro', x: -3, y: 0, z: 14, yaw: 1.3, dlg: 'anaximandro' }); hint(8, 12, 'D o clic: ataque giratorio. Rompe lo que lleve una flecha dorada y refuta a los mitos', { id: 'h3' });
+  for (const x of [-1, 0, 1]) box('wood', x, 0, 18, { drop: { coins: 3 } }); box('wood', 0, 0, 22, { drop: { coins: 3 } }); box('wood', 0, 1, 22, { drop: { coins: 5 } });
+  cl(-2.5, .8, 11, -2.5, .8, 16, 4); cl(2.5, .8, 16, 2.5, .8, 22, 5); arc(-1.5, 23, 1.5, 29, 1.2, 5);
+  en('mito', 0, 0, 31, { ax: 'x', a: -3, b: 3, spd: 1.8 }); hint(28, 30, 'Los mitos explican el mundo con dioses. Refútalos pisándolos o con un giro', { id: 'h5' });
+  L.tablets.push({ x: 3.4, y: 0, z: 30, id: 'agua' }); L.tablets.push({ x: -3.4, y: 0, z: 8, id: 'dioses' }); statue(-3, 44, 's1'); en('mito', 0, 0, 40, { ax: 'x', a: -3, b: 3, spd: 2.1 }); box('ceramic', 2.4, 0, 46, { drop: { amph: 1 } }); cl(-2, .8, 45, 2, .8, 48, 4);
+  /* B. Las barcas del puerto */
+  hint(48.5, 52, 'Las barcas se mueven con el oleaje: calcula el salto', { id: 'h8' });
+  MPB(-2, 2, 50, 54, { ax: 'x', amp: 2.2, per: 4.4, ph: 0 }); MPB(-2, 2, 57, 61, { ax: 'x', amp: 2.2, per: 4.4, ph: Math.PI }); MPB(-2, 2, 64, 68, { ax: 'x', amp: 2.2, per: 4.4, ph: 0 });
+  cl(0, 1.2, 55, 0, 1.2, 56, 2); cl(0, 1.2, 62, 0, 1.2, 63, 2); S(-4, 4, 72, 90, 0); box('bounce', -2.5, 0, 77, { skin: 'fuente' }); hint(72, 75, 'Los surtidores de agua te lanzan hacia arriba. Mantén Espacio para más altura', { id: 'h9' });
+  S(-7.5, -4, 75, 80, 4.4, 'marble', 1); item('scroll', -5.7, 5.3, 77.5, { id: 0 }); box('wood', -6.6, 4.4, 79.2, { drop: { coins: 4 } }); L.tablets.push({ x: 3.4, y: 0, z: 82, id: 'apeiron' }); cl(2, .8, 80, 2, .8, 88, 4);
+  /* C. El puente del viento (Anaxímenes) */
+  S(-1.6, 1.6, 90, 130, 0); box('check', 0, 0, 92); hint(92, 96, 'Anaxímenes dice que el aire lo es todo. Las ráfagas te empujan: avanza contra el viento', { id: 'h10' });
+  L.wind.push({ x0: -3, x1: 3, z0: 98, z1: 110, dx: 1, dz: 0, str: 3.4, per: 3.6, on: 2.1, ph: 0 }, { x0: -3, x1: 3, z0: 114, z1: 126, dx: -1, dz: 0, str: 3.4, per: 3.6, on: 2.1, ph: 1.6 });
+  cl(0, .8, 94, 0, .8, 128, 12);
+  /* D. La puerta de Pitágoras */
+  S(-4, 4, 130, 156, 0); L.npcs.push({ id: 'pitagoras', type: 'pitagoras', x: -3, y: 0, z: 134, yaw: 1.3, dlg: 'pitagoras' }); L.tablets.push({ x: 3.4, y: 0, z: 134, id: 'numero' });
+  [[-2.6, 143, 1], [0, 143, 2], [2.6, 143, 3], [-2.6, 146.5, 4], [0, 146.5, 5], [2.6, 146.5, 6]].forEach(([x, z, n]) => L.plates.push({ x, z, n })); L.plates.push({ x: 0, z: 138.5, n: 0, r: true }); L.triggers.push({ z0: 137, z1: 141, id: 'pita', done: false }); hint(133, 136.5, 'Pitágoras: escucha la sinfonía de 6 notas y repítela pisando las placas. La dorada la repite', { id: 'h11' });
+  S(-4, 4, 150, 151.2, 5, 'wall', 5, { door: true, gid: 'pita' }); item('scroll', 0, .9, 153.5, { id: 1 }); cl(-3, .8, 144, 3, .8, 148, 5);
+  /* E. El río de Heráclito */
+  S(-4, 4, 156, 159.4, 0); L.npcs.push({ id: 'heraclito', type: 'heraclito', x: 3.2, y: 0, z: 157.5, yaw: -1.3, dlg: 'heraclito' }); hint(158, 161, 'El río de Heráclito: las piedras cambian. Observa su ritmo', { id: 'h12' });
+  for (let i = 0; i < 6; i++) { box('rio', i % 2 ? 1.6 : -1.6, -.6, 161 + 3.3 * i, { sx: 2.2, sy: .6, sz: 2.2, cyc: 3.8, off: i * .95 }); } cl(-1.6, 1.2, 161, 1.6, 1.2, 177, 6);
+  S(-4, 4, 182.5, 198, 0); S(-10, -7, 167, 170, 0, 'gold', .8); item('feather', -8.5, .9, 168.5, { id: 'atomo', label: 'Átomo de Demócrito' }); L.tablets.push({ x: -3.4, y: 0, z: 186, id: 'fluye' });
+  /* F. El fuego de Heráclito: braseros */
+  S(-2, 2, 198, 232, 0); hint(198, 201, 'Heráclito: todo es fuego. Salen llamas de los lados: salta o cruza antes de que te alcancen. Si te pillan, solo quedan cenizas', { id: 'h13' });
+  [[-1, 202], [1, 205.5], [-1, 209], [1, 212.5], [-1, 216], [1, 219], [-1, 222.5], [1, 225.5], [0, 229]].forEach(([side, z], i) => L.jets.push({ side, z, per: 3.0, tele: .7, dur: .9, ph: i * .85 }));
+  L.braziers.push({ x: 0, y: 0, z: 207, per: 3.4, dur: 1.5, ph: .4 }, { x: 0, y: 0, z: 214, per: 3.4, dur: 1.5, ph: 1.9 }, { x: 0, y: 0, z: 220.5, per: 3.4, dur: 1.5, ph: .9 });
+  item('scroll', 0, 2.4, 211, { id: 2 }); cl(0, 1.2, 200, 0, 1.2, 230, 9);
+  S(-4, 4, 232, 240, 0); statue(-3, 235.5, 's3'); en('mito', 0, 0, 237.5, { ax: 'x', a: -3, b: 3, spd: 2 });
+  /* G. La arena del Arché */
+  L.camZones.push({ z0: 238, z1: 280, mode: 'behind', wide: true });
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) S(-10 + c * 5, -5 + c * 5, 240 + r * 5, 245 + r * 5, 0, 'tile', 1.5, { tile: true, r, c, gone: false, tm: 0 });
+  S(-6, 6, 260, 276, 0, 'path');
+  L.triggers.push({ z0: 240.2, z1: 244, id: 'boss', done: false }); L.triggers.push({ z0: 262, z1: 266, id: 'platon', done: false });
+  L.npcs.push({ id: 'anaximandro2', type: 'anaximandro', x: 3.6, y: 0, z: 265, yaw: -1.57, dlg: 'anaximandro' });
+  en('arche', 0, 2.4, 257, { boss: true, hp: 3, hp0: 3, style: 'arche', noTiles: true, stage: 0 }); L.bossHit = ['¡Primera hipótesis: no todo es agua!', '¡Tampoco todo es aire!', ''];
+  /* decorado de Mileto: casas blancas, olivos, barcas y templo */
+  const rng = mkRng(31);
+  for (let z = -8; z <= 278; z += 11) for (const sd of [-1, 1]) {
+    const x = sd * (10.5 + rng() * 3.5), w = 6 + rng() * 3, k = ((z / 11 | 0) + (sd > 0 ? 2 : 0)) % 5;
+    L.props.push({ t: 'island', x, y: 0, z, w, d: w });
+    if (k === 0 || k === 2) L.props.push({ t: 'house', x, y: 0, z, w: 3.6 + rng(), d: 3.4, h: 2.6 + rng(), c: 0xf4f0e6 });
+    if (k === 1 || k === 2) L.props.push({ t: 'tree', x: x + (k === 2 ? 2 : 0), y: 0, z: z + (k === 2 ? 1.5 : 0), s: 1 + rng() * .5, kind: 'olive' });
+    if (k === 3) { L.props.push({ t: 'column', x: x - 1.5, y: 0, z: z - 1.5, h: 5 }); L.props.push({ t: 'column', x: x + 1.5, y: 0, z: z - 1.5, h: 4 }); }
+    if (k === 4) L.props.push({ t: 'amph', x, y: 0, z, s: 1.1 + rng() * .6, c: [0xc8693a, 0x3a7bd5, 0xd9a02a][(rng() * 3) | 0] });
+  }
+  for (let z = 0; z < 290; z += 55) { L.props.push({ t: 'temple', x: -48, y: -6, z, w: 22, d: 14, h: 8, rot: 0 }); L.props.push({ t: 'sailboat', x: 30 + rng() * 14, y: -13.6, z: z + 20, rot: rng() * 6 }); L.props.push({ t: 'sailboat', x: -28 - rng() * 12, y: -13.6, z: z + 40, rot: rng() * 6 }); }
+  for (let z = -40; z < 320; z += 45) for (const sd of [-1, 1]) L.props.push({ t: 'hill', x: sd * (95 + rng() * 40), y: -14, z, s: 20 + rng() * 12 });
+  for (let i = 0; i < 16; i++) L.props.push({ t: 'cloud', x: (rng() - .5) * 260, y: 38 + rng() * 25, z: -20 + rng() * 320, s: 6 + rng() * 8 });
+  L.totalCoins = L.items.filter((i) => i.k === 'coin').length + L.boxes.reduce((a, b) => a + (b.drop.coins || 0), 0); L.totalEnemies = L.enemies.length; L.totalScrolls = 3;
+  return L;
+}
+
+
+/* ====================== NIVEL 3: EL TRIBUNAL (la Apología de Sócrates) ====================== */
+function buildL3() {
+  const L = { id: '3', num: '3', hero: 'soc', coinsBad: true, coinLabel: 'Sobornos', complete: PH.complete3, name: 'El tribunal: la Apología', region: 'Sócrates · Atenas', goalZ: 130, par: 170, music: 'w1', solids: [], ills: [], boxes: [], items: [], enemies: [], statues: [], npcs: [], tablets: [], triggers: [], camZones: [], braziers: [], jets: [], props: [], wind: [], plates: [], gate: { x: 0, y: 0, z: 130, open: false }, spawn: { x: 0, y: 0, z: -6 }, arena: { zb: 117, zc: 113, zEnd: 120 },
+    theme: { sun: 0xffd9a8, ld: [-.4, .85, -.35], ambT: 0xb0b8c8, ambB: 0xa08a68, fog: 0xf0dcc0, fogR: [70, 210], skyT: 0x6a98d8, skyB: 0xf8dcb4 }, dlg: { boss0: DLG.t_boss0, boss1: DLG.t_boss1, end: DLG.t_end, ability: null }, bossHitDlg: [DLG.t_hit1, DLG.t_hit2], bossHit: ['', '', ''] };
+  const S = (x0, x1, z0, z1, top, style, depth, o) => { depth = depth === undefined ? 4 : depth; const s = Object.assign({ x0, x1, y0: top - depth, y1: top, z0, z1, style: style || 'path' }, o || {}); L.solids.push(s); return s; };
+  const box = (type, x, y, z, o) => { const b = Object.assign({ type, x, y, z, sx: 1, sy: 1, sz: 1, alive: true, state: 'idle', t: 0, tex: BOXTEX[type], sq: 0, drop: {} }, o || {}); L.boxes.push(b); return b; };
+  const olive = (x, y, z) => L.items.push({ k: 'olive', x, y, z, got: false });
+  const mlure = (x, y, z, ax, amp, per, ph) => L.items.push({ k: 'coin', x, y, z, got: false, lure: true, mov: { ax, amp, per, ph } });
+  const item = (k, x, y, z, o) => L.items.push(Object.assign({ k, x, y, z, got: false }, o || {}));
+  const en = (type, x, y, z, o) => L.enemies.push(Object.assign({ type, x, y, z, alive: true, yaw: 0, ph: Math.random() * 6, t: 0, dir: 1, shoot: 2 + Math.random() * 2, turn: 2 }, o || {}));
+  const hint = (z0, z1, text, o) => L.triggers.push(Object.assign({ z0, z1, hint: text, done: false }, o || {}));
+  const statue = (x, z, id) => { L.statues.push({ x, y: 0, z, id, active: false }); S(x - .8, x + .8, z - .8, z + .8, 1, 'ped', 1); };
+  /* A. El atrio de la Heliaia */
+  S(-4, 4, -10, 38, 0, 'path'); hint(-5.5, -3, 'Muévete con las flechas · mantén A para correr · Espacio salta · D ataca', { id: 'h1' }); hint(8, 12, 'En el tribunal, las monedas siguen siendo sobornos: esquívalas', { id: 'h0' });
+  L.npcs.push({ id: 'platon', type: 'platon', x: -3, y: 0, z: 14, yaw: 1.3, dlg: 't_plat' });
+  for (const x of [-1, 0, 1]) box('wood', x, 0, 18, { drop: { coins: 3 } }); box('ceramic', 2.4, 0, 34, { drop: { scroll: 0 } });
+  for (const z of [20, 24, 28, 33]) for (let i = 0; i < 3; i++) mlure(-2 + i * 2, .8, z, 'x', 1.7, 3.0, i + z * .3);
+  for (let i = 0; i < 6; i++) olive(-3.4 + i * 1.36, .8, 8);
+  en('sofista', 0, 0, 26, { ax: 'x', a: -3, b: 3, spd: 1.9 }); L.tablets.push({ x: 3.4, y: 0, z: 30, id: 'tabano' });
+  /* B. El pasillo de las urnas: copas de cicuta y el ánfora de la Aporía */
+  S(-1.6, 1.6, 38, 58, 0, 'path'); S(-2.2, -1.6, 38, 58, 1, 'wall', 1); S(1.6, 2.2, 38, 58, 1, 'wall', 1); hint(38, 40, 'Copas de cicuta: explotan al contacto. ¡Esquívalas!', { id: 'h10' });
+  box('cicuta', -1.05, 0, 42); box('cicuta', 1.05, 0, 46); box('cicuta', -1.05, 0, 50); box('cicuta', 0, 0, 54);
+  for (const z of [40, 44, 48, 52]) { mlure(-.7, .8, z, 'z', 1.4, 2.4, z * .2); mlure(.7, .8, z, 'z', 1.4, 2.4, z * .2 + 1.2); }
+  S(-4, 4, 58, 84, 0, 'path'); statue(-3, 61, 's1'); hint(62, 65, 'Ánfora de la Aporía: pisa su interrogante, aléjate y deja que la pregunta estalle', { id: 'h11' });
+  box('tnt', 0, 0, 68.5); for (let i = 0; i < 8; i++) for (let y = 0; y < 3; y++) box('cicuta', -3.5 + i, y, 72);
+  box('ceramic', 0, 0, 76, { drop: { scroll: 1 } }); box('wood', -2, 0, 76, { drop: { coins: 4 } }); box('wood', 2, 0, 76, { drop: { coins: 4 } });
+  for (const z of [62, 77]) for (let i = 0; i < 3; i++) mlure(-2 + i * 2, .8, z, 'x', 1.8, 3.2, i * 1.1);
+  en('dogma', 0, 0, 81, { ax: 'x', a: -3, b: 3, spd: 1.2 });
+  /* C. El pórtico */
+  S(-4, 4, 84, 100, 0, 'path'); statue(-3, 87, 's2'); L.tablets.push({ x: 3.4, y: 0, z: 90, id: 'leyes' }); en('veloz', 0, 0, 94, { ax: 'x', a: -3, b: 3, spd: 5 });
+  box('ceramic', 2.4, 0, 98, { drop: { scroll: 2 } }); box('check', -2.5, 0, 96);
+  /* D. El estrado de los jueces */
+  L.camZones.push({ z0: 98, z1: 150, mode: 'behind', wide: true });
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) S(-10 + c * 5, -5 + c * 5, 100 + r * 5, 105 + r * 5, 0, 'tile', 1.5, { tile: true, r, c, gone: false, tm: 0 });
+  S(-10.7, -10, 100, 122, 1.2, 'wall', 1.2); S(10, 10.7, 100, 122, 1.2, 'wall', 1.2); S(-6, 6, 120, 136, 0, 'path');
+  L.triggers.push({ z0: 100.2, z1: 104, id: 'boss', done: false }); L.triggers.push({ z0: 122, z1: 126, id: 'platon', done: false });
+  L.npcs.push({ id: 'criton', type: 'criton', x: 3.6, y: 0, z: 125, yaw: -1.57, dlg: 't_end' });
+  en('acus', 0, 2.2, 117, { boss: true, hp: 3, hp0: 3, style: 'acus', noTiles: true });
+  const rng = mkRng(51);
+  for (let z = -8; z <= 140; z += 11) for (const sd of [-1, 1]) { const x = sd * (10.5 + rng() * 3.5), w = 6 + rng() * 3, k = ((z / 11 | 0) + (sd > 0 ? 1 : 0)) % 4; if (z > 92 && z < 128) continue; L.props.push({ t: 'island', x, y: 0, z, w, d: w }); if (k === 0 || k === 2) { L.props.push({ t: 'column', x: x - 1.5, y: 0, z: z - 1.5, h: 5 }); L.props.push({ t: 'column', x: x + 1.5, y: 0, z: z - 1.5, h: 5 }); } if (k === 1) L.props.push({ t: 'tree', x, y: 0, z, s: 1.2, kind: 'olive' }); if (k === 3) L.props.push({ t: 'amph', x, y: 0, z, s: 1.2, c: 0xc8693a }); }
+  for (const sd of [-1, 1]) { L.props.push({ t: 'stands', x: sd * 17, y: 0, z: 111, w: 9, d: 30, side: sd }); }
+  for (let z = -10; z < 160; z += 60) { L.props.push({ t: 'temple', x: -48, y: -6, z, w: 22, d: 14, h: 8, rot: 0 }); L.props.push({ t: 'temple', x: 52, y: -6, z: z + 30, w: 18, d: 12, h: 7, rot: 0 }); }
+  for (let z = -40; z < 200; z += 45) for (const sd of [-1, 1]) L.props.push({ t: 'hill', x: sd * (95 + rng() * 40), y: -14, z, s: 20 + rng() * 12 });
+  for (let i = 0; i < 12; i++) L.props.push({ t: 'cloud', x: (rng() - .5) * 220, y: 38 + rng() * 25, z: -20 + rng() * 200, s: 6 + rng() * 8 });
+  L.totalCoins = L.items.filter((i) => i.k === 'coin').length; L.totalEnemies = L.enemies.length; L.totalScrolls = 3;
+  return L;
+}
+
+const LEVELS = { '1': { id: '1', build: buildL1, name: 'Mileto: el arché', region: 'Los presocráticos · Mileto' }, '2': { id: '2', build: buildL11, name: 'El ágora de las falacias', region: 'Sócrates · Atenas' }, '3': { id: '3', build: buildL3, name: 'El tribunal: la Apología', region: 'Sócrates · Atenas' } };
 
 /* ====================== ESTADO Y LÓGICA ====================== */
 const SAVE_KEY = 'socrates_camino_v1';
@@ -597,8 +878,8 @@ addEventListener('keyup', (e) => { KEYS[e.code] = false; });
 addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; if (G.mode === 'play') togglePause(); });
 addEventListener('mousedown', (e) => { AU.init(); if (G.mode === 'play' && e.button === 0 && !e.target.closest('button,#touch,.ov')) PRESS.ClickSpin = true; if ((G.mode === 'dialog') && !e.target.closest('button')) PRESS.Advance = true; });
 function readInput() {
-  const k = KEYS; let x = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0) + TJ.x, z = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0) + TJ.z, l = Math.hypot(x, z); if (l > 1) { x /= l; z /= l; }
-  return { x, z, run: !!(k.ShiftLeft || k.ShiftRight || TJ.run), jump: !!(k.Space || TJ.jump), crouch: !!(k.KeyC || k.ControlLeft || k.ControlRight || TJ.crouch) };
+  const k = KEYS; let x = (k.ArrowRight ? 1 : 0) - (k.ArrowLeft ? 1 : 0) + TJ.x, z = (k.ArrowUp ? 1 : 0) - (k.ArrowDown ? 1 : 0) + TJ.z, l = Math.hypot(x, z); if (l > 1) { x /= l; z /= l; }
+  return { x, z, run: !!(k.KeyA || TJ.run), jump: !!(k.Space || TJ.jump), crouch: !!(k.KeyC || k.ControlLeft || k.ControlRight || TJ.crouch) };
 }
 
 /* ---- Partida y nivel ---- */
@@ -607,11 +888,11 @@ function startLevel(id, preview) {
   const def = LEVELS[id], lv = def.build(); G.lv = lv; G.lid = id; G.preview = !!preview; G.t = 0; G.projs = []; G.parts = []; flEl.innerHTML = ''; G.floats = [];
   for (const s of lv.solids) { if (s.mov) { s.ox = s.oy = s.oz = 0; s.dx = s.dy = s.dz = 0; } }
   for (const b of lv.boxes) { b.x0 = b.x - b.sx / 2; b.x1 = b.x + b.sx / 2; b.y0 = b.y; b.y1 = b.y + b.sy; b.z0 = b.z - b.sz / 2; b.z1 = b.z + b.sz / 2; b.ph = 0; }
-  G.chasm = { active: false, t: 0, dispelled: false }; G.kairos = null; G.dio = null; G.boss = null; G.bossDead = false; G.dlg = null; G.cine = null; G.intro = null; G.coinChain = 0; G.tileT = 3;
-  G.stats = { coins: 0, scrolls: [false, false, false], deaths: 0, kills: 0, secret: false, kairos: false, gems: [], masks: [], t: 0, score: 0, dj: false };
+  for (const it of lv.items) { it.bx = it.x; it.bz = it.z; } G.bfx = []; G.pita = null; G.deathMsg = null; G.chasm = { active: false, t: 0, dispelled: false }; G.kairos = null; G.dio = null; G.boss = null; G.bossDead = false; G.dlg = null; G.cine = null; G.intro = null; G.coinChain = 0; G.tileT = 3;
+  G.plateIdx = 0; G.stats = { bribes: 0, coins: 0, scrolls: [false, false, false], deaths: 0, kills: 0, secret: false, kairos: false, gems: [], masks: [], t: 0, score: 0, dj: false };
   G.cp = { x: lv.spawn.x, y: lv.spawn.y, z: lv.spawn.z, id: 'start' }; G.p = newPlayer(lv.spawn.x, lv.spawn.y, lv.spawn.z); G.camY = 0;
   G.fade = 1; $('#kairos').classList.add('hide'); $('#prompt').classList.add('hide'); $('#toast').classList.remove('show'); $('#hint').classList.remove('show');
-  if (!preview) { G.mode = 'play'; AU.music(lv.music); hideAllOv(); $('#hud').classList.remove('hide'); if (!save.seenIntro) startIntro(); else say(pick(PH.start), 3.5); updHUD(true); }
+  if (!preview) { G.mode = 'play'; AU.music(lv.music); hideAllOv(); $('#hud').classList.remove('hide'); { const hid = { soc: 'socrates' }[lv.hero] || lv.hero; if (!save.chars.includes(hid)) { save.chars.push(hid); writeSave(); } } if (lv.hasIntro && !save.seenIntro) startIntro(); else say(pick(lv.id === '1' ? PH.tales : PH.start), 3.5); updHUD(true); }
   snapCam();
 }
 function restartLevel() { hideAllOv(); startLevel(G.lid, false); }
@@ -625,10 +906,10 @@ function updMoving(dt) {
 }
 function buildCols() {
   const c = G.cols; c.length = 0; const lv = G.lv;
-  for (const s of lv.solids) { if (s.grp === 'chasm' && !G.chasm.active) continue; if (s.tile && s.st === 2) continue; c.push(s); }
+  for (const s of lv.solids) { if (s.grp === 'chasm' && !G.chasm.active) continue; if (s.tile && s.st === 2) continue; if (s.door && s.open) continue; c.push(s); }
   for (const b of lv.boxes) {
     if (!b.alive) continue; if (b.par) { const q = b.par; b.x = (q.x0 + q.x1) / 2 + (b.ox || 0); b.y = q.y1; b.z = (q.z0 + q.z1) / 2 + (b.oz || 0); }
-    if (b.type === 'rio') { const m = ((G.t + b.off) % b.cyc + b.cyc) % b.cyc; b.ph = m < 2.3 ? 0 : (m < 2.9 ? 1 : 2); if (b.ph === 2) continue; }
+    if (b.type === 'rio') { const m = ((G.t + b.off) % b.cyc + b.cyc) % b.cyc; b.ph = m < 2.6 ? 0 : (m < 3.1 ? 1 : 2); if (b.ph === 2) continue; }
     b.x0 = b.x - b.sx / 2; b.x1 = b.x + b.sx / 2; b.y0 = b.y; b.y1 = b.y + b.sy; b.z0 = b.z - b.sz / 2; b.z1 = b.z + b.sz / 2; c.push(b);
   }
 }
@@ -669,7 +950,7 @@ function updPlayer(dt) {
   else if (p.jbuf > 0 && save.dj && !p.dj && !p.onGround && p.coyote <= 0 && p.lock <= 0) { p.vy = 12.6; p.dj = true; p.jbuf = 0; p.jumped = true; AU.sfx('djump'); ring(p.x, p.y + .2, p.z); }
   if (p.jumped && p.vy > 6 && !inp.jump) { p.vy = 6; p.jumped = false; }
   // ataque giratorio
-  if ((PRESS.KeyJ || PRESS.KeyK || PRESS.ClickSpin) && p.spinCD <= 0 && p.slideT <= 0 && !p.crouch && p.lock <= 0) { p.spinT = .45; p.spinCD = .55; p.spinId++; AU.sfx('spin'); }
+  if ((PRESS.KeyD || PRESS.ClickSpin) && p.spinCD <= 0 && p.slideT <= 0 && !p.crouch && p.lock <= 0) { p.spinT = .45; p.spinCD = .55; p.spinId++; AU.sfx('spin'); }
   if (p.spinT > 0) { p.spinT -= dt; p.spinAng = (1 - Math.max(0, p.spinT) / .45) * TAU * 2; spinHit(); }
   // velocidad horizontal
   let sp = inp.run ? 11.5 : 8.5; if (p.crouch) sp = 3.4; if (p.spinT > 0) sp *= .92;
@@ -679,6 +960,8 @@ function updPlayer(dt) {
   if (p.lock <= 0 && (wx || wz) && p.slideT <= 0) p.yaw += wrapA(Math.atan2(wx, wz) - p.yaw) * Math.min(1, 16 * dt); else if (p.slideT > 0) p.yaw = Math.atan2(p.sdx, p.sdz);
   p.ph += Math.hypot(p.vx, p.vz) * dt * .62;
   p.vy -= (p.vy < 0 ? 46 : 38) * dt; if (p.vy < -32) p.vy = -32;
+  for (const w of lv.wind) if (p.x > w.x0 && p.x < w.x1 && p.z > w.z0 && p.z < w.z1 && (((G.t + w.ph) % w.per + w.per) % w.per) < w.on) { p.x += w.dx * w.str * dt; p.z += w.dz * w.str * dt; }
+  if (p.push && p.push.t > 0) { p.push.t -= dt; p.vx = p.push.vx; }
   carry(p); const wasG = p.onGround; p.onGround = false;
   const land = movePlayer(dt);
   if (land) {
@@ -688,13 +971,19 @@ function updPlayer(dt) {
   } else { p.ground = null; }
   if (side) { p.x += (zn.lockX - p.x) * Math.min(1, 10 * dt); p.vx = 0; }
   checkCicuta();
-  if (p.y < -14 && !p.dead) die(true);
+  if (p.y < -14 && !p.dead) die(true, 'void');
 }
-function hurt(kx, kz, why) { const p = G.p; if (p.dead || p.inv > 0 || p.win || G.cine) return; p.hp--; AU.sfx('hurt'); G.shake = .35; p.inv = 1.8; p.flash = .4; if (p.hp <= 0) { die(false); return; } p.lock = .28; p.vx = (kx || 0) * 7; p.vz = (kz || 0) * 7; p.vy = 8; p.slideT = 0; say(pick(PH.hurt), 2.4); updHUD(); }
-function die(voidD) { const p = G.p; if (p.dead) return; p.dead = true; p.deadT = 0; p.voidDeath = !!voidD; p.hp = 0; G.stats.deaths++; AU.sfx('die'); G.kairos = null; $('#kairos').classList.add('hide'); updHUD(); }
+function hurt(kx, kz, why) { const p = G.p; if (p.dead || p.inv > 0 || p.win || G.cine) return; p.hp--; AU.sfx('hurt'); G.shake = .35; p.inv = 1.8; p.flash = .4; if (p.hp <= 0) { die(false, why); return; } p.lock = .28; p.vx = (kx || 0) * 7; p.vz = (kz || 0) * 7; p.vy = 8; p.slideT = 0; say(pick(HMSG[why] || PH.hurt), 2.8); updHUD(); }
+function die(voidD, why) {
+  const p = G.p; if (p.dead) return; let cause = why || 'void';
+  if (voidD) cause = G.lv.id === '1' ? (G.t - (p.airPushT || -99) < 5 ? 'air' : 'water') : (why || 'void');
+  p.dead = true; p.deadT = 0; p.voidDeath = !!voidD; p.hp = 0; p.deathKind = cause; p.ashed = false; G.deathMsg = pick(MSG[cause] || PH.death); G.stats.deaths++; AU.sfx('die'); G.kairos = null; $('#kairos').classList.add('hide');
+  if (cause === 'fire') { burst(p.x, p.y + 1, p.z, 30, 0xff7a1a, 5); AU.sfx('boom'); } else if (cause === 'water') { burst(p.x, Math.max(p.y, -13) + .5, p.z, 26, 0x7fd8ff, 5); } updHUD();
+}
+function burn() { const p = G.p; if (p.dead || p.win) return; die(false, 'fire'); }
 function respawn() {
-  const p = newPlayer(G.cp.x, G.cp.y, G.cp.z); p.hp = 3; G.p = p; G.projs = []; for (const b of G.lv.boxes) if (b.alive && (b.state === 'fuse')) { b.state = 'idle'; b.t = 0; if (b.fl) { b.fl.life = 0; b.fl = null; } }
-  if (G.boss && !G.bossDead) { const e = G.boss; e.mode = 'float'; e.x = 0; e.z = 257; e.y = 2.3; e.t = 0; e.shoot = 2; e.orate = 6; }
+  const p = newPlayer(G.cp.x, G.cp.y, G.cp.z); p.hp = 3; G.p = p; G.projs = []; G.bfx = []; for (const b of G.lv.boxes) if (b.alive && (b.state === 'fuse')) { b.state = 'idle'; b.t = 0; if (b.fl) { b.fl.life = 0; b.fl = null; } }
+  if (G.boss && !G.bossDead) { const e = G.boss, A = lvA(); e.mode = 'float'; e.x = 0; e.z = A.zb; e.y = 2.3; e.t = 0; e.shoot = 2; e.orate = 6; }
   G.mode = 'play'; hideOv('defeat'); G.fade = 1; G.camY = G.cp.y; snapCam(); say('Desde la última estatua. «Conócete a ti mismo»… y a tus caídas.', 3); updHUD(true);
 }
 function setCheckpoint(x, y, z, id) { if (G.cp.id === id) return; G.cp = { x, y, z, id }; AU.sfx('check'); floater('Punto de control', x, y + 2.6, z, 'good', 1.8); say('Progreso guardado.', 2); }
@@ -737,7 +1026,7 @@ function breakBox(b, how) {
   b.alive = false; const col = { wood: 0xc98c4b, ceramic: 0xd9693f, check: 0xe6c25a, kairos: 0x8a5bd6, dioge: 0x7b5530, arist: 0xf1ead2, platon: 0x2f6fe0, bounce: 0x2fbf9f, aporia: 0xf08a1c, tnt: 0xd6342a, cicuta: 0x4cd04a }[b.type] || 0xcccccc;
   burst(b.x, b.y + b.sy / 2, b.z, 14, col, 5); AU.sfx(b.type === 'ceramic' ? 'clay' : 'break'); G.shake = Math.max(G.shake, .12);
   const d = b.drop || {}, ox = b.x, oy = b.y + .55, oz = b.z;
-  for (let i = 0; i < (d.coins || 0); i++) { const a = i / d.coins * TAU; G.lv.items.push({ k: 'coin', x: ox + Math.cos(a) * .7, y: oy + .3, z: oz + Math.sin(a) * .7, got: false, spawned: true }); }
+  for (let i = 0; i < (d.coins || 0); i++) { const a = i / d.coins * TAU; G.lv.items.push({ k: G.lv.coinsBad ? 'olive' : 'coin', x: ox + Math.cos(a) * .7, y: oy + .3, z: oz + Math.sin(a) * .7, got: false, spawned: true }); }
   if (d.amph) G.lv.items.push({ k: 'amph', x: ox, y: oy + .3, z: oz, got: false }); if (d.scroll !== undefined) G.lv.items.push({ k: 'scroll', x: ox, y: oy + .5, z: oz, id: d.scroll === 1 && b.type === 'arist' ? 1 : d.scroll, got: false });
   if (d.mask) G.lv.items.push({ k: 'mask', x: ox, y: oy + .4, z: oz, id: d.mask, got: false }); if (d.gem) G.lv.items.push({ k: 'gem', x: ox, y: oy + .4, z: oz, id: d.gem, got: false });
   floater(BN[b.type], b.x, b.y + 1.5, b.z, 'box', 1.3); if (how !== 'blast' && Math.random() < .22) say(pick(PH.box), 3);
@@ -763,23 +1052,25 @@ function updBoxes(dt) {
 
 /* ---- Objetos ---- */
 function updItems(dt) {
-  const p = G.p, lv = G.lv; if (p.dead || p.win) return; G.coinT -= dt; if (G.coinT <= 0) G.coinChain = 0;
+  const p = G.p, lv = G.lv; for (const it of lv.items) if (it.mov && !it.got) { const o = it.mov.amp * Math.sin(TAU * G.t / it.mov.per + it.mov.ph); if (it.mov.ax === 'x') it.x = it.bx + o; else it.z = it.bz + o; } if (p.dead || p.win) return; G.coinT -= dt; if (G.coinT <= 0) G.coinChain = 0;
   for (const it of lv.items) { if (it.got || it.hide) continue; const dx = it.x - p.x, dz = it.z - p.z; if (Math.abs(dx) < .85 && Math.abs(dz) < .85 && it.y - (p.y + .9) > -1.7 && it.y - (p.y + .9) < 1.5) collect(it); }
   if (G.dio && p.z >= G.dio.end) { for (const it of lv.items) if (it.hide) it.hide = false; if (!G.dio.fail) { G.stats.score += 500; G.stats.gems.push('Templanza'); floater('¡Autosuficiencia! +500 y gema de Templanza', p.x, p.y + 2.5, p.z, 'good', 2.6); AU.sfx('scroll'); say('Quien nada recoge, nada pierde… y puntúa.', 3.4); } G.dio = null; }
 }
 function collect(it) {
   it.got = true; const p = G.p, st = G.stats; if (G.dio && it.k !== 'coin') G.dio.fail = true;
   switch (it.k) {
-    case 'coin': st.coins++; st.score += 10; G.coinChain++; G.coinT = 1.1; AU.sfx('coin', 1 + Math.min(.7, G.coinChain * .045)); if (G.dio) G.dio.fail = true; break;
+    case 'olive': st.score += 20; AU.sfx('coin', .6); break;
+    case 'coin': if (G.lv.coinsBad) { st.bribes++; st.score = Math.max(0, st.score - 50); p.hp--; p.flash = .4; p.inv = Math.max(p.inv, .6); AU.sfx('hurt'); G.shake = .2; floater('Soborno aceptado: −1 ánfora', it.x, it.y + 1, it.z, '', 2.2); say(pick(PH.coin), 3.6); if (p.hp <= 0) die(false, 'bribe'); break; } st.coins++; st.score += 10; G.coinChain++; G.coinT = 1.1; if (G.lv.coinStyle === 'gota') AU.sfx('drip', 1 + Math.min(.6, G.coinChain * .04)); else AU.sfx('coin', 1 + Math.min(.7, G.coinChain * .045)); if (G.dio) G.dio.fail = true; break;
     case 'scroll': st.scrolls[it.id] = true; st.score += 500; AU.sfx('scroll'); floater('Pergamino de la Verdad ' + st.scrolls.filter(Boolean).length + '/3', it.x, it.y + 1.2, it.z, 'good', 2.4); say(pick(PH.scroll), 3.4); burst(it.x, it.y, it.z, 18, 0xfff2a0, 6); break;
     case 'amph': p.hp = Math.min(5, p.hp + 1); AU.sfx('scroll'); floater('+1 ánfora de sabiduría', it.x, it.y + 1, it.z, 'good', 1.8); break;
     case 'gem': st.gems.push(it.id); st.score += 300; AU.sfx('scroll'); floater('Gema: ' + it.id, it.x, it.y + 1, it.z, 'good', 2); break;
-    case 'feather': st.secret = true; st.score += 800; AU.sfx('scroll'); floater('Pluma de Platón: ¡secreto!', it.x, it.y + 1.2, it.z, 'good', 2.6); say(pick(PH.secret), 3.6); burst(it.x, it.y, it.z, 22, 0xffffff, 6); break;
+    case 'feather': st.secret = true; st.score += 800; AU.sfx('scroll'); floater((it.label || 'Pluma de Platón') + ': ¡secreto!', it.x, it.y + 1.2, it.z, 'good', 2.6); say(pick(PH.secret), 3.6); burst(it.x, it.y, it.z, 22, 0xffffff, 6); break;
     case 'mask': st.masks.push(it.id); st.score += 300; AU.sfx('scroll'); floater('Máscara teatral: ' + it.id, it.x, it.y + 1, it.z, 'good', 2.2); break;
   }
   updHUD();
 }
-function startDio() { const lv = G.lv; G.dio = { end: 222, fail: false }; for (const it of lv.items) if (it.k === 'coin' && !it.got && it.z > 196 && it.z < 222) it.hide = true; floater('Las monedas se esfuman… ¿serás autosuficiente?', G.p.x, G.p.y + 2.6, G.p.z, '', 2.6); }
+function startDio() { G.stats.score += 300; floater('Quien nada desea, nada necesita: +300', G.p.x, G.p.y + 2.6, G.p.z, 'good', 2.6); AU.sfx('scroll'); }
+function startDioOld() { const lv = G.lv; G.dio = { end: 222, fail: false }; for (const it of lv.items) if (it.k === 'coin' && !it.got && it.z > 196 && it.z < 222) it.hide = true; floater('Las monedas se esfuman… ¿serás autosuficiente?', G.p.x, G.p.y + 2.6, G.p.z, '', 2.6); }
 function startKairos() { if (G.kairos) return; G.kairos = { t: G.lv.kairos.time }; $('#kairos').classList.remove('hide'); AU.sfx('boss'); say('¡Kairos! Llega a la meta dorada antes de que se acabe el tiempo.', 3); }
 function updKairos(dt) {
   const k = G.kairos; if (!k) return; const p = G.p; k.t -= dt; $('#kairos').textContent = Math.max(0, k.t).toFixed(1) + ' s';
@@ -794,7 +1085,7 @@ function fireProj(e, spread, spd) { const p = G.p; let dx = p.x - e.x, dz = p.z 
 function updProjs(dt) { const p = G.p; for (const q of G.projs) { if (q.dead) continue; q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.life -= dt; if (q.life <= 0) q.dead = true; if (!p.dead && Math.hypot(q.x - p.x, q.z - p.z) < .6 && Math.abs(q.y - (p.y + .9)) < .9) { q.dead = true; hurt(q.vx * .1, q.vz * .1, 'arg'); } } G.projs = G.projs.filter((q) => !q.dead); }
 function killEnemy(e, how) {
   if (!e.alive) return; e.alive = false; e.dead = .6; G.stats.kills++; G.stats.score += 100; burst(e.x, e.y + 1, e.z, 14, 0xe8d8ff, 5); AU.sfx('poof');
-  const txt = { sofista: 'Argumento refutado', veloz: 'Retórica demasiado veloz', dogma: 'Un dogma menos', caster: 'Ilusión disipada', falacia: FALL[e.fal || 0][0] }[e.type] || 'Refutado';
+  const txt = { mito: 'Mito explicado: era la naturaleza', sofista: 'Argumento refutado', veloz: 'Retórica demasiado veloz', dogma: 'Un dogma menos', caster: 'Ilusión disipada', falacia: FALL[e.fal || 0][0] }[e.type] || 'Refutado';
   floater(txt, e.x, e.y + 2.4, e.z, 'good', 1.8); if (Math.random() < .5) say(pick(PH.sophist), 3);
   if (e.type === 'caster') dispel();
 }
@@ -825,14 +1116,15 @@ function enemyContact(e) {
   if (d < er + .33 && dy > -1.5 && dy < eh) { if (p.vy < -1 && p.y > e.y + eh * .5) { killEnemy(e, 'stomp'); p.vy = (KEYS.Space ? 14 : 10.5); p.jumped = false; p.coyote = 0; p.onGround = false; return; } if (p.inv <= 0) hurt(dx / d, dz / d, 'enemy'); }
 }
 /* ---- Jefe: el Maestro sofista ---- */
-function startBoss() { const e = G.lv.enemies.find((q) => q.boss); if (!e || !e.alive) return; G.boss = e; e.mode = 'idle'; dialog(DLG.boss0, () => { e.mode = 'float'; e.t = 0; e.shoot = 2; e.orate = 5; AU.music('boss'); AU.sfx('boss'); say('¡Aprovecha sus pausas! Golpéalo cuando se detenga a discursear.', 4); }); if (!save.chars.includes('maestro')) { save.chars.push('maestro'); writeSave(); } }
+function startBoss() { const e = G.lv.enemies.find((q) => q.boss); if (!e || !e.alive) return; G.boss = e; e.mode = 'idle'; dialog(G.lv.dlg.boss0, () => { e.mode = 'float'; e.t = 0; e.shoot = 2; e.orate = 5; AU.music('boss'); AU.sfx('boss'); say('¡Aprovecha sus pausas! Golpéalo cuando se detenga a discursear.', 4); }); for (const cid of (e.style === 'arche' ? ['arche'] : e.style === 'acus' ? ['meleto', 'anito', 'licon'] : ['maestro'])) if (!save.chars.includes(cid)) save.chars.push(cid); writeSave(); }
+const lvA = () => G.lv.arena || { zb: 257, zc: 253, zEnd: 260 };
 function updBoss(dt) {
-  const e = G.boss; if (!e || G.bossDead || !e.mode || e.mode === 'idle') return; const p = G.p, ph = 3 - e.hp; e.t += dt; e.ph += dt * 4;
+  const e = G.boss; if (!e || G.bossDead || !e.mode || e.mode === 'idle') return; if (e.style === 'arche') { updArche(dt); return; } const p = G.p, ph = Math.min(2, (e.hp0 || 3) - e.hp), A = lvA(); e.t += dt; e.ph += dt * 4;
   const spd = [.8, 1.1, 1.4][ph], shootInt = [2.6, 2.1, 1.6][ph];
-  if (e.mode === 'float') { e.x = Math.sin(e.t * spd) * 7.5; e.z = 257 + Math.sin(e.t * spd * .5) * 1.5; e.y = 2.3 + .25 * Math.sin(e.t * 3); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; e.shoot -= dt; e.orate -= dt;
+  if (e.mode === 'float') { e.x = Math.sin(e.t * spd) * 7.5; e.z = A.zb + Math.sin(e.t * spd * .5) * 1.5; e.y = 2.3 + .25 * Math.sin(e.t * 3); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; e.shoot -= dt; e.orate -= dt;
     if (e.shoot <= 0 && !p.dead) { const n = ph === 0 ? 3 : 5; for (let i = 0; i < n; i++) fireProj(e, (i - (n - 1) / 2) * .22, 6 + ph); e.shoot = shootInt; }
     if (e.orate <= 0) { e.mode = 'orate'; e.t = 0; e.sx = e.x; e.sz = e.z; floater('¡Voy a discursear!', e.x, e.y + 3, e.z, 'ask', 1.6); AU.sfx('boss'); } }
-  else if (e.mode === 'orate') { const k = Math.min(1, e.t / .8); e.x = lerp(e.sx, 0, k); e.z = lerp(e.sz, 253, k); e.y = lerp(2.3, .1, k); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 3.4) { e.mode = 'float'; e.t = 0; e.orate = 7 - ph; e.shoot = 1.2; } }
+  else if (e.mode === 'orate') { const k = Math.min(1, e.t / .8); e.x = lerp(e.sx, 0, k); e.z = lerp(e.sz, A.zc, k); e.y = lerp(2.3, .1, k); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 3.4) { e.mode = 'float'; e.t = 0; e.orate = 7 - ph; e.shoot = 1.2; } }
   else if (e.mode === 'hurt') { e.y += dt * 3; e.yaw += dt * 8; if (e.t > 1.3) { e.mode = 'float'; e.t = 0; e.shoot = 1.2; e.orate = 5.5 - ph * .6; } }
   else if (e.mode === 'dying') { e.y += dt * 2.5; e.yaw += dt * 10; if (e.t > 2.2) { e.mode = 'gone'; bossDefeated(); } return; }
   // contacto
@@ -840,34 +1132,94 @@ function updBoss(dt) {
   if (p.spinT > 0 && d < 2.4 && dy > -1.4 && dy < 2.4) { if (vuln) bossHit(e); else if (e.hitCD === undefined || G.t > e.hitCD) { e.hitCD = G.t + 1; floater('Solo se refuta cuando se detiene', e.x, e.y + 3.2, e.z, '', 1.4); } return; }
   if (d < 1.2 && dy > -1.5 && dy < 3.2) { if (p.vy < -1 && p.y > e.y + 1.8) { if (vuln) bossHit(e); else floater('Aún no… ¡espera su pausa!', e.x, e.y + 3.2, e.z, '', 1.4); p.vy = 12; p.jumped = false; p.coyote = 0; return; } if (p.inv <= 0) hurt(dx / d, dz / d, 'boss'); }
 }
-function bossHit(e) { e.hp--; e.mode = e.hp <= 0 ? 'dying' : 'hurt'; e.t = 0; AU.sfx('boom'); G.shake = .5; burst(e.x, e.y + 2, e.z, 24, 0xffd23a, 8); G.stats.score += 400; G.projs = []; floater(e.hp > 0 ? '¡Contraargumento!' : '¡Argumento refutado!', e.x, e.y + 3.4, e.z, 'good', 2); if (e.hp > 0) say(['Tu primera premisa tenía una grieta.', 'Y tu segunda no era mejor.'][2 - e.hp] || '', 3); }
-function bossDefeated() { G.bossDead = true; G.lv.enemies.find((q) => q.boss).alive = false; G.stats.kills++; AU.music('w1'); for (const t of G.lv.solids) if (t.tile) { t.st = 0; t.tm = 0; } dialog(DLG.boss1, () => { G.lv.gate.open = true; AU.sfx('gate'); say('La puerta del Templo de Atenea se ha abierto.', 3.5); G.lv.items.push({ k: 'coin', x: 0, y: 1, z: 255, got: false }); }); }
+function bossHit(e) { if (e.style === 'arche') { e.stage = (e.stage || 0) + 1; G.bfx = []; } e.hp--; e.mode = e.hp <= 0 ? 'dying' : 'hurt'; e.t = 0; AU.sfx('boom'); G.shake = .5; burst(e.x, e.y + 2, e.z, 24, 0xffd23a, 8); G.stats.score += 400; G.projs = []; floater(e.hp > 0 ? '¡Contraargumento!' : '¡Argumento refutado!', e.x, e.y + 3.4, e.z, 'good', 2); if (e.hp > 0 && G.lv.bossHitDlg && G.lv.bossHitDlg[(e.hp0 || 3) - e.hp - 1]) dialog(G.lv.bossHitDlg[(e.hp0 || 3) - e.hp - 1]); else if (e.hp > 0) say((G.lv.bossHit || ['Tu primera premisa tenía una grieta.', 'Y tu segunda no era mejor.', 'Y la tercera, aún menos.'])[(e.hp0 || 3) - e.hp - 1] || '', 3.2); }
+function bossDefeated() { G.bfx = []; G.bossDead = true; G.lv.enemies.find((q) => q.boss).alive = false; G.stats.kills++; AU.music('w1'); for (const t of G.lv.solids) if (t.tile) { t.st = 0; t.tm = 0; } dialog(G.lv.dlg.boss1, () => { G.lv.gate.open = true; AU.sfx('gate'); say('La puerta del Templo de Atenea se ha abierto.', 3.5); G.lv.items.push({ k: 'coin', x: 0, y: 1, z: 255, got: false }); }); }
 function updTiles(dt) {
-  const e = G.boss; if (!e || G.bossDead || (e.mode !== 'float' && e.mode !== 'orate' && e.mode !== 'hurt')) return; const ph = 3 - e.hp; if (ph < 1) return;
+  const e = G.boss; if (e && e.noTiles) return; if (!e || G.bossDead || (e.mode !== 'float' && e.mode !== 'orate' && e.mode !== 'hurt')) return; const ph = Math.min(2, (e.hp0 || 3) - e.hp); if (ph < 1) return;
   G.tileT -= dt; const tiles = G.lv.solids.filter((s) => s.tile);
   if (G.tileT <= 0) { G.tileT = 4.2 - ph * .8; const cand = tiles.filter((s) => s.r >= 1 && !s.st), n = ph === 1 ? 3 : 5; for (let i = 0; i < n && cand.length; i++) { const t = cand.splice((Math.random() * cand.length) | 0, 1)[0]; t.st = 1; t.tm = 1.3; } AU.sfx('ill'); }
   for (const t of tiles) { if (!t.st) continue; t.tm -= dt; if (t.tm <= 0) { if (t.st === 1) { t.st = 2; t.tm = 3.4; } else { t.st = 0; } } }
 }
 /* ---- Peligros y disparadores ---- */
-function updHazards(dt) { const p = G.p; if (p.dead) return; for (const h of G.lv.braziers) { const m = ((G.t + h.ph) % h.per + h.per) % h.per; h.lit = m < h.dur; if (h.lit && Math.hypot(h.x - p.x, h.z - p.z) < .95 && p.y < h.y + 1.9) hurt(0, -1, 'fuego'); } }
+function updPlates() {
+  const p = G.p, lv = G.lv; if (!lv.plates.length || p.dead) return;
+  for (const pl of lv.plates) { const on = p.onGround && Math.hypot(p.x - pl.x, p.z - pl.z) < .85 && Math.abs(p.y) < .3;
+    if (on && !pl.down) { pl.down = true;
+      if (pl.n === lv.plateSeq[G.plateIdx || 0]) { pl.lit = true; G.plateIdx = (G.plateIdx || 0) + 1; AU.tone([392, 523, 659, 784][G.plateIdx % 4], .5, 'triangle', .3); floater(String(pl.n), pl.x, 1.4, pl.z, 'good', 1.2);
+        if (G.plateIdx >= lv.plateSeq.length) { const door = lv.solids.find((s) => s.door); if (door) { door.open = true; burst((door.x0 + door.x1) / 2, 2, door.z0, 26, 0xffe27a, 6); } AU.sfx('gate'); say('La armonía abre la puerta de Pitágoras.', 3.4); } }
+      else { G.plateIdx = 0; for (const q of lv.plates) q.lit = false; AU.sfx('hurt'); floater('Desarmonía: vuelve a empezar', pl.x, 1.4, pl.z, '', 1.6); } }
+    if (!on) pl.down = false; }
+}
+function updHazards(dt) { const p = G.p; for (const w of G.lv.wind) if ((((G.t + w.ph) % w.per + w.per) % w.per) < w.on) for (let i = 0; i < 2; i++) G.parts.push({ x: rnd(w.x0, w.x1), y: rnd(.4, 2.6), z: rnd(w.z0, w.z1), vx: w.dx * 9, vy: 0, vz: w.dz * 9, life: .5, col: 0xe8f6ff, sz: .07, g: 0 });
+  updPita(dt);
+  for (const j of (G.lv.jets || [])) { const m = ((G.t + j.ph) % j.per + j.per) % j.per; j.st = m < j.tele ? 1 : (m < j.tele + j.dur ? 2 : 0);
+    if (j.st && Math.abs(j.z - p.z) < 16) for (let i = 0; i < 2; i++) G.parts.push({ x: j.side * 2.2, y: .5 + rnd(0, .9), z: j.z + rnd(-.25, .25), vx: -j.side * (j.st === 2 ? rnd(5, 9) : rnd(.5, 2)), vy: rnd(0, 1.5), vz: 0, life: .45, col: j.st === 2 ? 0xff8a2a : 0xcc3a1a, sz: j.st === 2 ? .17 : .1, g: 0 });
+    if (j.st === 2 && !p.dead && Math.abs(p.z - j.z) < .75 && Math.abs(p.x) < 2.5 && p.y < 1.8) burn(); }
+  if (p.dead) return; for (const h of G.lv.braziers) { const m = ((G.t + h.ph) % h.per + h.per) % h.per; h.lit = m < h.dur; if (h.lit && Math.hypot(h.x - p.x, h.z - p.z) < .95 && p.y < h.y + 1.9) burn(); } }
+/* ---- Sinfonía de Pitágoras ---- */
+const PNOTE = [0, 262, 295, 332, 349, 393, 442];
+const genSeq = () => { let q; do { q = Array.from({ length: 6 }, () => 1 + ((Math.random() * 6) | 0)); } while (new Set(q).size < 3); return q; };
+function litPlate(n, d) { const q = G.lv.plates.find((x) => x.n === n); if (!q) return; q.litT = d; AU.tone(PNOTE[n], .55, 'triangle', .34); AU.tone(PNOTE[n] * 2, .3, 'sine', .08); }
+function startPita() { const pg = G.pita = { seq: genSeq(), phase: 'show', si: 0, t: 1.3, idx: 0 }; say('Pitágoras: escucha la sinfonía…', 3); return pg; }
+function updPita(dt) {
+  const pg = G.pita, lv = G.lv, p = G.p; if (!lv.plates.length) return; for (const q of lv.plates) q.litT = Math.max(0, (q.litT || 0) - dt); if (!pg) return;
+  if (pg.phase === 'show') { pg.t -= dt; if (pg.t <= 0) { if (pg.si >= 6) { pg.phase = 'input'; pg.idx = 0; say('Tu turno: repite las 6 notas pisando las placas.', 3.2); } else { litPlate(pg.seq[pg.si++], .55); pg.t = .85; } } }
+  for (const q of lv.plates) { const on = !p.dead && p.onGround && Math.hypot(p.x - q.x, p.z - q.z) < .85 && Math.abs(p.y) < .3;
+    if (on && !q.down) { q.down = true;
+      if (q.r) { if (pg.phase === 'input') { pg.phase = 'show'; pg.si = 0; pg.t = .8; pg.idx = 0; floater('Otra vez…', q.x, 1.4, q.z, 'ask', 1.2); } }
+      else if (pg.phase === 'input') { litPlate(q.n, .45); if (q.n === pg.seq[pg.idx]) { pg.idx++; if (pg.idx >= 6) { pg.phase = 'done'; const door = lv.solids.find((d) => d.door); if (door) { door.open = true; burst((door.x0 + door.x1) / 2, 2, door.z0, 26, 0xffe27a, 6); } AU.sfx('gate'); say('La armonía abre la puerta de Pitágoras.', 3.4); } }
+        else { AU.sfx('hurt'); floater('Desafinado: ¡la sinfonía cambia!', q.x, 1.5, q.z, '', 1.8); pg.seq = genSeq(); pg.phase = 'show'; pg.si = 0; pg.t = 1.8; pg.idx = 0; } } }
+    if (!on) q.down = false; }
+}
+/* ---- El Arché: agua, aire y fuego ---- */
+function launchAttack(st, e) {
+  const A = lvA(), p = G.p;
+  if (st === 0) { const g1 = rnd(-6, 6); G.bfx.push({ k: 'wave', z: A.zb - 1, vz: -6.2, gapX: g1, gapW: 3.8, h: 1.7, delay: 0 }, { k: 'wave', z: A.zb - 1, vz: -6.2, gapX: g1 > 0 ? rnd(-7, -3) : rnd(3, 7), gapW: 3.8, h: 1.7, delay: 1.7 }); AU.sfx('boom'); }
+  else if (st === 1) { for (let i = 0; i < 3; i++) G.bfx.push({ k: 'torn', x: clamp(e.x + (i - 1) * 4, -8, 8), z: A.zb - 1, vz: -4.4, delay: i * .9, life: 9, a: 0 }); AU.sfx('ill'); }
+  else { e.volley = (e.volley || 0) + 1; for (let i = 0; i < 5; i++) { const ox = i === 0 ? 0 : rnd(-3.2, 3.2), oz = i === 0 ? 0 : rnd(-3.2, 3.2); G.bfx.push({ k: 'fire', x: clamp(p.x + ox, -9, 9), z: clamp(p.z + oz, A.zc - 9, A.zb + 1), tele: 1.0, act: .8, t: 0, delay: 0 }); } AU.sfx('ill'); }
+}
+function updBfx(dt) {
+  const p = G.p, A = lvA();
+  for (const f of G.bfx) {
+    if (f.delay > 0) { f.delay -= dt; continue; }
+    if (f.k === 'wave') { f.z += f.vz * dt; if (!p.dead && Math.abs(p.z - f.z) < .8 && p.y < f.h && Math.abs(p.x) < 12 && Math.abs(p.x - f.gapX) > f.gapW / 2) die(false, 'water'); if (f.z < A.zc - 14) f.dead = true; }
+    else if (f.k === 'torn') { f.a += dt; f.z += f.vz * dt; f.x += clamp(G.p.x - f.x, -2.4 * dt, 2.4 * dt); f.life -= dt; if (!p.dead && Math.hypot(p.x - f.x, p.z - f.z) < 1.25 && p.y < 3.5 && !(p.push && p.push.t > 0)) { const sg = p.x >= f.x ? 1 : -1; p.push = { vx: sg * 19, t: 1.1 }; p.vy = 8; p.lock = 1.1; p.airPushT = G.t; AU.sfx('boom'); burst(p.x, p.y + 1, p.z, 14, 0xe8f6ff, 6); f.dead = true; } if (f.life <= 0 || f.z < A.zc - 14) f.dead = true; }
+    else if (f.k === 'fire') { f.t += dt; if (f.t > f.tele && !f.burst) { f.burst = true; burst(f.x, .5, f.z, 16, 0xff8a2a, 5); AU.sfx('boom'); } if (f.t > f.tele && f.t < f.tele + f.act && !p.dead && Math.hypot(p.x - f.x, p.z - f.z) < 1.75 && p.y < 2.6) burn(); if (f.t >= f.tele + f.act) f.dead = true; }
+  }
+  G.bfx = G.bfx.filter((f) => !f.dead);
+}
+function updArche(dt) {
+  const e = G.boss, p = G.p, A = lvA(); if (e.mode === 'gone') return; e.t += dt; e.ph += dt * 4; const st = Math.min(2, e.stage || 0);
+  if (e.mode === 'float') { e.x = Math.sin(e.t * 1.1) * 6.5; e.z = A.zb + Math.sin(e.t * .6) * 1.2; e.y = 2.4 + .25 * Math.sin(e.t * 3); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 2) { e.mode = 'tele'; e.t = 0; floater(['¡AGUA!', '¡AIRE!', '¡FUEGO!'][st], e.x, e.y + 3.4, e.z, 'ask', 1.5); AU.sfx('boss'); } }
+  else if (e.mode === 'tele') { e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 1.3) { e.mode = 'attack'; e.t = 0; e.volley = 0; launchAttack(st, e); } }
+  else if (e.mode === 'attack') { if (st === 2 && e.volley < 3 && e.t > e.volley * 1.4) launchAttack(st, e); if (e.t > [5.0, 5.2, 6.0][st]) { e.mode = 'orate'; e.t = 0; e.sx = e.x; e.sz = e.z; G.bfx = []; floater('¡Ahora está vulnerable! Golpéalo', e.x, e.y + 3, e.z, 'good', 1.8); AU.sfx('boss'); } }
+  else if (e.mode === 'orate') { const k = Math.min(1, e.t / .8); e.x = lerp(e.sx, 0, k); e.z = lerp(e.sz, A.zc, k); e.y = lerp(2.4, .1, k); e.yaw = Math.atan2(p.x - e.x, p.z - e.z) || 0; if (e.t > 4.6) { e.mode = 'float'; e.t = 0; } }
+  else if (e.mode === 'hurt') { e.y += dt * 3; e.yaw += dt * 8; if (e.t > 1.3) { e.mode = 'float'; e.t = 0; } }
+  else if (e.mode === 'dying') { e.y += dt * 2.5; e.yaw += dt * 10; if (e.t > 2.2) { e.mode = 'gone'; bossDefeated(); } return; }
+  updBfx(dt);
+  if (p.dead || p.win || e.mode === 'hurt') return; const dx = p.x - e.x, dz = p.z - e.z, d = Math.hypot(dx, dz) || .001, dy = p.y - e.y, vuln = e.mode === 'orate' && e.y < 1.2;
+  if (p.spinT > 0 && d < 2.7 && dy > -1.4 && dy < 2.6) { if (vuln) bossHit(e); return; }
+  if (d < 1.4 && dy > -1.5 && dy < 3.4) { if (p.vy < -1 && p.y > e.y + 1.8) { if (vuln) bossHit(e); p.vy = 12; p.jumped = false; p.coyote = 0; return; } if (p.inv <= 0 && !vuln) hurt(dx / d, dz / d, 'boss'); }
+}
 function updTriggers(dt) {
   const p = G.p, lv = G.lv; if (p.dead) return;
   for (const tr of lv.triggers) { if (tr.done) continue; if (p.z >= tr.z0 && p.z <= tr.z1) {
     if (tr.id === 'boss') { tr.done = true; if (!G.bossDead) startBoss(); }
     else if (tr.id === 'chasm') { tr.done = true; const c = lv.enemies.find((q) => q.type === 'caster'); if (c && c.alive) { c.talking = true; dialog([{ w: 'Sofista', t: 'Estas plataformas son perfectamente sólidas. Fíate de mí.', ev: 'chasm' }, { w: 'Sócrates', t: 'Qué curioso: hoy todo el mundo me pide que confíe.' }], () => { c.talking = false; }); } else G.chasm.active = true; }
-    else if (tr.id === 'platon') { if (G.bossDead && !tr.done2) { tr.done = true; if (!save.chars.includes('platon')) save.chars.push('platon'); dialog(DLG.platon1, () => { save.dj = true; G.stats.dj = true; writeSave(); floater('¡Doble salto desbloqueado!', G.p.x, G.p.y + 2.6, G.p.z, 'good', 3); AU.sfx('win'); }); } }
+    else if (tr.id === 'pita') { tr.done = true; startPita(); }
+    else if (tr.id === 'platon') { if (G.bossDead && !tr.done2) { tr.done = true; if (lv.dlg.ability === 'dj' && !save.chars.includes('platon')) save.chars.push('platon'); dialog(lv.dlg.end, () => { if (lv.dlg.ability === 'dj') { save.dj = true; G.stats.dj = true; writeSave(); floater('¡Doble salto desbloqueado!', G.p.x, G.p.y + 2.6, G.p.z, 'good', 3); } AU.sfx('win'); }); } }
     else if (tr.hint) { if (tr.delay && !tr.t0) { tr.t0 = G.t; } if (!tr.delay || G.t - tr.t0 > tr.delay) { tr.done = true; hintShow(tr.hint, 5); } } } }
   if (G.chasm.active) G.chasm.t += dt;
   for (const s of lv.statues) if (!s.active && Math.hypot(s.x - p.x, s.z - p.z) < 2.3 && p.y < s.y + 1.5) { s.active = true; setCheckpoint(s.x > 0 ? s.x - 3 : s.x + 3.4, s.y, s.z, s.id); }
-  if (!G.bossDead && p.z > 260 && lv.enemies.some((q) => q.boss && q.alive)) { p.z = 260; p.vz = Math.min(p.vz, 0); }
+  if (!G.bossDead && p.z > lvA().zEnd && lv.enemies.some((q) => q.boss && q.alive)) { p.z = lvA().zEnd; p.vz = Math.min(p.vz, 0); }
   if (!lv.gate.open && p.z > lv.goalZ - 1) p.z = lv.goalZ - 1;
   if (lv.gate.open && p.z >= lv.goalZ - .4 && !p.win && !p.dead) finishLevel();
 }
 /* ---- Interacción, diálogos y escena ---- */
-function nearInteract() { const p = G.p, lv = G.lv; let best = null, bd = 2.1; for (const n of lv.npcs) { const d = Math.hypot(n.x - p.x, n.z - p.z); if (d < bd) { bd = d; best = { k: 'npc', o: n, t: 'Hablar con ' + (n.type === 'diog' ? 'Diógenes' : 'Platón') }; } } for (const t of lv.tablets) { const d = Math.hypot(t.x - p.x, t.z - p.z); if (d < bd) { bd = d; best = { k: 'tab', o: t, t: 'Leer inscripción' }; } } return best; }
+function nearInteract() { const p = G.p, lv = G.lv; let best = null, bd = 2.1; for (const n of lv.npcs) { const d = Math.hypot(n.x - p.x, n.z - p.z); if (d < bd) { bd = d; best = { k: 'npc', o: n, t: 'Hablar con ' + (CHARS[{ diog: 'diogenes' }[n.type] || n.type] || [n.type])[0] }; } } for (const t of lv.tablets) { const d = Math.hypot(t.x - p.x, t.z - p.z); if (d < bd) { bd = d; best = { k: 'tab', o: t, t: 'Leer inscripción' }; } } return best; }
 function doInteract(it) {
   if (it.k === 'tab') { const I = INSC[it.o.id]; if (!save.insc.includes(it.o.id)) { save.insc.push(it.o.id); writeSave(); G.stats.score += 150; } dialog([{ w: 'Inscripción antigua', t: '«' + I.t + '»\n' + (I.k === 'hist' ? 'Cita histórica · ' : 'Tradición/atribución · ') + I.src, noSfx: true }]); }
-  else { const n = it.o; if (!save.chars.includes(n.type === 'diog' ? 'diogenes' : 'platon')) { save.chars.push(n.type === 'diog' ? 'diogenes' : 'platon'); writeSave(); } dialog(n.type === 'diog' ? DLG.diog : DLG.platon0); }
+  else { const n = it.o, cid = { diog: 'diogenes' }[n.type] || n.type; if (!save.chars.includes(cid)) { save.chars.push(cid); writeSave(); } dialog(DLG[n.dlg]); }
 }
 function dialog(lines, onEnd) { G.dlg = { lines, i: 0, onEnd, c: 0, prev: G.mode === 'dialog' ? 'play' : G.mode, block: 0 }; G.mode = 'dialog'; $('#dialog').classList.remove('hide'); dlgLine(); }
 function dlgLine() { const d = G.dlg, l = d.lines[d.i]; d.c = 0; d.block = l.block || 0; $('#dlgWho').textContent = l.w; $('#dlgTxt').textContent = ''; $('#dlgHint').textContent = ''; if (l.ev) cineEvent(l.ev); }
@@ -885,6 +1237,7 @@ function cineEvent(ev) {
 }
 function updScene(dt) {
   G.shake = Math.max(0, G.shake - dt * 1.4); toastT -= dt; if (toastT <= 0) $('#toast').classList.remove('show'); hintTm -= dt; if (hintTm <= 0) $('#hint').classList.remove('show');
+  { const pp = G.p; if (pp && pp.dead) { if (pp.deathKind === 'fire') { if (pp.deadT < .9) for (let i = 0; i < 2; i++) G.parts.push({ x: pp.x + rnd(-.3, .3), y: pp.y + rnd(0, 1.6), z: pp.z + rnd(-.3, .3), vx: rnd(-.5, .5), vy: rnd(2, 4), vz: rnd(-.5, .5), life: .5, col: [0xff5a1a, 0xff9a2a, 0xffe27a][(Math.random() * 3) | 0], sz: rnd(.12, .22), g: -2 }); else if (!pp.ashed) { pp.ashed = true; burst(pp.x, pp.y + .6, pp.z, 36, 0x555555, 3.5); burst(pp.x, pp.y + .2, pp.z, 18, 0x222222, 2); } } else if (pp.deathKind === 'water' && pp.deadT < .7) for (let i = 0; i < 2; i++) G.parts.push({ x: pp.x + rnd(-.4, .4), y: pp.y + rnd(0, 1.6), z: pp.z + rnd(-.4, .4), vx: rnd(-1, 1), vy: rnd(0, 2), vz: rnd(-1, 1), life: .6, col: 0x7fd8ff, sz: rnd(.1, .2) }); } }
   for (const q of G.parts) { q.life -= dt; q.vy -= (q.g === undefined ? 14 : q.g) * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; } G.parts = G.parts.filter((q) => q.life > 0);
   for (const f of G.floats) f.life -= dt; for (let i = G.floats.length - 1; i >= 0; i--) if (G.floats[i].life <= 0) { G.floats[i].el.remove(); G.floats.splice(i, 1); }
   for (const i of G.lv.ills) { if (i.grp === 'intro') { if (i.on) i.fade = Math.min(1, (i.fade || 0) + dt / 1.2); } }
@@ -896,7 +1249,7 @@ function dust(x, y, z, n) { for (let i = 0; i < n; i++) { const a = Math.random(
 function ring(x, y, z, col, r) { for (let i = 0; i < 18; i++) { const a = i / 18 * TAU; G.parts.push({ x, y, z, vx: Math.cos(a) * (r || 2.5) * 2, vy: .5, vz: Math.sin(a) * (r || 2.5) * 2, life: .4, col: col || 0xfff2a0, sz: .1, g: 0 }); } }
 function togglePause() { if (G.mode === 'play') { G.mode = 'paused'; showOv('pause'); AU.sfx('ui'); } else if (G.mode === 'paused') { G.mode = 'play'; hideOv('pause'); } }
 function finishLevel() {
-  const p = G.p, st = G.stats, lv = G.lv; p.win = true; AU.sfx('win'); AU.music(null); const allS = st.scrolls.every(Boolean), amph = 1 + (allS ? 1 : 0) + ((st.secret || st.kairos) ? 1 : 0), rank = amph === 3 ? (st.t <= lv.par ? 'S' : 'A') : (amph === 2 ? 'B' : 'C');
+  const p = G.p, st = G.stats, lv = G.lv; p.win = true; AU.sfx('win'); AU.music(null); const allS = st.scrolls.every(Boolean), amph = 1 + (allS ? 1 : 0) + ((lv.coinsBad ? st.bribes === 0 : (st.secret || st.kairos)) ? 1 : 0), rank = amph === 3 ? (st.t <= lv.par ? 'S' : 'A') : (amph === 2 ? 'B' : 'C');
   st.amph = amph; st.rank = rank; const old = save.levels[G.lid] || {}; save.levels[G.lid] = { done: true, amph: Math.max(old.amph || 0, amph), time: old.time ? Math.min(old.time, st.t) : st.t, coins: Math.max(old.coins || 0, st.coins), scrolls: lv.totalScrolls ? st.scrolls.map((s, i) => s || !!(old.scrolls && old.scrolls[i])) : [], secret: !!(old.secret || st.secret || st.kairos), rank: (RK[old.rank] || 0) > RK[rank] ? old.rank : rank };
   save.obolos += st.coins; for (const m of st.masks) if (!save.masks.includes(m)) save.masks.push(m); save.last = G.lid; writeSave();
   setTimeout(() => { if (G.mode !== 'play') return; G.mode = 'victory'; fillVictory(); showOv('victory'); $('#hud').classList.add('hide'); }, 1900);
@@ -925,44 +1278,65 @@ function drawEnemy(e) {
   if (!e.alive) { if (e.dead > 0 && !e.boss) { const k = e.dead / .6; drawHuman(M4.mul(M4.T(e.x, e.y, e.z), M4.mul(M4.RY(e.yaw), M4.S(1 + (1 - k) * .4, k * .4 + .05, 1 + (1 - k) * .4))), STY[e.type === 'dogma' ? 'dogma' : 'sofista'], { a: k, sp: 0 }); } return; }
   const B = M4.mul(M4.T(e.x, e.y, e.z), M4.RY(e.yaw)), po = { ph: e.ph, sp: e.pause > 0 ? 0 : 1, t: G.t };
   if (e.type === 'sofista') { po.talk = 1; drawHuman(B, STY.sofista, po); }
+  else if (e.type === 'mito') { po.sp = 1; drawHuman(B, STY.mito, po); draw(MS, M4.trs(e.x, e.y + 2.4 + .1 * Math.sin(G.t * 3 + e.ph), e.z, 0, 0, 0, .22, .22, .22), 0x6ad0c8, { emis: 1, a: .8 }); }
   else if (e.type === 'veloz') { po.lean = .45; drawHuman(B, STY.veloz, po); }
   else if (e.type === 'falacia') { const c = FALL[e.fal || 0][1]; drawHuman(B, Object.assign({}, STY.falacia, { tunic: c, mantle: shade(c, .75), belt: shade(c, 1.3) }), po); }
   else if (e.type === 'dogma') { drawHuman(B, STY.dogma, po); draw(MB, M4.mul(B, M4.trs(0, 1.05, .8, 0, 0, 0, 1.55, 1.5, .2)), 0xffffff, { tex: TX.shield, rim: .2 }); }
   else if (e.type === 'caster') { po.sp = 0; po.talk = 1; drawHuman(B, STY.sofista, po); draw(MS, M4.trs(e.x, e.y + 2.6 + .1 * Math.sin(G.t * 3), e.z, 0, 0, 0, .35, .35, .35), 0xffe27a, { emis: 1, a: .8 }); if (G.chasm.active && !G.chasm.dispelled) draw(MD, M4.trs(e.x, e.y + .04, e.z, 0, 0, 0, 1.1 + .15 * Math.sin(G.t * 5), 1, 1.1 + .15 * Math.sin(G.t * 5)), 0xffe27a, { a: .35, emis: 1 }); }
   drawShadow(e.x, e.y, e.z, .7, .3);
 }
+function burntStyle(st, k) { const o = Object.assign({}, st); for (const key of ['skin', 'tunic', 'belt', 'mantle', 'hair', 'beard', 'sandal', 'nose', 'brow']) o[key] = shade(st[key], k); return o; }
+function drawDrop(x, y, z, t) { const by = y + .08 * Math.sin(t * 3 + x); draw(MS, M4.trs(x, by, z, 0, 0, 0, .17, .2, .17), 0x3aa8ff, { a: .85, emis: .5, rim: .7 }); draw(MC(.1, 0, false), M4.trs(x, by + .12, z, 0, 0, 0, 1, .3, 1), 0x3aa8ff, { a: .85, emis: .5 }); draw(MS, M4.trs(x - .05, by + .04, z + .07, 0, 0, 0, .05, .05, .05), 0xffffff, { emis: 1 }); }
+function drawArche(e) {
+  if (e.mode === 'gone') return; const t = G.t, ph = Math.min(2, e.stage || 0), cols = [0x3a9fff, 0xdff4ff, 0xff7a1a, 0xb08aff], vul = e.mode === 'orate' && e.y < 1.2, fl = (e.mode === 'hurt' || e.mode === 'dying') && Math.floor(t * 14) % 2, c = fl ? 0xffffff : cols[ph], k = 1 + .05 * Math.sin(t * 4);
+  draw(MS, M4.trs(e.x, e.y + 1.8, e.z, 0, 0, 0, 1.55 * k, 1.55 * k, 1.55 * k), c, { emis: .7, a: .78, rim: .6 }); if (e.mode === 'tele') draw(MS, M4.trs(e.x, e.y + 1.8, e.z, 0, 0, 0, 2.4 + .3 * Math.sin(t * 14), 2.4 + .3 * Math.sin(t * 14), 2.4 + .3 * Math.sin(t * 14)), c, { a: .25, emis: 1 }); draw(MS, M4.trs(e.x, e.y + 1.8, e.z, 0, 0, 0, .85, .85, .85), 0xffffff, { emis: 1 });
+  for (let i = 0; i < 4; i++) { const a = t * 1.3 + i * TAU / 4; draw(MS, M4.trs(e.x + Math.cos(a) * 2.5, e.y + 1.8 + Math.sin(a * 2) * .5, e.z + Math.sin(a) * 2.5, 0, 0, 0, .32, .32, .32), cols[i], { emis: .9 }); }
+  const fx = Math.sin(e.yaw), fz = Math.cos(e.yaw); draw(MS, M4.trs(e.x + fx * 1.4, e.y + 2, e.z + fz * 1.4, 0, 0, 0, .4, .4, .4), 0xffffff, { emis: .6 }); draw(MS, M4.trs(e.x + fx * 1.75, e.y + 2, e.z + fz * 1.75, 0, 0, 0, .17, .17, .17), 0x111111);
+  if (vul) draw(MD, M4.trs(e.x, e.y + .05, e.z, 0, 0, 0, 2.2 + .2 * Math.sin(t * 9), 1, 2.2 + .2 * Math.sin(t * 9)), 0xffd23a, { a: .45, emis: 1 });
+  drawShadow(e.x, 0, e.z, 1.7, .3);
+}
 function drawBoss(e) {
+  if (e.style === 'arche') { drawArche(e); return; }
   if (!e.alive && e.mode !== 'dying' && e.mode !== 'gone') return; if (e.mode === 'gone') return;
   const B = M4.mul(M4.T(e.x, e.y, e.z), M4.RY(e.yaw)), po = { ph: e.ph, sp: .2, t: G.t, talk: e.mode === 'orate' || e.mode === 'float' ? 1 : 0, mouth: e.mode === 'orate' ? 1 : 0, flash: e.mode === 'hurt' || e.mode === 'dying' ? (Math.floor(G.t * 14) % 2) : 0, air: 0 };
-  drawHuman(B, STY.maestro, po);
+  drawHuman(B, STY[e.style === 'acus' ? ['licon', 'licon', 'anito', 'meleto'][Math.max(0, Math.min(3, e.hp))] : 'maestro'], po);
   draw(MB, M4.mul(B, M4.trs(0, -.08, 0, 0, 0, 0, 3.2, .14, 2.2)), 0xb0182c, { emis: .15, rim: .3 }); draw(MB, M4.mul(B, M4.trs(0, -.02, 0, 0, 0, 0, 3.4, .06, 2.4)), 0xffd23a, { emis: .3 });
   if (e.mode === 'orate' && e.y < 1.2) draw(MS, M4.trs(e.x, e.y + 1.8, e.z, 0, 0, 0, 2.6, 2.9, 2.6), 0xffd23a, { a: .16 + .08 * Math.sin(G.t * 9), emis: 1 });
   drawShadow(e.x, 0, e.z, 1.5, .3);
 }
 function drawPlayer() {
   const p = G.p, spd = Math.hypot(p.vx, p.vz), yaw = p.yaw + (p.spinT > 0 ? p.spinAng : 0);
+  let baseSty = STY[G.lv.hero || 'soc'];
+  if (p.dead && p.deathKind === 'fire' && p.deadT > .95) { draw(MD, M4.trs(p.x, p.y + .05, p.z, 0, 0, 0, .65, 1, .65), 0x3a3a3a); draw(MD, M4.trs(p.x + .2, p.y + .06, p.z - .1, 0, 0, 0, .3, 1, .3), 0x555555); return; }
   const po = { ph: p.ph, sp: p.onGround ? Math.min(1, spd / 9) : 0, air: !p.onGround && !p.dead && !p.win, spin: p.spinT > 0, crouch: p.h < 1 ? 1 : 0, t: G.t, flash: p.flash > 0 ? .9 : 0, win: p.win, die: p.dead ? Math.min(1, p.deadT * 2.2) : 0, lean: p.slideT > 0 ? .9 : 0 };
   if (p.inv > 0 && !p.dead && Math.floor(G.t * 18) % 2 === 0) po.a = .35;
-  drawHuman(M4.mul(M4.T(p.x, p.y, p.z), M4.RY(yaw)), STY.soc, po);
+  if (p.dead && p.deathKind === 'fire') { baseSty = burntStyle(baseSty, clamp(1 - p.deadT / .9, .12, 1)); po.die = 0; po.win = true; po.flash = clamp(1.1 - p.deadT, 0, 1); }
+  else if (p.dead && p.deathKind === 'water') { po.a = clamp(1 - p.deadT * .6, .05, 1); po.flash = .5; }
+  drawHuman(M4.mul(M4.T(p.x, p.y, p.z), M4.RY(yaw)), baseSty, po);
   const g = groundAt(p.x, p.z, p.y + .4); if (g > -50 && !(p.dead && p.voidDeath)) drawShadow(p.x, g, p.z, .62 * (1 - clamp((p.y - g) / 9, 0, .75)), .4);
   if (p.spinT > 0) { const k = p.spinT / .45; draw(MD, M4.trs(p.x, p.y + .9, p.z, 0, 0, 0, 1.9, 1, 1.9), 0xfff0a0, { a: .22 * k + .1, emis: 1 }); draw(MD, M4.trs(p.x, p.y + .5, p.z, 0, 0, 0, 1.5, 1, 1.5), 0xffffff, { a: .14, emis: 1 }); }
   if (p.slideT > 0) dust(p.x, p.y, p.z, 1);
 }
 function drawScene() {
   const lv = G.lv, t = G.t, cam = G.cam, cz = cam.z, nz = (a, b) => b > cz - 45 && a < cz + 100;
-  draw(MD, M4.trs(cam.x, -14, cam.z, 0, 0, 0, 700, 1, 700), 0x2f86b8, { fx: 2 });
+  draw(MD, M4.trs(cam.x, -14, cam.z, 0, 0, 0, 700, 1, 700), lv.seaCol || 0x2f86b8, { fx: 2 });
   for (const pr of lv.props) {
     if (pr.t === 'hill' || pr.t === 'temple' || pr.t === 'cloud') { if (!nz(pr.z - 40, pr.z + 40)) continue; } else if (!nz(pr.z - 6, pr.z + 6)) continue;
     switch (pr.t) {
       case 'island': draw(MB, M4.trs(pr.x, -2, pr.z, 0, 0, 0, pr.w, 4, pr.d), 0xffffff, { tex: TX.stone, tile: [pr.w / 2.2, 1.8, pr.d / 2.2] }); break;
       case 'column': drawColumn(pr.x, pr.y, pr.z, pr.h, .45); break; case 'tree': drawTree(pr.x, pr.y, pr.z, pr.s, pr.kind); break;
       case 'stall': drawStall(pr.x, pr.y, pr.z, pr.rot, pr.c); break; case 'amph': drawAmphoraBig(pr.x, pr.y, pr.z, pr.s, pr.c); break; case 'temple': drawTemple(pr.x, pr.y, pr.z, pr.w, pr.d, pr.h, pr.rot); break;
+      case 'house': draw(MB, M4.trs(pr.x, pr.y + pr.h / 2, pr.z, 0, 0, 0, pr.w, pr.h, pr.d), pr.c, { tex: TX.marble, tile: [pr.w / 3, pr.h / 3, pr.d / 3], rim: .1 }); draw(MPR, M4.trs(pr.x, pr.y + pr.h, pr.z, 0, 0, 0, pr.w + .5, 1.2, pr.d + .5), 0xc8693a, { rim: .1 }); draw(MB, M4.trs(pr.x, pr.y + .9, pr.z + pr.d / 2 + .02, 0, 0, 0, .8, 1.8, .1), 0x3a7bd5); break;
+      case 'sailboat': draw(MB, M4.trs(pr.x, pr.y + .35, pr.z, 0, pr.rot, 0, 1.6, .7, 4.2), 0x9a6a3a, { rim: .1 }); draw(MC(.07, .07, false), M4.trs(pr.x, pr.y + .7, pr.z, 0, pr.rot, 0, 1, 4.2, 1), 0x6a4a2a); draw(MB, M4.mul(M4.T(pr.x, pr.y + 2.8, pr.z), M4.mul(M4.RY(pr.rot), M4.trs(0, 0, .3, 0, 0, 0, .06, 2.6, 2.2))), 0xfaf6ea, { rim: .2 }); break;
+      case 'stands': { const sd = pr.side; for (let ti = 0; ti < 3; ti++) { const cx = pr.x + sd * ti * 1.7, hh = .9 * (ti + 1); draw(MB, M4.trs(cx, hh / 2, pr.z, 0, 0, 0, 1.8, hh, pr.d), 0xffffff, { tex: TX.marble, tile: [1, hh / 2, pr.d / 2.5], rim: .08 });
+        for (let i = 0; i < 12; i++) { const jz = pr.z - pr.d / 2 + 1.2 + i * (pr.d - 2.4) / 11, pal = [0xe8d8b0, 0x8a6a4a, 0xc84a3a, 0x3a6ab0, 0xd9b04a][(i * 7 + ti * 3) % 5]; draw(MB, M4.trs(cx, hh + .3, jz, 0, 0, 0, .5, .6, .5), pal, { rim: .15 }); draw(MS, M4.trs(cx, hh + .75, jz, 0, 0, 0, .2, .22, .2), 0xe9b88a, { rim: .2 }); } } break; }
       case 'hill': draw(MS, M4.trs(pr.x, pr.y, pr.z, 0, 0, 0, pr.s * 1.6, pr.s, pr.s * 1.6), 0x7f9a6a, { rim: .1 }); break;
       case 'cloud': draw(MS, M4.trs(pr.x + Math.sin(t * .03 + pr.z) * 3, pr.y, pr.z, 0, 0, 0, pr.s * 1.8, pr.s * .55, pr.s), 0xffffff, { a: .85, emis: .6 }); break;
     }
   }
   for (const s of lv.solids) {
-    if (s.style === 'ped' || !nz(s.z0, s.z1)) continue; let a = 1;
+    if (s.style === 'ped' || (s.door && s.open) || !nz(s.z0, s.z1)) continue; let a = 1;
+    if (s.style === 'boat') { const mx = (s.x0 + s.x1) / 2, mz = (s.z0 + s.z1) / 2; draw(MC(.06, .06, false), M4.trs(mx, 0, mz, 0, 0, 0, 1, 3.2, 1), 0x6a4a2a); draw(MB, M4.trs(mx + .05, 2.2, mz, 0, 0, 0, .05, 1.8, 1.6), 0xfaf6ea, { rim: .2 }); }
     if (s.grp === 'chasm') { if (!G.chasm.active) continue; a = clamp((G.chasm.t - (s.z0 - 150) / 24) / .7, 0, 1); if (a <= 0) continue; }
     if (s.tile) { if (s.st === 2) { draw(MB, M4.trs((s.x0 + s.x1) / 2, -.1, (s.z0 + s.z1) / 2, 0, 0, 0, s.x1 - s.x0, .2, s.z1 - s.z0), 0xf6e7a0, { tex: TX.ill, fx: 1, a: .5, tile: [2, 1, 2] }); continue; } if (s.st === 1 && Math.floor(t * 12) % 2 === 0) a = .4; }
     drawSolid(s, a);
@@ -971,16 +1345,28 @@ function drawScene() {
     let a = 0; if (i.grp === 'intro') a = i.fade || 0; else if (i.grp === 'chasm') { if (!G.chasm.active || G.chasm.dispelled) continue; a = clamp((G.chasm.t - (i.z0 - 150) / 24) / .7, 0, 1); } if (a <= 0 || !nz(i.z0, i.z1)) continue;
     draw(MB, M4.trs((i.x0 + i.x1) / 2, -.15, (i.z0 + i.z1) / 2, 0, 0, 0, i.x1 - i.x0, .3, i.z1 - i.z0), 0xffffff, { tex: TX.ill, fx: 1, a, tile: [(i.x1 - i.x0) / 2.4, 1, (i.z1 - i.z0) / 2.4] });
   }
-  for (const b of lv.boxes) { if (!b.alive || !nz(b.z, b.z)) continue; if (b.type === 'rio' && b.ph === 2) { draw(MB, M4.trs(b.x, b.y + b.sy / 2, b.z, 0, 0, 0, b.sx, b.sy, b.sz), 0xffffff, { tex: TX.rio, fx: 1, a: .35 }); continue; } drawBoxTex(b, t); }
-  for (const it of lv.items) { if (it.got || it.hide || !nz(it.z, it.z)) continue; switch (it.k) { case 'coin': drawCoin(it.x, it.y, it.z, t); break; case 'scroll': drawScroll(it.x, it.y, it.z, t); break; case 'amph': drawAmphoraItem(it.x, it.y, it.z, t); break; case 'gem': drawGem(it.x, it.y, it.z, t, it.id === 'Justicia' ? 0xff5a5a : it.id === 'Templanza' ? 0x5affb0 : 0x5aa8ff); break; case 'feather': drawFeather(it.x, it.y, it.z, t); break; case 'mask': drawMaskItem(it.x, it.y, it.z, t); break; } }
+  for (const b of lv.boxes) { if (!b.alive || !nz(b.z, b.z)) continue; if (b.type === 'rio' && b.ph === 2) { draw(MB, M4.trs(b.x, b.y + b.sy / 2, b.z, 0, 0, 0, b.sx, b.sy, b.sz), 0xffffff, { tex: TX.rio, fx: 1, a: .35 }); continue; } drawBoxTex(b, t);
+    if (G.p && Math.abs(b.z - G.p.z) < 32 && b.alive) { const brk = b.type === 'wood' || b.type === 'ceramic' || b.type === 'kairos' || b.type === 'dioge' || b.type === 'platon' || b.type === 'arist' || b.type === 'tnt'; const bob = Math.sin(t * 4 + b.x);
+      if (brk) { draw(MC(.26, 0, false), M4.trs(b.x, b.y + b.sy + .72 + .1 * bob, b.z, Math.PI, 0, 0, 1, .55, 1), 0xffd23a, { emis: .9, rim: .5 }); draw(MD, M4.trs(b.x, b.y + .03, b.z, 0, 0, 0, .95 + .08 * bob, 1, .95 + .08 * bob), 0xffd23a, { a: .3 + .1 * bob, emis: 1 }); }
+      else if (b.type === 'bounce') { draw(MC(.26, 0, false), M4.trs(b.x, b.y + b.sy + .72 + .1 * bob, b.z, Math.PI, 0, 0, 1, .55, 1), 0x5affc8, { emis: .9, rim: .5 }); }
+      else if (b.type === 'cicuta') draw(MD, M4.trs(b.x, b.y + .03, b.z, 0, 0, 0, .98 + .06 * bob, 1, .98 + .06 * bob), 0xff2a2a, { a: .3 + .12 * bob, emis: 1 }); } }
+  for (const it of lv.items) { if (it.got || it.hide || !nz(it.z, it.z)) continue; switch (it.k) { case 'coin': if (lv.coinStyle === 'gota') drawDrop(it.x, it.y, it.z, t); else drawCoin(it.x, it.y, it.z, t); if (lv.coinsBad) draw(MD, M4.trs(it.x, it.y, it.z, 0, 0, 0, .55, 1, .55), 0xff3a3a, { a: .2 + .1 * Math.sin(t * 5), emis: 1 }); break; case 'olive': draw(MS, M4.trs(it.x - .08, it.y + .06 * Math.sin(t * 3 + it.x), it.z, 0, 0, 0, .13, .17, .13), 0x6a8a2a, { emis: .25, rim: .4 }); draw(MS, M4.trs(it.x + .1, it.y + .06 * Math.sin(t * 3 + it.x + 1), it.z + .04, 0, 0, 0, .12, .16, .12), 0x8aaa3a, { emis: .25, rim: .4 }); break; case 'scroll': drawScroll(it.x, it.y, it.z, t); break; case 'amph': drawAmphoraItem(it.x, it.y, it.z, t); break; case 'gem': drawGem(it.x, it.y, it.z, t, it.id === 'Justicia' ? 0xff5a5a : it.id === 'Templanza' ? 0x5affb0 : 0x5aa8ff); break; case 'feather': drawFeather(it.x, it.y, it.z, t); break; case 'mask': drawMaskItem(it.x, it.y, it.z, t); break; } }
+  for (const pl of lv.plates) if (nz(pl.z, pl.z)) { const col = pl.r ? 0xffd23a : [0xff5a5a, 0xffa03a, 0xffe45a, 0x5aff8a, 0x5ab4ff, 0xb07aff][pl.n - 1], on = (pl.litT || 0) > 0; draw(MD, M4.trs(pl.x, .07, pl.z, 0, 0, 0, .85, 1, .85), col, { emis: on ? 1 : .15, rim: .3 }); if (on) draw(MS, M4.trs(pl.x, .5, pl.z, 0, 0, 0, 1.2, .6, 1.2), col, { a: .3, emis: 1 }); draw(MQ, M4.trs(pl.x, 1.05, pl.z, 0, G.bbYaw, 0, pl.r ? 1.5 : 1.1, .28, 1), 0xffffff, { tex: labelTex(pl.r ? 'Repetir' : String(pl.n), '#2b3f5c', '#ffe27a'), emis: .4 }); }
   for (const s of lv.statues) if (nz(s.z, s.z)) drawStatue(s, t);
-  for (const n of lv.npcs) if (nz(n.z, n.z)) { const B = M4.mul(M4.T(n.x, n.y, n.z), M4.RY(n.yaw)); if (n.type === 'diog') { draw(MC(.62, .62, false), M4.trs(n.x + Math.sin(n.yaw + 1.57) * .1, 0, n.z - .9, 0, 0, 0, 1, 1.3, 1), 0x8a5a2c, { rim: .1 }); draw(MC(.64, .64, false), M4.trs(n.x, .25, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); draw(MC(.64, .64, false), M4.trs(n.x, .95, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); } drawHuman(B, STY[n.type === 'diog' ? 'diog' : 'platon'], { t, talk: Math.sin(t * .8) > .6 ? 1 : 0 }); drawShadow(n.x, n.y, n.z, .7, .3); }
+  for (const n of lv.npcs) if (nz(n.z, n.z)) { const B = M4.mul(M4.T(n.x, n.y, n.z), M4.RY(n.yaw)); if (n.type === 'diog') { draw(MC(.62, .62, false), M4.trs(n.x + Math.sin(n.yaw + 1.57) * .1, 0, n.z - .9, 0, 0, 0, 1, 1.3, 1), 0x8a5a2c, { rim: .1 }); draw(MC(.64, .64, false), M4.trs(n.x, .25, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); draw(MC(.64, .64, false), M4.trs(n.x, .95, n.z - .9, 0, 0, 0, 1, .08, 1), 0x3a3a3a); } drawHuman(B, STY[n.type] || STY.platon, { t, talk: Math.sin(t * .8) > .6 ? 1 : 0 }); drawShadow(n.x, n.y, n.z, .7, .3); }
   for (const tb of lv.tablets) if (nz(tb.z, tb.z)) { draw(MB, M4.trs(tb.x, .75, tb.z, 0, .3, 0, .9, 1.5, .25), 0xffffff, { tex: TX.board, tile: [1, 1, 1], rim: .2 }); if (!save.insc.includes(tb.id)) draw(MS, M4.trs(tb.x, 1.9 + .1 * Math.sin(t * 3), tb.z, 0, 0, 0, .15, .15, .15), 0xffe27a, { emis: 1 }); }
   for (const h of lv.braziers) if (nz(h.z, h.z)) drawBrazier(h, h.lit, t);
+  for (const j of (lv.jets || [])) if (nz(j.z, j.z)) { const nx = j.side * 2.45; draw(MB, M4.trs(nx, .55, j.z, 0, 0, 0, .7, 1.1, .8), 0x7a5a2a, { rim: .2 }); draw(MS, M4.trs(nx - j.side * .38, .7, j.z, 0, 0, 0, .2, .2, .2), j.st ? 0xff6a1a : 0x2a1a10, { emis: j.st ? 1 : 0 });
+    if (j.st === 1) draw(MB, M4.trs(0, .05, j.z, 0, 0, 0, 4.6, .05, 1.3), 0xff3a1a, { a: .22 + .2 * Math.sin(t * 18), emis: 1 });
+    if (j.st === 2) for (let i = 0; i < 6; i++) { const fx = j.side * (2.0 - i * .8); draw(MC(.42, 0, false), M4.trs(fx, 0, j.z, 0, t * 5 + i, 0, 1, 1.7 + .3 * Math.sin(t * 22 + i), 1), 0xff7a1a, { emis: 1, a: .9 }); draw(MC(.22, 0, false), M4.trs(fx, 0, j.z, 0, -t * 6 + i, 0, 1, 1.1, 1), 0xffe27a, { emis: 1, a: .9 }); } }
   drawGate(lv.gate, t);
   if (G.intro) { const I = G.intro; drawHuman(M4.mul(M4.T(I.x, I.y, I.z), M4.RY(I.yaw)), STY.sofista, { t, talk: I.state === 'idle' ? 1 : 0, sp: I.state === 'walk' ? 1 : 0, ph: I.t * 6, air: I.state === 'fall', flash: 0 }); if (I.state !== 'fall' && I.state !== 'gone') drawShadow(I.x, I.y, I.z, .7, .3); }
   for (const e of lv.enemies) { if (e.boss) { if (nz(e.z - 10, e.z + 10)) drawBoss(e); } else if (nz(e.z, e.z)) drawEnemy(e); }
-  for (const q of G.projs) { draw(MQ, M4.trs(q.x, q.y, q.z, 0, G.bbYaw, 0, 1.5, .38, 1), 0xffffff, { tex: labelTex(q.word, '#3a1d5c', '#ffe27a'), emis: .5, a: .98 }); }
+  for (const q of G.projs) { if (lv.coinsBad) { draw(MC(.3, .3, false), M4.trs(q.x, q.y, q.z, Math.PI / 2, t * 9 + q.x, 0, 1, .09, 1), 0xffc928, { emis: .8, rim: .7 }); draw(MS, M4.trs(q.x, q.y, q.z, 0, 0, 0, .5, .5, .5), 0xff4040, { a: .22, emis: 1 }); } else draw(MQ, M4.trs(q.x, q.y, q.z, 0, G.bbYaw, 0, 1.5, .38, 1), 0xffffff, { tex: labelTex(q.word, '#3a1d5c', '#ffe27a'), emis: .5, a: .98 }); }
+  for (const f of G.bfx) { if (f.delay > 0) continue;
+    if (f.k === 'wave') { const l0 = -12, l1 = f.gapX - f.gapW / 2, r0 = f.gapX + f.gapW / 2, r1 = 12; for (const [a, b] of [[l0, l1], [r0, r1]]) if (b > a) { draw(MB, M4.trs((a + b) / 2, f.h / 2, f.z, 0, 0, 0, b - a, f.h, 1.1), 0x3a9fff, { a: .72, emis: .4, rim: .6 }); draw(MB, M4.trs((a + b) / 2, f.h, f.z, 0, 0, 0, b - a, .18, 1.3), 0xffffff, { a: .8, emis: .8 }); } }
+    else if (f.k === 'torn') { for (let i = 0; i < 6; i++) { const r = .3 + i * .17; draw(MC(r, r * 1.1, false), M4.trs(f.x + .12 * Math.sin(f.a * 5 + i), i * .62, f.z, 0, f.a * 7 + i, 0, 1, .62, 1), 0xe8f6ff, { a: .55, emis: .5 }); } }
+    else if (f.k === 'fire') { if (f.t <= f.tele) draw(MD, M4.trs(f.x, .06, f.z, 0, 0, 0, 1.75, 1, 1.75), 0xff2a1a, { a: .3 + .25 * Math.sin(t * 16), emis: 1 }); else { draw(MC(1.5, .35, false), M4.trs(f.x, 0, f.z, 0, t * 6, 0, 1, 3.4 + .4 * Math.sin(t * 20), 1), 0xff7a1a, { emis: 1, a: .85 }); draw(MC(.8, .1, false), M4.trs(f.x, 0, f.z, 0, -t * 8, 0, 1, 2.6, 1), 0xffe27a, { emis: 1, a: .9 }); } } }
   for (const q of G.parts) { const k = clamp(q.life / .5, 0, 1); draw(MB, M4.trs(q.x, q.y, q.z, 0, 0, 0, q.sz * (.4 + k), q.sz * (.4 + k), q.sz * (.4 + k)), q.col, { emis: .6 }); }
   if (G.p && !G.preview) drawPlayer();
   if (G.kairos) draw(MD, M4.trs(0, .06, lv.kairos.goal, 0, 0, 0, 2.2, 1, 2.2), 0xffe27a, { a: .55, emis: 1 });
@@ -993,9 +1379,9 @@ const AMPH = (on) => `<svg viewBox="0 0 24 32" width="22" height="30"><path d="M
 const fmtT = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 const HUDC = { hp: -1, coins: -1, scr: -1, t: '', prog: -1, sc: -1 };
 function updHUD(force) {
-  const p = G.p, st = G.stats, lv = G.lv; if (!p || !st || G.preview) return; if (force) { HUDC.hp = HUDC.coins = HUDC.scr = HUDC.sc = -1; HUDC.t = ''; $('#hudReg').textContent = lv.region; $('#lvName').textContent = '1-1 · ' + lv.name; }
+  const p = G.p, st = G.stats, lv = G.lv; if (!p || !st || G.preview) return; if (force) { HUDC.hp = HUDC.coins = HUDC.scr = HUDC.sc = -1; HUDC.t = ''; $('#hudReg').textContent = lv.region; $('#lvName').textContent = lv.num + ' · ' + lv.name; $('#coinL').textContent = lv.coinLabel || 'Óbolos'; }
   const hp = Math.max(0, p.hp); if (HUDC.hp !== hp) { HUDC.hp = hp; let h = ''; for (let i = 0; i < Math.max(3, hp); i++) h += AMPH(i < hp); $('#amph').innerHTML = h; }
-  if (HUDC.coins !== st.coins) { HUDC.coins = st.coins; $('#coinN').textContent = st.coins + '/' + lv.totalCoins; }
+  { const cv = lv.coinsBad ? st.bribes : st.coins; if (HUDC.coins !== cv) { HUDC.coins = cv; $('#coinN').textContent = lv.coinsBad ? cv : cv + '/' + lv.totalCoins; } }
   const sc = st.scrolls.filter(Boolean).length; if (HUDC.scr !== sc) { HUDC.scr = sc; $('#scrN').textContent = sc + '/3'; }
   const tt = fmtT(st.t); if (HUDC.t !== tt) { HUDC.t = tt; $('#timeN').textContent = tt; }
   const pr = Math.round(clamp(p.z / lv.goalZ, 0, 1) * 100); if (HUDC.prog !== pr) { HUDC.prog = pr; $('#progBar').style.width = pr + '%'; }
@@ -1006,7 +1392,7 @@ function updPlay(dt) {
   if (!p.dead || p.deadT < 1.3) { updMoving(dt); buildCols(); updPlayer(dt); updBoxes(dt); updEnemies(dt); updBoss(dt); updTiles(dt); updProjs(dt); updHazards(dt); updItems(dt); updTriggers(dt); updKairos(dt); if (!p.dead && !p.win) G.stats.t += dt;
     const it = nearInteract(), pe = $('#prompt'); if (it && !p.dead && !p.win) { pe.textContent = 'E · ' + it.t; pe.classList.remove('hide'); if (PRESS.KeyE) doInteract(it); } else pe.classList.add('hide'); }
   updScene(dt); camTarget(dt, false); updHUD();
-  if (p.dead && p.deadT > 1.3 && G.mode === 'play') { G.mode = 'defeat'; $('#dPhrase').textContent = '«' + pick(PH.death) + '»'; $('#dInfo').textContent = 'Caídas en este nivel: ' + G.stats.deaths; showOv('defeat'); $('#prompt').classList.add('hide'); }
+  if (p.dead && p.deadT > 1.3 && G.mode === 'play') { G.mode = 'defeat'; $('#dPhrase').textContent = '«' + (G.deathMsg || pick(PH.death)) + '»'; $('#dInfo').textContent = 'Caídas en este nivel: ' + G.stats.deaths; showOv('defeat'); $('#prompt').classList.add('hide'); }
 }
 function stepGame(dt) {
   G.t += dt; G.tick++; const m = G.mode;
@@ -1027,9 +1413,9 @@ function fillVictory() {
   const st = G.stats, lv = G.lv, allS = st.scrolls.every(Boolean), ok = (b) => b ? '✔' : '✘';
   $('#vTitle').textContent = 'Nivel completado'; $('#vSub').textContent = lv.name;
   $('#vAmph').innerHTML = [1, 2, 3].map((i) => AMPH(i <= st.amph).replace('width="22" height="30"', 'width="54" height="72"')).join(''); $('#vRank').textContent = st.rank;
-  $('#vStats').innerHTML = `<div><b>Tiempo</b><span>${fmtT(st.t)}${st.t <= lv.par ? ' (bajo el par)' : ''}</span></div><div><b>Óbolos</b><span>${st.coins}/${lv.totalCoins}</span></div><div><b>Pergaminos</b><span>${st.scrolls.filter(Boolean).length}/3</span></div><div><b>Muertes</b><span>${st.deaths}</span></div><div><b>Enemigos refutados</b><span>${st.kills}/${lv.totalEnemies}</span></div><div><b>Secretos</b><span>${(st.secret ? 1 : 0) + (st.kairos ? 1 : 0)}/2</span></div><div><b>Puntos</b><span>${st.score}</span></div>`;
-  $('#vGoals').innerHTML = `<div>${ok(true)} 1ª ánfora · completar el nivel</div><div>${ok(allS)} 2ª ánfora · los 3 pergaminos</div><div>${ok(st.secret || st.kairos)} 3ª ánfora · la Pluma de Platón o el desafío Kairos</div>`;
-  $('#vPhrase').textContent = '«' + pick(PH.complete) + '»'; if (st.dj) $('#vPhrase').textContent += '  ·  Habilidad nueva: doble salto.';
+  $('#vStats').innerHTML = `<div><b>Tiempo</b><span>${fmtT(st.t)}${st.t <= lv.par ? ' (bajo el par)' : ''}</span></div><div><b>${lv.coinsBad ? 'Sobornos aceptados' : 'Óbolos'}</b><span>${lv.coinsBad ? st.bribes : st.coins + '/' + lv.totalCoins}</span></div><div><b>Pergaminos</b><span>${st.scrolls.filter(Boolean).length}/3</span></div><div><b>Muertes</b><span>${st.deaths}</span></div><div><b>Enemigos refutados</b><span>${st.kills}/${lv.totalEnemies}</span></div><div><b>Secretos</b><span>${(st.secret ? 1 : 0) + (st.kairos ? 1 : 0)}/2</span></div><div><b>Puntos</b><span>${st.score}</span></div>`;
+  $('#vGoals').innerHTML = `<div>${ok(true)} 1ª ánfora · completar el nivel</div><div>${ok(allS)} 2ª ánfora · los 3 pergaminos</div><div>${lv.coinsBad ? ok(st.bribes === 0) + ' 3ª ánfora · incorruptible: ni un soborno' : ok(st.secret || st.kairos) + ' 3ª ánfora · el secreto del nivel'}</div>`;
+  $('#vPhrase').textContent = '«' + pick(lv.complete || PH.complete) + '»'; if (st.dj) $('#vPhrase').textContent += '  ·  Habilidad nueva: doble salto.';
 }
 function buildMap() {
   let h = ''; WORLDS.forEach((w, i) => { h += `<div class="world${w.lv.length ? '' : ' lock'}"><h3>Mundo ${i + 1} · ${w.n}</h3><p>${w.d}</p>`; if (w.lv.length) for (const l of w.lv) { const r = save.levels[l.id]; h += `<button class="btn lvl" data-lv="${l.id}">${l.id} · ${l.n}<small>${r ? [1, 2, 3].map((k) => k <= r.amph ? '🏺' : '▫').join('') + ' · ' + r.rank + ' · ' + fmtT(r.time) : 'Sin completar'}</small></button>`; } else h += '<em>Próximamente (todavía no disponible)</em>'; h += '</div>'; });
@@ -1043,12 +1429,12 @@ function buildGallery(tab) {
   $('#galBody').innerHTML = h;
 }
 function beginLevel(id) { hideAllOv(); $('#hud').classList.add('hide'); $('#loadT').textContent = LEVELS[id].region + ' · ' + LEVELS[id].name; $('#loadP').textContent = pick(PH.tips); showOv('loading'); AU.music(null); clearTimeout(G.loadTm); G.loadTm = setTimeout(() => { hideOv('loading'); startLevel(id, false); }, 1300); }
-function toMenu() { hideAllOv(); $('#hud').classList.add('hide'); $('#dialog').classList.add('hide'); $('#kairos').classList.add('hide'); $('#prompt').classList.add('hide'); G.mode = 'menu'; startLevel('1-1', true); showOv('menu'); AU.music('menu'); refreshMenu(); }
+function toMenu() { hideAllOv(); $('#hud').classList.add('hide'); $('#dialog').classList.add('hide'); $('#kairos').classList.add('hide'); $('#prompt').classList.add('hide'); G.mode = 'menu'; startLevel('2', true); showOv('menu'); AU.music('menu'); refreshMenu(); }
 function refreshMenu() { const has = Object.keys(save.levels).length > 0 || save.seenIntro; $('#bCont').disabled = !has; $('#bCont').style.opacity = has ? 1 : .45; }
 function wireUI() {
   const on = (id, fn) => $('#' + id).addEventListener('click', () => { AU.init(); AU.sfx('ui'); fn(); });
   on('bNew', () => { save.seenIntro = false; hideAllOv(); showOv('story'); });
-  on('stGo', () => beginLevel('1-1'));
+  on('stGo', () => beginLevel('1'));
   on('bCont', () => { buildMap(); hideAllOv(); showOv('map'); });
   on('bLevels', () => { buildMap(); hideAllOv(); showOv('map'); });
   on('bGal', () => { buildGallery('insc'); hideAllOv(); showOv('gallery'); }); on('bOpts', () => { fillOpts(); G.optBack = 'menu'; hideAllOv(); showOv('opts'); });
@@ -1060,7 +1446,7 @@ function wireUI() {
   $('#optSfx').addEventListener('input', (e) => { save.opts.sfx = e.target.value / 100; AU.setVol(save.opts.mus, save.opts.sfx); writeSave(); }); $('#optSfx').addEventListener('change', () => AU.sfx('coin'));
   $('#optTouch').addEventListener('change', (e) => { save.opts.touch = e.target.checked; writeSave(); setTouch(); });
   on('optReset', () => { if (confirm('¿Borrar todo el progreso guardado?')) { save = defSave(); writeSave(); AU.setVol(save.opts.mus, save.opts.sfx); fillOpts(); refreshMenu(); } });
-  on('vMap', () => { G.mode = 'menu'; buildMap(); hideAllOv(); showOv('map'); AU.music('menu'); startLevel('1-1', true); }); on('vRetry', () => restartLevel());
+  on('vMap', () => { G.mode = 'menu'; buildMap(); hideAllOv(); showOv('map'); AU.music('menu'); startLevel('2', true); }); on('vRetry', () => restartLevel());
   on('dGo', () => respawn());
 }
 function fillOpts() { $('#optMus').value = save.opts.mus * 100; $('#optSfx').value = save.opts.sfx * 100; $('#optTouch').checked = !!save.opts.touch; }
@@ -1084,7 +1470,7 @@ function wireTouch() {
 let lastTs = 0, accT = 0;
 function frame(ts) { requestAnimationFrame(frame); const dt = Math.min(.1, (ts - lastTs) / 1000 || 0); lastTs = ts; accT += dt; let n = 0; while (accT >= 1 / 60 && n++ < 6) { stepGame(1 / 60); accT -= 1 / 60; } if (n >= 6) accT = 0; renderAll(); }
 function boot() {
-  initTextures(); AU.mus = save.opts.mus; AU.sfxV = save.opts.sfx; wireUI(); wireTouch(); setTouch(); startLevel('1-1', true); G.mode = 'menu'; showOv('menu'); refreshMenu(); G.fade = 1; requestAnimationFrame(frame);
+  initTextures(); AU.mus = save.opts.mus; AU.sfxV = save.opts.sfx; wireUI(); wireTouch(); setTouch(); startLevel('2', true); G.mode = 'menu'; showOv('menu'); refreshMenu(); G.fade = 1; requestAnimationFrame(frame);
 }
 window.__g = { G, TJ, get save() { return save; }, KEYS, PRESS, startLevel, stepGame, sim(n) { for (let i = 0; i < n; i++) stepGame(1 / 60); }, killEnemy, hurt, die, respawn, collect, breakBox, finishLevel, startBoss, dialog, AU, LEVELS, buildCols, camZone, blast, toMenu, beginLevel, groundAt, camTarget, bossHit, updMoving };
 boot();
