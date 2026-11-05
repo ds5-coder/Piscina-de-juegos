@@ -3355,6 +3355,8 @@ function walkable(x, z) {
   if (room) return x > room.x0 + 0.3 && x < room.x1 - 0.3 && z > room.z0 + 0.3 && z < room.z1 - 0.3;
   if (underground) return x > CISTERN.x0 && x < CISTERN.x1 && z > CISTERN.z0 && z < CISTERN.z1;
   for (const r of REGIONS) if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1) return true;
+  // the whole city and its fields are open ground: no invisible walls, only the sea stops you
+  if (x > -360 && x < 360 && z > -360 && z < 360 && !inSea(x, z)) return true;
   return false;
 }
 function keepWalkable(pos, ox, oz) {
@@ -9827,7 +9829,7 @@ function leaveApeiron(done) {
     fadeEl.classList.remove('on'); sleeping = false; if (done) done();
   }, 900);
 }
-addInteract({ label: 'Step through the seam (the way out)', pos: () => APX.exitP, r: 2.8, bias: 4, when: () => room === APX && APX.got && !sleeping, act: () => leaveApeiron(() => { Game.flags.ch2Back = true; }) });
+addInteract({ label: 'Step through the seam (the way out)', pos: () => APX.exitP, r: 3.2, bias: 4, when: () => room === APX && !sleeping, act: () => leaveApeiron(() => { Game.flags.ch2Back = true; }) });
 addInteract({ label: 'Take the Navigation Compass', pos: () => CH2.compass, r: 2.0, bias: 3, when: () => room === APX && !APX.got, act: () => {
   startAct({ kind: 'kneel', target: CH2.compass, stand: 0.85, dur: 1.4, onDone: () => {
     APX.got = true; Game.components.push('compass'); addItem('compass'); noiseBurst(1.2, 3000, 0.25);
