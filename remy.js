@@ -1,0 +1,23 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const p = await b.newPage({ viewport: { width: 800, height: 450 } }); const errs = [];
+  p.on('console', m => { if ((m.type() === 'error' || m.type() === 'warning') && !/Fetch API|_blob/.test(m.text())) errs.push(m.text().slice(0, 300)); });
+  p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  p.setDefaultTimeout(300000);
+  await p.goto('http://127.0.0.1:8766/test.html');
+  await p.waitForFunction(() => window.__T, null, { timeout: 120000 });
+  await p.evaluate(() => { __T.start(); __T.hud(); __T.setMin(17.6 * 60); __T.go(-30, 3, 1.2); });
+  await p.waitForFunction(() => __T.remy(), null, { timeout: 240000 });
+  console.log('remy loaded');
+  const shot = async (n, pre) => { if (pre) await p.evaluate(pre); await p.waitForTimeout(2500); await p.screenshot({ path: 'shots/remy_' + n + '.png' }); };
+  await shot('front', () => __T.camset(2.4, 0.08, 1.2 + Math.PI));
+  await shot('side', () => __T.camset(3.0, 0.15, 1.2 + Math.PI / 2));
+  await p.keyboard.down('ArrowUp'); await shot('walk', () => __T.camset(3.4, 0.15, 1.2 + Math.PI / 2));
+  await p.keyboard.down('KeyA'); await shot('run'); await p.keyboard.up('KeyA'); await p.keyboard.up('ArrowUp');
+  await p.waitForTimeout(1500); await p.keyboard.press('KeyD'); await shot('kick', null);
+  await p.evaluate(() => { __T.go(-18, -4.4, Math.PI); });
+  await p.waitForTimeout(11000); await shot('sit', () => __T.camset(3.2, 0.1, 0.5));
+  await p.keyboard.down('ArrowDown'); await p.keyboard.down('KeyA'); await p.waitForTimeout(250); await shot('runstart'); await p.keyboard.up('KeyA'); await p.keyboard.up('ArrowDown');
+  console.log(errs.slice(0, 20).join('\n') || 'no errors'); await b.close();
+})();

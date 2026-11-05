@@ -1,0 +1,10 @@
+<html><body style="margin:0"><script src="vendor/three.min.js"></script><script src="vendor/ld/GLTFLoader.js"></script><script>
+const R=new THREE.WebGLRenderer({antialias:true});R.setSize(1200,600);document.body.appendChild(R.domElement);R.outputEncoding=THREE.sRGBEncoding;
+const S=new THREE.Scene();S.background=new THREE.Color(0x9fc4e8);S.add(new THREE.HemisphereLight(0xffffff,0x887766,0.8));const d=new THREE.DirectionalLight(0xffffff,0.9);d.position.set(3,6,4);S.add(d);
+const C=new THREE.PerspectiveCamera(35,2,0.1,200);C.position.set(0,9,26);C.lookAt(0,1.5,0);
+fetch('models/poly.json').then(r=>r.json()).then(async all=>{const L=new THREE.GLTFLoader();let i=0;const ks=Object.keys(all);
+for(const k of ks){await new Promise(res=>L.parse(JSON.stringify(all[k]),'',g=>{const o=g.scene;o.traverse(m=>{if(m.isMesh){const c=m.material.color;m.material=new THREE.MeshStandardMaterial({color:c,map:m.material.map,roughness:0.9,flatShading:true});}});
+const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const s=2.6/Math.max(sz.x,sz.y,sz.z);o.scale.setScalar(s);o.position.set((i%8)*3.6-12.6,-b.min.y*s,Math.floor(i/8)*-4+4);S.add(o);
+const cv=document.createElement('canvas');cv.width=256;cv.height=48;const g2=cv.getContext('2d');g2.fillStyle='#000';g2.font='28px sans-serif';g2.fillText(k+' '+sz.y.toFixed(1),4,34);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv)}));sp.scale.set(3.2,0.6,1);sp.position.set(o.position.x,-0.5,o.position.z+1);S.add(sp);i++;res();},e=>{console.log(k,e);res();}));}
+R.render(S,C);window.done=1;});
+</script></body></html>

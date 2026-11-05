@@ -1,0 +1,8 @@
+shots/
+dl/
+conv/
+vendor/
+node_modules/
+test*.html
+t[0-9]*.js
+*.log
