@@ -16846,7 +16846,10 @@ function updateKos(dt, t) {
   if (KOS.socFollow && started && !Cine.active) {
     const sp = socrates.h.root.position, dxs = player.pos.x - sp.x, dzs = player.pos.z - sp.z, ds = Math.hypot(dxs, dzs);
     const otherSide = (player.pos.x > 1100) !== (sp.x > 1100);
-    socrates.hidden = underground || !!room || Sail.on;
+    const wet = player.swimming || inSea(sp.x, sp.z);
+    socrates.hidden = underground || !!room || Sail.on || wet;
+    if (wet && !player.swimming && !underground && !room && !Sail.on) { const bx = player.pos.x - 2, bz = player.pos.z - 2; sp.set(bx, floorAt(bx, bz), bz); socrates.hidden = false; }
+    if (wet && player.swimming) socrates.script = null;
     if (otherSide && !Sail.on && !underground && !room) { const bx = player.pos.x - 2, bz = player.pos.z - 2; sp.set(bx, floorAt(bx, bz), bz); }
     else if (ds > 45 && !underground && !room) { const bx = player.pos.x - Math.sin(player.yaw) * 5, bz = player.pos.z - Math.cos(player.yaw) * 5; if (walkable(bx, bz)) { sp.set(bx, floorAt(bx, bz), bz); } }
     if (!sub.cur) {
