@@ -7866,14 +7866,15 @@ const Voice = {
   },
   speak(line, done) {
     if (line.silent || this.mode === 'off' || /^[\s.…*]*$/.test(line.text)) return false;
+    const tok = this.tok = (this.tok || 0) + 1;
     const prof = this.profile(line), emo = EMO[emotionOf(line.text, line.who)] || EMO.neutral;
     const shown = tr(line.text), spoken = shown.replace(/\*[^*]*\*/g, ' ').trim() || shown;
     if (this.mode === 'speech' && !this.speechBroken && this.list.length && typeof SpeechSynthesisUtterance !== 'undefined') {
       const synth = window.speechSynthesis, v = this.voiceFor(line, prof), parts = this.phrases(spoken);
       let began = false, finished = false;
-      const fin = () => { if (finished) return; finished = true; done(); };
+      const fin = () => { if (finished || tok !== this.tok) return; finished = true; done(); };
       const fallback = () => {
-        if (finished) return; finished = true;
+        if (finished || tok !== this.tok) return; finished = true;
         try { synth.cancel(); } catch (e) { /* ignore */ }
         this.fails = (this.fails || 0) + 1; if (this.fails >= 2) this.speechBroken = true;
         const d = this.babble(prof, line.text, emo); setTimeout(done, Math.max(0.3, d) * 1000);
@@ -7886,13 +7887,13 @@ const Voice = {
         u.rate = clamp(prof.rate * emo.rate * (ex ? 1.05 : 1) * (/…\s*$/.test(ph) ? 0.88 : 1), 0.5, 2);
         u.volume = this.vol;
         if (i === 0) u.onstart = () => { began = true; this.fails = 0; };
-        u.onerror = () => { if (!began) fallback(); else if (last) fin(); };
+        u.onerror = e => { if (tok !== this.tok || (e && (e.error === 'canceled' || e.error === 'interrupted'))) return; if (!began) fallback(); else if (last) fin(); };
         if (last) u.onend = fin;
         return u;
       });
       if (synth.speaking || synth.pending) synth.cancel();
-      setTimeout(() => { if (finished) return; try { synth.resume(); us.forEach(u => synth.speak(u)); } catch (e) { fallback(); } }, 80);
-      setTimeout(() => { if (!began) fallback(); }, 1800);
+      setTimeout(() => { if (finished || tok !== this.tok) return; try { synth.resume(); us.forEach(u => synth.speak(u)); } catch (e) { fallback(); } }, 80);
+      setTimeout(() => { if (!began && tok === this.tok) fallback(); }, 2500);
       duck(true);
       return true;
     }
@@ -7900,7 +7901,7 @@ const Voice = {
     if (d > 0) { duck(true); setTimeout(done, d * 1000); return true; }
     return false;
   },
-  stop() { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); duck(false); },
+  stop() { this.tok = (this.tok || 0) + 1; if ('speechSynthesis' in window) window.speechSynthesis.cancel(); duck(false); },
   // fallback when the browser has no speech: a vowel-like murmur with a voice's own pitch, melody and timbre
   babble(prof, text, emo = EMO.neutral) {
     if (!ensureAudio()) return 0;
@@ -8304,35 +8305,49 @@ function readSave() { try { const s = localStorage.getItem(SAVE_KEY); return s ?
    Toasts, title cards, mission passed, district names
    ========================================================= */
 const toastEl = document.getElementById('toasts');
+/* one announcement at a time: toasts, title cards, mission-passed cards and district names wait their turn instead of piling up */
+const ANN = { q: [], cur: null };
+function annPush(kind, key, dur, show, hide) {
+  if (key && (ANN.q.some(a => a.key === key) || (ANN.cur && ANN.cur.key === key))) return;
+  ANN.q.push({ kind, key, dur, show, hide });
+  while (ANN.q.length > 4) { const i = ANN.q.findIndex(a => a.kind === 'toast' || a.kind === 'district'); if (i < 0) break; ANN.q.splice(i, 1); }
+  annNext();
+}
+function annNext() {
+  if (ANN.cur || !ANN.q.length) return;
+  const a = ANN.q.shift(); ANN.cur = a;
+  try { a.show(); } catch (e) { /* ignore */ }
+  setTimeout(() => { try { a.hide(); } catch (e) { /* ignore */ } setTimeout(() => { ANN.cur = null; annNext(); }, 550); }, a.dur);
+}
 function toast(text) {
-  const d = document.createElement('div');
-  d.className = 'toast'; d.textContent = tr(text);
-  toastEl.appendChild(d);
-  setTimeout(() => d.classList.add('out'), 3400);
-  setTimeout(() => { if (d.remove) d.remove(); }, 4000);
+  const s = tr(text);
+  let d = null;
+  annPush('toast', 't:' + s, clamp(1900 + s.length * 38, 2400, 4600),
+    () => { d = document.createElement('div'); d.className = 'toast'; d.textContent = s; toastEl.appendChild(d); },
+    () => { if (!d) return; d.classList.add('out'); const x = d; setTimeout(() => { if (x.remove) x.remove(); }, 600); });
 }
 const titleCardEl = document.getElementById('titleCard');
 let titleTimer = null;
 function titleCard(kind, title, subt) {
-  document.getElementById('tcKind').textContent = kind;
-  document.getElementById('tcTitle').textContent = title;
-  document.getElementById('tcSub').textContent = subt || '';
-  titleCardEl.classList.add('on');
-  clearTimeout(titleTimer);
-  titleTimer = setTimeout(() => titleCardEl.classList.remove('on'), 3800);
+  annPush('card', null, 3800, () => {
+    document.getElementById('tcKind').textContent = kind;
+    document.getElementById('tcTitle').textContent = title;
+    document.getElementById('tcSub').textContent = subt || '';
+    titleCardEl.classList.add('on');
+  }, () => titleCardEl.classList.remove('on'));
 }
 const passedEl = document.getElementById('passed');
 let passedTimer = null;
 function missionPassed(head, title, lines, good = true) {
-  document.getElementById('pHead').textContent = head;
-  document.getElementById('pTitle').textContent = title;
-  const ul = document.getElementById('pList'); ul.innerHTML = '';
-  lines.forEach(l => { const li = document.createElement('li'); li.textContent = l; ul.appendChild(li); });
-  passedEl.classList.toggle('fail', !good);
-  passedEl.classList.add('on');
   if (good) musicMoment(50);
-  clearTimeout(passedTimer);
-  passedTimer = setTimeout(() => passedEl.classList.remove('on'), 5600);
+  annPush('passed', null, 5600, () => {
+    document.getElementById('pHead').textContent = head;
+    document.getElementById('pTitle').textContent = title;
+    const ul = document.getElementById('pList'); ul.innerHTML = '';
+    lines.forEach(l => { const li = document.createElement('li'); li.textContent = l; ul.appendChild(li); });
+    passedEl.classList.toggle('fail', !good);
+    passedEl.classList.add('on');
+  }, () => passedEl.classList.remove('on'));
 }
 const districtEl = document.getElementById('district');
 let lastDistrict = '', districtTimer = null;
@@ -8349,10 +8364,7 @@ function updateDistrict() {
   const d = districtName();
   if (d === lastDistrict) return;
   lastDistrict = d;
-  districtEl.textContent = d;
-  districtEl.classList.add('on');
-  clearTimeout(districtTimer);
-  districtTimer = setTimeout(() => districtEl.classList.remove('on'), 3000);
+  annPush('district', 'd:' + d, 2600, () => { districtEl.textContent = d; districtEl.classList.add('on'); }, () => districtEl.classList.remove('on'));
 }
 /* =========================================================
    Mission engine (one mission at a time, as in Bully)
@@ -16192,20 +16204,21 @@ function updateHorses(dt, t) {
     H.o.visible = !hidden; if (hidden) return;
     if (H.ridden) return;
     const p = H.o.position, dPl = Math.hypot(p.x - player.pos.x, p.z - player.pos.z);
-    if (dPl > 120) return;
+    if (dPl > 120 && H.state !== 'come') return;
     H.stateT -= dt;
     // a horse is skittish: someone sprinting straight at it makes it trot off a few strides
-    if (dPl < 5 && player.speed > 5.5 && H.state !== 'shy' && Math.random() < dt * 0.6) { H.state = 'shy'; H.stateT = 1.6; const a = Math.atan2(p.x - player.pos.x, p.z - player.pos.z); H.target = { x: p.x + Math.sin(a) * 8, z: p.z + Math.cos(a) * 8 }; }
-    if (H.stateT < 0) {
+    if (H.roam !== false && dPl < 5 && player.speed > 5.5 && H.state !== 'shy' && Math.random() < dt * 0.6) { H.state = 'shy'; H.stateT = 1.6; const a = Math.atan2(p.x - player.pos.x, p.z - player.pos.z); H.target = { x: p.x + Math.sin(a) * 8, z: p.z + Math.cos(a) * 8 }; }
+    if (H.stateT < 0 && H.roam === false) { if (H.state === 'come' && KOS.snapHorse) KOS.snapHorse(H); H.state = 'graze'; H.target = null; H.exit = null; H.stateT = 60; }
+    else if (H.stateT < 0) {
       const r = Math.random();
       if (H.state === 'graze' || H.state === 'shy') { H.state = r < 0.75 ? 'walk' : 'trot'; H.target = pickHorseTarget(H); H.stateT = 25; }
       else { H.state = 'graze'; H.stateT = 4 + Math.random() * 9; H.target = null; }
     }
     let want = 0;
     if (H.target && H.state !== 'graze') {
-      const dx = H.target.x - p.x, dz = H.target.z - p.z, d = Math.hypot(dx, dz);
-      if (d < 1.5) { H.state = 'graze'; H.stateT = 3 + Math.random() * 8; H.target = null; }
-      else { H.yaw += clamp(angDiff(H.yaw, Math.atan2(dx, dz)), -2.2 * dt, 2.2 * dt); want = { walk: 1.0, trot: 2.0, gallop: 2.0, shy: 2.2 }[H.state] * Math.min(1, d / 4); }
+      const tg = H.exit || H.target, dx = tg.x - p.x, dz = tg.z - p.z, d = Math.hypot(dx, dz);
+      if (d < (H.exit ? 1.3 : 1.5)) { if (H.exit) H.exit = null; else { H.state = 'graze'; H.stateT = H.roam === false ? 60 : 3 + Math.random() * 8; H.target = null; } }
+      else { H.yaw += clamp(angDiff(H.yaw, Math.atan2(dx, dz)), -2.4 * dt, 2.4 * dt); want = { walk: 1.0, trot: 2.0, gallop: 2.0, shy: 2.2, come: 6.2 }[H.state] * Math.min(1, d / 4); }
     }
     H.graze = lerp(H.graze || 0, H.state === 'graze' ? 1 : 0, 1 - Math.exp(-dt * 1.5));
     H.speed = lerp(H.speed, want, 1 - Math.exp(-dt * 1.8));
@@ -16213,8 +16226,8 @@ function updateHorses(dt, t) {
     p.x += Math.sin(H.yaw) * H.speed * dt; p.z += Math.cos(H.yaw) * H.speed * dt;
     H.col.r = 0; collide(p, 0.8); keepWalkable(p, ox, oz); H.col.r = 0.9;
     // never through a wall: if the step would enter one, go back and turn for another place
-    if (!walkable(p.x, p.z) || boxes.some(b => p.x > b.x0 - 0.6 && p.x < b.x1 + 0.6 && p.z > b.z0 - 0.6 && p.z < b.z1 + 0.6)) { p.x = ox; p.z = oz; H.speed *= 0.3; H.target = pickHorseTarget(H) || H.target; }
-    if (H.speed > 0.5 && Math.hypot(p.x - ox, p.z - oz) < H.speed * dt * 0.3) { H.stuck = (H.stuck || 0) + dt; if (H.stuck > 1.2) { H.target = pickHorseTarget(H); H.stuck = 0; } } else H.stuck = 0;
+    if (!walkable(p.x, p.z) || boxes.some(b => p.x > b.x0 - 0.6 && p.x < b.x1 + 0.6 && p.z > b.z0 - 0.6 && p.z < b.z1 + 0.6)) { p.x = ox; p.z = oz; H.speed *= 0.3; if (H.state !== 'come') H.target = pickHorseTarget(H) || H.target; else H.yaw += (Math.random() - 0.5) * 1.6; }
+    if (H.speed > 0.5 && Math.hypot(p.x - ox, p.z - oz) < H.speed * dt * 0.3) { H.stuck = (H.stuck || 0) + dt; if (H.stuck > 1.2) { if (H.state === 'come') H.yaw += (Math.random() - 0.5) * 2.6; else H.target = pickHorseTarget(H); H.stuck = 0; } } else H.stuck = 0;
     p.y = floorAt(p.x, p.z); H.o.rotation.y = H.yaw; H.col.x = p.x; H.col.z = p.z;
     animateHorse(H, dt, t);
   });
@@ -16243,13 +16256,16 @@ function nearestHorse(r = 2.8) {
   return best;
 }
 function callHorse() {
-  let best = null, bd = 60;
+  let best = null, bd = 260;
   HORSES.forEach(h => { if (h.ridden || !h.o.visible) return; const d = Math.hypot(h.o.position.x - player.pos.x, h.o.position.z - player.pos.z); if (d < bd) { bd = d; best = h; } });
   if (!best) { toast('No horse close enough to hear you.'); return; }
-  // a spot a couple of steps in front of Nico, on ground a horse can walk on
-  let tx = player.pos.x + Math.sin(player.yaw) * 2.2, tz = player.pos.z + Math.cos(player.yaw) * 2.2;
-  if (!walkable(tx, tz)) { tx = player.pos.x; tz = player.pos.z + 2.2; }
-  best.target = { x: tx, z: tz }; best.state = 'trot'; best.stateT = 14; best.yaw = Math.atan2(tx - best.o.position.x, tz - best.o.position.z);
+  // a spot right beside Nico, on ground a horse can walk on
+  const rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
+  let tx = player.pos.x + rx * 2.1, tz = player.pos.z + rz * 2.1;
+  if (!walkable(tx, tz)) { tx = player.pos.x - rx * 2.1; tz = player.pos.z - rz * 2.1; }
+  if (!walkable(tx, tz)) { tx = player.pos.x + Math.sin(player.yaw) * 2.2; tz = player.pos.z + Math.cos(player.yaw) * 2.2; }
+  best.target = { x: tx, z: tz }; best.state = 'come'; best.stateT = 50; best.stuck = 0; best.exit = KOS.stableExit ? KOS.stableExit(best) : null;
+  const q = best.exit || best.target; best.yaw = Math.atan2(q.x - best.o.position.x, q.z - best.o.position.z);
   noiseBurst(0.25, 500, 0.3);
   toast('You whistle. The horse comes trotting.');
 }
@@ -16604,6 +16620,7 @@ function updateVitals(dt) {
     if (player.swimming) txt = player.under ? 'Space: swim up.  Q: dive deeper.  ' + runKeyName() + ': swim fast.' : 'Q: dive.  Space: climb out at a quay or pier.  ' + runKeyName() + ': swim fast.';
     else if (player.grounded && !player.mantle) { const L = findLedge(inSea(player.pos.x, player.pos.z) ? Math.max(player.pos.y, SEA_Y - 0.45) : player.pos.y); if (L && !L.tooHigh) txt = 'Space: climb up'; else if (L && L.tooHigh && player.speed < 0.5) txt = 'Too high to climb'; else if (waterAhead()) txt = 'Space: dive in'; }
   }
+  if (txt && (promptEl.classList.contains('on') || sub.cur || sub.queue.length)) txt = '';
   hint.textContent = txt; hint.classList.toggle('on', !!txt);
 }
 
@@ -17434,6 +17451,16 @@ defMission({
 
 
 
+
+
+
+
+
+
+
+
+
+
 /*KOS_E_BEGIN*/
 /* =========================================================================================
    ACT II (missions 5-9): Heraclitus, Parmenides, Zeno, Empedocles, Anaxagoras.
@@ -17885,7 +17912,7 @@ KOS.BP = (() => {
     const t = i / n, x = S.x + (G.x - S.x) * t, z = S.z + (G.z - S.z) * t, g = new THREE.Group();
     const ball = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 10), new THREE.MeshStandardMaterial({ color: i % 2 ? 0xff5a3a : 0xfff1c0, emissive: i % 2 ? 0xaa2a10 : 0x887a40, roughness: 0.5 })); ball.position.y = 0.25;
     const col = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 7, 8, 1, true), cm); col.position.y = 3.6;
-    g.add(ball, col); g.position.set(x, SEA_Y, z); g.visible = false; scene.add(g); list.push(g);
+    g.add(ball, col); g.position.set(x, SEA_Y, z); g.visible = false; g.userData.noCollide = true; scene.add(g); list.push(g);
   }
   return { S, G, list };
 })();
@@ -17898,6 +17925,124 @@ KOS.ticks.push((dt, t) => {
   const rx = player.pos.x - P.S.x, rz = player.pos.z - P.S.z, along = rx * ux + rz * uz, lat = rx * -uz + rz * ux;
   if (along > -6 && along < L + 2 && Math.abs(lat) < 11) { const k = Math.max(0, 1 - Math.abs(lat) / 11) * 1.8 * dt; player.pos.x += (ux * 0.9 - (-uz) * Math.sign(lat) * Math.min(1, Math.abs(lat) / 3) * 0.5) * k * 1.0; player.pos.z += (uz * 0.9 - ux * Math.sign(lat) * Math.min(1, Math.abs(lat) / 3) * 0.5) * k * 1.0; }
 });
+
+/* ---------- the stables: the six horses live in two stables. Press G and one trots over and stops beside you ---------- */
+KOS.stables = [];
+function kStable(cx, cz) {
+  let top = -9;
+  for (let dx = -6.5; dx <= 6.5; dx += 3.25) for (let dz = -3.5; dz <= 3.5; dz += 3.5) top = Math.max(top, terrainHeight(cx + dx, cz + dz));
+  const wood = kMat('#7a5232'), dark = kMat('#4b3120'), hayM = kMat('#d2b25e'), tile = kMat('#a8552f'), RH = top + 3.1;
+  const column = (x, z) => { const g = terrainHeight(x, z), h = RH - g + 0.4; kMesh(new THREE.BoxGeometry(0.32, h, 0.32), dark, x, g - 0.4 + h / 2, z); };
+  [-6.5, 6.5].forEach(x => [-3.3, 3.3].forEach(z => column(cx + x, cz + z)));
+  [-2.17, 2.17].forEach(x => column(cx + x, cz + 3.3));
+  const wall = (x0, x1, z0, z1, hgt, mat) => {
+    const g = Math.min(terrainHeight(x0, z0), terrainHeight(x1, z1), terrainHeight((x0 + x1) / 2, (z0 + z1) / 2)) - 0.4, h = hgt + 0.4 + (Math.max(terrainHeight(x0, z0), terrainHeight(x1, z1)) - g - 0.4);
+    kMesh(new THREE.BoxGeometry(x1 - x0, h, z1 - z0), mat, (x0 + x1) / 2, g + h / 2, (z0 + z1) / 2); boxes.push({ x0, x1, z0, z1 });
+  };
+  wall(cx - 6.6, cx + 6.6, cz - 3.55, cz - 3.2, 2.7, wood);                                   // the back wall
+  [-6.5, -2.17, 2.17, 6.5].forEach(x => wall(cx + x - 0.1, cx + x + 0.1, cz - 3.4, cz + 0.8, 1.45, wood)); // the stall partitions
+  const roof = kMesh(new THREE.BoxGeometry(14.4, 0.24, 9.2), tile, cx, RH + 0.2, cz + 0.2); roof.rotation.x = 0.1;
+  kMesh(new THREE.BoxGeometry(14.6, 0.14, 0.5), dark, cx, RH + 0.55, cz - 4.1);               // the ridge board at the back
+  [-4.33, 0, 4.33].forEach(dx => {
+    const x = cx + dx;
+    kMesh(new THREE.BoxGeometry(1.5, 0.7, 0.8), hayM, x - 1.3, terrainHeight(x - 1.3, cz - 2.8) + 0.35, cz - 2.8);   // hay
+    kMesh(new THREE.BoxGeometry(1.3, 0.5, 0.7), hayM, x - 0.7, terrainHeight(x - 0.7, cz - 2.8) + 0.95, cz - 2.8).rotation.y = 0.2;
+    const tg = terrainHeight(x + 1.2, cz - 2.9); kMesh(new THREE.BoxGeometry(1.4, 0.4, 0.55), dark, x + 1.2, tg + 0.35, cz - 2.9);   // the trough
+    kMesh(new THREE.BoxGeometry(1.2, 0.08, 0.4), kMat('#3b6c8a', { metalness: 0.2 }), x + 1.2, tg + 0.58, cz - 2.9);
+  });
+  const lamp = kMesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffc468 }), cx, RH - 0.25, cz + 3.1);
+  KOS.sites.push({ x: cx, z: cz, r: 11, name: 'The Stables' });
+  const S = { cx, cz, stalls: [-4.33, 0, 4.33].map(dx => ({ x: cx + dx, z: cz - 0.9 })) }; KOS.stables.push(S); return S;
+}
+KOS.stableExit = H => { for (const S of KOS.stables) { const p = H.o.position; if (Math.abs(p.x - S.cx) < 7.2 && p.z > S.cz - 3.7 && p.z < S.cz + 3.6) return { x: p.x, z: S.cz + 5.2 }; } return null; };
+KOS.snapHorse = H => {
+  const rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
+  for (const [a, b] of [[2.1, 0], [-2.1, 0], [0, -2.4], [3.2, -1]]) { const x = player.pos.x + rx * a + Math.sin(player.yaw) * b, z = player.pos.z + rz * a + Math.cos(player.yaw) * b; if (walkable(x, z)) { H.o.position.set(x, floorAt(x, z), z); H.col.x = x; H.col.z = z; H.yaw = player.yaw; H.speed = 0; return; } }
+};
+{
+  const A = kStable(24, -46), B = kStable(102, 38);
+  HORSES.forEach((H, i) => {
+    const S = i < 3 ? A : B, st = S.stalls[i % 3];
+    H.o.position.set(st.x, floorAt(st.x, st.z), st.z); H.col.x = st.x; H.col.z = st.z; H.yaw = 0; H.o.rotation.y = 0; H.roam = false; H.state = 'graze'; H.stateT = 30; H.target = null; H.speed = 0;
+  });
+}
+
+/* ---------- solid objects: everything standing in the city, on land or in the water, pushes back instead of letting you walk through it ---------- */
+KOS.solid = { seen: new Map(), t: 0, cursor: 0 };
+KOS.ticks.push((dt, t) => {
+  const S = KOS.solid; S.t -= dt; if (S.t > 0) return; S.t = 0.5;
+  const kids = scene.children, skip = new Set([nico.root, dio.root, thales.h.root, socrates.h.root]);
+  npcs.forEach(n => skip.add(n.h.root)); HORSES.forEach(h => skip.add(h.o)); SCHOOLS.forEach(s => s.fish.forEach(f => skip.add(f.o)));
+  const covered = (x, z, r) => boxes.some(b => x > b.x0 - 0.2 && x < b.x1 + 0.2 && z > b.z0 - 0.2 && z < b.z1 + 0.2) || circles.some(c => Math.hypot(c.x - x, c.z - z) < c.r + r * 0.6);
+  let n = 0;
+  for (let k = 0; k < kids.length && n < 70; k++) {
+    const i = (S.cursor + k) % kids.length, o = kids[i]; if (!o || o.isLight || o.isCamera || o.isSprite || o.isPoints || o.isLine || skip.has(o) || (o.userData && o.userData.noCollide)) continue;
+    let rec = S.seen.get(o);
+    if (rec && (rec.dead || (rec.col && rec.vis === o.visible))) continue;
+    n++;
+    if (!o.visible) { if (rec && rec.col) { removeCol(rec); rec.vis = false; } continue; }
+    const b = new THREE.Box3().setFromObject(o); if (b.isEmpty()) { S.seen.set(o, { dead: true }); continue; }
+    const sx = b.max.x - b.min.x, sz = b.max.z - b.min.z, h = b.max.y - b.min.y, cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2, side = Math.max(sx, sz);
+    if (side > 4.8 || side < 0.3 || h < 0.45 || h > 12 || o.isSkinnedMesh || Math.abs(cx) > 345 || Math.abs(cz) > 345) { S.seen.set(o, { dead: true }); continue; }
+    const g0 = terrainHeight(cx, cz); if (b.min.y > Math.max(g0, inSea(cx, cz) ? SEA_Y : g0) + 1.4) { S.seen.set(o, { dead: true }); continue; }
+    if (!rec) { S.seen.set(o, { c0: [cx, cz], t0: elapsed }); continue; }                              // first sighting: remember where it is
+    if (!rec.col && Math.hypot(rec.c0[0] - cx, rec.c0[1] - cz) > 0.25) { S.seen.set(o, { dead: true }); continue; }   // it moves: not a fixed object
+    if (covered(cx, cz, side / 2)) { S.seen.set(o, { dead: true }); continue; }
+    const top = b.max.y;
+    if (side <= 2.4) { const c = { x: cx, z: cz, r: Math.max(0.18, side * 0.42), top }; circles.push(c); rec.col = c; rec.arr = circles; }
+    else { const bx = { x0: b.min.x + sx * 0.06, x1: b.max.x - sx * 0.06, z0: b.min.z + sz * 0.06, z1: b.max.z - sz * 0.06, top }; boxes.push(bx); rec.col = bx; rec.arr = boxes; }
+    rec.vis = true; rec.c0 = [cx, cz];
+  }
+  S.cursor = (S.cursor + n + 1) % Math.max(1, kids.length);
+  // a solid that moved away later (a boat setting off, a door sliding) stops being solid
+  S.seen.forEach((rec, o) => { if (!rec.col) return; if (!o.parent) { removeCol(rec); rec.dead = true; return; } const c = rec.col; const ox = c.x !== undefined ? c.x : (c.x0 + c.x1) / 2, oz = c.z !== undefined ? c.z : (c.z0 + c.z1) / 2; const p = o.position; if (Math.abs(p.x) + Math.abs(p.z) > 1 && o.parent === scene && Math.hypot(o.getWorldPosition(tmpA).x - rec.c0[0], tmpA.z - rec.c0[1]) > 2.5) { removeCol(rec); rec.dead = true; } });
+});
+function removeCol(rec) { if (!rec.col) return; const i = rec.arr.indexOf(rec.col); if (i >= 0) rec.arr.splice(i, 1); rec.col = null; }
+
+/* ---------- the sea is full of fish: a hundred more fish in schools all over the water, and they scatter from a swimmer ---------- */
+KOS.fishDone = false;
+KOS.ticks.push((dt, t) => {
+  if (!KOS.fishDone) {
+    if (SCHOOLS.length < 3) return;
+    KOS.fishDone = true;
+    const srcs = [0, 1, 2].map(i => SCHOOLS[i].fish[0].o.children[0]), rnd = kRng2(4242), spots = [];
+    for (let tries = 0; tries < 900 && spots.length < 34; tries++) { const x = 60 + rnd() * 270, z = -330 + rnd() * 450; if (inSea(x, z) && inSea(x + 6, z) && inSea(x - 6, z) && inSea(x, z + 6) && inSea(x, z - 6) && !spots.some(s => Math.hypot(s[0] - x, s[1] - z) < 22)) spots.push([x, z]); }
+    [[182, -36], [190, -42], [198, -46], [206, -52], [196, -30], [212, -44], [178, -48], [186, -24]].forEach(p => { if (inSea(p[0], p[1])) spots.push(p); });   // the route to the sunken temple is busy with fish
+    spots.forEach(([x, z], s) => {
+      const school = { cx: x, cz: z, tx: x, tz: z, wander: 0, fish: [] };
+      for (let i = 0; i < 8; i++) {
+        const o = THREE.SkeletonUtils ? THREE.SkeletonUtils.clone(srcs[(s + i) % 3]) : srcs[(s + i) % 3].clone(); const sc = 0.7 + rnd() * 0.8; o.scale.multiplyScalar(sc);
+        o.traverse(m => { if (m.isMesh) { m.castShadow = false; m.receiveShadow = false; } });
+        const hold = new THREE.Group(); hold.add(o); hold.userData.noCollide = true; scene.add(hold);
+        school.fish.push({ o: hold, ox: (rnd() - 0.5) * 7, oz: (rnd() - 0.5) * 7, oy: -0.7 - rnd() * 3.2, yaw: rnd() * TAU, sp: 0.8 + rnd() * 0.7 });
+      }
+      SCHOOLS.push(school);
+    });
+  }
+  const px = player.pos.x, pz = player.pos.z;
+  if (!(player.swimming || inSea(px, pz) || Math.hypot(px - 150, pz) < 90)) return;
+  SCHOOLS.forEach(S => {
+    if (Math.hypot(S.cx - px, S.cz - pz) > 40) return;
+    S.fish.forEach(f => {
+      if (!f.o.visible) return; const p = f.o.position, dx = p.x - px, dz = p.z - pz, d = Math.hypot(dx, dz);
+      if (d < 3.4 && Math.abs(p.y - player.pos.y) < 3.2) { const k = (3.4 - d) / 3.4 * 6.5 * dt / Math.max(0.2, d); p.x += dx * k; p.z += dz * k; f.yaw += clamp(angDiff(f.yaw, Math.atan2(dx, dz)), -5 * dt, 5 * dt); }
+      const floor = terrainHeight(p.x, p.z) + 0.35; if (p.y < floor) p.y = floor;
+    });
+  });
+});
+function kRng2(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+
+/* ---------- the memes: posters all over Kosmopolis, in the Agora, along the roads, at the harbour and by the stables ---------- */
+(function moreMemes() {
+  const put = (n, x, z, tx, tz, h) => { const p = freeSpot(x, z, 1.9); placeMeme(n, p.x, p.z, faceTo(p, tx, tz), { h: h || 1.75 }); };
+  // around the Agora where Nico lands
+  put('trade_offer', 6, 24, 14, 8); put('homer', 28, 20, 14, 8); put('barber', -6, -4, 14, 8); put('cat_911', 36, -8, 14, 8); put('stoic', 4, -26, 14, 8); put('aristotle_cat', 26, -24, 14, 8);
+  put('euripides', -18, 10, 14, 8); put('socrates_dinner', 44, 6, 14, 8); put('alexander_ok', 14, 34, 14, 8);
+  // the road to the harbour and the harbour itself
+  put('homer', 78, -6, 100, -10); put('socrates_dinner', 96, -18, 110, -20); put('stoic', 118, -34, 130, -30); put('trade_offer', 142, -22, 150, -30); put('aristotle_cat', 164, -30, 176, -34); put('cat_911', 108, 8, 110, -10);
+  // the hill village, the stables and the fields
+  put('barber', -60, 14, -40, 10); put('alexander_ok', -84, 40, -70, 30); put('euripides', 20, -40, 24, -46); put('stoic', 98, 30, 102, 38); put('homer', -40, 70, -30, 60); put('cat_911', 60, 60, 50, 50);
+})();
 /*KOS_E_END*/
 /*KOS_F_BEGIN*/
 /* =========================================================================================
@@ -18195,51 +18340,243 @@ KOS.ending = function () {
 };
 
 /* =====================================  THE OPENING DREAM  =====================================
-   A cinematic before the first line: Nico falls asleep on a deadline in 2026 and the years run backwards. */
+   A real cinematic: dramatic score, flashes of Nico's face and eyes, the years running backwards, the beam;
+   then Nico falls out of the night sky into the Agora, where Diogenes and Socrates are waiting. */
+function kRng(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function kEye(g, o) {
+  const cx = o.cx, cy = o.cy, w = o.w, h = w * 0.46, op = Math.max(0.02, Math.min(1, o.open)), xl = cx - w / 2, xr = cx + w / 2, yl = cy + w * 0.03, yr = cy - w * 0.02, rnd = kRng(o.seed || 7);
+  const up = cy - h * 1.25 * op - 2, lo = cy + h * 0.7 * op + 2;
+  const lid = () => { g.beginPath(); g.moveTo(xl, yl); g.bezierCurveTo(cx - w * 0.22, up, cx + w * 0.22, up, xr, yr); g.bezierCurveTo(cx + w * 0.2, lo, cx - w * 0.2, lo, xl, yl); g.closePath(); };
+  // the brow and the crease above the lid
+  g.save(); g.lineCap = 'round';
+  for (let i = 0; i < 110; i++) { const t = rnd(), x = xl - w * 0.08 + t * (w * 1.2), y = cy - h * 1.95 - Math.sin(t * Math.PI) * h * 0.4 + (rnd() - 0.5) * h * 0.38; g.strokeStyle = 'rgba(18,10,7,' + (0.5 + rnd() * 0.5) + ')'; g.lineWidth = 2 + rnd() * 2; g.beginPath(); g.moveTo(x, y); g.lineTo(x + w * 0.035 + (rnd() - 0.2) * 5, y - h * 0.1 - rnd() * 6); g.stroke(); }
+  g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = w * 0.012; g.beginPath(); g.moveTo(xl + w * 0.05, yl - h * 0.5); g.bezierCurveTo(cx - w * 0.2, up - h * 0.65 * op, cx + w * 0.2, up - h * 0.65 * op, xr - w * 0.03, yr - h * 0.4); g.stroke(); g.restore();
+  if (op > 0.06) {
+    g.save(); lid(); g.clip();
+    const sc = g.createRadialGradient(cx, cy, w * 0.05, cx, cy, w * 0.55); sc.addColorStop(0, '#efe6dc'); sc.addColorStop(0.7, '#d9bfb2'); sc.addColorStop(1, '#a47770'); g.fillStyle = sc; g.fillRect(xl - 5, cy - h * 2, w + 10, h * 4);
+    g.lineWidth = 1.4; for (let i = 0; i < 22; i++) { const side = i % 2 ? 1 : -1, x0 = cx + side * w * 0.5, y0 = cy + (rnd() - 0.5) * h * 0.6; g.strokeStyle = 'rgba(190,40,40,' + (0.22 + (o.tired || 0) * 0.35 * rnd()) + ')'; g.beginPath(); g.moveTo(x0, y0); g.bezierCurveTo(x0 - side * w * 0.12, y0 + (rnd() - 0.5) * h * 0.5, x0 - side * w * 0.22, y0 + (rnd() - 0.5) * h * 0.5, x0 - side * w * (0.18 + rnd() * 0.22), cy + (rnd() - 0.5) * h * 0.7); g.stroke(); }
+    const R = w * 0.19, ix = cx + (o.lx || 0) * w * 0.07, iy = cy + (o.ly || 0) * h * 0.2;
+    const ir = g.createRadialGradient(ix, iy, R * 0.1, ix, iy, R); ir.addColorStop(0, '#1d1008'); ir.addColorStop(0.38, '#5a3418'); ir.addColorStop(0.72, '#9a6532'); ir.addColorStop(0.93, '#3a2410'); ir.addColorStop(1, '#0c0603'); g.fillStyle = ir; g.beginPath(); g.arc(ix, iy, R, 0, TAU); g.fill();
+    for (let i = 0; i < 80; i++) { const a = rnd() * TAU, r0 = R * (0.32 + rnd() * 0.2), r1 = R * (0.7 + rnd() * 0.25); g.strokeStyle = 'rgba(255,205,130,' + (0.06 + rnd() * 0.14) + ')'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(ix + Math.cos(a) * r0, iy + Math.sin(a) * r0); g.lineTo(ix + Math.cos(a) * r1, iy + Math.sin(a) * r1); g.stroke(); }
+    const pr = R * 0.4 * (o.pup || 1); g.fillStyle = '#020101'; g.beginPath(); g.arc(ix, iy, pr, 0, TAU); g.fill();
+    const rf = o.refl;
+    if (rf === 'screen') { g.fillStyle = 'rgba(130,200,255,.88)'; g.fillRect(ix - R * 0.6, iy - R * 0.55, R * 0.78, R * 0.5); g.fillStyle = 'rgba(10,30,60,.7)'; for (let k = 0; k < 4; k++) g.fillRect(ix - R * 0.54, iy - R * 0.5 + k * R * 0.11, R * (0.3 + rnd() * 0.35), R * 0.04); }
+    if (rf === 'glyph') { g.save(); g.translate(ix, iy); g.strokeStyle = 'rgba(127,233,255,.95)'; g.lineWidth = Math.max(2, R * 0.045); g.shadowColor = '#7fe9ff'; g.shadowBlur = 14; const r = R * 0.5; g.beginPath(); g.arc(0, 0, r, 0, TAU); g.stroke(); g.beginPath(); g.moveTo(0, -r * 0.9); g.lineTo(r * 0.8, r * 0.55); g.lineTo(-r * 0.8, r * 0.55); g.closePath(); g.stroke(); g.beginPath(); g.moveTo(-r * 1.15, 0); g.lineTo(r * 1.15, 0); g.stroke(); g.restore(); }
+    if (rf === 'beam') { const bg = g.createLinearGradient(ix - R * 0.16, 0, ix + R * 0.16, 0); bg.addColorStop(0, 'rgba(255,214,120,0)'); bg.addColorStop(0.5, 'rgba(255,236,170,.95)'); bg.addColorStop(1, 'rgba(255,214,120,0)'); g.fillStyle = bg; g.fillRect(ix - R * 0.16, iy - R, R * 0.32, R * 2); g.fillStyle = 'rgba(255,240,200,.9)'; g.beginPath(); g.arc(ix, iy + R * 0.55, R * 0.12, 0, TAU); g.fill(); }
+    g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(ix + R * 0.38, iy - R * 0.38, R * 0.09, 0, TAU); g.fill();
+    const sh = g.createLinearGradient(0, up, 0, cy); sh.addColorStop(0, 'rgba(0,0,0,.6)'); sh.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = sh; g.fillRect(xl, up - 4, w, cy - up + 4);
+    g.restore();
+  }
+  g.save(); g.lineCap = 'round'; g.strokeStyle = '#120807'; g.lineWidth = w * 0.014; lid(); g.stroke();
+  for (let i = 0; i <= 26; i++) { const t = i / 26, x = (1 - t) ** 3 * xl + 3 * (1 - t) ** 2 * t * (cx - w * 0.22) + 3 * (1 - t) * t * t * (cx + w * 0.22) + t ** 3 * xr, y = (1 - t) ** 3 * yl + 3 * (1 - t) ** 2 * t * up + 3 * (1 - t) * t * t * up + t ** 3 * yr, dir = t < 0.5 ? -1 : 1, ln = w * (0.03 + 0.03 * Math.sin(t * Math.PI)); g.lineWidth = 2.2; g.beginPath(); g.moveTo(x, y); g.lineTo(x + dir * ln * 0.55, y - ln * (op > 0.2 ? 1 : -0.3)); g.stroke(); }
+  g.restore();
+  if (o.glasses) {
+    g.save(); g.strokeStyle = '#08090c'; g.lineWidth = w * 0.03; const gw = w * 1.62, gh = h * 3.7, gx = cx - gw / 2, gy = cy - gh * 0.52, rr = gh * 0.3;
+    g.beginPath(); g.moveTo(gx + rr, gy); g.lineTo(gx + gw - rr, gy); g.quadraticCurveTo(gx + gw, gy, gx + gw, gy + rr); g.lineTo(gx + gw, gy + gh - rr); g.quadraticCurveTo(gx + gw, gy + gh, gx + gw - rr, gy + gh); g.lineTo(gx + rr, gy + gh); g.quadraticCurveTo(gx, gy + gh, gx, gy + gh - rr); g.lineTo(gx, gy + rr); g.quadraticCurveTo(gx, gy, gx + rr, gy); g.closePath(); g.fillStyle = 'rgba(110,160,220,.07)'; g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.11)'; g.beginPath(); g.moveTo(gx + gw * 0.12, gy + 6); g.lineTo(gx + gw * 0.3, gy + 6); g.lineTo(gx + gw * 0.12, gy + gh - 6); g.lineTo(gx + 4, gy + gh - 6); g.closePath(); g.fill(); g.restore();
+  }
+}
+function kFace(g, W, H, t, o) {
+  g.save(); g.translate(W / 2 + Math.sin(t * 0.7) * 6, H / 2 + 20); g.rotate(-0.09 + Math.sin(t * 0.5) * 0.015); const S = (o.scale || 1) * (1 + t * 0.035); g.scale(S, S);
+  const sk = g.createRadialGradient(0, 80, 40, 0, 40, 330); sk.addColorStop(0, '#9aa7b0'); sk.addColorStop(0.5, '#6a727a'); sk.addColorStop(1, '#262a30');
+  g.fillStyle = '#0d0f12'; g.beginPath(); g.moveTo(-330, 360); g.quadraticCurveTo(-300, 190, -120, 170); g.lineTo(120, 170); g.quadraticCurveTo(300, 190, 330, 360); g.closePath(); g.fill();   // shoulders
+  g.fillStyle = '#4d535a'; g.fillRect(-60, 130, 120, 100);                                                                                                     // neck
+  g.fillStyle = sk; g.beginPath(); g.ellipse(0, -10, 205, 270, 0, 0, TAU); g.fill();                                                                           // head
+  g.fillStyle = '#5a6168'; [-1, 1].forEach(s => { g.beginPath(); g.ellipse(s * 205, 10, 30, 55, 0, 0, TAU); g.fill(); });                                           // ears
+  const hr = kRng(33); g.fillStyle = '#120b08'; g.beginPath(); g.moveTo(-215, -20); g.quadraticCurveTo(-240, -250, -20, -290); g.quadraticCurveTo(230, -280, 215, -20); g.quadraticCurveTo(190, -150, 110, -175); g.quadraticCurveTo(0, -140, -100, -180); g.quadraticCurveTo(-190, -150, -215, -20); g.fill();
+  for (let i = 0; i < 26; i++) { const a = -2.9 + i * 0.22, r = 262; g.beginPath(); g.moveTo(Math.cos(a) * 230, Math.sin(a) * 250 - 30); g.lineTo(Math.cos(a) * (r + hr() * 40), Math.sin(a) * (r + hr() * 40) - 36); g.lineTo(Math.cos(a + 0.07) * 226, Math.sin(a + 0.07) * 246 - 30); g.fill(); }
+  // glasses with the screen's code reflected in the lenses
+  g.lineWidth = 9; g.strokeStyle = '#06070a';
+  const lens = (x, y) => { g.beginPath(); if (g.roundRect) g.roundRect(x - 70, y - 45, 140, 95, 22); else g.rect(x - 70, y - 45, 140, 95); };
+  [-1, 1].forEach(s => { const x = s * 92, y = -20; g.save(); lens(x, y); g.fillStyle = 'rgba(120,190,255,.34)'; g.fill(); g.clip(); g.fillStyle = 'rgba(190,235,255,.65)'; for (let k = 0; k < 6; k++) g.fillRect(x - 56, y - 36 + k * 15, 30 + ((k * 37) % 70), 4); g.restore(); lens(x, y); g.stroke(); });
+  g.beginPath(); g.moveTo(-22, -22); g.quadraticCurveTo(0, -36, 22, -22); g.stroke(); g.beginPath(); g.moveTo(-162, -26); g.lineTo(-202, -34); g.moveTo(162, -26); g.lineTo(202, -34); g.stroke();
+  // the closed eyes, the brows, the nose, the mouth
+  g.strokeStyle = 'rgba(8,8,10,.85)'; g.lineWidth = 5; [-1, 1].forEach(s => { g.beginPath(); g.moveTo(s * 92 - 40, -14); g.quadraticCurveTo(s * 92, 8, s * 92 + 40, -14); g.stroke(); g.lineWidth = 9; g.beginPath(); g.moveTo(s * 92 - 54, -82); g.quadraticCurveTo(s * 92, -100, s * 92 + 56, -78); g.stroke(); g.lineWidth = 5; });
+  g.strokeStyle = 'rgba(20,24,28,.55)'; g.lineWidth = 5; g.beginPath(); g.moveTo(-8, 10); g.quadraticCurveTo(-26, 76, 0, 92); g.quadraticCurveTo(24, 98, 22, 82); g.stroke();
+  g.strokeStyle = '#1a1214'; g.lineWidth = 7; g.beginPath(); g.moveTo(-42, 150); g.quadraticCurveTo(0, 168, 42, 148); g.stroke();
+  g.restore();
+}
+function kLaptop(g, W, H, t) {
+  const gl = g.createRadialGradient(W / 2, H * 0.55, 20, W / 2, H * 0.55, W * 0.6); gl.addColorStop(0, 'rgba(60,120,200,.35)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H);
+  const sx = W * 0.2, sy = H * 0.12, sw = W * 0.6, sh = H * 0.62; g.fillStyle = '#05070b'; g.fillRect(sx - 14, sy - 14, sw + 28, sh + 28); g.fillStyle = '#0c1a2c'; g.fillRect(sx, sy, sw, sh);
+  const r = kRng(5); g.fillStyle = 'rgba(120,200,255,.55)'; for (let i = 0; i < 18; i++) g.fillRect(sx + 24 + (i % 3) * 18, sy + 26 + i * 22, 60 + r() * sw * 0.5, 8);
+  g.fillStyle = '#7fe9ff'; g.font = 'bold ' + Math.round(sh * 0.28) + 'px Consolas, monospace'; g.textAlign = 'right'; g.fillText('03:17', sx + sw - 30, sy + sh * 0.42); g.font = Math.round(sh * 0.07) + 'px Consolas, monospace'; g.fillStyle = '#ff7a6a'; g.fillText('DEADLINE 06:00', sx + sw - 30, sy + sh * 0.56); g.textAlign = 'left';
+  if (((t * 2) | 0) % 2) { g.fillStyle = '#cfe9ff'; g.fillRect(sx + 24, sy + sh - 52, 14, 26); }
+  g.fillStyle = '#10141b'; g.fillRect(sx - 60, sy + sh + 14, sw + 120, 38);
+  g.fillStyle = '#d8d0c4'; g.beginPath(); g.ellipse(W * 0.84, H * 0.82, 70, 26, 0, 0, TAU); g.fill(); g.fillStyle = '#b8ae9e'; g.fillRect(W * 0.84 - 70, H * 0.82, 140, 70); g.beginPath(); g.ellipse(W * 0.84, H * 0.82 + 70, 70, 26, 0, 0, TAU); g.fill(); g.fillStyle = '#2a1a10'; g.beginPath(); g.ellipse(W * 0.84, H * 0.82, 58, 18, 0, 0, TAU); g.fill();
+}
 KOS.dream = function (done) {
   if (KOS.dreamEl) return done && done();
   Game.lock = true;
-  const el = document.createElement('div'); KOS.dreamEl = el;
-  el.style.cssText = 'position:fixed;inset:0;z-index:99998;background:radial-gradient(ellipse at center,#0b1626 0%,#02040a 70%);color:#e8e6df;font-family:Georgia,serif;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;transition:opacity 1.2s;overflow:hidden;';
-  const year = document.createElement('div'); year.style.cssText = 'font-family:ui-monospace,Consolas,monospace;font-size:clamp(46px,11vw,120px);letter-spacing:.06em;color:#7fe9ff;text-shadow:0 0 24px #2a8aa8;opacity:0;transition:opacity .8s;min-height:1.2em;';
-  const nm = document.createElement('div'); nm.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
-  const glyph = document.createElement('canvas'); glyph.width = glyph.height = 160; glyph.style.cssText = 'width:min(36vw,200px);opacity:0;transition:opacity 1.4s;margin:10px 0;filter:drop-shadow(0 0 14px #7fe9ff);';
-  { const g = glyph.getContext('2d'); g.strokeStyle = '#7fe9ff'; g.lineWidth = 7; g.beginPath(); g.arc(80, 80, 58, 0, TAU); g.stroke(); g.beginPath(); g.moveTo(80, 34); g.lineTo(126, 114); g.lineTo(34, 114); g.closePath(); g.stroke(); g.beginPath(); g.moveTo(22, 80); g.lineTo(138, 80); g.stroke(); }
-  const tx = document.createElement('div'); tx.style.cssText = 'max-width:680px;font-size:clamp(17px,2.8vw,26px);line-height:1.55;min-height:3.2em;transition:opacity .6s;margin-top:14px;text-shadow:0 2px 12px #000;';
-  const skip = document.createElement('button'); skip.textContent = 'Skip'; skip.style.cssText = 'position:absolute;right:18px;bottom:16px;padding:8px 16px;background:rgba(0,0,0,.4);color:#cfd6dd;border:1px solid #4a5a6a;border-radius:6px;font-size:14px;cursor:pointer;z-index:2;';
-  el.append(nm, year, glyph, tx, skip); document.body.appendChild(el); requestAnimationFrame(() => { el.style.opacity = 1; });
-  const T = []; let over = false, yTimer = null;
-  const at = (ms, fn) => T.push(setTimeout(fn, ms));
-  const say1 = s => { tx.style.opacity = 0; setTimeout(() => { tx.textContent = s; tx.style.opacity = 1; }, 350); };
+  const W = 1280, H = 720, el = document.createElement('div'); KOS.dreamEl = el;
+  el.style.cssText = 'position:fixed;inset:0;z-index:99998;background:#000;color:#e8e6df;font-family:Georgia,serif;opacity:0;transition:opacity .8s;overflow:hidden;';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+  const bar = (top) => { const b = document.createElement('div'); b.style.cssText = 'position:absolute;left:0;right:0;height:11%;background:#000;z-index:3;' + (top ? 'top:0;' : 'bottom:0;'); return b; };
+  const vig = document.createElement('div'); vig.style.cssText = 'position:absolute;inset:0;z-index:2;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.82) 100%);pointer-events:none;';
+  const fl = document.createElement('div'); fl.style.cssText = 'position:absolute;inset:0;z-index:4;background:#fff;opacity:0;pointer-events:none;';
+  const tx = document.createElement('div'); tx.style.cssText = 'position:absolute;left:8%;right:8%;bottom:2.2%;z-index:5;text-align:center;font-size:clamp(15px,2.5vw,24px);font-style:italic;letter-spacing:.04em;opacity:0;transition:opacity .5s;text-shadow:0 2px 10px #000;';
+  const skip = document.createElement('button'); skip.textContent = 'Skip'; skip.style.cssText = 'position:absolute;right:16px;top:12px;z-index:6;padding:6px 14px;background:rgba(0,0,0,.45);color:#cfd6dd;border:1px solid #4a5a6a;border-radius:6px;font-size:13px;cursor:pointer;';
+  el.append(cv, vig, bar(true), bar(false), fl, tx, skip); document.body.appendChild(el); requestAnimationFrame(() => { el.style.opacity = 1; });
+  const g = cv.getContext('2d');
+  let over = false, shake = 0, pulse = 0, beatTimer = null;
+  // ---- the score: a dark drone, a heartbeat that quickens, risers, and a hit on every cut ----
+  const A = ensureAudio(); let mg = null, noiseBuf = null, bed = null; const nodes = [];
+  const musicOn = typeof Music === 'undefined' || Music.on !== false;
+  if (A && musicOn) {
+    try {
+      if (A.state === 'suspended') A.resume();
+      mg = A.createGain(); mg.gain.value = 0; mg.connect(A.destination); mg.gain.linearRampToValueAtTime(0.9, A.currentTime + 1.5);
+      noiseBuf = A.createBuffer(1, A.sampleRate * 2, A.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const osc = (type, f, v, lp) => { const o = A.createOscillator(), gn = A.createGain(), fi = A.createBiquadFilter(); o.type = type; o.frequency.value = f; fi.type = 'lowpass'; fi.frequency.value = lp; gn.gain.value = v; o.connect(fi); fi.connect(gn); gn.connect(mg); o.start(); nodes.push(o); return { o, gn, fi }; };
+      const d1 = osc('sawtooth', 55, 0.10, 160), d2 = osc('sawtooth', 82.4, 0.06, 200), d3 = osc('sine', 36.7, 0.22, 200);
+      d1.fi.frequency.linearRampToValueAtTime(900, A.currentTime + 30); d2.fi.frequency.linearRampToValueAtTime(1300, A.currentTime + 30);
+      const pad = [[110, 0], [130.8, 7], [164.8, -6], [220, 4]].map(([f, c]) => { const p = osc('sawtooth', f, 0, 700); p.o.detune.value = c; p.gn.gain.setValueAtTime(0, A.currentTime); p.gn.gain.linearRampToValueAtTime(0.05, A.currentTime + 16); return p; });
+      pad.forEach((p, i) => { [[22, [87.3, 130.8, 174.6, 261.6]], [28, [82.4, 123.5, 164.8, 246.9]]].forEach(([when, ch]) => p.o.frequency.setValueAtTime(ch[i], A.currentTime + when)); });
+      [d1, d2, d3].forEach(x => x.gn.gain.linearRampToValueAtTime(x.gn.gain.value * 2.2, A.currentTime + 28));
+    } catch (e) { mg = null; }
+    // the game's own dramatic track underneath, if the page can load it
+    try { loadTrack('dramatic').then(() => { const b = Music.bufs.dramatic; if (!b || over || !mg) return; const s = A.createBufferSource(), gn = A.createGain(); s.buffer = b; gn.gain.value = 0; gn.gain.linearRampToValueAtTime(0.55, A.currentTime + 3); s.connect(gn); gn.connect(mg); s.start(); bed = { s, gn }; }); } catch (e) { /* the synthesised score carries on alone */ }
+  }
+  const boom = (big) => { if (!mg) return; try { const t0 = A.currentTime, o = A.createOscillator(), gn = A.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(big ? 90 : 120, t0); o.frequency.exponentialRampToValueAtTime(34, t0 + 1.2); gn.gain.setValueAtTime(big ? 1.3 : 0.8, t0); gn.gain.exponentialRampToValueAtTime(0.001, t0 + (big ? 2.6 : 1.4)); o.connect(gn); gn.connect(mg); o.start(t0); o.stop(t0 + 2.8); const n = A.createBufferSource(), ng = A.createGain(), nf = A.createBiquadFilter(); n.buffer = noiseBuf; nf.type = 'lowpass'; nf.frequency.value = big ? 2400 : 900; ng.gain.setValueAtTime(big ? 0.8 : 0.4, t0); ng.gain.exponentialRampToValueAtTime(0.001, t0 + 0.9); n.connect(nf); nf.connect(ng); ng.connect(mg); n.start(t0); n.stop(t0 + 1); } catch (e) { /* ignore */ } };
+  const riser = (dur) => { if (!mg) return; try { const t0 = A.currentTime, n = A.createBufferSource(), nf = A.createBiquadFilter(), ng = A.createGain(); n.buffer = noiseBuf; n.loop = true; nf.type = 'bandpass'; nf.Q.value = 2; nf.frequency.setValueAtTime(250, t0); nf.frequency.exponentialRampToValueAtTime(5000, t0 + dur); ng.gain.setValueAtTime(0, t0); ng.gain.linearRampToValueAtTime(0.5, t0 + dur); ng.gain.linearRampToValueAtTime(0, t0 + dur + 0.1); n.connect(nf); nf.connect(ng); ng.connect(mg); n.start(t0); n.stop(t0 + dur + 0.2); const o = A.createOscillator(), og = A.createGain(), of = A.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(110, t0); o.frequency.exponentialRampToValueAtTime(880, t0 + dur); og.gain.setValueAtTime(0, t0); og.gain.linearRampToValueAtTime(0.12, t0 + dur); og.gain.linearRampToValueAtTime(0, t0 + dur + 0.1); of.type = 'lowpass'; of.frequency.value = 1500; o.connect(of); of.connect(og); og.connect(mg); o.start(t0); o.stop(t0 + dur + 0.2); } catch (e) { /* ignore */ } };
+  const thump = () => { pulse = 1; if (!mg) return; try { const t0 = A.currentTime, o = A.createOscillator(), gn = A.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(78, t0); o.frequency.exponentialRampToValueAtTime(36, t0 + 0.16); gn.gain.setValueAtTime(0.95, t0); gn.gain.exponentialRampToValueAtTime(0.001, t0 + 0.26); o.connect(gn); gn.connect(mg); o.start(t0); o.stop(t0 + 0.3); } catch (e) { /* ignore */ } };
+  const T = []; const t0 = performance.now();
+  const at = (s, fn) => T.push(setTimeout(fn, s * 1000));
+  const beat = () => { if (over) return; const u = Math.min(1, (performance.now() - t0) / 30000); thump(); setTimeout(() => { if (!over && u > 0.1) thump(); }, 230); beatTimer = setTimeout(beat, 1150 - 650 * u); };
+  at(1.4, beat);
+  const flash = (ms, big) => { fl.style.transition = 'none'; fl.style.opacity = big ? 1 : 0.8; void fl.offsetWidth; fl.style.transition = 'opacity ' + (ms || 260) + 'ms ease-out'; fl.style.opacity = 0; shake = big ? 1 : 0.6; boom(big); };
+  const cap = s => { tx.style.opacity = 0; setTimeout(() => { if (over) return; tx.textContent = s; tx.style.opacity = 1; }, 380); };
+  const names = ['Thales', 'Pythagoras', 'Socrates', 'Plato', 'Aristotle', 'Heraclitus', 'Democritus', 'Zeno'];
   const fmt = y => y > 0 ? String(Math.round(y)) : Math.max(1, Math.abs(Math.round(y))) + (LANG === 'es' ? ' a. C.' : ' BC');
-  const runYears = (from, to, dur) => { clearInterval(yTimer); const t0 = performance.now(); yTimer = setInterval(() => { const u = Math.min(1, (performance.now() - t0) / dur), e = u * u * (3 - 2 * u); year.textContent = fmt(from + (to - from) * e); if (u >= 1) clearInterval(yTimer); }, 40); };
-  const flash = (name, i) => { const s = document.createElement('div'); s.textContent = tr(name); const x = 8 + (i * 23) % 60, y = 12 + (i * 37) % 66; s.style.cssText = 'position:absolute;left:' + x + '%;top:' + y + '%;font-size:clamp(18px,3.4vw,34px);color:#cfe9f4;opacity:0;transition:opacity 1.2s,transform 4s;transform:translateY(14px);text-shadow:0 0 16px #2a8aa8;letter-spacing:.1em;'; nm.appendChild(s); requestAnimationFrame(() => { s.style.opacity = .85; s.style.transform = 'translateY(-14px)'; }); setTimeout(() => { s.style.opacity = 0; }, 2600); setTimeout(() => s.remove(), 4000); };
+  // ---- the cuts ----
+  const cuts = [
+    [0, 3.0, (u) => { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.fillStyle = 'rgba(127,233,255,' + Math.min(1, u / 1.4) + ')'; g.font = '110px Consolas, monospace'; g.textAlign = 'center'; g.fillText('2026', W / 2, H / 2 + 36); g.textAlign = 'left'; }],
+    [3.0, 6.7, (u) => { g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H); kFace(g, W, H, u, { scale: 0.92 }); }],
+    [6.7, 8.2, (u) => { g.fillStyle = '#020304'; g.fillRect(0, 0, W, H); kLaptop(g, W, H, u); }],
+    [8.2, 11.0, (u) => { g.fillStyle = '#0a0705'; g.fillRect(0, 0, W, H); const k = Math.max(0.02, 0.34 - u * 0.1 + (u > 1.2 ? Math.sin(u * 11) * 0.015 : 0)); kEye(g, { cx: W / 2, cy: H / 2, w: 760 + u * 24, open: k, lx: 0, ly: 0.3, tired: 1, refl: 'screen', glasses: true, seed: 3 }); const bl = g.createRadialGradient(W / 2, H * 0.6, 10, W / 2, H * 0.6, 520); bl.addColorStop(0, 'rgba(60,130,220,.22)'); bl.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = bl; g.fillRect(0, 0, W, H); }],
+    [11.0, 13.6, (u) => { g.fillStyle = '#0a0705'; g.fillRect(0, 0, W, H); const o = Math.min(1, u / 0.5); kEye(g, { cx: W / 2, cy: H / 2, w: 820 + u * 40, open: o, lx: Math.sin(u * 4) * 0.4, ly: 0, pup: 1.35 - Math.min(0.7, u * 0.3), tired: 1, refl: u < 1.3 ? 'screen' : 'glyph', glasses: true, seed: 3 }); }],
+    [13.6, 20.2, (u) => {
+      g.fillStyle = 'rgba(0,4,10,.5)'; g.fillRect(0, 0, W, H); const r = kRng(Math.floor(u * 30) + 1), spd = 0.35 + u * 0.35;
+      for (let i = 0; i < 120; i++) { const a = (i * 2.399 + Math.floor(i / 7) * 0.31) % TAU, rr0 = (((i * 53) % 100) / 100 + u * spd) % 1, r0 = 30 + rr0 * rr0 * 900, r1 = r0 + 20 + rr0 * 200; g.strokeStyle = i % 5 ? 'rgba(127,233,255,' + (0.15 + rr0 * 0.6) + ')' : 'rgba(255,214,120,' + (0.2 + rr0 * 0.6) + ')'; g.lineWidth = 1 + rr0 * 3; g.beginPath(); g.moveTo(W / 2 + Math.cos(a) * r0 * 1.6, H / 2 + Math.sin(a) * r0 * 0.9); g.lineTo(W / 2 + Math.cos(a) * r1 * 1.6, H / 2 + Math.sin(a) * r1 * 0.9); g.stroke(); }
+      const e = Math.min(1, u / 5.6), ee = e * e * (3 - 2 * e), yr = 2026 + (-585 - 2026) * ee; g.textAlign = 'center'; g.font = '130px Consolas, monospace'; g.fillStyle = '#d8f6ff'; g.shadowColor = '#2a9ac8'; g.shadowBlur = 30; g.fillText(fmt(yr), W / 2, H / 2 + 46); g.shadowBlur = 0;
+      names.forEach((n, i) => { const s0 = 1.2 + i * 0.7, k = u - s0; if (k < 0 || k > 1.6) return; const a = Math.sin(k / 1.6 * Math.PI), rr = kRng(i * 77 + 5); g.globalAlpha = a * 0.9; g.font = 'italic 54px Georgia, serif'; g.fillStyle = '#e8f4ff'; g.shadowColor = '#2a9ac8'; g.shadowBlur = 24; g.fillText(tr(n).toUpperCase(), 250 + rr() * 780, 140 + ((i * 97) % 440)); g.shadowBlur = 0; g.globalAlpha = 1; });
+      g.textAlign = 'left';
+    }],
+    [20.2, 24.6, (u) => {
+      g.fillStyle = '#02060d'; g.fillRect(0, 0, W, H); const gx = W / 2, gy = H / 2 - 10, r = 170, p = Math.min(1, u / 2.4); g.save(); g.strokeStyle = '#7fe9ff'; g.shadowColor = '#7fe9ff'; g.shadowBlur = 26; g.lineWidth = 8; g.lineCap = 'round';
+      const seg = (n, fn) => { const k = Math.max(0, Math.min(1, p * 3 - n)); if (k > 0) fn(k); };
+      seg(0, k => { g.beginPath(); g.arc(gx, gy, r, -Math.PI / 2, -Math.PI / 2 + TAU * k); g.stroke(); });
+      seg(1, k => { const a = [[gx, gy - r * 0.9], [gx + r * 0.8, gy + r * 0.55], [gx - r * 0.8, gy + r * 0.55], [gx, gy - r * 0.9]]; g.beginPath(); g.moveTo(a[0][0], a[0][1]); const n = k * 3; for (let i = 0; i < 3; i++) { const f = Math.min(1, Math.max(0, n - i)); if (f <= 0) break; g.lineTo(a[i][0] + (a[i + 1][0] - a[i][0]) * f, a[i][1] + (a[i + 1][1] - a[i][1]) * f); } g.stroke(); });
+      seg(2, k => { g.beginPath(); g.moveTo(gx - r * 1.3, gy); g.lineTo(gx - r * 1.3 + r * 2.6 * k, gy); g.stroke(); }); g.restore();
+    }],
+    [24.6, 28.4, (u) => {
+      const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#02030a'); sky.addColorStop(0.7, '#0a1830'); sky.addColorStop(1, '#10264a'); g.fillStyle = sky; g.fillRect(0, 0, W, H); const r = kRng(11); g.fillStyle = '#fff'; for (let i = 0; i < 160; i++) { g.globalAlpha = 0.3 + 0.7 * r() * (0.6 + 0.4 * Math.sin(u * 3 + i)); g.fillRect(r() * W, r() * H * 0.75, 2, 2); } g.globalAlpha = 1;
+      const hz = H * 0.74, k = Math.min(1, u / 2.2), top = hz - (hz + 40) * k * k * (3 - 2 * k), bw = 40 + k * 60, bg = g.createLinearGradient(W / 2 - bw, 0, W / 2 + bw, 0); bg.addColorStop(0, 'rgba(255,214,120,0)'); bg.addColorStop(0.5, 'rgba(255,244,200,.98)'); bg.addColorStop(1, 'rgba(255,214,120,0)'); g.fillStyle = bg; g.fillRect(W / 2 - bw, top, bw * 2, hz - top);
+      const glow = g.createRadialGradient(W / 2, hz, 10, W / 2, hz, 320); glow.addColorStop(0, 'rgba(255,230,160,.7)'); glow.addColorStop(1, 'rgba(255,200,100,0)'); g.fillStyle = glow; g.fillRect(0, hz - 320, W, 420);
+      g.fillStyle = '#071326'; g.fillRect(0, hz, W, H - hz); g.strokeStyle = 'rgba(255,224,150,.35)'; g.lineWidth = 2; for (let i = 0; i < 9; i++) { g.beginPath(); const y = hz + 10 + i * 26 + Math.sin(u * 2 + i) * 3; g.moveTo(W / 2 - 60 - i * 20, y); g.lineTo(W / 2 + 60 + i * 20, y); g.stroke(); }
+    }],
+    [28.4, 32.2, (u) => { g.fillStyle = '#070403'; g.fillRect(0, 0, W, H); kEye(g, { cx: W / 2, cy: H / 2, w: 900 + u * 18, open: Math.min(1, 0.65 + u * 0.2), lx: 0, ly: 0, pup: 0.8, tired: 1, refl: 'beam', glasses: false, seed: 9 }); }],
+    [32.2, 36.4, (u) => { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); const a = Math.min(1, u / 1.2); g.fillStyle = 'rgba(255,236,170,' + a * 0.9 + ')'; g.fillRect(W / 2 - 3, 0, 6, H); }],
+  ];
+  const render = () => {
+    if (over) return; const u = (performance.now() - t0) / 1000;
+    const cut = cuts.find(c => u >= c[0] && u < c[1]) || cuts[cuts.length - 1];
+    g.save(); const sh = shake * 14; if (shake > 0.01) { g.translate((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh); shake *= 0.9; }
+    cut[2](u - cut[0]); g.restore();
+    const gr = kRng(Math.floor(u * 24) + 1); g.fillStyle = 'rgba(255,255,255,.05)'; for (let i = 0; i < 90; i++) g.fillRect(gr() * W, gr() * H, 2, 2);
+    if (pulse > 0.02) { vig.style.boxShadow = 'inset 0 0 ' + Math.round(90 + pulse * 120) + 'px rgba(0,0,0,' + (0.2 + pulse * 0.5) + ')'; pulse *= 0.86; } else vig.style.boxShadow = 'none';
+    KOS._dreamRaf = requestAnimationFrame(render);
+  };
+  render();
   const finish = () => {
-    if (over) return; over = true; T.forEach(clearTimeout); clearInterval(yTimer);
-    el.style.transition = 'opacity 1.4s'; el.style.background = '#fff'; el.style.opacity = 0;
-    setTimeout(() => { el.remove(); KOS.dreamEl = null; if (done) done(); }, 1500);
+    if (over) return; over = true; T.forEach(clearTimeout); clearTimeout(beatTimer); cancelAnimationFrame(KOS._dreamRaf);
+    try { if (mg) { mg.gain.cancelScheduledValues(A.currentTime); mg.gain.setValueAtTime(mg.gain.value, A.currentTime); mg.gain.linearRampToValueAtTime(0, A.currentTime + 1.2); setTimeout(() => nodes.forEach(n => { try { n.stop(); } catch (e) { /* stopped */ } }), 1400); if (bed) setTimeout(() => { try { bed.s.stop(); } catch (e) { /* stopped */ } }, 1400); } } catch (e) { /* ignore */ }
+    fl.style.transition = 'none'; fl.style.opacity = 1; void fl.offsetWidth; el.style.transition = 'opacity 1.1s'; el.style.opacity = 0;
+    setTimeout(() => { el.remove(); KOS.dreamEl = null; if (done) done(); }, 1150);
   };
   skip.addEventListener('click', finish);
   const onKey = e => { if (over) { document.removeEventListener('keydown', onKey); return; } if (e.key === 'Escape' || e.key === 'Enter') { finish(); document.removeEventListener('keydown', onKey); } };
   document.addEventListener('keydown', onKey);
-  kosTone(98, 5, 'sine', 0.06); kosTone(147, 5, 'sine', 0.04);
-  at(900, () => { say1('The year is 2026.'); year.style.opacity = 1; year.textContent = '2026'; });
-  at(4200, () => say1('Nico has not slept in two days.'));
-  at(7400, () => say1('A laptop. A deadline. A cup of cold coffee.'));
-  at(10600, () => say1('His eyes close.'));
-  at(13000, () => { say1('And the screen begins to remember.'); kosTone(196, 3, 'triangle', 0.05); });
-  at(15600, () => { say1('Years run backwards.'); runYears(2026, -585, 6200); });
-  ['Descartes?', 'Aristotle', 'Plato', 'Socrates', 'Pythagoras', 'Thales'].filter(n => n !== 'Descartes?').forEach((n, i) => at(16200 + i * 900, () => flash(n, i)));
-  at(22200, () => say1('A circle. A triangle. A line through both.'));
-  at(22400, () => { glyph.style.opacity = 1; kosTone(330, 2.5, 'sine', 0.07); });
-  at(26000, () => { say1('A beam of light, rising out of the sea.'); year.style.opacity = 0.35; });
-  at(29600, () => say1('Somewhere, something is watching. Something very patient.'));
-  at(33200, () => say1('He does not wake up in 2026.'));
-  at(36200, () => { say1('Every century. One street.'); kosTone(392, 2, 'sine', 0.08); });
-  at(39200, finish);
+  // ---- the beats ----
+  at(0.8, () => cap('The year is 2026.'));
+  at(3.3, () => cap('Nico has not slept in two days.'));
+  at(6.8, () => { cap('A laptop. A deadline. A cup of cold coffee.'); flash(200, false); });
+  at(8.2, () => { cap('His eyes close.'); flash(500, false); });
+  at(11.0, () => { cap('And the screen begins to remember.'); flash(400, true); });
+  at(13.6, () => { cap('Years run backwards.'); flash(500, true); });
+  at(16.2, () => flash(180, false)); at(18.4, () => flash(180, false));
+  at(19.2, () => riser(5));
+  at(20.4, () => { cap('A circle. A triangle. A line through both.'); flash(300, false); });
+  at(24.6, () => { cap('A beam of light, rising out of the sea.'); flash(500, true); });
+  at(28.4, () => { cap('Somewhere, something is watching. Something very patient.'); flash(350, true); });
+  at(32.2, () => { cap('He does not wake up in 2026.'); riser(3.2); });
+  at(35.0, () => cap('Every century. One street.'));
+  at(36.2, finish);
   KOS._dreamSkip = finish;
 };
-{ const _begin = KOS.begin; KOS.begin = function () { KOS.dream(() => _begin.call(KOS)); }; }
+/* ---- the fall: Nico drops out of the night sky into the Agora, where Diogenes and Socrates are waiting ---- */
+KOS.fallIntro = function () {
+  const ph = document.getElementById('phone'); if (ph) ph.style.display = 'none';
+  Object.assign(Game.flags, { prologueDone: true, kosStarted: true, sailOpen: true });
+  KOS.glyphs.forEach(g => { g.seen = false; });
+  applySeason('summer'); syncSeasonChips(); gameMin = Math.floor(gameMin / 1440) * 1440 + 23.4 * 60;
+  const s = { x: 18, z: 2.5 }, gy = floorAt(s.x, s.z), H0 = 90;
+  player.pos.set(s.x, gy + H0, s.z); player.yaw = -Math.PI / 2; cam.yaw = player.yaw; player.speed = 0; player.vy = -3; player.grounded = false; player.diveJump = false;
+  cam.pitch = -0.55; cam.dist = 9; cam.cur = 9;
+  DG.state = 'intro'; DG.walkTo = null; DG.pos.set(s.x - 6.5, 0, s.z + 3.0); DG.yaw = Math.PI / 2;
+  thales.schedule = false; thales.script = null; thales.h.root.position.set(150, floorAt(150, -28), -28); thales.facing = thales.baseYaw = Math.PI / 2;
+  socrates.hidden = false; socrates.script = null; socrates.h.root.position.set(s.x - 5.5, floorAt(s.x - 5.5, s.z - 3.6), s.z - 3.6); socrates.facing = socrates.baseYaw = Math.PI / 2;
+  KOS.socFollow = false; KOS.setBeam(214, -62, true);
+  Game.lock = true; sleeping = false; fadeEl.classList.remove('on');
+  KOS.fall = { on: true, t: 0, v: 5, landed: false, gy, sinceLand: 0, said: false };
+};
+KOS.ticks.push((dt, t) => {
+  const F = KOS.fall; if (!F || !F.on) return;
+  F.t += dt;
+  if (!F.landed) {
+    const h = player.pos.y - floorAt(player.pos.x, player.pos.z), target = h > 26 ? 21 : Math.max(2.6, h * 0.7);
+    F.v = lerp(F.v, target, 1 - Math.exp(-dt * 1.6)); player.vy = -F.v; player.diveJump = h > 7; player.diveSpeed = 0; player.grounded = false;
+    cam.pitch = lerp(cam.pitch, h > 10 ? -0.38 : 0.08, 1 - Math.exp(-dt * 1.2)); cam.dist = cam.cur = lerp(cam.cur, h > 10 ? 10 : 5, 1 - Math.exp(-dt * 1.2));
+    if (h < 0.35) {
+      F.landed = true; player.diveJump = false; player.vy = 0; player.pos.y = floorAt(player.pos.x, player.pos.z); kosTone(48, 1.6, 'sine', 0.3); kosTone(96, 0.6, 'triangle', 0.15);
+      const fl = document.createElement('div'); fl.style.cssText = 'position:fixed;inset:0;z-index:99990;background:#fff;opacity:.85;pointer-events:none;transition:opacity 1s;'; document.body.appendChild(fl); requestAnimationFrame(() => { fl.style.opacity = 0; }); setTimeout(() => fl.remove(), 1200);
+    }
+    return;
+  }
+  F.sinceLand += dt;
+  if (!F.said && F.sinceLand > 1.6) { F.said = true; F.on = false; titleCard('', 'KOSMOPOLIS', 'Every century. One street.'); setTimeout(() => KOS.fallTalk(), 2200); }
+});
+KOS.fallTalk = function () {
+  Voice.stop(); sub.cur = null; sub.queue.length = 0; sub.conv = false; subEl.classList.remove('show');
+  say([
+    Ni('Ow. Why is the ground made of marble and bad decisions?'),
+    Dg('Do not get up too quickly. You fell out of the sky into the Agora at midnight. It is either the sea air or the wine. I recommend both.'),
+    Ni('Last thing I remember: 2026, a laptop, a deadline, cold coffee. Now it is night, there is a goat staring at me like I owe it money, and two strangers are looking at me like I am the entertainment.'),
+    Dg('Don’t stand there looking like an expensive statue. They tax those here.', { act: () => { DG.state = 'follow'; } }),
+    Ni('Who are you?'),
+    Dg('Diogenes. I live in a jar and I hold a lantern during the day. Don’t ask. Everybody asks. It is tiring.'),
+    So('Greetings, stranger! May I ask you a few simple questions?', { act: () => { KOS.socFollow = true; socrates.script = { pos: V(player.pos.x + 2.4, 0, player.pos.z + 1.4), walk: true, speed: 1.8 }; } }),
+    Dg('Do not say yes. They are never simple, and never few.'),
+    So('Do you know where you are?'),
+    Ni('Ancient Greece?'),
+    So('A splendid first guess. Which Greece? And which year?'),
+    Ni('I… the ancient one? Around… BC?'),
+    So('Intriguing. The man selling fish over there says it is the fourth year of Pythagoras. The woman beside him says Pythagoras is dead, and she knows because she was at his funeral, which she places after Alexander. I have asked four hundred people. No two answers agree.'),
+    Dg('And three hundred and ninety-nine wanted to hit him.'),
+    So('And the other was Diogenes.'),
+    So('Welcome to Kosmopolis, young man: every century, one street. Nobody remembers arriving. Nobody knows who built it. And since last night, there is that.'),
+    Ni('The beam.'),
+    So('A column of light that begins beneath the harbour and ends where nobody has been. It appeared the night you did. I do not believe in coincidences. I believe in questions I haven’t asked yet.'),
+    Dg('Go and see Thales at the harbour. He thinks everything is water. He fell in a well once because of that, so he is almost certainly right about water.'),
+    Ni('Thales. Harbour. Beam. Got it. Do I get a map?'),
+    Dg('You get a lantern and an attitude. It is all anyone gets.', { act: () => {
+      Game.flags.kosCompanions = true; clue('beam', 'The beam', 'A column of light rises from the sea floor beneath the Old Harbour and goes straight up into the sky. It appeared the night Nico did. Everyone in Kosmopolis has an opinion about it. None of them agree.');
+      sleeping = true; fadeEl.classList.add('on');
+      setTimeout(() => { gameMin = (Math.floor(gameMin / 1440) + 1) * 1440 + 7.2 * 60; fadeEl.classList.remove('on'); sleeping = false; Game.lock = false; titleCard('', 'Dawn', 'The city does not explain itself.'); updateObjective(); }, 1800);
+    } }),
+  ]);
+};
+KOS.begin = function () { KOS.dream(() => KOS.fallIntro()); };
 /*KOS_F_END*/
 /*KOS_ES_BEGIN*/
 Object.assign(ES_TEXT, {
@@ -18907,6 +19244,9 @@ Object.assign(ES_TEXT, {
 })();
 
 Object.assign(ES_TEXT, {
+  'Do not get up too quickly. You fell out of the sky into the Agora at midnight. It is either the sea air or the wine. I recommend both.': 'No te levantes tan rápido. Caíste del cielo en el Ágora a medianoche. O es la brisa del mar o es el vino. Recomiendo ambos.',
+  'Last thing I remember: 2026, a laptop, a deadline, cold coffee. Now it is night, there is a goat staring at me like I owe it money, and two strangers are looking at me like I am the entertainment.': 'Lo último que recuerdo: 2026, un portátil, una entrega, café frío. Ahora es de noche, hay una cabra mirándome como si le debiera dinero, y dos desconocidos me miran como si fuera el espectáculo.',
+  'Dawn': 'Amanecer', 'The city does not explain itself.': 'La ciudad no se explica.',
   'Skip': 'Saltar', 'The year is 2026.': 'Estamos en 2026.', 'Nico has not slept in two days.': 'Nico lleva dos días sin dormir.', 'A laptop. A deadline. A cup of cold coffee.': 'Un portátil. Una entrega. Una taza de café frío.', 'His eyes close.': 'Sus ojos se cierran.', 'And the screen begins to remember.': 'Y la pantalla empieza a recordar.', 'Years run backwards.': 'Los años corren hacia atrás.', 'A circle. A triangle. A line through both.': 'Un círculo. Un triángulo. Una línea que atraviesa ambos.', 'A beam of light, rising out of the sea.': 'Un haz de luz que se eleva desde el mar.', 'Somewhere, something is watching. Something very patient.': 'En algún lugar, algo observa. Algo muy paciente.', 'He does not wake up in 2026.': 'No despierta en 2026.',
 });
 /*KOS_ES_END*/
