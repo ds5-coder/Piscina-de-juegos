@@ -959,6 +959,23 @@ const games = [
     image: "assets/game-covers/socrates_agora.png",
     previewUrl: "games/socrates_camino_sabiduria.html",
     playUrl: "games/socrates_camino_sabiduria.html"
+  },
+  {
+    id: 49,
+    title: "Kosmopolis",
+    category: "Aventura",
+    collection: "Filosofía",
+    subcollection: "Filosofía antigua",
+    mode: "Aventura 3D",
+    duration: "Larga",
+    description:
+      "Nico, un estudiante de 2026, queda atrapado en la antigua Grecia con el coche del tiempo de su abuelo y se cruza con los primeros filósofos.",
+    longDescription:
+      "Una aventura 3D en el navegador: recorre Atenas, el Egeo y Mileto en 13 capítulos, habla con filósofos como Tales y Anaximandro (el ápeiron, el gnomon), juega en las tabernas, conduce el coche del tiempo y navega entre ciudades.",
+    gradient: "linear-gradient(135deg, rgba(20,50,100,0.95), rgba(220,170,60,0.85))",
+    image: "",
+    previewUrl: "games/kosmopolis/index.html",
+    playUrl: "games/kosmopolis/index.html"
   }
 ];
 
@@ -1021,7 +1038,8 @@ const gameTranslations = {
     45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." },
     46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." },
     47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." },
-    48: { title: "Socrates: the Path of Wisdom", description: "A platform adventure through classical Greece: Socrates recovers the Scrolls of Truth stolen by the sophists, by asking questions.", longDescription: "A platformer where you run, jump and dodge traps through the Athenian Agora and other worlds, defeat sophists with questions and unlock a gallery of philosophical characters and inscriptions." }
+    48: { title: "Socrates: the Path of Wisdom", description: "A platform adventure through classical Greece: Socrates recovers the Scrolls of Truth stolen by the sophists, by asking questions.", longDescription: "A platformer where you run, jump and dodge traps through the Athenian Agora and other worlds, defeat sophists with questions and unlock a gallery of philosophical characters and inscriptions." },
+    49: { title: "Kosmopolis", description: "Nico, a 2026 student, gets stranded in ancient Greece with his grandfather's time car and meets the first philosophers.", longDescription: "A 3D browser adventure: travel through Athens, the Aegean and Miletus in 13 chapters, talk to philosophers such as Thales and Anaximander (the apeiron, the gnomon), play in the taverns, drive the time car and sail between cities." }
   }
 };
 
