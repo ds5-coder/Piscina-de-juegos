@@ -15748,7 +15748,7 @@ function driveCharModel(h, dt, speed, t) {
   }).catch(e => modelNote("hero (protagonist)", false, e));
   // Socrates, the villagers and the townswomen
   const sceneOf = u => modelGLTF(u).then(g => { modelNote(u, true); return g.scene; }).catch(e => { modelNote(u, false, e); return null; });
-  MC.promise = Promise.all([sceneOf('models/socrates.json'), sceneOf('models/man.json'), sceneOf('models/woman.json'), anims]);
+  MC.promise = Promise.all([sceneOf('models/socrates.json'), Promise.resolve(null), Promise.resolve(null), anims]);
   MC.promise.then(([so, man, wom, A]) => {
     if (so) attachCharModel(socrates.h, so, null, { height: 1.7, static: true, rawHeight: 197.6, rawMinY: -6.1 });
     const MEN = ['Kleon', 'Theron', 'Demeas', 'Philon', 'Dockworker', 'Fisherman', 'Lampon', 'Lykos', 'Traveller', 'Hermon', 'Ktesias'];
