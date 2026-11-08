@@ -16198,14 +16198,14 @@ function updateHorses(dt, t) {
     if (dPl < 5 && player.speed > 5.5 && H.state !== 'shy' && Math.random() < dt * 0.6) { H.state = 'shy'; H.stateT = 1.6; const a = Math.atan2(p.x - player.pos.x, p.z - player.pos.z); H.target = { x: p.x + Math.sin(a) * 8, z: p.z + Math.cos(a) * 8 }; }
     if (H.stateT < 0) {
       const r = Math.random();
-      if (H.state === 'graze' || H.state === 'shy') { H.state = r < 0.55 ? 'walk' : r < 0.85 ? 'trot' : 'gallop'; H.target = pickHorseTarget(H); H.stateT = 25; }
+      if (H.state === 'graze' || H.state === 'shy') { H.state = r < 0.75 ? 'walk' : 'trot'; H.target = pickHorseTarget(H); H.stateT = 25; }
       else { H.state = 'graze'; H.stateT = 4 + Math.random() * 9; H.target = null; }
     }
     let want = 0;
     if (H.target && H.state !== 'graze') {
       const dx = H.target.x - p.x, dz = H.target.z - p.z, d = Math.hypot(dx, dz);
       if (d < 1.5) { H.state = 'graze'; H.stateT = 3 + Math.random() * 8; H.target = null; }
-      else { H.yaw += clamp(angDiff(H.yaw, Math.atan2(dx, dz)), -2.2 * dt, 2.2 * dt); want = { walk: 1.1, trot: 2.4, gallop: 5.2, shy: 3.2 }[H.state] * Math.min(1, d / 4); }
+      else { H.yaw += clamp(angDiff(H.yaw, Math.atan2(dx, dz)), -2.2 * dt, 2.2 * dt); want = { walk: 1.0, trot: 2.0, gallop: 2.0, shy: 2.2 }[H.state] * Math.min(1, d / 4); }
     }
     H.graze = lerp(H.graze || 0, H.state === 'graze' ? 1 : 0, 1 - Math.exp(-dt * 1.5));
     H.speed = lerp(H.speed, want, 1 - Math.exp(-dt * 1.8));
@@ -17430,6 +17430,7 @@ defMission({
 
 
 
+
 /*KOS_E_BEGIN*/
 /* =========================================================================================
    ACT II (missions 5-9): Heraclitus, Parmenides, Zeno, Empedocles, Anaxagoras.
@@ -17871,6 +17872,28 @@ defMission({
     clue('anaxagoras', 'The machine nobody built', 'Anaxagoras insists he did not build the machine. Its parts seem to be made of something invisible, or something unstable: they vanish when looked at. The evidence against him has too many small mistakes. Democritus may know what it is made of.');
     return ['Clue: Anaxagoras denies building it; the parts are unstable', 'Suspect, but not convinced', '+45 obols'];
   },
+});
+
+/* ---------- Mission 1: a clear, lit path of buoys across the water to the sunken temple, with a gentle current ---------- */
+KOS.BP = (() => {
+  const S = { x: 178.5, z: -33 }, G = { x: KOS.P.temple.x, z: KOS.P.temple.z + 9.5 }, n = 10, list = [];
+  const cm = new THREE.MeshBasicMaterial({ color: 0xffd66b, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, x = S.x + (G.x - S.x) * t, z = S.z + (G.z - S.z) * t, g = new THREE.Group();
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 10), new THREE.MeshStandardMaterial({ color: i % 2 ? 0xff5a3a : 0xfff1c0, emissive: i % 2 ? 0xaa2a10 : 0x887a40, roughness: 0.5 })); ball.position.y = 0.25;
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 7, 8, 1, true), cm); col.position.y = 3.6;
+    g.add(ball, col); g.position.set(x, SEA_Y, z); g.visible = false; scene.add(g); list.push(g);
+  }
+  return { S, G, list };
+})();
+KOS.ticks.push((dt, t) => {
+  const P = KOS.BP, on = Game.active === 'k1' && !!KOS.barrel && !underground;
+  P.list.forEach((g, i) => { g.visible = on; if (on) g.position.y = SEA_Y + Math.sin(t * 1.6 + i) * 0.08; });
+  if (!on || !player.swimming || player.under) return;
+  // a gentle current along the path, so the swim is never a fight
+  const dx = P.G.x - P.S.x, dz = P.G.z - P.S.z, L = Math.hypot(dx, dz), ux = dx / L, uz = dz / L;
+  const rx = player.pos.x - P.S.x, rz = player.pos.z - P.S.z, along = rx * ux + rz * uz, lat = rx * -uz + rz * ux;
+  if (along > -6 && along < L + 2 && Math.abs(lat) < 11) { const k = Math.max(0, 1 - Math.abs(lat) / 11) * 1.8 * dt; player.pos.x += (ux * 0.9 - (-uz) * Math.sign(lat) * Math.min(1, Math.abs(lat) / 3) * 0.5) * k * 1.0; player.pos.z += (uz * 0.9 - ux * Math.sign(lat) * Math.min(1, Math.abs(lat) / 3) * 0.5) * k * 1.0; }
 });
 /*KOS_E_END*/
 /*KOS_F_BEGIN*/
