@@ -17422,6 +17422,9 @@ defMission({
 
 
 
+
+
+
 /*KOS_E_BEGIN*/
 /* =========================================================================================
    ACT II (missions 5-9): Heraclitus, Parmenides, Zeno, Empedocles, Anaxagoras.
@@ -17865,6 +17868,301 @@ defMission({
   },
 });
 /*KOS_E_END*/
+/*KOS_F_BEGIN*/
+/* =========================================================================================
+   ACT III (missions 10-13): Democritus, Socrates, Plato, Aristotle, and the thing that is not quite a villain.
+   ========================================================================================= */
+const kFade = (mid, after) => { Game.lock = true; sleeping = true; fadeEl.classList.add('on'); setTimeout(() => { try { mid(); } catch (e) { console.warn(e); } fadeEl.classList.remove('on'); sleeping = false; Game.lock = false; if (after) after(); }, 1100); };
+const kSay2 = (list) => say(list);
+
+/* =====================================  MISSION 10: DEMOCRITUS  =====================================
+   A laboratory, a flask, and a tiny world made of atoms, crumbs and cheese. Some things only exist when you are not looking. */
+const D0 = KOS.P.atoms = kAt(-224, 136);
+KOS.sites.push({ x: D0.x, z: D0.z, r: 30, name: 'The Laughing Laboratory' });
+const kDemocritus = kosNPC('Democritus', 909, D0.x + 2, D0.z - 4, Math.PI, kDes({ skin: '#d6ab84', hair: 'curly', hairCol: '#bdb6a8', beard: 'full', beardCol: '#bdb6a8', tunic: '#a8895a', sash: '#6a8a5a', skirt: { len: 0.95, col: '#a8895a', flare: 0.08 }, height: 0.97 }),
+  { lineNow: () => pick(['Nothing exists but atoms and the void. All else is opinion. Ha! I laugh when I say it. I laugh when I hear it. I laughed at my own funeral, and I have not even had it yet.', 'They call me the Laughing Philosopher. It is a compliment. They also say I blinded myself to think better. A lie. I just closed my eyes more often.', 'If you cut a cheese in half, and half again, and so on, you reach something that cannot be cut. The cheese is gone by then. I am very sorry.']) });
+KOS.AT = (() => {
+  // the laboratory: a table, jars of nothing, a flask
+  const bench = kSolid(D0.x - 3, D0.z - 5, 4.2, 1.6, 1.0, '#7a5a3a'); const flask = kMesh(new THREE.SphereGeometry(0.35, 16, 12), new THREE.MeshStandardMaterial({ color: 0x9fe8ff, emissive: 0x2a8aa0, transparent: true, opacity: 0.8 }), D0.x - 3, D0.y + 1.35, D0.z - 5);
+  KOS.addGlyph(D0.x + 7, D0.z + 5, false);
+  // the micro world floats 60 m above, so the real one is still there underneath
+  const MY = D0.y + 60, M = { x: D0.x, z: D0.z, y: MY };
+  const floor = { x0: M.x - 20, x1: M.x + 20, z0: M.z - 20, z1: M.z + 20, top: MY, ramp: 0.001 }; platforms.push(floor);
+  const gridMat = new THREE.MeshBasicMaterial({ color: 0x111a2a }); const g = kMesh(new THREE.BoxGeometry(40, 0.4, 40), gridMat, M.x, MY - 0.2, M.z);
+  const gh = new THREE.GridHelper(40, 40, 0x3a8aa8, 0x1c3a4a); gh.position.set(M.x, MY + 0.03, M.z); scene.add(gh);
+  // giant crumbs to hop over, and a cheese
+  const crumbs = [[-6, 12, 1.0], [-1, 9, 1.8], [4, 6, 2.6], [8, 1, 3.2], [4, -4, 2.4], [-2, -7, 1.6], [-8, -5, 1.2]].map(([dx, dz, h]) => { const p = { x0: M.x + dx - 2, x1: M.x + dx + 2, z0: M.z + dz - 2, z1: M.z + dz + 2, top: MY + h, ramp: 0.001 }; platforms.push(p); kMesh(new THREE.BoxGeometry(4, h, 4), kMat('#c9a96e'), M.x + dx, MY + h / 2, M.z + dz); return p; });
+  const cheese = kMesh(new THREE.BoxGeometry(7, 4.5, 6), kMat('#e8c24a'), M.x - 10, MY + 2.25, M.z - 10); [[0.8, 0.8], [-1.6, 1.2], [1.4, -1.5]].forEach(([a, b]) => { const h = kMesh(new THREE.SphereGeometry(0.7, 10, 8), kMat('#b8921e'), M.x - 10 + a * 2, MY + 3.2 + b * 0.3, M.z - 10 + 3.05); }); circles.push({ x: M.x - 10, z: M.z - 10, r: 3.6 });
+  const atomsSpec = [[-6, 12, 1.0, 0], [4, 6, 2.6, 0], [8, 1, 3.2, 1], [-2, -7, 1.6, 0], [-8, -5, 1.2, 1]];
+  const atoms = atomsSpec.map(([dx, dz, h, obs], i) => ({ i, x: M.x + dx, z: M.z + dz, y: MY + h + 1.1, obs: !!obs, got: false, m: kMesh(new THREE.SphereGeometry(0.34, 14, 10), new THREE.MeshBasicMaterial({ color: obs ? 0xd8a8ff : 0x7fe9ff }), M.x + dx, MY + h + 1.1, M.z + dz) }));
+  const pad = kMesh(new THREE.CylinderGeometry(1.4, 1.4, 0.15, 20), new THREE.MeshBasicMaterial({ color: 0xfff1a8 }), M.x + 14, MY + 0.08, M.z + 14);
+  const plats = [floor].concat(crumbs), circ = circles[circles.length - 1];
+  const setMicro = on => { plats.forEach(p => { const i = platforms.indexOf(p); if (on && i < 0) platforms.push(p); if (!on && i >= 0) platforms.splice(i, 1); }); const j = circles.indexOf(circ); if (on && j < 0) circles.push(circ); if (!on && j >= 0) circles.splice(j, 1); };
+  setMicro(false);
+  return { M, MY, atoms, pad, flask, cheese, pulls: 0, inMicro: false, active: false, setMicro };
+})();
+KOS.ticks.push((dt, t) => {
+  const A = KOS.AT; if (!A.active && !A.inMicro) return;
+  A.atoms.forEach(a => { a.m.position.y = a.y + Math.sin(t * 2 + a.i) * 0.12; a.m.visible = !a.got && (!a.obs || kLook(a.x, a.y, a.z) < 0.15); });
+  A.pad.material.color.setHex(A.atoms.every(a => a.got) && A.pulls >= 3 ? 0x7dffa0 : 0xfff1a8);
+  if (A.inMicro && player.pos.y < A.MY - 8 && !Death.on) { player.pos.set(A.M.x + 14, A.MY + 1, A.M.z + 14); player.vy = 0; toast('You fell through the void. It is mostly void.'); }
+});
+defMission({
+  id: 'k10', kind: 'main', title: 'Atoms and the Void', sub: 'Democritus. Everything is small. Some things are smaller.',
+  marker: () => V(D0.x, 0, D0.z + 8), when: () => !!Game.flags.k9Done,
+  restart: () => V(D0.x, 0, D0.z + 9),
+  start() { const A = KOS.AT; A.setMicro(false); A.active = true; A.inMicro = false; A.pulls = 0; A.atoms.forEach(a => { a.got = false; }); },
+  steps: [
+    talkStep('Talk to Democritus in his laboratory', kDemocritus, 'Talk to Democritus', () => [
+      { who: 'Democritus', npc: kDemocritus, text: 'Ha! Anaxagoras sent you. He is innocent, you know. Probably. I have only been wrong once, and it was about a different thing entirely. Come. Let me show you what the machine is made of.' },
+      Ni('How? I cannot even see the parts. They vanish when I look at them.'),
+      { who: 'Democritus', npc: kDemocritus, text: 'Then do not look. Everything is atoms and the void. Hard atoms, tiny atoms, dancing in the emptiness. Taste is an opinion. Colour is an opinion. Cheese, my friend, is a very dense opinion. Drink the flask: you will be as small as the truth.' },
+      So('I knew a man who tried to compute the number of grains of sand in the world. Archimedes. He had better luck. It required a great deal of sand.'),
+      Dg('Does the flask taste bad? Everything that makes you smaller tastes bad.'),
+      Ni('Here goes nothing. Which is, apparently, mostly everything.', { act: () => { kFade(() => { const A = KOS.AT; A.setMicro(true); A.inMicro = true; kTP(A.M.x + 14, A.M.z + 14); player.pos.y = A.MY + 0.3; KOS.microDG = DG.state; DG.state = 'absent'; }); } }),
+    ]),
+    {
+      obj: () => { const A = KOS.AT, n = A.atoms.filter(a => a.got).length; return 'Micro-world: collect the 5 atoms (' + n + '/5). Violet atoms exist only when you are not looking straight at them. Then pull Diogenes out of the cheese (' + A.pulls + '/3) and step on the pad.'; },
+      target: () => { const A = KOS.AT, a = A.atoms.find(q => !q.got); if (a) return V(a.x, a.y, a.z); if (A.pulls < 3) return V(A.M.x - 10, A.MY + 1, A.M.z - 6); return V(A.pad.position.x, A.pad.position.y + 1, A.pad.position.z); },
+      enter(rt) {
+        const A = KOS.AT;
+        say([Ni('Everything is huge. That is a breadcrumb. That is a grain of dust the size of a sofa.'), Dg('(from somewhere inside the cheese) Nico? Nico. I am in a cheese. I would like to make clear that this is not a suitable scale for a dignified philosopher.'), So('He is stuck in the cheese. We all saw it coming.')]);
+        A.atoms.forEach(a => stepInteract({ label: a.obs ? 'Catch the violet atom' : 'Collect the atom', pos: () => V(a.x, a.y, a.z), r: 2.2, bias: 5, when: () => !a.got && a.m.visible, act: () => { a.got = true; kosTone(500 + a.i * 90, 0.5, 'sine', 0.16); toast('Atom ' + A.atoms.filter(q => q.got).length + '/5'); } }));
+        stepInteract({ label: 'Pull Diogenes out of the cheese', pos: () => V(A.M.x - 10, A.MY + 1.5, A.M.z - 6), r: 3.2, bias: 5, when: () => A.pulls < 3, act: () => { A.pulls++; kosTone(160 + A.pulls * 40, 0.4, 'sawtooth', 0.1); toast(['Pull!', 'He moved. A bit. The cheese is winning.', 'POP.'][A.pulls - 1]); if (A.pulls === 3) say([Dg('At last. I am out. I smell like a goat’s dinner. If you tell anyone, I will deny it with excessive eloquence.', { act: () => { DG.state = KOS.microDG || 'follow'; DG.pos.set(player.pos.x - 2, 0, player.pos.z - 1); } })]); } });
+      },
+      update(rt) { const A = KOS.AT; return A.atoms.every(a => a.got) && A.pulls >= 3 && Math.hypot(player.pos.x - A.pad.position.x, player.pos.z - A.pad.position.z) < 1.8 && !sub.conv && !Game.lock; },
+      exit(rt) { const A = KOS.AT; if (Game.step >= 1 && A.atoms.every(a => a.got)) { kFade(() => { A.inMicro = false; A.setMicro(false); DG.state = 'follow'; kTP(D0.x, D0.z + 6); DG.pos.set(D0.x + 2, 0, D0.z + 8); }); } },
+    },
+    talkStep('Back at full size: tell Democritus what you found', kDemocritus, 'Talk to Democritus', () => [
+      Ni('The machine parts are made of atoms. Except the atoms are not heavy or hard. They are just... decided. They look different depending on who is looking at them. That is not matter.'),
+      { who: 'Democritus', npc: kDemocritus, text: 'Ha! An observer-dependent atom. I have not laughed so hard since the funeral. A machine that is not a machine: it is a rule pretending to be a thing. Fascinating. Dreadful.' },
+      So('And the evidence against Anaxagoras? You said the handwriting was wrong. The letter, the plans: do the atoms confirm that?'),
+      { who: 'Democritus', npc: kDemocritus, text: 'The ink on the plans was new. By my count, three days old and a thousand years old at the same time. Somebody wanted Anaxagoras found. Somebody who forgot that ink ages.' },
+      Dg('The cheese was real, though. I can vouch for the cheese.'),
+      { who: 'Democritus', npc: kDemocritus, text: 'You are asking the wrong person. Ask the man who asks questions. Socrates says no one knows anything. I propose we find out whether he is right.' },
+    ]),
+  ],
+  complete() {
+    KOS.AT.active = false; Game.flags.k10Done = true; addMoney(50); const f = KOS.P.start; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('atoms', 'The machine is not matter', 'The machine’s parts have no stable form: they change with whoever observes them. It is not a physical object. The evidence against Anaxagoras was staged: the ink on the plans was new and ancient at once.');
+    return ['Clue: the machine is not physical; the evidence was staged', 'The beam returns to the Agora', '+50 obols'];
+  },
+});
+
+/* =====================================  MISSION 11: SOCRATES  =====================================
+   Go back and question the people already met. Compare what they say. Find what cannot all be true. */
+const kQ = (n) => {
+  const retry = (k) => ({ act: () => setTimeout(() => say(kQ(k)), 80) });
+  if (n === 1) return [So('Let us put it together, Nico. Three people described the night the beam appeared. Thales said dusk: he fell asleep at the well. Pythagoras said dawn: the first bell. Anaxagoras said midnight: a hum under the sea. What do you make of it?', { choices: [
+    { label: 'They were each right about their own moment. A long night.', then: [So('A long night has an end. They described one event. One event cannot be at dusk, midnight and dawn.'), Dg('Unless the night is very long. I have been to parties like that.', retry(1))] },
+    { label: 'They cannot all be true. One event, three different times.', then: [So('Precisely. And honest men, all three. Pythagoras does not lie, Thales is too proud, and Anaxagoras too cross. Why do three honest people disagree?')], act: () => { KOS.qOk = 1; } },
+    { label: 'They are lying. Obviously.', then: [So('Obviously? Nothing is obvious, Nico. I have known liars. These are not liars. They are three men who each remember something different.'), Dg('Or three men and a lot of wine.', retry(1))] }] })];
+  if (n === 2) return [So('Why would a city let three honest men remember three different times for the same event?', { choices: [
+    { label: 'Because someone in the city altered their memories.', then: [So('Who? A man inside the city, with a hand in three different heads? Think further.'), Dg('A man with a very large pair of hands.', retry(2))] },
+    { label: 'Diogenes’ idea: “Time is not broken, it is unfinished. Nobody wrote it down properly.”', then: [Dg('(clearing his throat) I said it purely for fun.'), So('That is... actually correct. A city without a single clock cannot give three men the same hour. Irritating.'), Dg('I contain multitudes. Mostly figs.')], act: () => { KOS.qOk = 2; } },
+    { label: 'The city has no single time; it never needed one.', then: [So('Yes. Every century, one street. The city does not keep time. It keeps appearances. Which is more worrying.')], act: () => { KOS.qOk = 2; } }] })];
+  return [So('Last question. Who could keep a whole city so consistent that nobody can see the seams? Not Anaxagoras, with his clumsy forgeries. Who?', { choices: [
+    { label: 'A tyrant. The Thirty, perhaps, from the Acropolis.', then: [So('A tyrant is a man in the city. He must sleep. He must eat. He is as confused by the street as you are.'), Dg('Tyrants have terrible taste in wine.', retry(3))] },
+    { label: 'A god. Zeus, Apollo, one of them.', then: [So('A god is also in the city, by the stories. And they are quarrelsome, and so very bad at secrets.'), Dg('They would have bragged. Immediately.', retry(3))] },
+    { label: 'Nobody inside it. The world itself is the deception.', then: [So('Yes. Nobody inside it. The only liar who is not a person is the world. I have long suspected that “knowing nothing” was a charitable description.'), Dg('And I, being a dog, suspected it first.')], act: () => { KOS.qOk = 3; } }] })];
+};
+defMission({
+  id: 'k11', kind: 'main', title: 'The Question of Reality', sub: 'Socrates. He knows he knows nothing. Today he insists on proving it.',
+  marker: () => V(KOS.P.start.x, 0, KOS.P.start.z), when: () => !!Game.flags.k10Done,
+  restart: () => V(KOS.P.start.x, 0, KOS.P.start.z + 2),
+  start() { KOS.qOk = 0; },
+  steps: [
+    talkStep('Talk to Socrates: it is time to question everyone again', socrates, 'Talk to Socrates', () => [
+      So('Nico. Democritus is right. We have been asking the world questions, and the world answers politely, and always in the direction of the next beam. I propose we stop following the light and examine what it shows us.'),
+      Dg('He wants to ask questions. Again. Everyone run.'),
+      So('We start with Thales, at the harbour. Then Pythagoras, in his garden. Compare what each says about the night the beam appeared. Then we shall see which statements can live together in the same city.'),
+      Ni('So: witnesses, testimony, contradictions. Like a very old detective show.'),
+      So('Like any honest conversation. Except they are rarely honest, and almost never short.'),
+    ]),
+    talkStep('Question Thales at the harbour', thales, 'Question Thales', () => [
+      Ni('Thales. The night the beam appeared. What did you see?'),
+      Th('Water! I was by the harbour. I fell asleep at the well, as one does. I woke at dusk and there was a column of light over the sea. A fine omen. Water, you see, is in everything, including light.'),
+      Dg('He falls down wells. That is why he keeps going back to them. It is a very good place for his philosophy.'),
+      So('Noted: dusk. Thales fell asleep at the well and saw the beam rise at dusk.'),
+    ], () => thales.h.root.position),
+    talkStep('Question Pythagoras in the Harmonic Garden', kPythagoras, 'Question Pythagoras', () => [
+      Ni('Pythagoras. The night of the beam. What happened?'),
+      { who: 'Pythagoras', npc: kPythagoras, text: 'It was dawn. I was striking the first bell. Of course it was dawn. I never sleep before the bells; it is the rule. The beam rose at the third note. I have no clue why it picked that one.' },
+      Dg('Dawn! The man is wrong. He has never stood up before noon in his life.'),
+      So('Noted: dawn. Pythagoras, at the first bell. And Anaxagoras: midnight, a hum under the sea.'),
+      So('Now, Nico. Let us examine all three.', { act: () => { KOS.qReady = true; } }),
+    ]),
+    {
+      obj: 'Reason it out with Socrates: three questions, one honest answer',
+      target: () => socrates.h.root.position,
+      enter(rt) { rt.data.n = 1; stepInteract({ label: 'Reason it out with Socrates', pos: () => socrates.h.root.position, r: 5, bias: 6, when: () => !rt.data.on && !sub.conv, act: () => { rt.data.on = true; KOS.qOk = 0; say(kQ(1)); } }); },
+      update(rt) {
+        if (!rt.data.on) return false;
+        if (KOS.qOk >= 1 && rt.data.n === 1) { rt.data.n = 2; KOS.qOk = 0; setTimeout(() => say(kQ(2)), 400); }
+        else if (KOS.qOk >= 2 && rt.data.n === 2) { rt.data.n = 3; KOS.qOk = 0; setTimeout(() => say(kQ(3)), 400); }
+        else if (KOS.qOk >= 3 && rt.data.n === 3 && !rt.data.fin) { rt.data.fin = true; KOS.qOk = 0; setTimeout(() => say([So('Then here is what we know, young Nico: no person in this city is the author of the deception. The city is its own lie. And a lie that big needs a place where it is made. Plato taught that behind our shadows there is a cave, and a fire, and a wall. Let us find it.'), Ni('The beam is pointing at the cliffs. West, toward the old quarry.'), Dg('A cave. Excellent. I love a cave. They have a very low rent.')]), 400); }
+        return !!rt.data.fin && talkIdle();
+      },
+    },
+  ],
+  complete() {
+    Game.flags.k11Done = true; addMoney(50); const f = KOS.P.cave; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('socrates', 'No person is the liar', 'Three honest witnesses remember three different times for the same event. No single person inside Kosmopolis could keep it consistent. Socrates suggests the world itself is deceiving Nico. The beam points to a cave.');
+    return ['Clue: no one inside the city is the deceiver. The world itself is', 'The beam rises from the Cave of Shadows', '+50 obols'];
+  },
+});
+
+/* =====================================  MISSION 12: PLATO  =====================================
+   The Cave. Three fires cast the city on a wall. Put them out, one at a time, and see what the wall is really showing. */
+const C0 = KOS.P.cave = kAt(-176, 208);
+KOS.sites.push({ x: C0.x, z: C0.z, r: 30, name: 'The Cave of Shadows' });
+const kPlato = kosNPC('Plato', 910, C0.x + 9, C0.z + 6, Math.PI * 1.2, kDes({ skin: '#d6a784', hair: 'curly', hairCol: '#5a5248', beard: 'full', beardCol: '#5a5248', tunic: '#e8e0d0', sash: '#8a6ab0', skirt: { len: 1.0, col: '#e8e0d0', flare: 0.1 }, height: 1.04 }),
+  { lineNow: () => pick(['The Forms are real. This chair is a shadow of the Chair. If you sit on it, you are sitting on a shadow. Do be careful.', 'Philosophers should rule. I tried it in Syracuse. They sold me into slavery. A learning experience.', 'Socrates told me to write nothing down. I wrote everything down. He would have been delighted. And appalled.']) });
+KOS.CV = (() => {
+  const W = { x: C0.x - 12, z: C0.z, w: 20, h: 7 };
+  // the rock wall behind, a luminous screen on it, a low parapet, and three fires
+  for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + i / 11 * Math.PI, rx = C0.x - 14 + Math.cos(a) * 0, rz = C0.z + Math.sin(a) * 14; const r = kMesh(new THREE.DodecahedronGeometry(2.6 + (i % 3) * 0.5), kMat('#4a4238', { roughness: 1 }), C0.x - 15 - Math.cos(a) * 1.5, terrainHeight(C0.x - 15, rz) + 2.0, rz); circles.push({ x: C0.x - 15 - Math.cos(a) * 1.5, z: rz, r: 2.2 }); }
+  const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 360; const cx = cv.getContext('2d'); const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+  const screen = kMesh(new THREE.PlaneGeometry(W.w, W.h), new THREE.MeshBasicMaterial({ map: tex }), C0.x - 12.5, C0.y + 4.4, C0.z); screen.rotation.y = Math.PI / 2;
+  const fires = [-6, 0, 6].map((dz, i) => { const b = kBowl(C0.x - 2, C0.z + dz, C0.y); scene.add(b.fl); b.fl.visible = true; b.lit = true; b.i = i; circles.push({ x: b.x, z: b.z, r: 0.7 }); return b; });
+  const parapet = kSolid(C0.x - 5, C0.z, 0.8, 22, 1.0, '#6a5a44');
+  // the shadow-figures: each belongs to one fire; they march along the wall, tall and flat and very sure of themselves
+  const names = ['Pericles, the tax collector', 'A general, in a hurry', 'Aspasia, the hostess', 'The Archon of Everything', 'A fishmonger', 'Alexander, briefly', 'A poet, between poems', 'The very important man', 'A man selling oaths'];
+  const figs = names.map((n, i) => { const c = document.createElement('canvas'); c.width = 64; c.height = 128; const g = c.getContext('2d'); g.fillStyle = '#000'; g.beginPath(); g.arc(32, 22, 14, 0, TAU); g.fill(); g.fillRect(18, 38, 28, 60); g.fillRect(22, 96, 8, 30); g.fillRect(34, 96, 8, 30); const t = new THREE.CanvasTexture(c); const m = kMesh(new THREE.PlaneGeometry(1.5, 3), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: 0.9, depthWrite: false }), C0.x - 12.4, C0.y + 3, C0.z); m.rotation.y = Math.PI / 2; return { m, n, fire: i % 3, off: i * 2.3, op: 0.9 }; });
+  KOS.addGlyph(C0.x + 6, C0.z - 9, false);
+  return { W, screen, cv, cx, tex, fires, figs, state: 'shadow', active: false, kN: 0 };
+})();
+KOS.CV.paint = (mode) => {
+  const { cx, cv, tex } = KOS.CV; cx.clearRect(0, 0, 1024, 360);
+  if (mode === 'shadow') { const gd = cx.createLinearGradient(0, 0, 0, 360); gd.addColorStop(0, '#ffd89a'); gd.addColorStop(1, '#e8a860'); cx.fillStyle = gd; cx.fillRect(0, 0, 1024, 360); cx.fillStyle = '#b8845a'; for (let i = 0; i < 9; i++) cx.fillRect(40 + i * 110, 210 - (i % 3) * 30, 70, 150); }
+  else { cx.fillStyle = '#05080f'; cx.fillRect(0, 0, 1024, 360); cx.fillStyle = '#7fe9ff'; cx.font = '24px monospace'; const rows = [['THALES', '-585', 'FRAGMENT'], ['PYTHAGORAS', '-530', 'FRAGMENT'], ['SOCRATES', '-420', 'FRAGMENT'], ['PLATO', '-380', 'FRAGMENT'], ['ARISTOTLE', '-340', 'FRAGMENT'], ['ALEXANDER', '-330', 'FRAGMENT'], ['N.', '2026', 'REAL?']]; rows.forEach((r, i) => { cx.fillStyle = i === 6 ? '#ffd66b' : '#7fe9ff'; cx.fillText(r[0].padEnd(14, ' ') + r[1].padStart(6, ' ') + '   ' + r[2], 80, 50 + i * 40); }); cx.strokeStyle = '#7fe9ff'; cx.lineWidth = 4; cx.beginPath(); cx.arc(900, 180, 70, 0, TAU); cx.stroke(); cx.beginPath(); cx.moveTo(900, 120); cx.lineTo(950, 220); cx.lineTo(850, 220); cx.closePath(); cx.stroke(); cx.beginPath(); cx.moveTo(820, 180); cx.lineTo(980, 180); cx.stroke(); cx.fillStyle = '#ff5a5a'; cx.font = '20px monospace'; cx.fillText('COEXISTENCE: IMPOSSIBLE', 80, 340); }
+  tex.needsUpdate = true;
+};
+KOS.CV.paint('shadow');
+KOS.ticks.push((dt, t) => {
+  const V2 = KOS.CV; if (Math.hypot(player.pos.x - C0.x, player.pos.z - C0.z) > 70) return;
+  V2.figs.forEach(f => { const on = V2.fires[f.fire].lit && V2.state === 'shadow'; f.op = lerp(f.op, on ? 0.9 : 0, 1 - Math.exp(-dt * 3)); f.m.material.opacity = f.op; f.m.visible = f.op > 0.02; const u = ((t * 0.05 + f.off / 20) % 1); f.m.position.z = C0.z - 9 + u * 18; f.m.position.y = C0.y + 3 + Math.sin(t * 2 + f.off) * 0.08; });
+  V2.fires.forEach(b => { if (b.lit) { b.fl.visible = true; b.fl.position.set(b.x, b.y + 1.9 + Math.sin(t * 9 + b.i) * 0.05, b.z); b.fl.scale.set(1.1, 1.1 + Math.sin(t * 7 + b.i) * 0.15, 1.1); } else b.fl.visible = false; });
+  if (KOS.glitch && started && (KOS.glT = (KOS.glT || 0) - dt) < 0) { KOS.glT = 4 + Math.random() * 6; shakeAmt = Math.max(shakeAmt, 0.18); KOS.beamMode = 'flicker'; setTimeout(() => { if (KOS.beamMode === 'flicker') KOS.beamMode = 'steady'; }, 900); }
+});
+defMission({
+  id: 'k12', kind: 'main', title: 'The Cave', sub: 'Plato. The shadows on the wall are not the people. The people are not the people.',
+  marker: () => V(C0.x + 14, 0, C0.z), when: () => !!Game.flags.k11Done,
+  restart: () => V(C0.x + 14, 0, C0.z + 2),
+  start() { const V2 = KOS.CV; V2.active = true; V2.state = 'shadow'; V2.fires.forEach(b => { b.lit = true; }); V2.kN = 0; V2.paint('shadow'); },
+  steps: [
+    talkStep('Meet Plato at the mouth of the cave', kPlato, 'Talk to Plato', () => [
+      { who: 'Plato', npc: kPlato, text: 'Nico. Socrates. And a dog. Naturally. Look at the wall. Do you see them? The people who pass by? They are the people of Kosmopolis. They are not the people.' },
+      Dg('Excuse me? I am extremely a person. Ask anyone. Ask the dog.'),
+      { who: 'Plato', npc: kPlato, text: 'You, Diogenes, are the problem: you refuse to be a shadow. The rest are born in chains, facing a wall, taking the passing shadows for the whole world. It is in my book. Number seven. I would explain, but you would only comment.' },
+      So('The cave. Prisoners chained, a fire behind them, puppeteers carrying shapes along a parapet. The prisoners name the shadows. Nico, someone has been carrying shapes for you.'),
+      Ni('The fires. Three of them. If I put them out, the shadows should go. And maybe whatever is behind them shows.'),
+      { who: 'Plato', npc: kPlato, text: 'The light is the source. Remove the light, and the shadows fail. Remove the shadows, and you may finally see the wall. I do wish somebody had done it for me earlier.' },
+    ]),
+    {
+      obj: () => 'Put out the three fires of the cave (' + KOS.CV.fires.filter(b => !b.lit).length + '/3). Each fire carries its own shadows.',
+      target: () => { const b = KOS.CV.fires.find(q => q.lit); return b ? V(b.x, b.y + 1, b.z) : null; },
+      enter(rt) { KOS.CV.fires.forEach(b => stepInteract({ label: 'Put out the fire', pos: () => V(b.x, b.y + 1, b.z), r: 2.2, bias: 5, when: () => b.lit, act: () => { b.lit = false; noiseBurst(0.5, 300, 0.5); const gone = KOS.CV.figs.filter(f => f.fire === b.i).map(f => f.n); toast('The shadows of ' + gone[0] + ' and others go out.'); if (KOS.CV.fires.filter(q => !q.lit).length === 1) say([Dg('Pericles has gone out! And my tax collector! Are those taxes real? Can I get my money back? Who do I ask?'), So('I have a feeling you did not pay them.'), Dg('Exactly. That is why I want to know whether to start.')]); } })); },
+      update(rt) { return KOS.CV.fires.every(b => !b.lit); },
+    },
+    {
+      obj: 'Read the wall',
+      target: () => V(C0.x - 8, 2, C0.z),
+      enter(rt) {
+        KOS.CV.state = 'real'; KOS.CV.paint('real'); KOS.glitch = true; shakeAmt = Math.max(shakeAmt, 0.5);
+        say([Ni('The wall is... a list. Names. Years. Thales, 585 BC. Socrates, 420. Aristotle, 340. Alexander… and a last name: N. Twenty twenty-six.'), So('They are all real. Every one of them lived. But not here, not together. “Coexistence: impossible.” Whoever made this took real people and real events and sewed them into one impossible street.'), { who: 'Plato', npc: kPlato, text: 'Fragments of history, cast as shadows, taken for a world. The Forms are somewhere else. This is merely the cave, and it is a very good one.', act: () => { shakeAmt = Math.max(shakeAmt, 0.6); } }, Dg('The fishmonger was real? I wanted to complain about the fish.'), Ni('And the city above us is flickering. Look: the beam. The walls up there. It is coming apart.', { act: () => { rt.data.done = true; } })]);
+      },
+      update(rt) { return !!rt.data.done && talkIdle(); },
+    },
+  ],
+  complete() {
+    KOS.CV.active = false; Game.flags.k12Done = true; addMoney(60); const f = KOS.P.lyceum; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('cave', 'Real people, impossible street', 'The wall of the cave lists every person in Kosmopolis with their real dates. All are fragments of real history. Their coexistence is impossible: the city is a construction. The city above is beginning to glitch.');
+    return ['Clue: real history, assembled into an impossible city', 'The beam shines over the Lyceum', '+60 obols'];
+  },
+});
+
+/* =====================================  MISSION 13: ARISTOTLE  =====================================
+   The four causes. Classify the evidence. Name the architect. Then wake up. Or do not. */
+const L0 = KOS.P.lyceum = kAt(-256, -96);
+KOS.sites.push({ x: L0.x, z: L0.z, r: 30, name: 'The Lyceum' });
+const kAristotle = kosNPC('Aristotle', 911, L0.x, L0.z - 3, 0, kDes({ skin: '#d9b08a', hair: 'baldsides', hairCol: '#6a5a48', beard: 'short', beardCol: '#6a5a48', tunic: '#5a3b6a', sash: '#d6c9a0', skirt: { len: 1.0, col: '#5a3b6a', flare: 0.08 }, height: 0.99 }),
+  { lineNow: () => pick(['Man is a rational animal. Plato says a featherless biped. I prefer mine. Diogenes brought me a plucked chicken. It was an effective counter-argument.', 'Excellence is a habit. We are what we repeatedly do. I repeat lunch.', 'I taught Alexander. He conquered the world. I am not sure whether that is a credit or a warning.']) });
+KOS.AR = (() => {
+  [-6, -2, 2, 6].forEach(dx => { kMesh(new THREE.CylinderGeometry(0.5, 0.6, 4.2, 12), kMat('#dad2bd'), L0.x + dx, terrainHeight(L0.x + dx, L0.z - 8) + 2.1, L0.z - 8); circles.push({ x: L0.x + dx, z: L0.z - 8, r: 0.65 }); });
+  kMesh(new THREE.BoxGeometry(15, 0.5, 2.4), kMat('#cfc6b0'), L0.x, L0.y + 4.4, L0.z - 8);
+  const boards = [['MATERIAL', -6, 0x8fd0ff], ['FORMAL', -2, 0xffd66b], ['EFFICIENT', 2, 0xff8a8a], ['FINAL', 6, 0xb8ffa0]].map(([n, dx, col], i) => { const m = kMesh(new THREE.BoxGeometry(1.8, 2.6, 0.2), new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 0.25 }), L0.x + dx, L0.y + 1.4, L0.z + 4); return { n, m, got: false, dx }; });
+  KOS.addGlyph(L0.x - 8, L0.z + 8, false);
+  return { boards, round: 0, active: false, kOk: -1 };
+})();
+const kCauses = [
+  { q: 'EVIDENCE 1: “The stone, the light and the air of Kosmopolis are fragments: real dates, real people, real events, cut up and rearranged.” What is this?', ok: 0, why: 'MATERIAL cause: what the city is made of. Fragments of real history.' },
+  { q: 'EVIDENCE 2: “The circle, the triangle and the bar are on every wall, every pot and every floor.” What is this?', ok: 1, why: 'FORMAL cause: the pattern, the shape, what the city is. A repeated structure.' },
+  { q: 'EVIDENCE 3: “The beam moved with every clue; each philosopher, in turn, pointed to the next. Nico was led.” What is this?', ok: 2, why: 'EFFICIENT cause: what makes it happen. The process that guides him.' },
+  { q: 'EVIDENCE 4: “The city adapts to what Nico expects, and never lets him be sure of anything.” What is this?', ok: 3, why: 'FINAL cause: what it is for. To keep him believing.' },
+];
+KOS.arAsk = (i) => {
+  const c = kCauses[i], names = ['The material cause (what it is made of)', 'The formal cause (its pattern)', 'The efficient cause (what drives it)', 'The final cause (its purpose)'];
+  return [{ who: 'Aristotle', npc: kAristotle, text: c.q, choices: names.map((n, k) => ({ label: n, silent: false, then: k === c.ok ? [{ who: 'Aristotle', npc: kAristotle, text: 'Correct. ' + c.why }, i === 3 ? Dg('The final cause of almost everything people do is lunch. I would like that entered into the record.') : Dg(['Material: marble, mostly. And apparently history.', 'Formal: a symbol. And that was on my pot.', 'Efficient: the beam. I hate the beam.'][i])] : [{ who: 'Aristotle', npc: kAristotle, text: 'No. Think. ' + (k < c.ok ? 'It is more concrete than that.' : 'It is more specific than that.') }, Dg('Try lunch.')].concat([{ who: 'Aristotle', npc: kAristotle, text: '(Look at the evidence again.)', act: () => setTimeout(() => say(KOS.arAsk(i)), 100) }]), act: k === c.ok ? () => { KOS.AR.kOk = i; } : undefined })) }];
+};
+defMission({
+  id: 'k13', kind: 'main', title: 'The Four Causes', sub: 'Aristotle. Classify the evidence. Name the architect.',
+  marker: () => V(L0.x, 0, L0.z + 10), when: () => !!Game.flags.k12Done,
+  restart: () => V(L0.x, 0, L0.z + 11),
+  start() { KOS.AR.active = true; KOS.AR.round = 0; KOS.AR.kOk = -1; KOS.AR.boards.forEach(b => { b.got = false; }); },
+  steps: [
+    talkStep('Talk to Aristotle at the Lyceum', kAristotle, 'Talk to Aristotle', () => [
+      { who: 'Aristotle', npc: kAristotle, text: 'You have been assembling a story out of guesses. Plato is a poet. Democritus is a joker. Socrates asks so many questions that no answer is ever safe. I would like to see the evidence set down in order.' },
+      Dg('He wants to organise things. A man who alphabetises his grudges.'),
+      { who: 'Aristotle', npc: kAristotle, text: 'To know a thing, one must know its four causes: what it is made of, its form, what moves it, and what it is for. Do so for the city, and the truth will not be allowed to hide. Stand at the four tablets and answer me.' },
+      Ni('Four questions. Four causes. One city. I have never been so ready.'),
+    ]),
+    {
+      obj: () => 'Classify the four pieces of evidence at the tablets (' + (KOS.AR.round) + '/4)',
+      target: () => V(L0.x, 1, L0.z + 4),
+      enter(rt) { stepInteract({ label: () => 'Examine the evidence (' + (KOS.AR.round + 1) + '/4)', pos: () => V(L0.x, 1, L0.z + 4), r: 7, bias: 6, when: () => KOS.AR.round < 4 && !sub.conv, act: () => { KOS.AR.kOk = -1; say(KOS.arAsk(KOS.AR.round)); } }); },
+      update(rt) { const A = KOS.AR; if (A.kOk === A.round && A.kOk >= 0) { A.boards[A.round].got = true; A.boards[A.round].m.material.emissiveIntensity = 1; kosTone(330 + A.round * 110, 0.8, 'triangle', 0.18); A.round++; A.kOk = -1; } return A.round >= 4 && talkIdle(); },
+    },
+    talkStep('Tell Aristotle what the four causes add up to', kAristotle, 'Talk to Aristotle', () => [
+      Ni('Material: fragments of real history. Formal: that symbol, repeated everywhere. Efficient: the beam, leading me from one clue to the next. Final: to keep me believing. It adapts. It never lets me be sure.'),
+      { who: 'Aristotle', npc: kAristotle, text: 'Then no one built Kosmopolis with their hands. And not with a mind like Anaxagoras’: his Nous orders; it does not deceive. Whoever did this is a deceiver in the strict sense. An intelligence that makes a false world seem coherent. A being, in short, as cunning as it is powerful.' },
+      So('Anaxagoras is innocent. His forged evidence was meant to stop us here. Someone needed a suspect. A good one. Clumsy enough to be caught.', { act: () => { toast('Anaxagoras is cleared.'); } }),
+      Ni('But who? There are no names. Everyone in this city is a fragment of someone real, even you. Even me?'),
+      { who: 'Aristotle', npc: kAristotle, text: 'Perhaps the one who made it is also a fragment. A philosopher who will not be born for two thousand years, who once wrote that a malicious demon, supremely powerful and cunning, might deceive us in everything, so that the sky, the earth and all outward things are only the delusions of dreams.' },
+      Dg('Who? Do I know him?'),
+      So('His name is René Descartes. He calls the thing the Evil Demon. He lived in the seventeenth century, in a world after this one. He supposed it as a thought experiment. Someone has made it an experiment.'),
+      Ni('So the beam, the clues, the philosophers. All of it was the demon’s idea of a puzzle. And I walked into every room it opened.'),
+      { who: 'Aristotle', npc: kAristotle, text: 'You solved it. Now it must decide what to do with a prisoner who has solved the prison. Brace yourself, young man. If I know the demon, and I think I do, it never leaves a question open without leaving a better one behind.' },
+    ]),
+  ],
+  complete() {
+    KOS.AR.active = false; Game.flags.k13Done = true; addMoney(100); KOS.glitch = true;
+    clue('demon', 'The architect', 'Anaxagoras is innocent. The material, form, process and purpose of Kosmopolis point to one intelligence: Descartes’ Evil Demon, who built a coherent false world out of real people and events. It never appears. Its fingerprints are on everything.');
+    setTimeout(() => KOS.ending && KOS.ending(), 1500);
+    return ['The architect: Descartes’ Evil Demon', 'Anaxagoras is cleared', '+100 obols'];
+  },
+});
+
+/* =====================================  THE ENDING  =====================================
+   Nico appears to wake up in 2026. It is ordinary. Reassuring. One detail is wrong. */
+KOS.ending = function () {
+  if (KOS.endEl) return;
+  Game.lock = true;
+  const el = document.createElement('div'); el.id = 'kosEnd'; el.style.cssText = 'position:fixed;inset:0;background:#000;color:#e8e6df;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:Georgia,serif;text-align:center;padding:24px;opacity:0;transition:opacity 1.6s;';
+  const tx = document.createElement('div'); tx.style.cssText = 'max-width:640px;font-size:clamp(16px,2.6vw,24px);line-height:1.6;min-height:5em;'; el.appendChild(tx);
+  const sm = document.createElement('div'); sm.style.cssText = 'margin-top:28px;font-family:ui-monospace,Consolas,monospace;color:#7fe9ff;font-size:clamp(15px,2.4vw,22px);letter-spacing:.12em;opacity:0;transition:opacity .4s;min-height:3.4em;'; el.appendChild(sm);
+  const btn = document.createElement('button'); btn.textContent = 'Return to Kosmopolis'; btn.style.cssText = 'margin-top:28px;padding:10px 22px;background:transparent;color:#e8e6df;border:1px solid #7fe9ff;border-radius:6px;font-size:16px;cursor:pointer;display:none;'; el.appendChild(btn);
+  document.body.appendChild(el); KOS.endEl = el; requestAnimationFrame(() => { el.style.opacity = 1; });
+  const seq = [
+    [600, 'Beep. Beep. Beep.'], [2600, '06:30. A grey light through a curtain. Your own ceiling.'], [5800, 'A laptop. Cold coffee. A deadline that no longer matters.'], [9200, 'A car outside. A neighbour’s radio. The year: 2026.'], [12600, 'You are home, Nico. It was a dream. A long, strange dream about philosophers.'],
+  ];
+  seq.forEach(([ms, s]) => setTimeout(() => { tx.style.opacity = 0; setTimeout(() => { tx.textContent = s; tx.style.opacity = 1; }, 300); tx.style.transition = 'opacity .5s'; }, ms));
+  setTimeout(() => { tx.textContent = ''; sm.style.opacity = 1; sm.innerHTML = 'KOSMOPOLIS — SIMULATION 02<br>WELCOME BACK, NICO.'; kosTone(110, 3, 'sawtooth', 0.12); kosTone(114, 3, 'sawtooth', 0.08); }, 16200);
+  setTimeout(() => { tx.textContent = 'How could you prove that this is real?'; tx.style.opacity = 1; }, 20000);
+  setTimeout(() => { btn.style.display = 'inline-block'; }, 23000);
+  btn.addEventListener('click', () => { el.style.opacity = 0; setTimeout(() => { el.remove(); KOS.endEl = null; Game.lock = false; Game.flags.kosEnded = true; toast('Kosmopolis is still here. Is it?'); }, 1600); });
+};
+/*KOS_F_END*/
 
 frame();
 })();
