@@ -16858,6 +16858,7 @@ function updateKos(dt, t) {
   if (KOS.k2tick) KOS.k2tick(dt, t);
   if (KOS.k3tick) KOS.k3tick(dt, t);
   if (KOS.k4tick) KOS.k4tick(dt, t);
+  if (KOS.ticks) KOS.ticks.forEach(f => f(dt, t));
   updateChat(dt);
 }
 
@@ -17417,6 +17418,453 @@ defMission({
     return ['Clue: the frequency points to a district that is always changing', 'The beam rises from the Flux Quarter', '+30 obols'];
   },
 });
+
+
+
+
+/*KOS_E_BEGIN*/
+/* =========================================================================================
+   ACT II (missions 5-9): Heraclitus, Parmenides, Zeno, Empedocles, Anaxagoras.
+   Each one has a place you walk to (gold marker), a mechanic of its own, and a Diogenes.
+   ========================================================================================= */
+KOS.ticks = KOS.ticks || [];
+const kOcc = [];
+const kAt = (x, z) => V(x, terrainHeight(x, z), z);
+function kFind(px, pz, R) {
+  const clear = (x, z) => {
+    if (!walkable(x, z) || inSea(x, z)) return false; const h = terrainHeight(x, z); if (h < 0.7) return false;
+    for (let a = 0; a < 10; a++) { const qx = x + Math.cos(a * 0.628) * R, qz = z + Math.sin(a * 0.628) * R; if (inSea(qx, qz) || Math.abs(terrainHeight(qx, qz) - h) > 1.5) return false; }
+    if (boxes.some(b => b.x1 > x - R && b.x0 < x + R && b.z1 > z - R && b.z0 < z + R)) return false;
+    if (circles.some(c => Math.abs(c.x - x) < R && Math.abs(c.z - z) < R)) return false;
+    if (kOcc.some(o => Math.hypot(o.x - x, o.z - z) < o.r + R + 14)) return false;
+    if (scene.children.some(o => (o.isMesh || o.isGroup) && o.position && (Math.abs(o.position.x) + Math.abs(o.position.z) > 2) && Math.abs(o.position.x - x) < R + 4 && Math.abs(o.position.z - z) < R + 4)) return false;
+    return true;
+  };
+  for (let r = 0; r < 330; r += 6) for (let a = 0; a < (r ? 16 : 1); a++) {
+    const x = px + Math.cos(a * 0.3927 + r) * r, z = pz + Math.sin(a * 0.3927 + r) * r;
+    if (Math.abs(x) < 335 && Math.abs(z) < 335 && clear(x, z)) { kOcc.push({ x, z, r: R }); return V(x, terrainHeight(x, z), z); }
+  }
+  kOcc.push({ x: px, z: pz, r: R }); return V(px, terrainHeight(px, pz), pz);
+}
+const kMat = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85 }, o || {}));
+function kMesh(geo, mat, x, y, z) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); scene.add(m); return m; }
+function kSolid(x, z, w, d, h, col) { const y = terrainHeight(x, z), m = kMesh(new THREE.BoxGeometry(w, h, d), kMat(col), x, y + h / 2, z), b = { x0: x - w / 2, x1: x + w / 2, z0: z - d / 2, z1: z + d / 2 }; boxes.push(b); return { m, b }; }
+const kTP = (x, z) => { player.pos.set(x, floorAt(x, z), z); player.vy = 0; player.speed = 0; setCheckpoint(); };
+const kNear = (p, x, z, r) => Math.hypot(player.pos.x - x, player.pos.z - z) < r;
+const kLook = (x, y, z) => { const v = new THREE.Vector3(x, y, z).sub(camera.position), d = new THREE.Vector3(); camera.getWorldDirection(d); const l = v.length() || 1; return v.dot(d) / l; };
+const kDes = (o) => Object.assign({ skin: '#c8956b', hair: 'curly', hairCol: '#6b6358', beard: 'short', beardCol: '#6b6358', top: 'tunic', tunic: '#8a6f4e', sleeve: 'short', sash: '#b8863a', skirt: { len: 0.95, col: '#8a6f4e', flare: 0.08 }, legs: 'bare', feet: 'sandals', height: 0.98 }, o);
+const kFlame = (col) => { const m = kMesh(new THREE.ConeGeometry(0.42, 1.3, 9), new THREE.MeshBasicMaterial({ color: col || 0xff8a2a, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }), 0, -50, 0); return m; };
+const kBowl = (x, z, y0) => { const y = y0 === undefined ? terrainHeight(x, z) : y0; const st = kMesh(new THREE.CylinderGeometry(0.28, 0.4, 1.0, 10), kMat('#5b4632'), x, y + 0.5, z); const bw = kMesh(new THREE.CylinderGeometry(0.75, 0.35, 0.45, 12), kMat('#3e342a', { metalness: 0.4 }), x, y + 1.2, z); const fl = kFlame(); fl.position.set(x, y + 1.9, z); fl.visible = false; return { st, bw, fl, x, z, y, lit: false }; };
+
+/* =====================================  MISSION 5: HERACLITUS  =====================================
+   The Flux Quarter: three walls that slide like rivers. You cannot step in the same gap twice. */
+const H0 = KOS.P.flux = kAt(40, -76);
+KOS.sites.push({ x: H0.x, z: H0.z, r: 32, name: 'The Flux Quarter' });
+const kHeraclitus = kosNPC('Heraclitus', 904, H0.x, H0.z - 17, 0, kDes({ skin: '#c99a74', hair: 'long', hairCol: '#4a4540', beard: 'full', beardCol: '#4a4540', tunic: '#6e4b3a', sash: '#8a8378', skirt: { len: 1.0, col: '#6e4b3a', flare: 0.08 } }),
+  { lineNow: () => pick(['No man steps in the same river twice, for it is not the same river and he is not the same man. That is why I never pay what I owe.', 'Nature loves to hide. So do I. They call me the Obscure. I call it concise.', 'Dogs bark at those they do not know. Present company excepted. And not excepted.']) });
+KOS.FX = (() => {
+  const rows = [{ z: 9, A: 11, w: 0.62, ph: 0 }, { z: 0, A: 12, w: -0.5, ph: 2 }, { z: -9, A: 11, w: 0.85, ph: 4 }].map(r => {
+    const mk = () => { const m = kMesh(new THREE.BoxGeometry(1, 3.2, 1.4), kMat('#9a8466'), 0, H0.y + 1.6, H0.z + r.z); const b = { x0: 0, x1: 0, z0: H0.z + r.z - 0.9, z1: H0.z + r.z + 0.9 }; boxes.push(b); return { m, b }; };
+    return Object.assign(r, { L: mk(), R: mk(), gap: 3.3, cx: 0 });
+  });
+  // the rivers between the walls: shallow blue strips that visibly flow (they are just a mood, not a hazard)
+  const flow = [4.5, -4.5, -14.5].map(z => kMesh(new THREE.PlaneGeometry(38, 7.4), new THREE.MeshBasicMaterial({ color: 0x4a86b8, transparent: true, opacity: 0.22, depthWrite: false }), H0.x, H0.y + 0.06, H0.z + z)).map(m => { m.rotation.x = -Math.PI / 2; return m; });
+  const braziers = [[-10, 4.5], [11, -4.5], [0, -14.5]].map(([x, z]) => kBowl(H0.x + x, H0.z + z));
+  braziers.forEach(b => { scene.add(b.fl); circles.push({ x: b.x, z: b.z, r: 0.7 }); });
+  const wander = kMesh(new THREE.BoxGeometry(3.2, 2.4, 2.6), kMat('#c9a96e'), H0.x + 14, H0.y + 1.2, H0.z + 16.5);
+  const roof = kMesh(new THREE.ConeGeometry(2.6, 1.3, 4), kMat('#9a3b2e'), 0, 0, 0); roof.rotation.y = Math.PI / 4; wander.add(roof); roof.position.set(0, 1.8, 0);
+  const sign = kMesh(new THREE.PlaneGeometry(1.6, 0.5), new THREE.MeshBasicMaterial({ color: 0xf0e0b0 }), 0, 0, 0); wander.add(sign); sign.position.set(0, 0.2, 1.33);
+  const tav = { m: wander, b: { x0: 0, x1: 0, z0: 0, z1: 0 }, said: false }; boxes.push(tav.b);
+  KOS.addGlyph(H0.x - 16, H0.z + 14, false);
+  return { rows, flow, braziers, tav };
+})();
+KOS.ticks.push((dt, t) => {
+  const F = KOS.FX; if (Math.hypot(player.pos.x - H0.x, player.pos.z - H0.z) > 90) return;
+  F.rows.forEach(r => {
+    r.cx = H0.x + r.A * Math.sin(t * r.w + r.ph); const x0 = H0.x - 19, x1 = H0.x + 19, lw = Math.max(0.01, r.cx - r.gap - x0), rw = Math.max(0.01, x1 - r.cx - r.gap);
+    r.L.m.scale.x = lw; r.L.m.position.x = x0 + lw / 2; r.L.b.x0 = x0; r.L.b.x1 = x0 + lw;
+    r.R.m.scale.x = rw; r.R.m.position.x = x1 - rw / 2; r.R.b.x0 = x1 - rw; r.R.b.x1 = x1;
+  });
+  F.flow.forEach((f, i) => { f.material.opacity = 0.2 + 0.07 * Math.sin(t * 2 + i); });
+  F.braziers.forEach(b => { if (b.lit) { b.fl.position.set(b.x, b.y + 1.9 + Math.sin(t * 9 + b.x) * 0.06, b.z); b.fl.scale.set(1 + Math.sin(t * 11) * 0.12, 1 + Math.sin(t * 7 + b.z) * 0.15, 1); } });
+  // the tavern that keeps wandering off, with Diogenes’ drink inside it
+  const tv = F.tav, tx = H0.x + 16 * Math.sin(t * 0.22), tzp = H0.z + 16.5; tv.m.position.x = tx; tv.m.position.z = tzp; tv.m.position.y = H0.y + 1.2;
+  tv.b.x0 = tx - 1.6; tv.b.x1 = tx + 1.6; tv.b.z0 = tzp - 1.3; tv.b.z1 = tzp + 1.3;
+  if (Game.active === 'k5' && !tv.said && kNear(player.pos, tx, tzp, 7) && !sub.conv) { tv.said = true; say([Dg('There! A tavern! I ordered a cup of wine, put it down for one second, and the tavern walked off with my wine in it.'), Dg('A man should be allowed to finish one drink in peace. That is in the Constitution of Everywhere. I wrote it just now.')]); }
+});
+defMission({
+  id: 'k5', kind: 'main', title: 'Everything Flows', sub: 'Heraclitus. The Obscure. The river. The walls.',
+  marker: () => V(H0.x, 0, H0.z + 19), when: () => !!Game.flags.k4Done,
+  restart: () => V(H0.x, 0, H0.z + 20),
+  start() { KOS.FX.braziers.forEach(b => { b.lit = false; b.fl.visible = false; }); KOS.FX.tav.said = false; },
+  steps: [
+    talkStep('Cross the moving walls and reach Heraclitus (the gaps slide like rivers: read the pattern, wait for them)', kHeraclitus, 'Talk to Heraclitus', () => [
+      { who: 'Heraclitus', npc: kHeraclitus, text: 'You crossed three walls in the time it took them to become different walls. Impressive. Or lucky. I make no distinction; both are rivers.' },
+      Ni('The beam is above this district. Everything keeps rearranging itself. Why does the quarter move?'),
+      { who: 'Heraclitus', npc: kHeraclitus, text: 'Panta rhei: everything flows. The sun is new each day. The road up and the road down are one road. War is the father of all things, and rent is its cousin.' },
+      Dg('He is the weeping one. He cried at a hundred things and wrote about none of them clearly. They call him the Obscure for a reason.'),
+      { who: 'Heraclitus', npc: kHeraclitus, text: 'Fire is the first stuff, because fire never stays what it is. And the Logos, the measure, keeps the flame honest: so much kindles, so much goes out. Light my three braziers in the lanes, and the quarter will tell you what does not change.' },
+      So('Remember what Cratylus took from this, Nico: if you cannot step in the same river once, you cannot even speak of it. He gave up speaking and just wiggled a finger.'),
+      Dg('A cowardly way to win an argument. I approve.'),
+    ]),
+    {
+      obj: () => 'Light the three braziers in the lanes between the walls (' + KOS.FX.braziers.filter(b => b.lit).length + '/3): E',
+      target: () => { const b = KOS.FX.braziers.find(q => !q.lit); return b ? V(b.x, b.y + 1, b.z) : null; },
+      enter(rt) { KOS.FX.braziers.forEach(b => stepInteract({ label: 'Light the brazier', pos: () => V(b.x, b.y + 1, b.z), r: 2.2, bias: 5, when: () => !b.lit, act: () => { b.lit = true; b.fl.visible = true; noiseBurst(0.4, 420, 0.4); kosTone(220 + KOS.FX.braziers.filter(q => q.lit).length * 80, 0.8, 'sawtooth', 0.12); toast('The fire takes: ' + KOS.FX.braziers.filter(q => q.lit).length + '/3'); } })); },
+      update(rt) { return KOS.FX.braziers.every(b => b.lit); },
+    },
+    {
+      obj: 'Return to Heraclitus',
+      target: () => kHeraclitus.h.root.position,
+      enter(rt) { stepInteract({ label: 'Talk to Heraclitus', pos: () => kHeraclitus.h.root.position, r: 3.6, bias: 4, when: () => !sub.conv, act: () => { if (rt.data.t) return; rt.data.t = true; say([
+        { who: 'Heraclitus', npc: kHeraclitus, text: 'Three fires, three different fires. You are no longer the man who lit the first one. Look: the walls have stopped.' },
+        Ni('Wait. Everything in this quarter has changed, but that hill, over there, hasn’t moved at all.', { act: () => { KOS.FX.rows.forEach(r => { r.w *= 0.1; }); } }),
+        { who: 'Heraclitus', npc: kHeraclitus, text: 'An exception to flux? Ha. That cannot be. And yet the old man has seen it too. Go to the place that does not change. There, a man named Parmenides will explain to you why I am wrong. He will enjoy it.' },
+        Dg('Parmenides! The man who said nothing moves. I assume he arrived by tapping his heels together.'),
+        So('He argues that what is, is, and what is not, is not, and so change is impossible. It is a very good argument for a person who wants to stay in bed.'),
+      ]); } }); },
+      update(rt) { return !!rt.data.t && talkIdle(); },
+    },
+  ],
+  complete() {
+    Game.flags.k5Done = true; addMoney(35); const f = KOS.P.stillt; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('flux', 'The place that does not change', 'Every street in the Flux Quarter rearranged itself. One thing did not: a hill, perfectly still, where the beam is now. Heraclitus says change is the only law. Something disagrees.');
+    return ['Clue: a location that does not change at all', 'The beam rises from the Still Temple', '+35 obols'];
+  },
+});
+
+/* =====================================  MISSION 6: PARMENIDES  =====================================
+   The Still Temple. The statues only move when nobody is looking, which is at least polite. */
+const S0 = KOS.P.stillt = kAt(64, -144);
+KOS.sites.push({ x: S0.x, z: S0.z, r: 34, name: 'The Still Temple' });
+const kParmenides = kosNPC('Parmenides', 905, S0.x, S0.z, Math.PI, kDes({ skin: '#d9ad86', hair: 'baldsides', hairCol: '#e9e2d4', beard: 'full', beardCol: '#e9e2d4', tunic: '#cfc9bd', sash: '#555', skirt: { len: 1.0, col: '#cfc9bd', flare: 0.08 }, height: 1.0 }),
+  { lineNow: () => pick(['What is, is. What is not, is not. I could stop there. I usually do. People rarely stop me.', 'Motion is an illusion. If you disagree, kindly do not move while you disagree.', 'The goddess took me in a chariot to the gates of Night and Day. Naturally she gave me a lecture.']) });
+KOS.PM = (() => {
+  // the temple ring
+  [0, 1, 2, 3, 4, 5, 6, 7].forEach(i => { const a = i / 8 * TAU, x = S0.x + Math.cos(a) * 6, z = S0.z + Math.sin(a) * 6; const c = kMesh(new THREE.CylinderGeometry(0.55, 0.65, 5, 12), kMat('#d8d0bf'), x, terrainHeight(x, z) + 2.5, z); circles.push({ x, z, r: 0.7 }); });
+  kMesh(new THREE.CylinderGeometry(7.2, 7.4, 0.3, 24), kMat('#c8bfa8'), S0.x, S0.y + 0.15, S0.z);
+  const statues = [];
+  for (let i = 0; i < 6; i++) {
+    const g = new THREE.Group(), mat = kMat('#aaa59a', { roughness: 0.95 }), dark = new THREE.MeshBasicMaterial({ color: 0xff5533 });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.5, 1.5, 10), mat); body.position.y = 0.95;
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 10), mat); head.position.y = 1.95;
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.16, 0.18), mat); arm.position.y = 1.5;
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.05, 0.05), dark); eye.position.set(0, 2.0, 0.26); eye.visible = false;
+    g.add(body, head, arm, eye); scene.add(g);
+    const a = i / 6 * TAU + 0.4, rr = 17 + (i % 2) * 5; const home = { x: S0.x + Math.cos(a) * rr, z: S0.z + Math.sin(a) * rr };
+    g.position.set(home.x, terrainHeight(home.x, home.z), home.z);
+    statues.push({ g, eye, home, moving: false });
+  }
+  const tabs = ['BEING', 'THE ONE', 'UNCHANGING'].map((txt, i) => {
+    const a = i / 3 * TAU + 1.0, x = S0.x + Math.cos(a) * 14, z = S0.z + Math.sin(a) * 14;
+    const m = kMesh(new THREE.BoxGeometry(0.9, 1.2, 0.18), new THREE.MeshStandardMaterial({ color: 0xe8d9a8, emissive: 0x6a5a20, roughness: 0.7 }), x, terrainHeight(x, z) + 0.9, z);
+    return { m, x, z, got: false, txt };
+  });
+  KOS.addGlyph(S0.x + 4, S0.z + 9, false);
+  return { statues, tabs, active: false, fails: 0 };
+})();
+KOS.ticks.push((dt, t) => {
+  const P = KOS.PM; if (!P.active) return;
+  let anyMove = false;
+  P.statues.forEach(s => {
+    const px = s.g.position.x, pz = s.g.position.z, seen = kLook(px, s.g.position.y + 1.2, pz) > 0.42;
+    s.moving = !seen; s.eye.visible = s.moving;
+    if (s.moving) {
+      const dx = player.pos.x - px, dz = player.pos.z - pz, d = Math.hypot(dx, dz) || 1, sp = 3.1 * dt;
+      s.g.position.x += dx / d * sp; s.g.position.z += dz / d * sp; s.g.position.y = floorAt(s.g.position.x, s.g.position.z); s.g.rotation.y = Math.atan2(dx, dz); anyMove = true;
+      if (d < 1.3 && !sub.conv && !Death.on) {
+        P.fails++; P.statues.forEach(q => { q.g.position.set(q.home.x, terrainHeight(q.home.x, q.home.z), q.home.z); });
+        shakeAmt = Math.max(shakeAmt, 0.4); kTP(S0.x, S0.z + 30);
+        say(P.fails === 1 ? [Dg('They touched you! Heavens. A statue just put its hand on you. It is the most any of us has ever got from a statue.'), Ni('They only move when I am not looking at them. Never take your eyes off the stone. Got it.')] : [Dg('Again? Don’t they teach you anything where you are from? Look at the thing that is trying to kill you!')]);
+        return;
+      }
+    }
+  });
+  if (anyMove && (P.tk = (P.tk || 0) - dt) < 0) { P.tk = 0.45; kosTone(62 + Math.random() * 10, 0.3, 'sawtooth', 0.07); }
+  P.tabs.forEach(b => { b.m.rotation.y = t * 0.8; });
+});
+defMission({
+  id: 'k6', kind: 'main', title: 'The Unchanging World', sub: 'Parmenides. Being is, not-being is not, and the statues are rude.',
+  marker: () => V(S0.x, 0, S0.z + 30), when: () => !!Game.flags.k5Done,
+  restart: () => V(S0.x, 0, S0.z + 32),
+  start() { const P = KOS.PM; P.active = true; P.fails = 0; P.tabs.forEach(b => { b.got = false; b.m.visible = true; }); P.statues.forEach(q => q.g.position.set(q.home.x, terrainHeight(q.home.x, q.home.z), q.home.z)); },
+  steps: [
+    {
+      obj: () => 'Collect the three inscriptions of Being (' + KOS.PM.tabs.filter(b => b.got).length + '/3). The stone figures move only when you are not looking at them.',
+      target: () => { const b = KOS.PM.tabs.find(q => !q.got); return b ? V(b.x, 1, b.z) : null; },
+      enter(rt) {
+        say([So('Nico, I am told these statues are the guards of the temple. Parmenides has not moved them in years. They have apparently decided to move themselves.'), Dg('The simplest solution: do not turn your back on any piece of rock. It is how I treat most of Athens.'), Ni('If they only move when unseen, then I must always have them in view. Right. Easy. Six statues and one pair of eyes.')]);
+        KOS.PM.tabs.forEach(b => stepInteract({ label: 'Take the inscription: “' + b.txt + '”', pos: () => V(b.x, 1, b.z), r: 2.1, bias: 5, when: () => !b.got, act: () => { b.got = true; b.m.visible = false; kosTone(520, 0.7, 'triangle', 0.18); toast('“' + b.txt + '” (' + KOS.PM.tabs.filter(q => q.got).length + '/3)'); } }));
+      },
+      update() { return KOS.PM.tabs.every(b => b.got) && talkIdle(); },
+    },
+    talkStep('Bring the inscriptions to Parmenides, at the centre of the temple', kParmenides, 'Talk to Parmenides', () => [
+      { who: 'Parmenides', npc: kParmenides, text: 'Being. The One. The Unchanging. You have all three. And you moved to bring them. A pity. By my argument, you did not.' },
+      Dg('(poking a stone statue) MOVE. I said, MOVE. You moved a minute ago and now you will not even answer me. More stubborn than a philosopher.', { act: () => { KOS.PM.active = false; } }),
+      { who: 'Parmenides', npc: kParmenides, text: 'That is the way of the temple, and of Being: it does not move, and nothing that is can come to be or cease to be. All your “change” is an opinion of mortals who have not been to the gates of Night and Day.' },
+      So('Your master’s argument is that you cannot speak of what is not. And yet we have spoken about it all morning. Intriguing.'),
+      { who: 'Parmenides', npc: kParmenides, text: 'Socrates. They tell me we met once when you were young and I was old, and you made me look foolish, and I was kind about it. I do not recall. It is not important, since time, you see, is…' },
+      Ni('Hold on. The ground inside the temple. Every path I took to get here ended at this same circle. Like a path that repeats itself, and the centre is connected to it.'),
+      { who: 'Parmenides', npc: kParmenides, text: 'You walk a long road to a place you never left. That is the first thing to know about my poem. If you wish to chase the beam, ask Zeno, my student. He will be at the road that does not end. Do not let him begin a sentence. He will not finish it.' },
+      Dg('What does he do? Run the same race twice?'),
+      So('Worse. He will prove that you cannot run it once.'),
+    ]),
+  ],
+  complete() {
+    KOS.PM.active = false; Game.flags.k6Done = true; addMoney(35); const f = KOS.P.road; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('still', 'The path that repeats', 'Every road around the Still Temple returned to the same circle. A path that repeats itself infinitely, and the unmoving centre of the temple appears connected to it. Parmenides sends Nico to his student, Zeno.');
+    return ['Clue: an endless path, joined to the temple’s fixed centre', 'The beam rises from the Road that Never Ends', '+35 obols'];
+  },
+});
+
+/* =====================================  MISSION 7: ZENO  =====================================
+   The Road That Never Ends. The gate retreats by half every time you reach it. Diogenes' solution is to walk. */
+const Z0 = KOS.P.road = kAt(104, 98);
+KOS.sites.push({ x: Z0.x, z: Z0.z, r: 40, name: 'The Road That Never Ends' });
+const kZeno = kosNPC('Zeno', 906, Z0.x - 28, Z0.z + 3.5, Math.PI / 2, kDes({ skin: '#d4a07a', hair: 'curly', hairCol: '#3a342b', beard: 'short', beardCol: '#3a342b', tunic: '#7a8aa8', sash: '#d6c9a0', skirt: { len: 0.9, col: '#7a8aa8', flare: 0.08 }, height: 0.97 }),
+  { lineNow: () => pick(['To reach the end, you must first reach half the end. And before that, half of half. Which is why I never leave the house.', 'The arrow, at each moment, is at rest. So how does it ever arrive? Ask the archer. He is still waiting.', 'Achilles will never catch the tortoise. It is an unfortunate result for Achilles. The tortoise is thrilled.']) });
+KOS.ZN = (() => {
+  const S = V(Z0.x - 28, 0, Z0.z), G = V(Z0.x + 28, 0, Z0.z);
+  const road = kMesh(new THREE.PlaneGeometry(64, 4), kMat('#8d7e66'), Z0.x, Z0.y + 0.05, Z0.z); road.rotation.x = -Math.PI / 2;
+  for (let i = 0; i <= 8; i++) { const x = S.x + i * 7, p = kMesh(new THREE.CylinderGeometry(0.14, 0.14, 1.3, 8), kMat('#5b4632'), x, terrainHeight(x, Z0.z + 2.6) + 0.65, Z0.z + 2.6); }
+  const gate = new THREE.Group(), pm = kMat('#e0d6bd'), gl = new THREE.MeshBasicMaterial({ color: 0x9fe8ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const l = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 4.4, 10), pm), r = l.clone(), top = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.5, 0.6), pm), sheet = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 3.8), gl);
+  l.position.set(-2, 2.2, 0); r.position.set(2, 2.2, 0); top.position.y = 4.5; sheet.position.y = 2.2; sheet.rotation.y = Math.PI / 2; gate.rotation.y = Math.PI / 2; gate.add(l, r, top, sheet); scene.add(gate);
+  const tort = new THREE.Group(); const shell = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8, 0, TAU, 0, Math.PI / 2), kMat('#4e6b3a')), hd = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), kMat('#8aa56c')); hd.position.set(0.55, 0.15, 0); tort.add(shell, hd); scene.add(tort);
+  KOS.addGlyph(Z0.x, Z0.z + 4.8, false);
+  return { S, G, gate, tort, frac: 0.5, hits: 0, loop: 0, solved: false, active: false };
+})();
+KOS.ZN.gx = () => KOS.ZN.S.x + (KOS.ZN.G.x - KOS.ZN.S.x) * KOS.ZN.frac;
+KOS.ticks.push((dt, t) => {
+  const Z = KOS.ZN; if (Math.hypot(player.pos.x - Z0.x, player.pos.z - Z0.z) > 90) return;
+  const gx = Z.gx(); Z.gate.position.set(gx, terrainHeight(gx, Z0.z), Z0.z); Z.gate.children[3].material.opacity = 0.28 + 0.12 * Math.sin(t * 3);
+  const tx = Z.S.x + ((t * 0.12) % 1) * 56; Z.tort.position.set(tx, terrainHeight(tx, Z0.z - 2) + 0.05, Z0.z - 2); Z.tort.rotation.y = 0;
+  if (!Z.active || Z.solved) return;
+  // reaching the gate: it politely steps away by half the remaining distance
+  if (Z.frac < 0.99 && Math.abs(player.pos.x - gx) < 2.4 && Math.abs(player.pos.z - Z0.z) < 3.5 && !sub.conv) {
+    Z.hits++; Z.frac += (1 - Z.frac) / 2; shakeAmt = Math.max(shakeAmt, 0.15); kosTone(330 / Z.hits, 0.5, 'sine', 0.14);
+    toast(['Half the distance remains.', 'Half of the half remains.', 'Half of half of half...', 'A quarter of a quarter of a bit.'][Math.min(Z.hits - 1, 3)]);
+  }
+  // past the end of the road: the road is only the road
+  if (player.pos.x > Z.G.x + 4 && Z.frac < 0.99) { Z.loop++; kTP(Z.S.x + 2, Z0.z); toast('The road loops. You have passed this post before. (' + Z.loop + ')'); if (Z.loop === 2) say([Dg('That is the same post. I scratched my initials on it. “D”, with a drawing of a dog.'), So('Look: the initials are there. And so are other people’s initials, from other lives.')]); }
+});
+defMission({
+  id: 'k7', kind: 'main', title: 'The Impossible Path', sub: 'Zeno. Achilles, the tortoise, and a gate that is shy.',
+  marker: () => V(Z0.x - 31, 0, Z0.z), when: () => !!Game.flags.k6Done,
+  restart: () => V(Z0.x - 30, 0, Z0.z + 1),
+  start() { const Z = KOS.ZN; Z.frac = 0.5; Z.hits = 0; Z.loop = 0; Z.solved = false; Z.active = false; },
+  steps: [
+    talkStep('Talk to Zeno at the start of the road', kZeno, 'Talk to Zeno', () => [
+      { who: 'Zeno', npc: kZeno, text: 'Do not speak! Do not walk! Parmenides says that motion is impossible. I came to prove it. Let me show you. You wish to reach that gate?' },
+      Ni('Yes. The beam is directly behind it. That is why I am here.'),
+      { who: 'Zeno', npc: kZeno, text: 'To reach the gate, you must first cross half the distance. Then half of what remains. Then half of that. Infinitely many tasks, in finite time. Therefore you cannot start. It is a trifling observation.' },
+      Dg('He explained the same thing to a tortoise. He is still on the first sentence.'),
+      { who: 'Zeno', npc: kZeno, text: 'Achilles, in the old fable, can never overtake the tortoise: by the time he reaches where it was, it has moved on. And so on, forever. And the arrow, at each moment, rests. And the stadium…' },
+      So('He did these for Parmenides, as a defence. Aristotle, I believe, will tell you one day that they are muddled and that he is cleverer. Both are probably true.'),
+      Ni('Fine. Gate. Half. Half of half. Let’s walk until it stops me.', { act: () => { KOS.ZN.active = true; setCheckpoint(); } }),
+    ]),
+    {
+      obj: () => KOS.ZN.frac < 0.99 ? 'Reach the gate at the end of the road (it steps away by half every time: ' + KOS.ZN.hits + '/4). Do not run past the end.' : 'Walk through the gate',
+      target: () => V(KOS.ZN.gx(), 1, Z0.z),
+      enter(rt) {
+        stepInteract({ label: 'Ask Diogenes for his “shortcut”', pos: () => V(DG.pos.x, 1, DG.pos.z), r: 5, bias: 6, when: () => KOS.ZN.hits >= 4 && !rt.data.dio, act: () => {
+          rt.data.dio = true; Game.lock = true;
+          say([Ni('The gate keeps retreating. Four times. A quarter of a quarter of a quarter. I could do this until the sun dies.'),
+            Dg('Out of my way. Watch a refutation.'), Dg('There. I stood up. I walked. I have refuted Zeno. The man was not even impressed.', { act: () => { const G = KOS.ZN; DG.pos.set(G.G.x - 2, 0, Z0.z + 1.5); } }),
+            Dg('Wait. How did I get behind you? I took the short way and appeared at the back. That is a badly designed universe, Nico. I will be writing to someone.', { act: () => { const G = KOS.ZN; DG.pos.set(player.pos.x - 2.5, 0, player.pos.z - 1.5); G.frac = 1; G.solved = true; } }),
+            Ni('Diogenes just walked. And now the gate is… standing still. Right where it should be.'),
+            { who: 'Zeno', npc: kZeno, text: 'Walking proves nothing! It only shows that the sum of infinitely many ever-smaller steps is a finite number. I did not forbid it. I only pointed out that I do not understand it.', act: () => { Game.lock = false; } }]);
+        } });
+      },
+      update(rt) { const Z = KOS.ZN; return Z.solved && Math.abs(player.pos.x - Z.G.x) < 3 && Math.abs(player.pos.z - Z0.z) < 4; },
+    },
+    {
+      obj: 'Look at the beam',
+      target: () => V(KOS.ZN.G.x, 1, KOS.ZN.G.z),
+      enter(rt) {
+        Game.lock = true; KOS.beamMode = 'split';
+        say([Ni('A post I have passed before. This road, this gate. I have walked here, what, five times? Six? And the beam…'),
+          So('Is split in four. Do you see them? They stand apart, as if they had been one thing and have been made to forget it.', { act: () => { KOS.beamMode = 'split'; } }),
+          Dg('Four beams. I told you the universe was badly designed. This is the evidence.'),
+          { who: 'Zeno', npc: kZeno, text: 'Four roads, four directions, four… Empedocles will explain. He is mad. He is also a physician, an engineer, a magician and a poet, and he claims to have been a bush, a bird and a fish. Wear something fireproof.', act: () => { Game.lock = false; rt.data.done = true; } }]);
+      },
+      update(rt) { return !!rt.data.done && talkIdle(); },
+    },
+  ],
+  complete() {
+    KOS.ZN.active = false; Game.flags.k7Done = true; addMoney(40); KOS.beamMode = 'split'; const f = KOS.P.elem; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('road', 'Four directions', 'On the Road That Never Ends, Nico reached a post he had passed many times. The beam split into four directions. Zeno says the explanation is on the Plain of Four Altars: ask Empedocles.');
+    return ['Clue: Nico has passed this point many times; the beam splits into four', 'The beam shines from the Plain of Four Altars', '+40 obols'];
+  },
+});
+
+/* =====================================  MISSION 8: EMPEDOCLES  =====================================
+   The Plain of Four Altars. Earth, Fire, Water, Air. And Diogenes, who found a place to cook. */
+const E0 = KOS.P.elem = kAt(208, 48);
+KOS.sites.push({ x: E0.x, z: E0.z, r: 38, name: 'The Plain of Four Altars' });
+const kEmpedocles = kosNPC('Empedocles', 907, E0.x, E0.z + 2.5, Math.PI, kDes({ skin: '#cf9d78', hair: 'long', hairCol: '#2d2823', beard: 'full', beardCol: '#2d2823', tunic: '#7a2e3a', sash: '#e0c36a', skirt: { len: 1.0, col: '#7a2e3a', flare: 0.1 }, feet: 'sandals', height: 1.03 }),
+  { lineNow: () => pick(['I have been a boy, a girl, a bush, a bird and a mute fish in the sea. The fish was the most intelligent of the lot.', 'Love joins. Strife divides. That is all of physics. And most of marriage.', 'People call me a god. I let them. It is faster than correcting them.']) });
+KOS.EM = (() => {
+  const C = E0, alt = kBowl(C.x, C.z, C.y), els = {};
+  scene.add(alt.fl); circles.push({ x: C.x, z: C.z, r: 0.9 }); alt.fl.visible = true;
+  // EARTH (south): a pile of rubble that must be cleared, five times, with feeling
+  const earth = { x: C.x, z: C.z + 15, hits: 0, got: false, rocks: [] };
+  for (let i = 0; i < 6; i++) { const m = kMesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.5), kMat('#7b7062', { roughness: 1 }), earth.x + (Math.random() - 0.5) * 2.4, terrainHeight(earth.x, earth.z) + 0.5, earth.z + (Math.random() - 0.5) * 2.4); earth.rocks.push(m); }
+  earth.orb = kMesh(new THREE.SphereGeometry(0.4, 16, 12), new THREE.MeshBasicMaterial({ color: 0xb08a5a }), earth.x, terrainHeight(earth.x, earth.z) + 0.8, earth.z); earth.orb.visible = false;
+  // FIRE (east): an orb inside a ring of flame jets that breathe in turn
+  const fire = { x: C.x + 15, z: C.z, got: false, jets: [] };
+  for (let i = 0; i < 5; i++) { const a = i / 5 * TAU, jx = fire.x + Math.cos(a) * 3.2, jz = fire.z + Math.sin(a) * 3.2; const f = kFlame(0xff5a1a); f.scale.set(1.6, 2.4, 1.6); f.position.set(jx, terrainHeight(jx, jz) + 1.3, jz); fire.jets.push({ x: jx, z: jz, f, a }); const base = kMesh(new THREE.CylinderGeometry(0.5, 0.6, 0.3, 10), kMat('#2e2924'), jx, terrainHeight(jx, jz) + 0.15, jz); }
+  fire.orb = kMesh(new THREE.SphereGeometry(0.4, 16, 12), new THREE.MeshBasicMaterial({ color: 0xff7a22 }), fire.x, terrainHeight(fire.x, fire.z) + 0.9, fire.z);
+  const stove = kMesh(new THREE.BoxGeometry(1.4, 0.9, 1.0), kMat('#4a3a2a'), fire.x + 6, terrainHeight(fire.x + 6, fire.z) + 0.45, fire.z + 5); circles.push({ x: fire.x + 6, z: fire.z + 5, r: 1 });
+  // WATER (north): a lane where three waves sweep across; the orb sits at the far end
+  const water = { x: C.x, z: C.z - 15, got: false, waves: [] };
+  const lane = kMesh(new THREE.PlaneGeometry(26, 6), new THREE.MeshBasicMaterial({ color: 0x3f8fd0, transparent: true, opacity: 0.25, depthWrite: false }), water.x, terrainHeight(water.x, water.z) + 0.06, water.z); lane.rotation.x = -Math.PI / 2;
+  for (let i = 0; i < 3; i++) { const m = kMesh(new THREE.BoxGeometry(1.6, 1.5, 6), new THREE.MeshBasicMaterial({ color: 0x5aaee8, transparent: true, opacity: 0.55, depthWrite: false }), 0, terrainHeight(water.x, water.z) + 0.8, water.z); water.waves.push({ m, off: i * 8.6 }); }
+  water.orb = kMesh(new THREE.SphereGeometry(0.4, 16, 12), new THREE.MeshBasicMaterial({ color: 0x3fb4ff }), water.x - 12.5, terrainHeight(water.x - 12.5, water.z) + 0.9, water.z);
+  // AIR (west): a spiral of ledges in a gale, the orb at the top
+  const air = { x: C.x - 15, z: C.z, got: false, ledges: [], gust: 0 };
+  for (let i = 0; i < 5; i++) { const a = i / 5 * TAU * 0.9, lx = air.x + Math.cos(a) * 4.5, lz = air.z + Math.sin(a) * 4.5, top = terrainHeight(lx, lz) + 0.9 * (i + 1); const p = { x0: lx - 1.6, x1: lx + 1.6, z0: lz - 1.6, z1: lz + 1.6, top, ramp: 0.001 }; platforms.push(p); air.ledges.push(p);
+    const col = kMesh(new THREE.BoxGeometry(3.2, top - terrainHeight(lx, lz), 3.2), kMat('#b4a98a'), lx, (top + terrainHeight(lx, lz)) / 2 - 0.05, lz); }
+  const lp = air.ledges[4]; air.orb = kMesh(new THREE.SphereGeometry(0.4, 16, 12), new THREE.MeshBasicMaterial({ color: 0xd8f2ff }), (lp.x0 + lp.x1) / 2, lp.top + 1.0, (lp.z0 + lp.z1) / 2);
+  KOS.addGlyph(C.x + 8, C.z + 8, false);
+  return { C, alt, earth, fire, water, air, active: false, held: 0, burnT: 0 };
+})();
+KOS.ticks.push((dt, t) => {
+  const E = KOS.EM; if (Math.hypot(player.pos.x - E.C.x, player.pos.z - E.C.z) > 70) return;
+  E.alt.fl.position.set(E.C.x, E.C.y + 1.9 + Math.sin(t * 9) * 0.05, E.C.z); E.alt.fl.scale.set(1 + Math.sin(t * 11) * 0.1, 1 + Math.sin(t * 7) * 0.12, 1);
+  E.fire.jets.forEach((j, i) => { const ph = (t * 0.55 + i * 0.2) % 1, on = ph < 0.42; j.on = on; j.f.visible = on; j.f.scale.set(1.4, on ? 1.5 + 2.4 * Math.sin(ph / 0.42 * Math.PI) : 0.1, 1.4); });
+  E.fire.orb.visible = !E.fire.got; E.earth.orb.visible = E.earth.hits >= 5 && !E.earth.got; E.water.orb.visible = !E.water.got; E.air.orb.visible = !E.air.got;
+  E.fire.orb.position.y = terrainHeight(E.fire.x, E.fire.z) + 0.9 + Math.sin(t * 3) * 0.1; E.water.orb.position.y = terrainHeight(E.water.x, E.water.z) + 0.9 + Math.sin(t * 3 + 1) * 0.1; E.air.orb.position.y = E.air.ledges[4].top + 1.0 + Math.sin(t * 3 + 2) * 0.1;
+  E.water.waves.forEach(w => { const u = ((t * 0.12 + w.off / 26) % 1); w.m.position.x = E.water.x - 13 + u * 26; w.u = u; });
+  if (!E.active) return;
+  // flames hurt, a little; the waves shove you back along the lane
+  E.fire.jets.forEach(j => { if (j.on && !player.swimming && kNear(player.pos, j.x, j.z, 1.15) && (E.burnT -= dt) <= 0) { E.burnT = 1.0; shakeAmt = Math.max(shakeAmt, 0.3); const dx = player.pos.x - j.x, dz = player.pos.z - j.z, d = Math.hypot(dx, dz) || 1; player.pos.x += dx / d * 2.4; player.pos.z += dz / d * 2.4; toast('Hot. Very hot. Wait for the jet to rest.'); } });
+  E.burnT = Math.max(E.burnT - dt, -1);
+  if (Math.abs(player.pos.z - E.water.z) < 3.1 && player.pos.x > E.water.x - 13.5 && player.pos.x < E.water.x + 13.5) E.water.waves.forEach(w => { if (Math.abs(player.pos.x - w.m.position.x) < 1.1) { player.pos.x += 5.5 * dt * 3.2; toast('The wave pushes you back.'); } });
+  // the gale on the stair of ledges
+  if (kNear(player.pos, E.air.x, E.air.z, 7)) { E.air.gust = Math.sin(t * 1.6) > 0.7 ? 1 : 0; if (E.air.gust && player.pos.y > E.C.y + 1.4) { player.pos.x -= 2.6 * dt; player.pos.z += 2.2 * dt; } }
+});
+defMission({
+  id: 'k8', kind: 'main', title: 'Love and Strife', sub: 'Empedocles. Earth, water, air, fire, and a very hot stove.',
+  marker: () => V(E0.x, 0, E0.z + 6), when: () => !!Game.flags.k7Done,
+  restart: () => V(E0.x, 0, E0.z + 8),
+  start() { const E = KOS.EM; E.active = false; E.held = 0; ['earth', 'fire', 'water', 'air'].forEach(k => { E[k].got = false; }); E.earth.hits = 0; E.earth.rocks.forEach(r => { r.visible = true; }); },
+  steps: [
+    talkStep('Talk to Empedocles at the central altar', kEmpedocles, 'Talk to Empedocles', () => [
+      { who: 'Empedocles', npc: kEmpedocles, text: 'You come from the Road. The beam split because the Roots were scattered. Earth, water, air and fire: four roots, joined by Love, torn apart by Strife. Mend them, and the beam is whole.' },
+      Dg('He is the one who said he was a god and then proved it by jumping into Etna. The volcano threw back his sandal. They say the sandal was a hint.'),
+      { who: 'Empedocles', npc: kEmpedocles, text: 'A sandal is a sandal. Do you know that I cured a plague by diverting two rivers? And I once held back the winds for a whole month with a bag of donkey skin? I am practical.' },
+      So('And you are the one who wrote that nothing comes to be or perishes, but only mixes and unmixes. A nice theory, if it did not fit so neatly in a poem.'),
+      { who: 'Empedocles', npc: kEmpedocles, text: 'Bring me the four Roots from the four altars: the stone in the south, the fire in the east, the water in the north and the wind in the west. Beware of the flames. I am told they hurt.' },
+      Dg('Fire! Excellent. Is there a stove near it? I will go and check. For the fire, you understand, not for me.'),
+      Ni('Four orbs. Four altars. Rubble, flames, waves and a gale. I knew today would be a normal day.', { act: () => { KOS.EM.active = true; setCheckpoint(); } }),
+    ]),
+    {
+      obj: () => { const E = KOS.EM, g = k => E[k].got ? '✔' : '·'; return 'Gather the four Roots (' + E.held + '/4): Earth ' + g('earth') + ' (south), Fire ' + g('fire') + ' (east), Water ' + g('water') + ' (north), Air ' + g('air') + ' (west)'; },
+      target: () => { const E = KOS.EM; for (const k of ['earth', 'fire', 'water', 'air']) if (!E[k].got) return k === 'earth' ? (E.earth.hits >= 5 ? V(E.earth.x, 1, E.earth.z) : V(E.earth.x, 1, E.earth.z)) : V(E[k].orb.position.x, E[k].orb.position.y, E[k].orb.position.z); return null; },
+      enter(rt) {
+        const E = KOS.EM;
+        stepInteract({ label: () => E.earth.hits < 5 ? 'Clear the rubble (' + (E.earth.hits + 1) + '/5)' : 'Take the Root of Earth', pos: () => V(E.earth.x, 1, E.earth.z), r: 3.0, bias: 5, when: () => !E.earth.got, act: () => {
+          if (E.earth.hits < 5) { E.earth.hits++; E.earth.rocks[E.earth.hits - 1].visible = false; noiseBurst(0.3, 120, 0.5); shakeAmt = Math.max(shakeAmt, 0.2); toast('A rock goes. ' + (5 - E.earth.hits) + ' to go.'); if (E.earth.hits === 3) say([Dg('Have you tried hitting it with philosophy?'), Ni('That does not do a thing.'), Dg('No. But it is cheaper than a shovel.')]); }
+          else { E.earth.got = true; E.held++; E.earth.orb.visible = false; toast('Root of Earth (' + E.held + '/4)'); kosTone(110, 1, 'triangle', 0.2); }
+        } });
+        [['fire', 'Take the Root of Fire'], ['water', 'Take the Root of Water'], ['air', 'Take the Root of Air']].forEach(([k, lab]) => stepInteract({ label: lab, pos: () => V(E[k].orb.position.x, E[k].orb.position.y, E[k].orb.position.z), r: 2.4, bias: 5, when: () => !E[k].got, act: () => { E[k].got = true; E.held++; E[k].orb.visible = false; toast('Root of ' + k + ' (' + E.held + '/4)'); kosTone({ fire: 330, water: 262, air: 440 }[k], 1, 'sine', 0.2); if (k === 'fire') say([Dg('(from the stove) I found a place where nobody tells me to leave. I am cooking a fig. Please do not touch anything.')]); } }));
+      },
+      update() { return KOS.EM.held >= 4; },
+    },
+    talkStep('Bring the four Roots to Empedocles', kEmpedocles, 'Offer the Roots', () => [
+      { who: 'Empedocles', npc: kEmpedocles, text: 'Earth, fire, water, air. And now: Love!', act: () => { KOS.beamMode = 'steady'; shakeAmt = Math.max(shakeAmt, 0.5); [1, 1.25, 1.5, 2].forEach((r, i) => setTimeout(() => kosTone(196 * r, 2, 'sine', 0.13), i * 220)); } },
+      Ni('The four beams are moving toward each other. All of them. They converge, there, over the sea, and… what is that? Something is rising out of the water.'),
+      { who: 'Empedocles', npc: kEmpedocles, text: 'A structure! Behold: the machine that is not a machine. Four roots joined by one hand. Nothing in nature does that by itself. Somebody has arranged this city. Somebody arranged us.' },
+      So('Someone who needed the elements in a particular order. That is a design. And a design implies a designer, which is a very large claim to make while standing on a plain.'),
+      Dg('Whoever he is, I hope he left a tip.'),
+      { who: 'Empedocles', npc: kEmpedocles, text: 'The man who knows the secrets of that machine is Anaxagoras. He sits in his observatory and says the Mind orders everything. Naturally, that makes him the first suspect. Do tread softly. He is a friend, but they say he suffers from a persistent logic.' },
+    ]),
+  ],
+  complete() {
+    KOS.EM.active = false; Game.flags.k8Done = true; addMoney(45); const f = KOS.P.obs; KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('roots', 'A structure with a system', 'When the four paths converged, a hidden structure rose from the sea. Its pattern suggests the city was deliberately arranged according to a system. Empedocles points to Anaxagoras’ observatory.');
+    return ['Clue: a hidden structure; the city was arranged on purpose', 'The beam shines over Anaxagoras’ Observatory', '+45 obols'];
+  },
+});
+
+/* =====================================  MISSION 9: ANAXAGORAS  =====================================
+   The Observatory. Sneak in, search the notes. The guards are lanterns on legs. Diogenes has a soapbox. */
+const O0 = KOS.P.obs = kAt(-32, 208);
+KOS.sites.push({ x: O0.x, z: O0.z, r: 36, name: 'Anaxagoras’ Observatory' });
+const kAnaxagoras = kosNPC('Anaxagoras', 908, O0.x, O0.z - 17.5, 0, kDes({ skin: '#d4a982', hair: 'long', hairCol: '#9a948a', beard: 'full', beardCol: '#9a948a', tunic: '#54606e', sash: '#d6c9a0', skirt: { len: 1.0, col: '#54606e', flare: 0.08 }, height: 1.0 }),
+  { lineNow: () => pick(['The sun is a red-hot stone, larger than the Peloponnese. The Athenians were quite upset. I do not know why they would be.', 'Mind set everything in order. And then left us to figure it out, which is rude.', 'Snow is black. Water is dark, and snow is frozen water. I offer this to the unconvinced.']) });
+KOS.OB = (() => {
+  const dome = kMesh(new THREE.SphereGeometry(5.5, 20, 12, 0, TAU, 0, Math.PI / 2), kMat('#cfc6b0'), O0.x, O0.y + 5, O0.z - 19); const bd = kSolid(O0.x, O0.z - 19, 10, 8, 5, '#b9ad92');
+  const tel = kMesh(new THREE.CylinderGeometry(0.3, 0.5, 5, 10), kMat('#6a4a2e'), O0.x + 1.8, O0.y + 8.4, O0.z - 19); tel.rotation.z = 0.7;
+  const crates = [[-9, -3], [8, -8], [-6, -12], [10, 3]].map(([dx, dz]) => kSolid(O0.x + dx, O0.z + dz, 2.4, 2.4, 1.8, '#8a6a42'));
+  const ev = [[-12, -10, 'THE PLANS', 'blueprints of a vast machine, drawn in a hand that does not look like his'], [13, -14, 'THE COMPONENTS', 'a tray of machine parts that flicker whenever you look straight at them'], [0, -6, 'THE LETTER', 'an anonymous letter naming Anaxagoras as the builder, delivered the morning before the beam']].map(([dx, dz, n, d]) => ({ x: O0.x + dx, z: O0.z + dz, n, d, got: false, m: kMesh(new THREE.BoxGeometry(0.8, 0.12, 1.1), new THREE.MeshStandardMaterial({ color: 0xeee2b0, emissive: 0x5a4a1a }), O0.x + dx, terrainHeight(O0.x + dx, O0.z + dz) + 0.9, O0.z + dz) }));
+  const guards = [{ x: -4, z: -2, base: 0.4, amp: 1.2, sp: 0.8 }, { x: 4, z: -12, base: Math.PI, amp: 1.0, sp: 0.6 }, { x: -12, z: -4, base: 1.0, amp: 1.5, sp: 0.5 }].map((g, i) => {
+    const grp = new THREE.Group(), body = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.45, 1.5, 10), kMat('#3c3c46')), head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 8), kMat('#d7b08d')); body.position.y = 0.85; head.position.y = 1.85;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(Math.tan(0.5) * 13, 13, 18, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe08a, transparent: true, opacity: 0.17, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    cone.geometry.translate(0, -6.5, 0); cone.geometry.rotateX(-Math.PI / 2); cone.position.y = 1.5; grp.add(body, head, cone); scene.add(grp);
+    return Object.assign(g, { gx: O0.x + g.x, gz: O0.z + g.z, grp, cone, ang: g.base, dist: 0 });
+  });
+  const soap = kMesh(new THREE.BoxGeometry(1.4, 0.7, 1.0), kMat('#a07848'), O0.x + 15, O0.y + 0.35, O0.z + 12); circles.push({ x: O0.x + 15, z: O0.z + 12, r: 0.9 });
+  KOS.addGlyph(O0.x - 2, O0.z - 7, false);
+  return { dome, crates, ev, guards, soap, active: false, distract: 0, caught: 0, S: V(O0.x, O0.y, O0.z + 24) };
+})();
+KOS.OB.blocked = (gx, gz, px, pz) => KOS.OB.crates.some(c => { for (let i = 1; i < 14; i++) { const x = gx + (px - gx) * i / 14, z = gz + (pz - gz) * i / 14; if (x > c.b.x0 && x < c.b.x1 && z > c.b.z0 && z < c.b.z1) return true; } return false; });
+KOS.ticks.push((dt, t) => {
+  const B = KOS.OB; if (Math.hypot(player.pos.x - O0.x, player.pos.z - O0.z) > 80) return;
+  B.ev.forEach(e => { e.m.rotation.y = t; e.m.visible = !e.got; });
+  B.guards.forEach((g, i) => {
+    const aim = B.distract > 0 ? Math.atan2(B.soap.position.x - g.gx, B.soap.position.z - g.gz) : g.base + Math.sin(t * g.sp + i) * g.amp;
+    g.ang += kAng(aim, g.ang) * Math.min(1, dt * 3);
+    g.grp.position.set(g.gx, terrainHeight(g.gx, g.gz), g.gz); g.grp.rotation.y = g.ang;
+    if (!B.active || Game.active !== 'k9' || sub.conv || Death.on) return;
+    const dx = player.pos.x - g.gx, dz = player.pos.z - g.gz, d = Math.hypot(dx, dz);
+    const inCone = d < 13 && Math.abs(kAng(Math.atan2(dx, dz), g.ang)) < 0.5 && B.distract <= 0 && !B.blocked(g.gx, g.gz, player.pos.x, player.pos.z);
+    g.dist = clamp((g.dist || 0) + (inCone ? dt * (d < 5 ? 2.2 : 0.9) : -dt * 1.2), 0, 1);
+    g.cone.material.opacity = 0.14 + g.dist * 0.4;
+    if (g.dist >= 1) { B.caught++; B.guards.forEach(q => { q.dist = 0; }); kTP(B.S.x, B.S.z); shakeAmt = Math.max(shakeAmt, 0.3); say(B.caught === 1 ? [{ who: 'Watchman', text: 'Halt! Who goes there, in the middle of the night, in broad daylight?' }, Dg('Run! The watchman is very tired and very well paid. Hide behind a crate.')] : [Dg('Spotted again. A thief with no sense of shadow. We are perfect.')]); }
+  });
+  B.distract = Math.max(0, B.distract - dt);
+});
+function kAng(a, b) { let d = a - b; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; return d; }
+defMission({
+  id: 'k9', kind: 'main', title: 'The Mind Behind the Cosmos', sub: 'Anaxagoras. Prime suspect. Possibly innocent. Probably chatty.',
+  marker: () => V(O0.x, 0, O0.z + 26), when: () => !!Game.flags.k8Done,
+  restart: () => V(O0.x, 0, O0.z + 24),
+  start() { const B = KOS.OB; B.active = true; B.caught = 0; B.distract = 0; B.ev.forEach(e => { e.got = false; }); B.guards.forEach(g => { g.dist = 0; }); },
+  steps: [
+    {
+      obj: () => 'Sneak through the grounds and find all three pieces of evidence (' + KOS.OB.ev.filter(e => e.got).length + '/3). Stay out of the lantern beams; crates block light. Soapbox (E) draws the guards’ attention.',
+      target: () => { const e = KOS.OB.ev.find(q => !q.got); return e ? V(e.x, 1, e.z) : null; },
+      enter(rt) {
+        say([So('The Mind of the Cosmos is also the man with the most locks in the Aegean. And three watchmen with lanterns.'), Dg('I could distract them. I am wonderful at being a nuisance. Point me at the soapbox and let me be the sun that gets in their way.'), Ni('The soapbox. When I hit it, you shout.'), Dg('I will deliver a speech on a topic of my choosing. It will be about the guards.')]);
+        KOS.OB.ev.forEach(e => stepInteract({ label: 'Search: “' + e.n + '”', pos: () => V(e.x, 1, e.z), r: 2.1, bias: 5, when: () => !e.got, act: () => { e.got = true; kosTone(440, 0.5, 'triangle', 0.15); toast('Evidence: ' + e.n); clue('ev_' + e.n, 'Evidence: ' + e.n.toLowerCase(), 'A page from Anaxagoras’ observatory: ' + e.d + '.'); } }));
+        stepInteract({ label: 'Have Diogenes hold forth from the soapbox', pos: () => V(KOS.OB.soap.position.x, 1, KOS.OB.soap.position.z), r: 2.8, bias: 4, when: () => KOS.OB.distract <= 0, act: () => { KOS.OB.distract = 9; say([Dg('Citizens of Athens! Guards! Look at me, standing on a box. I am a very important man. Look at my feet! They are shod in nothing!')]); } });
+      },
+      update() { return KOS.OB.ev.every(e => e.got) && talkIdle(); },
+    },
+    talkStep('Confront Anaxagoras at his observatory door', kAnaxagoras, 'Confront Anaxagoras', () => [
+      Ni('Anaxagoras. I found the plans. A machine, big, bright, and drawn by someone with your handwriting. Explain it.'),
+      { who: 'Anaxagoras', npc: kAnaxagoras, text: 'My handwriting. Hm. The ‘a’ is wrong. I always loop my alphas the other way round. Come in. I have not been this popular since the Athenians threw stones at me for saying the sun is not a god.', act: () => { KOS.OB.active = false; } },
+      Dg('Name. Where were you on the night of the beam. Name. Where were you on the night of the beam. Name.'),
+      So('Diogenes, you are asking him the same question repeatedly.'),
+      Dg('It is the Socratic method, but faster.'),
+      So('It is, in fact, not.'),
+      { who: 'Anaxagoras', npc: kAnaxagoras, text: 'I was here. I was watching the sun. There was a hum under the sea, and then the light. I did not build that machine. I did not! Look at its parts. Take one. Hold it. Go on.' },
+      Ni('(picks up a machine part) It is warm. And it is… not there when I look directly at it. It comes back when I look away.'),
+      { who: 'Anaxagoras', npc: kAnaxagoras, text: 'Components made of something invisible, or something that cannot decide what it is. I teach that Mind sets everything in order. It would be very odd if Mind set this one in order and forgot to tell me.' },
+      So('The evidence is oddly specific, and oddly wrong. A forger would not make that many small mistakes. Unless he wanted them to be found.'),
+      Ni('Someone is staging this. Whatever Anaxagoras is, he isn’t that careful.'),
+      { who: 'Anaxagoras', npc: kAnaxagoras, text: 'You want to know what it is made of? Seek Democritus. He says everything is atoms and the void. He will make you very small and very confused. It is how he relaxes.' },
+    ]),
+  ],
+  complete() {
+    KOS.OB.active = false; Game.flags.k9Done = true; addMoney(45); const f = KOS.P.atoms || V(150, 0, 210); KOS.beamArrive(f.x, f.z); Game.flags.beamAt = [f.x, f.z];
+    clue('anaxagoras', 'The machine nobody built', 'Anaxagoras insists he did not build the machine. Its parts seem to be made of something invisible, or something unstable: they vanish when looked at. The evidence against him has too many small mistakes. Democritus may know what it is made of.');
+    return ['Clue: Anaxagoras denies building it; the parts are unstable', 'Suspect, but not convinced', '+45 obols'];
+  },
+});
+/*KOS_E_END*/
 
 frame();
 })();
