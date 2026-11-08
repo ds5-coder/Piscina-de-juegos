@@ -556,13 +556,14 @@ html:not(.playing) #panel { z-index: 12; bottom: auto; top: 50%; transform: tran
   <div class="pause-card">
     <div class="pause-head">
       <div><h2>Paused</h2><p id="pauseStats"></p></div>
-      <div class="chips" id="pauseTabs"><button data-tab="map" aria-pressed="true">Map</button><button data-tab="missions">Missions</button><button data-tab="inventory">Inventory</button><button data-tab="notebook">Notebook</button></div>
+      <div class="chips" id="pauseTabs"><button data-tab="map" aria-pressed="true">Map</button><button data-tab="missions">Missions</button><button data-tab="inventory">Inventory</button><button data-tab="notebook">Notebook</button><button data-tab="guide">Guide</button></div>
       <div class="pause-actions"><button id="pauseOptions" type="button">Options</button><button id="pauseResume" type="button" class="primary">Resume</button></div>
     </div>
-    <div class="pane on" id="pane-map"><canvas id="bigmap" width="900" height="460"></canvas><p class="legend"><span class="lg" style="--c:#5fd38d">H</span> Home: sleep and save <span class="lg" style="--c:#f2c94c">M</span> Main mission <span class="lg" style="--c:#5ab0ff">E</span> Errand <span class="lg" style="--c:#ffd23f">!</span> Where to go now <span class="lg" style="--c:#ff4d4d">!</span> Archer chasing you <span class="lg dot"></span> Archer on patrol <span class="lg road"></span> Road</p></div>
+    <div class="pane on" id="pane-map"><canvas id="bigmap" width="900" height="580"></canvas><p class="legend"><span class="lg" style="--c:#5fd38d">H</span> Home: sleep and save <span class="lg" style="--c:#f2c94c">M</span> Main mission <span class="lg" style="--c:#5ab0ff">E</span> Errand <span class="lg" style="--c:#ffd23f">!</span> Where to go now <span class="lg" style="--c:#ff4d4d">!</span> Archer chasing you <span class="lg dot"></span> Archer on patrol <span class="lg road"></span> Road</p></div>
     <div class="pane" id="pane-inventory"><ul id="invList"></ul></div>
     <div class="pane" id="pane-missions"><ul id="missionList"></ul></div>
     <div class="pane" id="pane-notebook"><ul id="noteList"></ul></div>
+    <div class="pane" id="pane-guide"><ul id="guideList"></ul></div>
   </div>
 </div>
 <div id="joy" aria-hidden="true"><div id="joyKnob"></div></div>
@@ -7087,6 +7088,13 @@ function applySeason(name) {
   resetParticles();
 }
 
+/* overcast days: each day has its own sky (clear, patchy or grey) that drifts slowly through the day */
+let ovcAmt = 0.25;
+function overcastTarget() {
+  const day = Math.floor(gameMin / 1440), x = Math.sin(day * 12.9898 + 4.1) * 43758.5453, d = x - Math.floor(x);
+  const base = day === 0 ? 0.3 : d < 0.3 ? 0.05 : d < 0.65 ? 0.4 : 0.85;
+  return clamp(base + 0.18 * Math.sin(gameMin / 95 + day * 2.3), 0, 1);
+}
 const MOONLIGHT = lin('#9db4ff'), moonDir = new THREE.Vector3();
 const _rimC = new THREE.Color();
 const UW = { cam: false };
@@ -7097,6 +7105,9 @@ function updateEnvironment(dt, t) {
   env.elev = st.elev; env.dir.copy(st.dir);
   sampleKeys(st.elev);
   if (S.tintAmt > 0) { env.hor.lerp(tintC, S.tintAmt); env.top.lerp(tintC, S.tintAmt * 0.6); }
+  ovcAmt = lerp(ovcAmt, overcastTarget(), 1 - Math.exp(-dt * 0.15));
+  const ovc = ovcAmt * (1 - rainAmt) * (1 - env.N * 0.5);
+  if (ovc > 0.01) { env.top.lerp(greyC, 0.5 * ovc); env.hor.lerp(greyC, 0.42 * ovc); env.sunI *= 1 - 0.55 * ovc; env.hI *= 1 + 0.12 * ovc; }
   if (rainAmt > 0.01) {
     env.top.lerp(greyC, 0.55 * rainAmt); env.hor.lerp(greyC, 0.45 * rainAmt);
     env.sunI *= 1 - 0.6 * rainAmt; env.hI *= 1 + 0.15 * rainAmt;
@@ -7106,11 +7117,11 @@ function updateEnvironment(dt, t) {
 
   skyU.uTop.value.copy(env.top); skyU.uHor.value.copy(env.hor); skyU.uBot.value.copy(env.bot);
   skyU.uSunDir.value.copy(st.dir); skyU.uSunCol.value.copy(env.sun);
-  skyU.uSunVis.value = smooth(-1.5, 1, st.elev) * (1 - rainAmt * 0.9);
-  skyU.uGlow.value = (1 - env.N * 0.92) * (1 - rainAmt * 0.6);
+  skyU.uSunVis.value = smooth(-1.5, 1, st.elev) * (1 - rainAmt * 0.9) * (1 - ovc * 0.85);
+  skyU.uGlow.value = (1 - env.N * 0.92) * (1 - rainAmt * 0.6) * (1 - ovc * 0.55);
   scene.fog.color.copy(env.hor);
 
-  const sunI = st.elev > -0.5 ? env.sunI * S.sunMul : 0;
+  const sunI = st.elev > -0.5 ? env.sunI * S.sunMul * 0.8 : 0;
   const moonI = 0.56 * smooth(-1, -8, st.elev) * (1 - rainAmt * 0.7);
   sun.target.position.set(Math.round(centre.x * 2) / 2, 0, Math.round(centre.z * 2) / 2);
   if (sunI >= moonI) {
@@ -7137,15 +7148,15 @@ function updateEnvironment(dt, t) {
   starU.uOpacity.value = smooth(0.25, 1, env.N) * (1 - rainAmt); starU.uTime.value = t; starU.uPR.value = renderer.getPixelRatio();
   sunSprite.position.copy(camera.position).addScaledVector(st.dir, 700);
   sunSprite.material.color.copy(env.sun);
-  sunSprite.material.opacity = smooth(-3, 2, st.elev) * (1 - rainAmt * 0.85);
+  sunSprite.material.opacity = smooth(-3, 2, st.elev) * (1 - rainAmt * 0.85) * (1 - ovc * 0.85);
   sunSprite.visible = st.elev > -4;
 
-  skyU.uTime.value = t; skyU.uCloud.value = Math.min(0.92, (CLOUD_BY[season] ?? 0.45) + rainAmt * 0.35);
+  skyU.uTime.value = t; skyU.uCloud.value = Math.min(0.92, (CLOUD_BY[season] ?? 0.45) + rainAmt * 0.35 + ovc * 0.55);
   skyU.uCloudLit.value.setRGB(1, 1, 1).lerp(env.hor, 0.25).multiplyScalar(0.12 + 0.95 * env.D).lerp(cloudNight, env.N * 0.6);
   skyU.uCloudShade.value.copy(env.top).multiplyScalar(0.55).lerp(env.hor, 0.4).multiplyScalar(0.45 + 0.5 * env.D);
 
   matWindows.color.copy(winDark).lerp(winWarm, smooth(0, 1, env.N * 1.1));
-  setExposure(lerp(0.76, 1.5, env.N));
+  setExposure(lerp(0.68, 1.5, env.N) * (1 + 0.06 * ovc));
   updateLightPool(dt, t);
 
   flames.forEach(f => {
@@ -7164,7 +7175,7 @@ function updateEnvironment(dt, t) {
     sky.visible = false; stars.visible = false; sunSprite.visible = false; moonSprite.visible = false;
     setExposure(1.3);
   } else {
-    sky.visible = true; stars.visible = true; scene.fog.near = S.fogNear; scene.fog.far = S.fogFar;
+    sky.visible = true; stars.visible = true; scene.fog.near = S.fogNear; scene.fog.far = S.fogFar * (1 - 0.3 * ovc);
   }
   const cm = Cine.active ? Cine.envMode : null;
   envBlocked = !!cm;
@@ -8455,7 +8466,7 @@ function updateObjective() {
     if (next && elapsed - nextHint.at > 10) { objEl.classList.add('hidden'); return; }
     if (next) {
       lab.textContent = 'Next'; lab.className = 'main';
-      document.getElementById('objText').textContent = next.hint ? next.hint : 'Walk into the gold light to start ' + next.title + '. It is the M on your map (P).';
+      document.getElementById('objText').textContent = next.hint ? next.hint : 'Walk into the gold light to start ' + next.title + '. It is the gold numbered marker on your map (P).';
       document.getElementById('objTimer').textContent = '';
       objEl.classList.remove('hidden'); return;
     }
@@ -8807,7 +8818,12 @@ function togglePause(force) {
 }
 function renderPause() {
   document.querySelectorAll('#pauseTabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === pauseTab)));
-  ['map', 'missions', 'inventory', 'notebook'].forEach(t => document.getElementById('pane-' + t).classList.toggle('on', t === pauseTab));
+  ['map', 'missions', 'inventory', 'notebook', 'guide'].forEach(t => document.getElementById('pane-' + t).classList.toggle('on', t === pauseTab));
+  const gb = document.querySelector('#pauseTabs button[data-tab="guide"]'); if (gb) gb.textContent = LANG === 'es' ? 'Guía' : 'Guide';
+  if (pauseTab === 'guide') {
+    const ul = document.getElementById('guideList'); ul.innerHTML = '';
+    guideParas().forEach(([h, txt]) => { const li = document.createElement('li'); if (h) { const s = document.createElement('strong'); s.textContent = h; li.appendChild(s); } const p = document.createElement('p'); p.textContent = txt; li.appendChild(p); ul.appendChild(li); });
+  }
   document.getElementById("pauseStats").textContent = (LANG === 'es' ? `Dinero: ${fmtMoney(Game.obols)}.   Piezas de la máquina: ${Game.components.length} de 13.   Fotos: ${Game.photos.length}.` : `Money: ${fmtMoney(Game.obols)}.   Machine parts: ${Game.components.length} of 13.   Photos: ${Game.photos.length}.`);
   if (pauseTab === 'inventory') {
     const ul = document.getElementById('invList'); ul.innerHTML = '';
@@ -8833,7 +8849,32 @@ function renderPause() {
     Game.notes.forEach(n => { const li = document.createElement('li'); const h = document.createElement('strong'); h.textContent = n.title; const p = document.createElement('p'); p.textContent = n.text; li.appendChild(h); li.appendChild(p); ul.appendChild(li); });
   }
 }
-const CHAPTERS_LATER = ['Chapter 2: The Map of Everything (Anaximander)', 'Chapter 3: Thick Air, Thin Air (Anaximenes)', 'Chapter 4: The Silence of the Brotherhood (Pythagoras)', 'Chapters 5 to 13: Heraclitus to Aristotle'];
+const CHAPTERS_LATER = [];
+/* the how-to-play guide: shown in the pause menu (Guide tab) and from the title menu */
+function guideParas() {
+  const es = LANG === 'es', w = controlScheme === 'wasd';
+  const mv = w ? 'W A S D' : '↑ ← ↓ →', run = w ? 'Shift' : 'A', hit = attackKey().replace('Key', ''), up = w ? 'E' : 'W';
+  let now = '';
+  try { const d = MISSIONS.find(m => mState(m.id) === 'active') || MISSIONS.find(m => mState(m.id) === 'available'); if (d) now = tr(typeof d.title === 'function' ? d.title() : d.title); } catch (e) { /* no mission yet */ }
+  const G = es ? [
+    ['Qué hacer', 'Estás atrapado en Kosmópolis. Hay 13 misiones, una por filósofo (numeradas 1 a 13 en el mapa). Entra en la luz dorada de una misión disponible, habla con el filósofo y resuelve su enigma. Al final te espera el Genio Maligno.' + (now ? '   Ahora: ' + now + '.' : '')],
+    ['Moverse', mv + ' para caminar. ' + run + ' para correr. Espacio salta (y trepa). Ratón o pulgar derecho: la cámara.'],
+    ['Interactuar', 'E (o Enter) para hablar, coger, activar y pasar el diálogo. Mantén E para saltar una escena. C: cámara de fotos. F: linterna del móvil (' + hit + ' para atacar con ' + (w ? 'F' : 'D') + ').'],
+    ['Caballos', 'Los caballos duermen en los establos. G: silba y el más cercano viene y se detiene a tu lado. ' + up + ': montar o bajar. ' + run + ' galopa; Espacio salta; Q mira atrás.'],
+    ['Agua y barcos', 'Nada con las flechas; busca burbujas para recuperar aire. B sube o baja de un barco. Los peces huyen de ti.'],
+    ['Mapa', 'P o Esc abre la pausa con el mapa. Los números dorados son misiones disponibles, azul = en curso, verde = hecha, gris = bloqueada. La flecha amarilla “!” marca adónde ir ahora. Tu casa (H) guarda la partida.'],
+    ['Otras teclas', 'T: opciones. H: ocultar la interfaz. 1-4: amanecer, mediodía, hora dorada, noche. I: inventario.'],
+  ] : [
+    ['What to do', 'You are trapped in Kosmopolis. There are 13 missions, one per philosopher (numbered 1 to 13 on the map). Step into the gold light of an available mission, talk to the philosopher and solve their puzzle. The Evil Demon waits at the end.' + (now ? '   Now: ' + now + '.' : '')],
+    ['Moving', mv + ' to walk. ' + run + ' to run. Space jumps (and climbs). Mouse or right thumb: camera.'],
+    ['Interacting', 'E (or Enter) to talk, pick up, use and advance dialogue. Hold E to skip a scene. C: photo camera. F: phone flashlight. ' + (w ? 'F' : 'D') + ': attack.'],
+    ['Horses', 'Horses rest in the stables. G: whistle and the nearest one trots over and stops beside you. ' + up + ': mount or get down. ' + run + ' gallops; Space jumps; Q looks back.'],
+    ['Water and boats', 'Swim with the movement keys; find bubbles to refill your air. B boards or leaves a boat. Fish flee from you.'],
+    ['Map', 'P or Esc opens the pause menu with the map. Gold numbers are available missions, blue = in progress, green = done, grey = locked. The yellow “!” shows where to go now. Your home (H) saves the game.'],
+    ['Other keys', 'T: options. H: hide the HUD. 1-4: dawn, noon, golden hour, night. I: inventory.'],
+  ];
+  return G;
+}
 /* =========================================================
    "The Last Drop": per-frame animation of its moving parts
    ========================================================= */
@@ -8912,10 +8953,11 @@ function drawBigMap() {
   const Wd = cv.width, Hd = cv.height;
   const ISL = !Sail.on && window.__athens ? islandOf() : null;
   const AM = ISL ? 3 : player.pos.x > 2380 && !Sail.on ? 1 : player.pos.x > 1100 ? 2 : 0;
-  const [X0, X1, Z0, Z1] = AM === 3 ? [ISL.x - 90, ISL.x + 90, ISL.z - 70, ISL.z + 70] : AM === 1 ? [2440, 2724, -140, 150] : AM === 2 ? [1150, 2760, -460, 460] : [-130, 190, -134, 40];
+  const [X0, X1, Z0, Z1] = AM === 3 ? [ISL.x - 90, ISL.x + 90, ISL.z - 70, ISL.z + 70] : AM === 1 ? [2440, 2724, -140, 150] : AM === 2 ? [1150, 2760, -460, 460] : [-300, 270, -185, 275];
   const sc = Math.min(Wd / (X1 - X0), Hd / (Z1 - Z0));
   const ox = (Wd - (X1 - X0) * sc) / 2, oz = (Hd - (Z1 - Z0) * sc) / 2;
   const P = (x, z) => [ox + (x - X0) * sc, oz + (z - Z0) * sc];
+  if (AM === 0 && KOS.paintLegend) KOS.paintLegend();
   g.fillStyle = S.ground; g.fillRect(0, 0, Wd, Hd);
   g.globalAlpha = 0.22; g.fillStyle = '#000'; g.fillRect(0, 0, Wd, Hd); g.globalAlpha = 1;
   const shape = s => { const [x, y] = P(s.x, s.z); g.fillStyle = s.fill; if (s.round) { g.beginPath(); g.arc(x, y, Math.max(1.5, s.w * sc * 0.5), 0, TAU); g.fill(); } else g.fillRect(x - s.w * sc / 2, y - s.d * sc / 2, s.w * sc, s.d * sc); };
@@ -8923,7 +8965,7 @@ function drawBigMap() {
   strokeRoads(g, P, sc);
   mapShapes.slice(1).forEach(shape);
   g.font = `700 ${Math.round(15 * Wd / 900)}px Cinzel, Georgia, serif`; g.textAlign = 'center';
-  (AM === 3 ? [[ISL.name, ISL.port.plaza.x, ISL.port.plaza.z - 22], ['Harbour', ISL.port.pier.x + 12, ISL.port.pier.z]] : AM === 1 ? [['Acropolis', ATH.AX, ATH.AZ - 50], ['Agora of Athens', ATH.agora.x, ATH.agora.z - 22], ['Piraeus', 2470, 64], ['Hill of the Muses', ATH.view.x, ATH.view.z - 20], ['Lycabettus', ATH.lyc.x, ATH.lyc.z + 30]] : AM === 2 ? [['Miletus', 1200, -20], ...ISLES.map(I => [I.name, I.x, I.z - I.r - 12]), ['Sounion', ATH.sounion.x - 20, ATH.sounion.z - 30], ['Athens', 2600, -60]] : [['Agora of Miletus', 0, 26], ['Miletus Harbour', 118, 0], ['Hill village', -100, -16], ['The sea', 172, -100], ['Hill road', 128, -118], ['Ship to Athens ▸', 182, -46]]).forEach(([n, x, z]) => { const [px, py] = P(x, z); g.fillStyle = 'rgba(244,242,236,.9)'; g.fillText(n, px, py); });
+  (AM === 3 ? [[ISL.name, ISL.port.plaza.x, ISL.port.plaza.z - 22], ['Harbour', ISL.port.pier.x + 12, ISL.port.pier.z]] : AM === 1 ? [['Acropolis', ATH.AX, ATH.AZ - 50], ['Agora of Athens', ATH.agora.x, ATH.agora.z - 22], ['Piraeus', 2470, 64], ['Hill of the Muses', ATH.view.x, ATH.view.z - 20], ['Lycabettus', ATH.lyc.x, ATH.lyc.z + 30]] : AM === 2 ? [['Miletus', 1200, -20], ...ISLES.map(I => [I.name, I.x, I.z - I.r - 12]), ['Sounion', ATH.sounion.x - 20, ATH.sounion.z - 30], ['Athens', 2600, -60]] : []).forEach(([n, x, z]) => { const [px, py] = P(x, z); g.fillStyle = 'rgba(244,242,236,.9)'; g.fillText(n, px, py); });
   const s = curStep(); const tp = s && s.target ? s.target(stepRT) : null;
   if (tp && !underground) {
     const [ax, ay] = P(player.pos.x, player.pos.z), [bx, by] = P(tp.x, tp.z);
@@ -8938,7 +8980,7 @@ function drawBigMap() {
   });
   if (Game.flags.prologueDone) { const hs = homeSpot(); icon(hs.x, hs.z, '#5fd38d', 'H'); }
   if (Game.flags.houseOffer && !Game.flags.ownHouse) icon(HOUSE.door.x, HOUSE.door.z, '#5ab0ff', 'H');
-  missionMarkers().forEach(({ d, p }) => icon(p.x, p.z, d.kind === 'main' ? '#f2c94c' : '#5ab0ff', d.kind === 'main' ? 'M' : 'E'));
+  if (AM === 0 && KOS.mapMissions) KOS.mapMissions(g, P, sc); else missionMarkers().forEach(({ d, p }) => icon(p.x, p.z, d.kind === 'main' ? '#f2c94c' : '#5ab0ff', d.kind === 'main' ? 'M' : 'E'));
   if (tp && !underground) icon(tp.x, tp.z, '#ffd23f', '!');
   const [px, py] = P(player.pos.x, player.pos.z);
   g.save(); g.translate(px, py); g.rotate(-player.yaw + Math.PI);
@@ -14282,6 +14324,14 @@ function openSheet(title, paras) {
 document.getElementById('sheetClose').addEventListener('click', closeTitleSheet);
 document.getElementById('settingsBtn').addEventListener('click', () => { closeTitleSheet(); togglePanel(true); document.getElementById('panelBack').focus(); });
 document.getElementById('panelBack').addEventListener('click', () => { togglePanel(false); });
+(function () {
+  const b = document.createElement('button'); b.id = 'guideBtn'; b.type = 'button';
+  const sp = document.createElement('span'); b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 16h-2v-2h2zm2.1-7.75l-.9.9c-.7.7-1.2 1.3-1.2 2.85h-2v-.5c0-1.1.5-2.1 1.2-2.8l1.2-1.25A1.8 1.8 0 0012 7.6a2 2 0 00-2 2H8a4 4 0 118 0c0 .8-.3 1.7-.9 2.65z"/></svg>'; b.appendChild(sp);
+  const paint = () => { sp.textContent = LANG === 'es' ? 'Cómo se juega' : 'How to Play'; }; paint(); b._paint = paint;
+  b.addEventListener('click', () => { paint(); openSheet(LANG === 'es' ? 'Cómo se juega' : 'How to Play', guideParas().map(([h, t]) => [h + ': ' + t])); });
+  const c = document.getElementById('creditsBtn'); c.parentNode.insertBefore(b, c);
+  window.__guideBtn = b;
+})();
 document.getElementById('creditsBtn').addEventListener('click', () => {
   const es = LANG === 'es';
   openSheet(t2('creditsTitle'), (es ? I18N.creditsBodyEs : I18N.creditsBody).map(x => [x]));
@@ -16322,7 +16372,7 @@ function updateRide(dt, t) {
   player.pos.set(p.x, g, p.z); player.yaw = h.yaw; player.speed = Ride.speed; player.grounded = true; player.vy = 0;
   // the rider: astride, moving with the horse's back; mounting is a leap or a climb
   h.o.updateMatrixWorld(true);
-  const seat = new THREE.Vector3(0, SADDLE + 1.18 - nico.hipY + 0.02, 0.05); h.body.localToWorld(seat.set(0, 0.42, 0.02));
+  const seat = new THREE.Vector3(0, SADDLE + 1.18 - nico.hipY + 0.02, 0.05); h.body.localToWorld(seat.set(0, 0.27, 0.45));
   Ride.mountT += dt;
   const mk = clamp(Ride.mountT / Ride.mountDur, 0, 1);
   if (mk < 1) {
@@ -16341,9 +16391,9 @@ function updateRide(dt, t) {
     nico.legR.hip.rotation.x = -0.3; nico.legR.hip.rotation.z = -1.3 * sw; nico.legL.hip.rotation.x = -0.6 * sw; nico.legL.knee.rotation.x = 1.0 * sw;
   } else {
     nico.hips.position.y = nico.hipY; nico.hips.rotation.x = 0;
-    nico.legL.hip.rotation.x = -1.15; nico.legR.hip.rotation.x = -1.15; nico.legL.hip.rotation.z = 0.5; nico.legR.hip.rotation.z = -0.5;
-    nico.legL.knee.rotation.x = 1.45; nico.legR.knee.rotation.x = 1.45;
-    nico.torso.rotation.x = 0.08 + gal * 0.42 - (h.air ? 0.25 : 0);
+    nico.legL.hip.rotation.x = -0.62; nico.legR.hip.rotation.x = -0.62; nico.legL.hip.rotation.z = 0.36; nico.legR.hip.rotation.z = -0.36;
+    nico.legL.knee.rotation.x = 0.85; nico.legR.knee.rotation.x = 0.85;
+    nico.torso.rotation.x = 0.02 + gal * 0.38 - (h.air ? 0.2 : 0);
     nico.armL.sh.rotation.x = -0.75 - gal * 0.3; nico.armR.sh.rotation.x = -0.75 - gal * 0.3; nico.armL.sh.rotation.z = 0.12; nico.armR.sh.rotation.z = -0.12;
     if (nico.armL.elbow) { nico.armL.elbow.rotation.x = -1.0 + gal * 0.4; nico.armR.elbow.rotation.x = -1.0 + gal * 0.4; }
     if (cam.lb > 0.3) { nico.torso.rotation.y = 0.9 * cam.lb; nico.head.rotation.y = 1.2 * cam.lb; }
@@ -17461,6 +17511,9 @@ defMission({
 
 
 
+
+
+
 /*KOS_E_BEGIN*/
 /* =========================================================================================
    ACT II (missions 5-9): Heraclitus, Parmenides, Zeno, Empedocles, Anaxagoras.
@@ -18043,6 +18096,31 @@ function kRng2(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 16807) % 
   // the hill village, the stables and the fields
   put('barber', -60, 14, -40, 10); put('alexander_ok', -84, 40, -70, 30); put('euripides', 20, -40, 24, -46); put('stoic', 98, 30, 102, 38); put('homer', -40, 70, -30, 60); put('cat_911', 60, 60, 50, 50);
 })();
+/* ---- map: numbered mission badges, dynamic legend ---- */
+KOS.PHIL = ['Thales', 'Anaximander', 'Anaximenes', 'Pythagoras', 'Heraclitus', 'Parmenides', 'Zeno', 'Empedocles', 'Anaxagoras', 'Democritus', 'Socrates', 'Plato', 'Aristotle'];
+KOS.mapMissions = function (g, P, sc) {
+  const es = LANG === 'es', COL = { available: '#f2c94c', active: '#5ab0ff', done: '#5fd38d', 'done-today': '#5fd38d', failed: '#f2994a', locked: '#8a8f98' };
+  g.save(); g.textAlign = 'center';
+  MISSIONS.forEach(d => {
+    const m = /^k(\d+)$/.exec(d.id); if (!m || !d.marker) return;
+    let p; try { p = d.marker(); } catch (e) { p = null; } if (!p) return;
+    const n = +m[1], st = mState(d.id), [x, y] = P(p.x, p.z), on = st === 'available' || st === 'active', r = on ? 15 : 12;
+    if (on) { g.beginPath(); g.arc(x, y, r + 6 + 2 * Math.sin(performance.now() / 300), 0, TAU); g.fillStyle = 'rgba(255,230,120,.22)'; g.fill(); }
+    g.beginPath(); g.arc(x, y, r, 0, TAU); g.fillStyle = COL[st] || COL.locked; g.fill(); g.lineWidth = 3; g.strokeStyle = '#1b2330'; g.stroke();
+    g.fillStyle = '#1b2330'; g.font = '800 ' + (on ? 16 : 13) + 'px Alegreya Sans, sans-serif'; g.textBaseline = 'middle';
+    g.fillText(st === 'done' || st === 'done-today' ? '✓' : String(n), x, y + 1); g.textBaseline = 'alphabetic';
+    g.font = '700 13px Alegreya Sans, sans-serif'; g.lineWidth = 4; g.strokeStyle = 'rgba(15,20,30,.9)';
+    const nm = tr(KOS.PHIL[n - 1]); g.strokeText(nm, x, y + r + 14); g.fillStyle = on ? '#fff3c4' : 'rgba(235,235,225,.75)'; g.fillText(nm, x, y + r + 14);
+  });
+  g.restore();
+};
+KOS.paintLegend = function () {
+  const el = document.querySelector('#pane-map .legend'); if (!el) return;
+  const es = LANG === 'es', key = LANG;
+  if (el.dataset.k === key) return; el.dataset.k = key;
+  const lg = (c, t, tx) => '<span class="lg" style="--c:' + c + '">' + t + '</span> ' + tx;
+  el.innerHTML = [lg('#f2c94c', '1', es ? 'Misión disponible' : 'Mission available'), lg('#5ab0ff', '2', es ? 'En curso' : 'In progress'), lg('#5fd38d', '✓', es ? 'Hecha' : 'Done'), lg('#8a8f98', '3', es ? 'Bloqueada' : 'Locked'), lg('#ffd23f', '!', es ? 'Adónde ir ahora' : 'Where to go now'), lg('#5fd38d', 'H', es ? 'Casa: dormir y guardar' : 'Home: sleep and save'), lg('#ff4d4d', '!', es ? 'Arquero te persigue' : 'Archer chasing you')].join(' ');
+};
 /*KOS_E_END*/
 /*KOS_F_BEGIN*/
 /* =========================================================================================
@@ -19192,6 +19270,7 @@ Object.assign(ES_TEXT, {
   'Diogenes': 'Diógenes', 'Socrates': 'Sócrates', 'Thales': 'Tales', 'Anaximander': 'Anaximandro', 'Anaximenes': 'Anaxímenes', 'Pythagoras': 'Pitágoras', 'Heraclitus': 'Heráclito', 'Parmenides': 'Parménides', 'Zeno': 'Zenón', 'Empedocles': 'Empédocles', 'Anaxagoras': 'Anaxágoras', 'Democritus': 'Demócrito', 'Plato': 'Platón', 'Aristotle': 'Aristóteles', 'Watchman': 'Vigilante',
   'THALES': 'TALES', 'PYTHAGORAS': 'PITÁGORAS', 'SOCRATES': 'SÓCRATES', 'PLATO': 'PLATÓN', 'ARISTOTLE': 'ARISTÓTELES', 'ALEXANDER': 'ALEJANDRO', 'FRAGMENT': 'FRAGMENTO', 'BEING': 'EL SER', 'THE ONE': 'EL UNO', 'UNCHANGING': 'LO INMUTABLE',
   'KOSMOPOLIS': 'KOSMÓPOLIS', 'Kosmopolis': 'Kosmópolis',
+  'How to Play': 'Cómo se juega', 'Guide': 'Guía',
   'Look at the evidence again.': 'Vuelve a mirar las pruebas.',
 });
 (() => {
@@ -19221,7 +19300,7 @@ Object.assign(ES_TEXT, {
     [/^A page from Anaxagoras’ observatory: (.+)\.$/, m => 'Una página del observatorio de Anaxágoras: ' + base(m[1]) + '.'],
     [/^Evidence: (.+)$/, m => 'Prueba: ' + m[1]],
     [/^\+(\d+) obols?$/, m => '+' + m[1] + ' óbolos'],
-    [/^Walk into the gold light to start (.+)\. It is the M on your map \(P\)\.$/, m => 'Entra en la luz dorada para empezar «' + base(m[1]) + '». Es la M de tu mapa (P).'],
+    [/^Walk into the gold light to start (.+)\. It is the gold numbered marker on your map \(P\)\.$/, m => 'Entra en la luz dorada para empezar «' + base(m[1]) + '». Es el marcador dorado numerado de tu mapa (P).'],
     [/^Turn the three water valves in the sunken temple \((\d)\/3\)\. Watch your air: the bubble columns refill it\.$/, m => 'Gira las tres válvulas de agua del templo hundido (' + m[1] + '/3). Vigila tu aire: las columnas de burbujas lo rellenan.'],
     [/^Ride the updrafts to the three ledges and pull the vent levers \((\d)\/3\)\. Jump into the swirling air!$/, m => 'Sube con las corrientes de aire hasta las tres repisas y tira de las palancas (' + m[1] + '/3). ¡Salta al aire en remolino!'],
     [/^Tune the pipes with E: pipe 2 to an octave \(2:1\), pipe 3 to a fifth \(3:2\)\. Now pipe 2 = (.+), pipe 3 = (.+)$/, m => 'Afina los tubos con E: el tubo 2 a una octava (2:1), el tubo 3 a una quinta (3:2). Ahora tubo 2 = ' + m[1] + ', tubo 3 = ' + m[2]],
