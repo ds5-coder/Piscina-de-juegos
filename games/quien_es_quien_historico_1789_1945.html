@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quién es Quién? · Archivo Histórico (1789–1945)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#fcfaf4',
+                            100: '#f5efe0',
+                            200: '#e9dec4',
+                            300: '#d7c49e',
+                            400: '#bfa372',
+                            800: '#5a4932',
+                            900: '#3c3020',
+                        },
+                        slatearchive: {
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        },
+                        crimson: {
+                            600: '#991b1b',
+                            700: '#7f1d1d',
+                            800: '#651616',
+                        },
+                        gold: {
+                            400: '#d4af37',
+                            500: '#b89428',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f3ecdc;
+            background-image:
+                radial-gradient(at 15% 15%, rgba(212, 175, 55, 0.12) 0px, transparent 50%),
+                radial-gradient(at 85% 85%, rgba(127, 29, 29, 0.08) 0px, transparent 50%),
+                linear-gradient(180deg, rgba(255, 252, 245, 0.7) 0%, rgba(233, 222, 196, 0.5) 100%);
+            min-height: 100vh;
+        }
+
+        .suspect-card {
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .suspect-card.eliminated {
+            opacity: 0.34;
+            filter: grayscale(100%);
+            transform: scale(0.96);
+            background-color: #e5dec9;
+            border-color: #cbbba0;
+        }
+
+        .suspect-card.eliminated .eliminated-stamp {
+            opacity: 1;
+            transform: rotate(-8deg) scale(1);
+        }
+
+        .eliminated-stamp {
+            opacity: 0;
+            transform: rotate(-8deg) scale(1.2);
+            transition: all 0.25s ease;
+            pointer-events: none;
+        }
+
+        .archive-stamp {
+            border: 1.5px solid rgba(127, 29, 29, 0.35);
+            color: #7f1d1d;
+            letter-spacing: 0.15em;
+            transform: rotate(-1.5deg);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.3s ease-out forwards;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #efe6d2;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #bfa372;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slatearchive-900 antialiased selection:bg-gold-400 selection:text-slatearchive-900">
+
+    <!-- Cabecera Superior -->
+    <header class="bg-slatearchive-900 text-parchment-50 border-b-2 border-gold-500 shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-crimson-700 to-crimson-800 border border-gold-400/70 flex items-center justify-center shrink-0 shadow-inner">
+                    <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold uppercase tracking-[0.22em] text-gold-400">Expediente de Inteligencia · 1789–1945</span>
+                    <h1 class="font-serif text-lg sm:text-2xl font-bold tracking-tight leading-tight text-parchment-50">
+                        ¿Quién es Quién? Histórico
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btn-back-eras" type="button" onclick="showEraSelector()" class="hidden items-center gap-1.5 px-3 py-2 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-medium transition shadow-sm">
+                    <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <span>Cambiar Época</span>
+                </button>
+                <button type="button" onclick="openHelpModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-medium transition shadow-sm">
+                    <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="hidden sm:inline">Cómo Jugar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANTALLA 1: SELECCIÓN DE ÉPOCA / COLECCIÓN -->
+    <section id="era-screen" class="max-w-6xl mx-auto px-4 py-8 sm:py-10 animate-fade-up">
+        <div class="bg-parchment-50/95 border border-parchment-300 rounded-2xl p-6 sm:p-9 shadow-xl">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-3 py-1 rounded mb-3">
+                    Archivo Biográfico · 8 Colecciones
+                </span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slatearchive-900 mb-2.5">
+                    Selecciona una época o colección
+                </h2>
+                <p class="text-sm sm:text-base text-parchment-800 leading-relaxed">
+                    El sistema elegirá un <strong>personaje secreto</strong> al azar dentro de la época elegida. Haz preguntas sobre su origen, cargo o papel histórico para descartar fichas hasta dar con su identidad.
+                </p>
+            </div>
+
+            <div id="era-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: TABLERO DE DEDUCCIÓN -->
+    <main id="game-screen" class="hidden max-w-7xl mx-auto px-4 py-5 sm:py-6 animate-fade-up">
+        <!-- Barra superior de estado -->
+        <section class="bg-parchment-50/95 border border-parchment-300 rounded-2xl p-4 mb-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+                <span id="era-badge" class="inline-flex items-center gap-2 bg-slatearchive-900 text-parchment-50 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-xl border border-gold-500/60">
+                    <span class="w-2 h-2 rounded-full bg-gold-400"></span>
+                    <span id="era-title-label">Época</span>
+                </span>
+                <button type="button" onclick="requestHint()" id="btn-hint" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-xs font-semibold transition">
+                    <svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    <span>Pista directa (<span id="hints-left">2</span>)</span>
+                </button>
+                <button type="button" onclick="toggleHostPeek()" id="btn-host-peek" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slatearchive-800 hover:bg-slatearchive-700 text-gold-400 border border-gold-500/40 text-xs font-semibold transition shadow-xs" title="Mostrar u ocultar el personaje secreto (modo presentador)">
+                    <svg id="icon-eye-open" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <svg id="icon-eye-closed" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                    <span id="host-peek-label">Ver Indiciado</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 sm:gap-6">
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">En pie</span>
+                    <span id="stat-remaining" class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900">10 / 10</span>
+                </div>
+                <div class="h-8 w-px bg-parchment-300"></div>
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">Preguntas</span>
+                    <span id="stat-questions" class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900">0 / 10</span>
+                </div>
+                <div class="h-8 w-px bg-parchment-300"></div>
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">Modo</span>
+                    <button type="button" id="btn-accuse-mode" onclick="toggleAccuseMode()" class="mt-0.5 px-3 py-1 rounded-lg bg-crimson-700 hover:bg-crimson-800 text-white text-xs font-bold uppercase tracking-wider shadow-sm transition">
+                        Acusar
+                    </button>
+                </div>
+                <button type="button" onclick="startEraGame(currentEraId)" class="px-3 py-2 rounded-xl bg-parchment-200 hover:bg-parchment-300 text-slatearchive-900 text-xs font-semibold border border-parchment-300 transition" title="Nueva partida en esta época">
+                    Reiniciar
+                </button>
+            </div>
+        </section>
+
+        <!-- Tarjeta Discreta del Indiciado (Modo Presentador) -->
+        <div id="host-peek-panel" class="hidden mb-4 bg-slatearchive-900 text-parchment-50 border-2 border-gold-500 rounded-2xl p-3.5 sm:p-4 shadow-xl animate-fade-up">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5 min-w-0">
+                    <div id="host-peek-portrait" class="w-12 h-14 rounded-lg overflow-hidden bg-slatearchive-800 border border-gold-400/60 shrink-0 flex items-center justify-center"></div>
+                    <div class="min-w-0">
+                        <span class="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-gold-400">
+                            Vista de Presentador · Indiciado Secreto
+                        </span>
+                        <h3 id="host-peek-name" class="font-serif text-lg sm:text-xl font-bold text-white leading-tight truncate">
+                            Nombre
+                        </h3>
+                        <p id="host-peek-bio" class="text-xs text-parchment-200 line-clamp-1 mt-0.5">
+                            Biografía...
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleHostPeek(false)" class="px-3 py-1.5 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 text-xs font-semibold shrink-0 transition">
+                    Ocultar
+                </button>
+            </div>
+        </div>
+
+        <!-- Banner de Modo Acusación -->
+        <div id="accuse-banner" class="hidden mb-4 bg-crimson-800 text-white border-2 border-gold-400 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-lg animate-fade-up">
+            <div class="flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-gold-400 animate-ping"></span>
+                <p class="text-xs sm:text-sm font-semibold">
+                    <strong>MODO ACUSACIÓN ACTIVO:</strong> Haz clic directamente sobre la ficha del personaje que crees que es el objetivo secreto.
+                </p>
+            </div>
+            <button type="button" onclick="toggleAccuseMode(false)" class="px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold uppercase">
+                Cancelar
+            </button>
+        </div>
+
+        <!-- Cuerpo Principal: Tablero de Sospechosos + Panel de Interrogatorio -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Cuadrícula de Personajes (8 columnas en desktop) -->
+            <div class="lg:col-span-8">
+                <div class="flex items-center justify-between mb-2.5 px-1">
+                    <span class="text-xs font-semibold text-parchment-800">
+                        Haz clic en una ficha para <strong>descartarla o restaurarla</strong> manualmente (o usa las preguntas).
+                    </span>
+                    <button type="button" onclick="restoreAllSuspects()" class="text-xs font-bold text-crimson-700 hover:underline">
+                        Restaurar todas
+                    </button>
+                </div>
+                <div id="suspects-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3"></div>
+            </div>
+
+            <!-- Panel de Preguntas e Historial (4 columnas en desktop) -->
+            <aside class="lg:col-span-4 bg-parchment-50/95 border border-parchment-300 rounded-2xl p-4 sm:p-5 shadow-md lg:sticky lg:top-20 space-y-4">
+                <div>
+                    <div class="flex items-center justify-between border-b border-parchment-300 pb-2.5 mb-3">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slatearchive-900">Interrogatorio Histórico</span>
+                        <span class="text-[11px] text-parchment-800">20 preguntas sutiles</span>
+                    </div>
+
+                    <!-- Lista de Preguntas Disponibles -->
+                    <div id="questions-list" class="max-h-72 overflow-y-auto custom-scroll space-y-1.5 pr-1"></div>
+                </div>
+
+                <!-- Registro de Pistas y Respuestas -->
+                <div class="border-t border-parchment-300 pt-3">
+                    <span class="block text-xs font-bold uppercase tracking-widest text-slatearchive-900 mb-2">
+                        Bitácora de Deducción
+                    </span>
+                    <div id="log-container" class="max-h-52 overflow-y-auto custom-scroll space-y-2 pr-1">
+                        <p class="text-xs italic text-parchment-800 py-3 text-center">
+                            Formula tu primera pregunta para obtener una respuesta SÍ / NO sobre el personaje secreto.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- MODAL DE RESULTADO (VICTORIA O FALLO DE ACUSACIÓN) -->
+    <div id="result-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/75 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 border-gold-500 rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl text-center animate-fade-up">
+            <div id="result-icon-wrap" class="w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center"></div>
+            <span id="result-stamp" class="inline-block archive-stamp text-[10px] font-bold uppercase px-2.5 py-0.5 rounded mb-2">
+                Caso Resuelto
+            </span>
+            <h2 id="result-title" class="font-serif text-2xl sm:text-3xl font-bold text-slatearchive-900 mb-1">
+                ¡Identidad Confirmada!
+            </h2>
+            <p id="result-subtitle" class="text-xs sm:text-sm text-parchment-800 mb-4"></p>
+
+            <!-- Ficha Biográfica del Personaje Secreto -->
+            <div class="bg-white border border-parchment-300 rounded-xl p-4 text-left mb-5 shadow-inner flex items-start gap-3.5">
+                <div id="secret-reveal-portrait" class="w-16 h-20 rounded-lg overflow-hidden bg-slatearchive-900 border border-gold-500/60 shrink-0 flex items-center justify-center"></div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-crimson-700">Personaje Objetivo</span>
+                    <h3 id="secret-reveal-name" class="font-serif text-2xl font-bold text-slatearchive-900 mt-0.5 leading-tight">Nombre</h3>
+                    <p id="secret-reveal-meta" class="text-xs font-semibold text-parchment-800 mt-0.5">País · Rol</p>
+                    <div class="w-10 h-0.5 bg-gold-500 my-2"></div>
+                    <p id="secret-reveal-bio" class="text-xs sm:text-sm text-slatearchive-900 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button type="button" onclick="closeResultModal(); startEraGame(currentEraId);" class="flex-1 py-2.5 px-4 rounded-xl bg-crimson-700 hover:bg-crimson-800 text-white text-xs font-bold uppercase tracking-wider transition">
+                    Otro personaje (misma época)
+                </button>
+                <button type="button" onclick="closeResultModal(); showEraSelector();" class="flex-1 py-2.5 px-4 rounded-xl bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-50 text-xs font-bold uppercase tracking-wider transition">
+                    Cambiar época
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE INSTRUCCIONES -->
+    <div id="help-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/75 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 border-parchment-400 rounded-2xl max-w-lg w-full p-6 shadow-2xl animate-fade-up">
+            <div class="flex items-center justify-between border-b border-parchment-300 pb-3 mb-4">
+                <h2 class="font-serif text-2xl font-bold text-slatearchive-900">Reglas del Juego</h2>
+                <button type="button" onclick="closeHelpModal()" class="w-8 h-8 rounded-lg bg-parchment-200 hover:bg-parchment-300 font-bold">✕</button>
+            </div>
+            <ul class="space-y-2.5 text-sm text-parchment-900 leading-relaxed">
+                <li><strong>1. Objetivo:</strong> Descubrir qué personaje histórico de la época seleccionada ha elegido en secreto el archivo.</li>
+                <li><strong>2. Límite de 10 Preguntas:</strong> Dispones de un máximo de <strong>10 preguntas</strong> por partida (incluidas las pistas directas). Usa preguntas genéricas de ámbito, rasgos visuales o época para ir cerrando el cerco sin gastar intentos innecesarios.</li>
+                <li><strong>3. Descarte Manual:</strong> También puedes hacer clic sobre cualquier tarjeta para tacharla o volver a levantarla según tus propias deducciones.</li>
+                <li><strong>4. Acusar:</strong> Cuando estés seguro (o al agotar tus 10 preguntas), pulsa <strong>Acusar</strong> y selecciona la ficha del personaje final.</li>
+            </ul>
+            <button type="button" onclick="closeHelpModal()" class="mt-5 w-full py-2.5 rounded-xl bg-slatearchive-900 text-parchment-50 text-xs font-bold uppercase tracking-wider">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // BASE DE DATOS DE ÉPOCAS, PERSONAJES Y PREGUNTAS DEDUCTIVAS
+        // =========================================================================
+        const ERAS_DB = [
+            {
+                id: 'rev-francesa',
+                period: '1789–1815',
+                title: 'Revolución Francesa y Era Napoleónica',
+                desc: 'Monarcas, revolucionarios jacobinos y comandantes de las guerras napoleónicas.',
+                characters: [
+                    { name: 'Napoleón Bonaparte', sub: 'Francia · Emperador', bio: 'Emperador de Francia y protagonista de las guerras napoleónicas.', tags: ['francia', 'lider', 'militar', 'europa', 'monarquia'] },
+                    { name: 'Luis XVI', sub: 'Francia · Rey', bio: 'Rey de Francia durante el inicio de la Revolución.', tags: ['francia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'María Antonieta', sub: 'Francia / Austria · Reina', bio: 'Reina consorte de Francia durante la Revolución Francesa.', tags: ['francia', 'austria', 'mujer', 'monarquia', 'europa'] },
+                    { name: 'Maximilien Robespierre', sub: 'Francia · Revolucionario', bio: 'Figura central del periodo del Terror y líder jacobino.', tags: ['francia', 'lider', 'revolucion', 'europa'] },
+                    { name: 'Georges Danton', sub: 'Francia · Revolucionario', bio: 'Dirigente revolucionario francés y figura clave de la Primera República.', tags: ['francia', 'lider', 'revolucion', 'europa'] },
+                    { name: 'Jean-Paul Marat', sub: 'Francia · Periodista', bio: 'Periodista, médico y radical revolucionario francés.', tags: ['francia', 'revolucion', 'escritor', 'europa'] },
+                    { name: 'Horatio Nelson', sub: 'Reino Unido · Almirante', bio: 'Almirante británico vencedor en la batalla de Trafalgar.', tags: ['reino_unido', 'militar', 'aliado_coalicion', 'europa'] },
+                    { name: 'Duque de Wellington', sub: 'Reino Unido · General', bio: 'Militar británico que derrotó a Napoleón en Waterloo.', tags: ['reino_unido', 'militar', 'lider', 'aliado_coalicion', 'europa'] },
+                    { name: 'Mijaíl Kutúzov', sub: 'Rusia · Mariscal', bio: 'General ruso que dirigió la defensa frente a la invasión napoleónica.', tags: ['rusia', 'militar', 'aliado_coalicion', 'europa'] },
+                    { name: 'Alejandro I de Rusia', sub: 'Rusia · Zar', bio: 'Zar ruso durante las guerras napoleónicas y el Congreso de Viena.', tags: ['rusia', 'lider', 'monarquia', 'aliado_coalicion', 'europa'] }
+                ]
+            },
+            {
+                id: 'siglo-xix',
+                period: '1815–1900',
+                title: 'Siglo XIX: Imperios y Unificaciones',
+                desc: 'Unificación de Alemania e Italia, líderes americanos y reformas en Asia y África.',
+                characters: [
+                    { name: 'Otto von Bismarck', sub: 'Alemania · Canciller', bio: 'Artífice de la unificación alemana y primer canciller del Imperio.', tags: ['alemania', 'lider', 'europa'] },
+                    { name: 'Guillermo I de Alemania', sub: 'Alemania · Káiser', bio: 'Rey de Prusia y primer emperador de la Alemania unificada.', tags: ['alemania', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Guillermo II de Alemania', sub: 'Alemania · Káiser', bio: 'Último emperador alemán y rey de Prusia.', tags: ['alemania', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Víctor Manuel II', sub: 'Italia · Rey', bio: 'Primer rey de una Italia unificada en 1861.', tags: ['italia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Giuseppe Garibaldi', sub: 'Italia · Militar', bio: 'Militar y revolucionario clave en la unificación de Italia.', tags: ['italia', 'militar', 'revolucion', 'europa'] },
+                    { name: 'Camillo Benso, conde de Cavour', sub: 'Italia · Estadista', bio: 'Primer ministro del Piamonte e impulsor diplomático de la unidad italiana.', tags: ['italia', 'lider', 'europa'] },
+                    { name: 'Victoria del Reino Unido', sub: 'Reino Unido · Reina', bio: 'Monarca británica que dio nombre a la era victoriana.', tags: ['reino_unido', 'lider', 'monarquia', 'mujer', 'europa'] },
+                    { name: 'Karl Marx', sub: 'Alemania · Filósofo', bio: 'Filósofo, economista y teórico del socialismo científico.', tags: ['alemania', 'pensador', 'escritor', 'revolucion', 'europa'] },
+                    { name: 'Friedrich Engels', sub: 'Alemania · Pensador', bio: 'Filósofo y coautor junto a Karl Marx del Manifiesto Comunista.', tags: ['alemania', 'pensador', 'escritor', 'revolucion', 'europa'] },
+                    { name: 'León Tolstói', sub: 'Rusia · Escritor', bio: 'Novelista ruso autor de Guerra y paz y Ana Karénina.', tags: ['rusia', 'escritor', 'europa'] },
+                    { name: 'Fiódor Dostoyevski', sub: 'Rusia · Escritor', bio: 'Escritor ruso autor de Crimen y castigo y Los hermanos Karamázov.', tags: ['rusia', 'escritor', 'europa'] },
+                    { name: 'Napoleón III', sub: 'Francia · Emperador', bio: 'Presidente y posteriormente emperador del Segundo Imperio francés.', tags: ['francia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Francisco José I de Austria', sub: 'Austria-Hungría · Emperador', bio: 'Emperador de Austria y rey de Hungría durante casi 68 años.', tags: ['austria', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Abraham Lincoln', sub: 'EE. UU. · Presidente', bio: 'Presidente estadounidense durante la Guerra de Secesión; abolió la esclavitud.', tags: ['eeuu', 'lider', 'america'] },
+                    { name: 'Simón Bolívar', sub: 'Sudamérica · Libertador', bio: 'Militar y estadista clave en la independencia de varias naciones sudamericanas.', tags: ['america', 'lider', 'militar', 'revolucion'] },
+                    { name: 'José de San Martín', sub: 'Sudamérica · Libertador', bio: 'Militar y libertador de Argentina, Chile y Perú.', tags: ['america', 'lider', 'militar', 'revolucion'] },
+                    { name: 'George Washington', sub: 'EE. UU. · Presidente', bio: 'Comandante revolucionario y primer presidente de Estados Unidos.', tags: ['eeuu', 'lider', 'militar', 'revolucion', 'america'] },
+                    { name: 'Benito Juárez', sub: 'México · Presidente', bio: 'Presidente de México y figura central de la Reforma liberal.', tags: ['america', 'lider'] },
+                    { name: 'Porfirio Díaz', sub: 'México · Presidente', bio: 'Militar y presidente mexicano que gobernó durante el Porfiriato.', tags: ['america', 'lider', 'militar'] },
+                    { name: 'Meiji', sub: 'Japón · Emperador', bio: 'Emperador japonés bajo cuyo reinado se modernizó e industrializó Japón.', tags: ['japon', 'lider', 'monarquia', 'asia_africa'] },
+                    { name: 'Sun Yat-sen', sub: 'China · Estadista', bio: 'Líder revolucionario y primer presidente provisional de la República de China.', tags: ['china', 'lider', 'revolucion', 'asia_africa'] },
+                    { name: 'Muhammad Ahmad', sub: 'Sudán · Líder religioso', bio: 'Líder político y religioso sudanés conocido como el Mahdi.', tags: ['lider', 'revolucion', 'asia_africa'] },
+                    { name: 'Menelik II', sub: 'Etiopía · Emperador', bio: 'Emperador de Etiopía que derrotó a Italia en la batalla de Adua.', tags: ['lider', 'monarquia', 'militar', 'asia_africa'] }
+                ]
+            },
+            {
+                id: 'ww1-rusia',
+                period: '1900–1922',
+                title: 'I Guerra Mundial y Revolución Rusa',
+                desc: 'Dirigentes y generales de la Gran Guerra junto a los protagonistas de 1917.',
+                characters: [
+                    { name: 'Guillermo II', sub: 'Alemania · Káiser', bio: 'Emperador alemán durante la Primera Guerra Mundial hasta 1918.', tags: ['alemania', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Francisco Fernando de Austria', sub: 'Austria-Hungría · Archiduque', bio: 'Heredero austrohúngaro cuyo asesinato en Sarajevo detonó la guerra en 1914.', tags: ['austria', 'monarquia', 'europa'] },
+                    { name: 'Nicolás II de Rusia', sub: 'Rusia · Zar', bio: 'Último zar de Rusia, derrocado tras la Revolución de 1917.', tags: ['rusia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Francisco José I', sub: 'Austria-Hungría · Emperador', bio: 'Monarca del Imperio austrohúngaro al estallar la Primera Guerra Mundial.', tags: ['austria', 'lider', 'monarquia', 'europa'] },
+                    { name: 'David Lloyd George', sub: 'Reino Unido · Primer Ministro', bio: 'Primer ministro británico en la fase final de la Gran Guerra.', tags: ['reino_unido', 'lider', 'aliado', 'europa'] },
+                    { name: 'Georges Clemenceau', sub: 'Francia · Primer Ministro', bio: 'Jefe de gobierno francés durante el final de la guerra y Versalles.', tags: ['francia', 'lider', 'aliado', 'europa'] },
+                    { name: 'Woodrow Wilson', sub: 'EE. UU. · Presidente', bio: 'Presidente estadounidense impulsor de los Catorce Puntos y la Sociedad de Naciones.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Paul von Hindenburg', sub: 'Alemania · Mariscal', bio: 'Comandante supremo alemán en la Gran Guerra y luego presidente de Weimar.', tags: ['alemania', 'militar', 'lider', 'europa'] },
+                    { name: 'Erich Ludendorff', sub: 'Alemania · General', bio: 'General alemán y estratega principal del alto mando imperial.', tags: ['alemania', 'militar', 'europa'] },
+                    { name: 'Ferdinand Foch', sub: 'Francia · Mariscal', bio: 'Comandante supremo de los ejércitos aliados en 1918.', tags: ['francia', 'militar', 'aliado', 'europa'] },
+                    { name: 'John J. Pershing', sub: 'EE. UU. · General', bio: 'Comandante de la Fuerza Expedicionaria Estadounidense en Europa.', tags: ['eeuu', 'militar', 'aliado', 'america'] },
+                    { name: 'Mustafa Kemal Atatürk', sub: 'Turquía · Líder y Militar', bio: 'Héroe de Galípoli y fundador de la República de Turquía.', tags: ['militar', 'lider', 'revolucion'] },
+                    { name: 'Vladimir Lenin', sub: 'Rusia / URSS · Líder Bolchevique', bio: 'Líder de la Revolución de Octubre y fundador de la Unión Soviética.', tags: ['rusia', 'lider', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'León Trotski', sub: 'Rusia / URSS · Revolucionario', bio: 'Organizador del Ejército Rojo y figura clave de la Revolución rusa.', tags: ['rusia', 'lider', 'militar', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'Iósif Stalin', sub: 'URSS · Dirigente', bio: 'Dirigente bolchevique que consolidó el poder absoluto en la Unión Soviética.', tags: ['rusia', 'lider', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'Grigori Zinóviev', sub: 'URSS · Dirigente Bolchevique', bio: 'Dirigente soviético y primer presidente de la Internacional Comunista.', tags: ['rusia', 'lider', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'Nikolái Bujarin', sub: 'URSS · Teórico Bolchevique', bio: 'Dirigente revolucionario y economista soviético.', tags: ['rusia', 'pensador', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'Aleksandr Kérenski', sub: 'Rusia · Primer Ministro', bio: 'Jefe del Gobierno Provisional ruso derrocado en octubre de 1917.', tags: ['rusia', 'lider', 'revolucion', 'europa'] }
+                ]
+            },
+            {
+                id: 'entreguerras',
+                period: '1919–1939',
+                title: 'Periodo de Entreguerras',
+                desc: 'Ascenso de los totalitarismos, Guerra Civil Española y tensiones internacionales.',
+                characters: [
+                    { name: 'Adolf Hitler', sub: 'Alemania · Führer', bio: 'Líder del Partido Nazi y dictador de Alemania desde 1933.', tags: ['alemania', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Hermann Göring', sub: 'Alemania · Jerarca Nazi', bio: 'Comandante de la Luftwaffe y alto dirigente del régimen nazi.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Heinrich Himmler', sub: 'Alemania · Reichsführer-SS', bio: 'Jefe máximo de las SS y del aparato policial del Tercer Reich.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Joseph Goebbels', sub: 'Alemania · Ministro', bio: 'Ministro de Propaganda e Ilustración Pública del régimen nazi.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Rudolf Hess', sub: 'Alemania · Lugarteniente', bio: 'Lugarteniente de Adolf Hitler en el partido nazi durante los años treinta.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Ernst Röhm', sub: 'Alemania · Jefe de las SA', bio: 'Cofundador y comandante de las tropas de asalto SA hasta 1934.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Albert Speer', sub: 'Alemania · Arquitecto y Ministro', bio: 'Arquitecto jefe de Hitler y posterior ministro de Armamento.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Reinhard Heydrich', sub: 'Alemania · Jefe del SD', bio: 'Alto oficial de las SS y director de la Oficina Central de Seguridad del Reich.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Erwin Rommel', sub: 'Alemania · Militar', bio: 'Oficial del ejército alemán destacado por su táctica blindada.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Benito Mussolini', sub: 'Italia · Duce', bio: 'Fundador del fascismo italiano y dictador de Italia desde 1922.', tags: ['italia', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Víctor Manuel III', sub: 'Italia · Rey', bio: 'Rey de Italia durante el régimen fascista de Mussolini.', tags: ['italia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Galeazzo Ciano', sub: 'Italia · Ministro', bio: 'Ministro de Asuntos Exteriores de la Italia fascista.', tags: ['italia', 'eje_fascismo', 'europa'] },
+                    { name: 'Francisco Franco', sub: 'España · General y Dictador', bio: 'General sublevado en 1936 y dictador de España tras la Guerra Civil.', tags: ['espana', 'lider', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'José Antonio Primo de Rivera', sub: 'España · Político', bio: 'Abogado y fundador de Falange Española en 1933.', tags: ['espana', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Manuel Azaña', sub: 'España · Presidente', bio: 'Político, escritor y presidente de la Segunda República Española.', tags: ['espana', 'lider', 'escritor', 'europa'] },
+                    { name: 'Dolores Ibárruri', sub: 'España · Dirigente', bio: 'Dirigente comunista española conocida como «La Pasionaria».', tags: ['espana', 'mujer', 'comunismo', 'revolucion', 'europa'] },
+                    { name: 'Buenaventura Durruti', sub: 'España · Anarquista', bio: 'Sindicalista y miliciano anarquista de la Guerra Civil Española.', tags: ['espana', 'militar', 'revolucion', 'europa'] },
+                    { name: 'Emilio Mola', sub: 'España · General', bio: 'General español organizador del alzamiento militar de julio de 1936.', tags: ['espana', 'militar', 'europa'] },
+                    { name: 'Franklin D. Roosevelt', sub: 'EE. UU. · Presidente', bio: 'Presidente estadounidense impulsor del New Deal frente a la Gran Depresión.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Winston Churchill', sub: 'Reino Unido · Político', bio: 'Estadista británico que advirtió tempranamente contra el rearme nazi.', tags: ['reino_unido', 'lider', 'aliado', 'europa'] },
+                    { name: 'Neville Chamberlain', sub: 'Reino Unido · Primer Ministro', bio: 'Primer ministro británico asociado a la política de apaciguamiento en Múnich.', tags: ['reino_unido', 'lider', 'europa'] },
+                    { name: 'Mao Zedong', sub: 'China · Líder Comunista', bio: 'Dirigente del Partido Comunista Chino y protagonista de la Larga Marcha.', tags: ['china', 'lider', 'comunismo', 'revolucion', 'asia_africa'] },
+                    { name: 'Chiang Kai-shek', sub: 'China · Generalísimo', bio: 'Líder nacionalista del Kuomintang y jefe del gobierno chino.', tags: ['china', 'lider', 'militar', 'asia_africa'] },
+                    { name: 'Hideki Tōjō', sub: 'Japón · General', bio: 'General del Ejército Imperial Japonés y futuro primer ministro.', tags: ['japon', 'militar', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Hirohito', sub: 'Japón · Emperador', bio: 'Emperador de Japón (era Shōwa) desde 1926.', tags: ['japon', 'lider', 'monarquia', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Charles de Gaulle', sub: 'Francia · Militar', bio: 'Militar francés teórico de la guerra mecanizada moderna.', tags: ['francia', 'militar', 'aliado', 'europa'] },
+                    { name: 'Mustafa Kemal Atatürk', sub: 'Turquía · Presidente', bio: 'Primer presidente de la República de Turquía y modernizador del país.', tags: ['lider', 'militar'] }
+                ]
+            },
+            {
+                id: 'ww2',
+                period: '1939–1945',
+                title: 'Segunda Guerra Mundial',
+                desc: 'Mandos políticos y militares de las potencias del Eje y de los Aliados.',
+                characters: [
+                    { name: 'Adolf Hitler', sub: 'Alemania · Eje', bio: 'Führer y comandante supremo de las fuerzas armadas alemanas.', tags: ['alemania', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Hermann Göring', sub: 'Alemania · Eje', bio: 'Mariscal del Reich y comandante en jefe de la Luftwaffe.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Heinrich Himmler', sub: 'Alemania · Eje', bio: 'Reichsführer-SS y responsable del aparato represivo nazi.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Joseph Goebbels', sub: 'Alemania · Eje', bio: 'Ministro de Propaganda del Tercer Reich.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Joachim von Ribbentrop', sub: 'Alemania · Eje', bio: 'Ministro de Asuntos Exteriores de la Alemania nazi.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Karl Dönitz', sub: 'Alemania · Eje', bio: 'Gran almirante de la flota submarina y sucesor de Hitler en 1945.', tags: ['alemania', 'militar', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Erwin Rommel', sub: 'Alemania · Eje', bio: 'Mariscal de campo conocido como el «Zorro del Desierto».', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Gerd von Rundstedt', sub: 'Alemania · Eje', bio: 'Mariscal de campo alemán en los frentes occidental y oriental.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Albert Kesselring', sub: 'Alemania · Eje', bio: 'Mariscal de campo de la Luftwaffe y comandante alemán en Italia.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Benito Mussolini', sub: 'Italia · Eje', bio: 'Duce de la Italia fascista y aliado de Alemania.', tags: ['italia', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Hideki Tōjō', sub: 'Japón · Eje', bio: 'Primer ministro de Japón durante gran parte de la guerra del Pacífico.', tags: ['japon', 'lider', 'militar', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Isoroku Yamamoto', sub: 'Japón · Eje', bio: 'Almirante japonés planificador del ataque a Pearl Harbor.', tags: ['japon', 'militar', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Hirohito', sub: 'Japón · Eje', bio: 'Emperador de Japón hasta la rendición en agosto de 1945.', tags: ['japon', 'lider', 'monarquia', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Tomoyuki Yamashita', sub: 'Japón · Eje', bio: 'General japonés que conquistó Malasia y Singapur.', tags: ['japon', 'militar', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Winston Churchill', sub: 'Reino Unido · Aliados', bio: 'Primer ministro británico que lideró la resistencia contra el Eje.', tags: ['reino_unido', 'lider', 'aliado', 'europa'] },
+                    { name: 'Franklin D. Roosevelt', sub: 'EE. UU. · Aliados', bio: 'Presidente estadounidense durante casi toda la Segunda Guerra Mundial.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Harry S. Truman', sub: 'EE. UU. · Aliados', bio: 'Presidente estadounidense que autorizó el uso de las bombas atómicas en 1945.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Iósif Stalin', sub: 'URSS · Aliados', bio: 'Máximo dirigente de la Unión Soviética durante la Gran Guerra Patria.', tags: ['rusia', 'lider', 'aliado', 'comunismo', 'europa'] },
+                    { name: 'Georgui Zhúkov', sub: 'URSS · Aliados', bio: 'Mariscal soviético clave en Stalingrado, Kursk y la toma de Berlín.', tags: ['rusia', 'militar', 'aliado', 'comunismo', 'europa'] },
+                    { name: 'Konstantín Rokossovski', sub: 'URSS · Aliados', bio: 'Mariscal soviético destacado en la Operación Bagratión.', tags: ['rusia', 'militar', 'aliado', 'comunismo', 'europa'] },
+                    { name: 'Dwight D. Eisenhower', sub: 'EE. UU. · Aliados', bio: 'Comandante supremo de las fuerzas aliadas en Europa Occidental.', tags: ['eeuu', 'militar', 'lider', 'aliado', 'america'] },
+                    { name: 'George S. Patton', sub: 'EE. UU. · Aliados', bio: 'General estadounidense célebre por sus campañas blindadas en Europa.', tags: ['eeuu', 'militar', 'aliado', 'america'] },
+                    { name: 'Bernard Montgomery', sub: 'Reino Unido · Aliados', bio: 'Mariscal británico vencedor en la batalla de El Alamein.', tags: ['reino_unido', 'militar', 'aliado', 'europa'] },
+                    { name: 'Charles de Gaulle', sub: 'Francia Libre · Aliados', bio: 'Líder de la Francia Libre y posterior presidente francés.', tags: ['francia', 'lider', 'militar', 'aliado', 'europa'] },
+                    { name: 'Alan Turing', sub: 'Reino Unido · Aliados', bio: 'Matemático británico clave en el descifrado de la máquina Enigma.', tags: ['reino_unido', 'ciencia', 'aliado', 'europa'] },
+                    { name: 'Chester W. Nimitz', sub: 'EE. UU. · Aliados', bio: 'Almirante comandante de la Flota del Pacífico de Estados Unidos.', tags: ['eeuu', 'militar', 'aliado', 'america'] },
+                    { name: 'Douglas MacArthur', sub: 'EE. UU. · Aliados', bio: 'General estadounidense comandante de las fuerzas aliadas en el Pacífico Suroccidental.', tags: ['eeuu', 'militar', 'aliado', 'america'] }
+                ]
+            },
+            {
+                id: 'ciencia-pensamiento',
+                period: '1789–1945',
+                title: 'Científicos, Inventores y Pensadores',
+                desc: 'Mentes que revolucionaron la física, la medicina, la filosofía y la tecnología.',
+                characters: [
+                    { name: 'Albert Einstein', sub: 'Alemania / EE. UU. · Físico', bio: 'Físico teórico autor de la teoría de la relatividad y Nobel de Física.', tags: ['alemania', 'eeuu', 'ciencia', 'europa'] },
+                    { name: 'Nikola Tesla', sub: 'Serbia / EE. UU. · Inventor', bio: 'Ingeniero e inventor pionero en la corriente alterna y el electromagnetismo.', tags: ['eeuu', 'ciencia', 'europa'] },
+                    { name: 'Thomas Edison', sub: 'EE. UU. · Inventor', bio: 'Inventor y empresario estadounidense creador del fonógrafo y la lámpara incandescente.', tags: ['eeuu', 'ciencia', 'america'] },
+                    { name: 'Marie Curie', sub: 'Polonia / Francia · Científica', bio: 'Pionera en la radiactividad y primera persona en ganar dos premios Nobel.', tags: ['francia', 'ciencia', 'mujer', 'europa'] },
+                    { name: 'Max Planck', sub: 'Alemania · Físico', bio: 'Físico alemán fundador de la teoría cuántica.', tags: ['alemania', 'ciencia', 'europa'] },
+                    { name: 'Sigmund Freud', sub: 'Austria · Neurólogo', bio: 'Médico neurólogo austriaco creador del psicoanálisis.', tags: ['austria', 'ciencia', 'pensador', 'europa'] },
+                    { name: 'Friedrich Nietzsche', sub: 'Alemania · Filósofo', bio: 'Filósofo alemán autor de Así habló Zaratustra.', tags: ['alemania', 'pensador', 'escritor', 'europa'] },
+                    { name: 'Arthur Schopenhauer', sub: 'Alemania · Filósofo', bio: 'Filósofo alemán autor de El mundo como voluntad y representación.', tags: ['alemania', 'pensador', 'escritor', 'europa'] },
+                    { name: 'Charles Darwin', sub: 'Reino Unido · Naturalista', bio: 'Naturalista británico que formuló la teoría de la evolución por selección natural.', tags: ['reino_unido', 'ciencia', 'europa'] },
+                    { name: 'Louis Pasteur', sub: 'Francia · Químico y Microbiólogo', bio: 'Científico francés creador de la pasteurización y vacunas contra la rabia.', tags: ['francia', 'ciencia', 'europa'] },
+                    { name: 'Alexander Graham Bell', sub: 'Reino Unido / EE. UU. · Inventor', bio: 'Científico e inventor acreditado por patentar el primer teléfono práctico.', tags: ['reino_unido', 'eeuu', 'ciencia', 'america'] },
+                    { name: 'Orville Wright', sub: 'EE. UU. · Pionero de la aviación', bio: 'Junto a su hermano Wilbur realizó el primer vuelo controlado a motor en 1903.', tags: ['eeuu', 'ciencia', 'america'] },
+                    { name: 'Wilbur Wright', sub: 'EE. UU. · Pionero de la aviación', bio: 'Cofundador junto a Orville de la aviación moderna.', tags: ['eeuu', 'ciencia', 'america'] },
+                    { name: 'Robert Oppenheimer', sub: 'EE. UU. · Físico', bio: 'Físico teórico director científico del Proyecto Manhattan.', tags: ['eeuu', 'ciencia', 'america'] },
+                    { name: 'Enrico Fermi', sub: 'Italia / EE. UU. · Físico', bio: 'Físico creador del primer reactor nuclear autosostenido.', tags: ['italia', 'eeuu', 'ciencia', 'europa'] },
+                    { name: 'Werner Heisenberg', sub: 'Alemania · Físico', bio: 'Físico alemán formulador del principio de incertidumbre.', tags: ['alemania', 'ciencia', 'europa'] },
+                    { name: 'Niels Bohr', sub: 'Dinamarca · Físico', bio: 'Físico danés fundamental en la comprensión de la estructura atómica.', tags: ['ciencia', 'europa'] }
+                ]
+            },
+            {
+                id: 'cultura-artes',
+                period: '1789–1945',
+                title: 'Escritores, Artistas y Cultura',
+                desc: 'Compositores, pintores, cineastas y autores esenciales de la historia moderna.',
+                characters: [
+                    { name: 'Ludwig van Beethoven', sub: 'Alemania · Compositor', bio: 'Compositor y pianista alemán puente entre el clasicismo y el romanticismo.', tags: ['alemania', 'arte_musica', 'europa'] },
+                    { name: 'Richard Wagner', sub: 'Alemania · Compositor', bio: 'Compositor y director de orquesta alemán célebre por sus óperas.', tags: ['alemania', 'arte_musica', 'europa'] },
+                    { name: 'Wolfgang Amadeus Mozart', sub: 'Austria · Compositor', bio: 'Genio del clasicismo musical nacido en Salzburgo.', tags: ['austria', 'arte_musica', 'europa'] },
+                    { name: 'Vincent van Gogh', sub: 'Países Bajos · Pintor', bio: 'Pintor postimpresionista neerlandés de enorme influencia en el arte moderno.', tags: ['arte_musica', 'europa'] },
+                    { name: 'Pablo Picasso', sub: 'España · Pintor', bio: 'Pintor y escultor español cofundador del cubismo y autor del Guernica.', tags: ['espana', 'arte_musica', 'europa'] },
+                    { name: 'Salvador Dalí', sub: 'España · Pintor', bio: 'Pintor español máximo exponente del surrealismo.', tags: ['espana', 'arte_musica', 'europa'] },
+                    { name: 'Ernest Hemingway', sub: 'EE. UU. · Escritor', bio: 'Novelista y periodista estadounidense ganador del Premio Nobel de Literatura.', tags: ['eeuu', 'escritor', 'america'] },
+                    { name: 'George Orwell', sub: 'Reino Unido · Escritor', bio: 'Escritor británico autor de 1984 y Rebelión en la granja.', tags: ['reino_unido', 'escritor', 'europa'] },
+                    { name: 'Franz Kafka', sub: 'Praga / Austria-Hungría · Escritor', bio: 'Escritor en lengua alemana autor de La metamorfosis y El proceso.', tags: ['austria', 'escritor', 'europa'] },
+                    { name: 'H. G. Wells', sub: 'Reino Unido · Escritor', bio: 'Escritor británico pionero de la ciencia ficción con La guerra de los mundos.', tags: ['reino_unido', 'escritor', 'europa'] },
+                    { name: 'Oscar Wilde', sub: 'Irlanda / Reino Unido · Escritor', bio: 'Dramaturgo y novelista autor de El retrato de Dorian Gray.', tags: ['reino_unido', 'escritor', 'europa'] },
+                    { name: 'Charles Dickens', sub: 'Reino Unido · Escritor', bio: 'Novelista británico retratista de la sociedad victoriana.', tags: ['reino_unido', 'escritor', 'europa'] },
+                    { name: 'Federico García Lorca', sub: 'España · Poeta y Dramaturgo', bio: 'Poeta y dramaturgo español de la Generación del 27.', tags: ['espana', 'escritor', 'europa'] },
+                    { name: 'Thomas Mann', sub: 'Alemania · Escritor', bio: 'Novelista alemán autor de La montaña mágica y Nobel de Literatura.', tags: ['alemania', 'escritor', 'europa'] },
+                    { name: 'Charlie Chaplin', sub: 'Reino Unido / EE. UU. · Cineasta', bio: 'Actor, humorista y director británico icono del cine mudo y El gran dictador.', tags: ['reino_unido', 'eeuu', 'arte_musica', 'europa'] }
+                ]
+            },
+            {
+                id: 'seleccion-30',
+                period: '1789–1945',
+                title: 'Selección de 30 Personajes Clave',
+                desc: 'Gran tablero recopilatorio con 30 de las figuras más influyentes de todas las épocas.',
+                characters: [
+                    { name: 'Napoleón Bonaparte', sub: 'Francia · Emperador', bio: 'Emperador de Francia y estratega de las guerras napoleónicas.', tags: ['francia', 'lider', 'militar', 'monarquia', 'europa'] },
+                    { name: 'Maximilien Robespierre', sub: 'Francia · Revolucionario', bio: 'Líder jacobino durante la Revolución Francesa.', tags: ['francia', 'lider', 'revolucion', 'europa'] },
+                    { name: 'Otto von Bismarck', sub: 'Alemania · Canciller', bio: 'Canciller de hierro y unificador de Alemania.', tags: ['alemania', 'lider', 'europa'] },
+                    { name: 'Victoria del Reino Unido', sub: 'Reino Unido · Reina', bio: 'Reina del Imperio británico durante el siglo XIX.', tags: ['reino_unido', 'lider', 'monarquia', 'mujer', 'europa'] },
+                    { name: 'Abraham Lincoln', sub: 'EE. UU. · Presidente', bio: 'Presidente de Estados Unidos que preservó la Unión y abolió la esclavitud.', tags: ['eeuu', 'lider', 'america'] },
+                    { name: 'Karl Marx', sub: 'Alemania · Filósofo', bio: 'Pensador alemán autor de El capital.', tags: ['alemania', 'pensador', 'escritor', 'revolucion', 'europa'] },
+                    { name: 'Simón Bolívar', sub: 'Sudamérica · Libertador', bio: 'Libertador de varias repúblicas sudamericanas.', tags: ['america', 'lider', 'militar', 'revolucion'] },
+                    { name: 'Guillermo II', sub: 'Alemania · Káiser', bio: 'Último emperador alemán (1888–1918).', tags: ['alemania', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Nicolás II', sub: 'Rusia · Zar', bio: 'Último zar del Imperio ruso.', tags: ['rusia', 'lider', 'monarquia', 'europa'] },
+                    { name: 'Vladimir Lenin', sub: 'URSS · Líder Bolchevique', bio: 'Líder de la Revolución rusa y fundador de la URSS.', tags: ['rusia', 'lider', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'León Trotski', sub: 'URSS · Revolucionario', bio: 'Fundador del Ejército Rojo soviético.', tags: ['rusia', 'lider', 'militar', 'revolucion', 'comunismo', 'europa'] },
+                    { name: 'Mustafa Kemal Atatürk', sub: 'Turquía · Presidente', bio: 'Fundador de la moderna República de Turquía.', tags: ['lider', 'militar', 'revolucion'] },
+                    { name: 'Mao Zedong', sub: 'China · Líder Comunista', bio: 'Líder del comunismo chino.', tags: ['china', 'lider', 'comunismo', 'revolucion', 'asia_africa'] },
+                    { name: 'Winston Churchill', sub: 'Reino Unido · Primer Ministro', bio: 'Primer ministro británico durante la Segunda Guerra Mundial.', tags: ['reino_unido', 'lider', 'aliado', 'europa'] },
+                    { name: 'Benito Mussolini', sub: 'Italia · Duce', bio: 'Dictador fascista de Italia.', tags: ['italia', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Francisco Franco', sub: 'España · Dictador', bio: 'General y dictador español (1939–1975).', tags: ['espana', 'lider', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Iósif Stalin', sub: 'URSS · Dirigente', bio: 'Dirigente de la Unión Soviética.', tags: ['rusia', 'lider', 'aliado', 'comunismo', 'europa'] },
+                    { name: 'Franklin D. Roosevelt', sub: 'EE. UU. · Presidente', bio: 'Presidente de Estados Unidos durante la Gran Depresión y la IIGM.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Adolf Hitler', sub: 'Alemania · Führer', bio: 'Dictador de la Alemania nazi.', tags: ['alemania', 'lider', 'eje_fascismo', 'europa'] },
+                    { name: 'Hermann Göring', sub: 'Alemania · Mariscal del Reich', bio: 'Comandante de la Luftwaffe en el Tercer Reich.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Heinrich Himmler', sub: 'Alemania · Reichsführer-SS', bio: 'Jefe máximo de las SS nazis.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Erwin Rommel', sub: 'Alemania · Mariscal', bio: 'Mariscal de campo alemán del Afrika Korps.', tags: ['alemania', 'militar', 'eje_fascismo', 'europa'] },
+                    { name: 'Joseph Goebbels', sub: 'Alemania · Ministro', bio: 'Ministro de Propaganda de la Alemania nazi.', tags: ['alemania', 'eje_fascismo', 'europa'] },
+                    { name: 'Charles de Gaulle', sub: 'Francia · General y Presidente', bio: 'Líder de la Francia Libre.', tags: ['francia', 'lider', 'militar', 'aliado', 'europa'] },
+                    { name: 'Hirohito', sub: 'Japón · Emperador', bio: 'Emperador de Japón.', tags: ['japon', 'lider', 'monarquia', 'eje_fascismo', 'asia_africa'] },
+                    { name: 'Dwight D. Eisenhower', sub: 'EE. UU. · General', bio: 'Comandante supremo aliado en Europa.', tags: ['eeuu', 'militar', 'lider', 'aliado', 'america'] },
+                    { name: 'Albert Einstein', sub: 'Alemania / EE. UU. · Físico', bio: 'Autor de la teoría de la relatividad.', tags: ['alemania', 'eeuu', 'ciencia', 'europa'] },
+                    { name: 'Georgui Zhúkov', sub: 'URSS · Mariscal', bio: 'Principal mariscal soviético en la Segunda Guerra Mundial.', tags: ['rusia', 'militar', 'aliado', 'comunismo', 'europa'] },
+                    { name: 'Harry S. Truman', sub: 'EE. UU. · Presidente', bio: 'Presidente estadounidense al final de la Segunda Guerra Mundial.', tags: ['eeuu', 'lider', 'aliado', 'america'] },
+                    { name: 'Douglas MacArthur', sub: 'EE. UU. · General', bio: 'General estadounidense en el frente del Pacífico.', tags: ['eeuu', 'militar', 'aliado', 'america'] }
+                ]
+            }
+        ];
+
+        const QUESTIONS_BANK = [
+            {
+                id: 'q-antes-1900',
+                text: '¿Alcanzó su mayor relevancia histórica antes de comenzar el siglo XX?',
+                test: p => ['rev-francesa', 'siglo-xix'].includes(currentEraId) && !['Guillermo II de Alemania', 'Sun Yat-sen'].includes(p.name) || ['Napoleón Bonaparte', 'Maximilien Robespierre', 'Otto von Bismarck', 'Victoria del Reino Unido', 'Abraham Lincoln', 'Karl Marx', 'Simón Bolívar', 'Charles Darwin', 'Louis Pasteur', 'Friedrich Nietzsche', 'Arthur Schopenhauer', 'Ludwig van Beethoven', 'Richard Wagner', 'Wolfgang Amadeus Mozart', 'Vincent van Gogh', 'Oscar Wilde', 'Charles Dickens'].includes(p.name)
+            },
+            {
+                id: 'q-dos-guerras',
+                text: '¿Vivió lo suficiente como para presenciar tanto el siglo XIX como la Primera Guerra Mundial?',
+                test: p => !['rev-francesa'].includes(currentEraId) && !['Abraham Lincoln', 'Karl Marx', 'Friedrich Engels', 'Fiódor Dostoyevski', 'Napoleón III', 'Víctor Manuel II', 'Camillo Benso, conde de Cavour', 'Benito Juárez', 'Muhammad Ahmad', 'Wolfgang Amadeus Mozart', 'Ludwig van Beethoven', 'Richard Wagner', 'Vincent van Gogh', 'Arthur Schopenhauer', 'Charles Darwin', 'Oscar Wilde'].includes(p.name)
+            },
+            {
+                id: 'q-exilio',
+                text: '¿Tuvo que vivir en el exilio o emigrar fuera de su tierra natal por motivos políticos o bélicos?',
+                test: p => ['Napoleón Bonaparte', 'Vladimir Lenin', 'León Trotski', 'Karl Marx', 'Friedrich Engels', 'Giuseppe Garibaldi', 'Simón Bolívar', 'José de San Martín', 'Sun Yat-sen', 'Guillermo II', 'Guillermo II de Alemania', 'Aleksandr Kérenski', 'Albert Einstein', 'Sigmund Freud', 'Thomas Mann', 'Enrico Fermi', 'Charles de Gaulle', 'Dolores Ibárruri', 'Manuel Azaña', 'Chiang Kai-shek', 'Napoleón III', 'Víctor Manuel III'].includes(p.name)
+            },
+            {
+                id: 'q-muerte-violenta',
+                text: '¿Tuvo un final trágico (ejecutado, asesinado o suicidio)?',
+                test: p => ['Luis XVI', 'María Antonieta', 'Maximilien Robespierre', 'Georges Danton', 'Jean-Paul Marat', 'Abraham Lincoln', 'Francisco Fernando de Austria', 'Nicolás II de Rusia', 'Nicolás II', 'León Trotski', 'Grigori Zinóviev', 'Nikolái Bujarin', 'Adolf Hitler', 'Hermann Göring', 'Heinrich Himmler', 'Joseph Goebbels', 'Ernst Röhm', 'Reinhard Heydrich', 'Erwin Rommel', 'Benito Mussolini', 'Galeazzo Ciano', 'José Antonio Primo de Rivera', 'Buenaventura Durruti', 'Emilio Mola', 'Hideki Tōjō', 'Tomoyuki Yamashita', 'Federico García Lorca', 'Joachim von Ribbentrop'].includes(p.name)
+            },
+            {
+                id: 'q-derrocado-abdicado',
+                text: '¿Perdió el poder tras una revolución, abdicación o derrota militar total?',
+                test: p => ['Napoleón Bonaparte', 'Luis XVI', 'Guillermo II', 'Guillermo II de Alemania', 'Nicolás II de Rusia', 'Nicolás II', 'Napoleón III', 'Aleksandr Kérenski', 'Adolf Hitler', 'Karl Dönitz', 'Benito Mussolini', 'Víctor Manuel III', 'Manuel Azaña', 'Chiang Kai-shek', 'Hideki Tōjō'].includes(p.name)
+            },
+            {
+                id: 'q-imperio',
+                text: '¿Fue súbdito o gobernante de un gran imperio multinacional (austrohúngaro, ruso, británico, alemán o japonés)?',
+                test: p => p.tags.includes('austria') || p.tags.includes('rusia') || p.tags.includes('reino_unido') || p.tags.includes('japon') || ['Guillermo I de Alemania', 'Guillermo II de Alemania', 'Guillermo II', 'Otto von Bismarck', 'Franz Kafka', 'Sigmund Freud', 'Nikola Tesla'].includes(p.name)
+            },
+            {
+                id: 'q-sin-cargo-publico',
+                text: '¿Influyó en la historia sin haber ocupado nunca la jefatura de un Estado o gobierno?',
+                test: p => !p.tags.includes('lider') && !p.tags.includes('monarquia')
+            },
+            {
+                id: 'q-nobel-premio',
+                text: '¿Fue galardonado con el Premio Nobel en alguna de sus categorías?',
+                test: p => ['Albert Einstein', 'Marie Curie', 'Max Planck', 'Werner Heisenberg', 'Niels Bohr', 'Enrico Fermi', 'Ernest Hemingway', 'Thomas Mann', 'Winston Churchill', 'Woodrow Wilson'].includes(p.name)
+            },
+            {
+                id: 'q-campo-batalla',
+                text: '¿Participó directamente en campañas militares o mandó tropas en el frente?',
+                test: p => p.tags.includes('militar')
+            },
+            {
+                id: 'q-formacion-civil',
+                text: '¿Su formación o vocación original era civil (derecho, medicina, letras, ciencias o artes) antes que castrense?',
+                test: p => !p.tags.includes('militar')
+            },
+            {
+                id: 'q-obra-escrita',
+                text: '¿Dejó tratados teóricos, manifiestos políticos o grandes obras literarias que marcaron su época?',
+                test: p => p.tags.includes('escritor') || p.tags.includes('pensador') || ['Vladimir Lenin', 'León Trotski', 'Adolf Hitler', 'Winston Churchill', 'Mao Zedong', 'Charles de Gaulle', 'Manuel Azaña', 'Nikolái Bujarin'].includes(p.name)
+            },
+            {
+                id: 'q-cambio-regimen',
+                text: '¿Participó activamente en el derrocamiento de un régimen anterior o en la fundación de un nuevo Estado?',
+                test: p => p.tags.includes('revolucion') || ['Otto von Bismarck', 'Camillo Benso, conde de Cavour', 'Víctor Manuel II', 'Francisco Franco', 'Adolf Hitler', 'Benito Mussolini', 'Charles de Gaulle'].includes(p.name)
+            },
+            {
+                id: 'q-frente-oriental-ruso',
+                text: '¿Su trayectoria estuvo ligada al mundo eslavo o a Europa Oriental?',
+                test: p => p.tags.includes('rusia') || ['Marie Curie', 'Nikola Tesla', 'Franz Kafka'].includes(p.name)
+            },
+            {
+                id: 'q-mundo-anglosajon',
+                text: '¿Estuvo vinculado históricamente al mundo anglosajón (Reino Unido o Estados Unidos)?',
+                test: p => p.tags.includes('reino_unido') || p.tags.includes('eeuu')
+            },
+            {
+                id: 'q-europa-mediterranea',
+                text: '¿Desarrolló su actividad en países de la Europa mediterránea (España o Italia)?',
+                test: p => p.tags.includes('espana') || p.tags.includes('italia')
+            },
+            {
+                id: 'q-europa-central',
+                text: '¿Su origen o carrera se sitúa en la Europa central de habla alemana?',
+                test: p => p.tags.includes('alemania') || p.tags.includes('austria')
+            },
+            {
+                id: 'q-fuera-europa',
+                text: '¿Su principal escenario histórico estuvo fuera del continente europeo (América, Asia o África)?',
+                test: p => !p.tags.includes('europa') || ['Mustafa Kemal Atatürk'].includes(p.name)
+            },
+            {
+                id: 'q-guerra-fria-inicio',
+                text: '¿Sobrevivió a 1945 y llegó a ver el comienzo de la Guerra Fría?',
+                test: p => ['Iósif Stalin', 'Winston Churchill', 'Harry S. Truman', 'Dwight D. Eisenhower', 'Charles de Gaulle', 'Francisco Franco', 'Mao Zedong', 'Chiang Kai-shek', 'Hirohito', 'Georgui Zhúkov', 'Konstantín Rokossovski', 'Bernard Montgomery', 'Douglas MacArthur', 'Chester W. Nimitz', 'Albert Einstein', 'Robert Oppenheimer', 'Enrico Fermi', 'Werner Heisenberg', 'Niels Bohr', 'Pablo Picasso', 'Salvador Dalí', 'Ernest Hemingway', 'George Orwell', 'Thomas Mann', 'Charlie Chaplin', 'Dolores Ibárruri', 'Aleksandr Kérenski', 'Albert Speer', 'Karl Dönitz', 'Albert Kesselring', 'Gerd von Rundstedt', 'Víctor Manuel III'].includes(p.name)
+            },
+            {
+                id: 'q-prisionero',
+                text: '¿Fue encarcelado o juzgado por motivos políticos o crímenes de guerra en algún momento de su vida?',
+                test: p => ['Napoleón Bonaparte', 'Luis XVI', 'María Antonieta', 'Maximilien Robespierre', 'Georges Danton', 'Adolf Hitler', 'Rudolf Hess', 'Hermann Göring', 'Albert Speer', 'Karl Dönitz', 'Joachim von Ribbentrop', 'Hideki Tōjō', 'Tomoyuki Yamashita', 'Benito Mussolini', 'José Antonio Primo de Rivera', 'Manuel Azaña', 'Buenaventura Durruti', 'Oscar Wilde', 'Fiódor Dostoyevski', 'Vladimir Lenin', 'Iósif Stalin', 'León Trotski', 'Grigori Zinóviev', 'Nikolái Bujarin', 'Konstantín Rokossovski'].includes(p.name)
+            },
+            {
+                id: 'q-siglo-luces-revoluciones',
+                text: '¿Su figura está asociada a las revoluciones liberales, nacionales o industriales del siglo XIX o finales del XVIII?',
+                test: p => ['rev-francesa', 'siglo-xix'].includes(currentEraId) || ['Napoleón Bonaparte', 'Maximilien Robespierre', 'Otto von Bismarck', 'Victoria del Reino Unido', 'Abraham Lincoln', 'Karl Marx', 'Simón Bolívar', 'Charles Darwin', 'Louis Pasteur'].includes(p.name)
+            }
+        ];
+
+        const MAX_QUESTIONS = 10;
+
+        // =========================================================================
+        // ESTADO GLOBAL DEL JUEGO Y SELECCIÓN DE ÉPOCAS
+        // =========================================================================
+        let currentEraId = null;
+        let currentEra = null;
+        let suspects = [];
+        let secretCharacter = null;
+        let askedQuestionIds = new Set();
+        let questionsCount = 0;
+        let hintsRemaining = 2;
+        let accuseMode = false;
+        let hostPeekVisible = false;
+        let currentQGroup = 'all';
+
+        // =========================================================================
+        // RETRATOS HISTÓRICOS REALES (WIKIPEDIA API + RESPALDO MONOGRAMA)
+        // =========================================================================
+        const WIKI_TITLES = {
+            'Napoleón Bonaparte': 'Napoleon',
+            'Luis XVI': 'Louis XVI',
+            'María Antonieta': 'Marie Antoinette',
+            'Maximilien Robespierre': 'Maximilien Robespierre',
+            'Georges Danton': 'Georges Danton',
+            'Jean-Paul Marat': 'Jean-Paul Marat',
+            'Horatio Nelson': 'Horatio Nelson, 1st Viscount Nelson',
+            'Duque de Wellington': 'Arthur Wellesley, 1st Duke of Wellington',
+            'Mijaíl Kutúzov': 'Mikhail Kutuzov',
+            'Alejandro I de Rusia': 'Alexander I of Russia',
+            'Otto von Bismarck': 'Otto von Bismarck',
+            'Guillermo I de Alemania': 'William I, German Emperor',
+            'Guillermo II de Alemania': 'Wilhelm II',
+            'Guillermo II': 'Wilhelm II',
+            'Víctor Manuel II': 'Victor Emmanuel II of Italy',
+            'Giuseppe Garibaldi': 'Giuseppe Garibaldi',
+            'Camillo Benso, conde de Cavour': 'Camillo Benso, Count of Cavour',
+            'Victoria del Reino Unido': 'Queen Victoria',
+            'Karl Marx': 'Karl Marx',
+            'Friedrich Engels': 'Friedrich Engels',
+            'León Tolstói': 'Leo Tolstoy',
+            'Fiódor Dostoyevski': 'Fyodor Dostoevsky',
+            'Napoleón III': 'Napoleon III',
+            'Francisco José I de Austria': 'Franz Joseph I of Austria',
+            'Francisco José I': 'Franz Joseph I of Austria',
+            'Abraham Lincoln': 'Abraham Lincoln',
+            'Simón Bolívar': 'Simón Bolívar',
+            'José de San Martín': 'José de San Martín',
+            'George Washington': 'George Washington',
+            'Benito Juárez': 'Benito Juárez',
+            'Porfirio Díaz': 'Porfirio Díaz',
+            'Meiji': 'Emperor Meiji',
+            'Sun Yat-sen': 'Sun Yat-sen',
+            'Muhammad Ahmad': 'Muhammad Ahmad',
+            'Menelik II': 'Menelik II',
+            'Francisco Fernando de Austria': 'Archduke Franz Ferdinand of Austria',
+            'Nicolás II de Rusia': 'Nicholas II of Russia',
+            'Nicolás II': 'Nicholas II of Russia',
+            'David Lloyd George': 'David Lloyd George',
+            'Georges Clemenceau': 'Georges Clemenceau',
+            'Woodrow Wilson': 'Woodrow Wilson',
+            'Paul von Hindenburg': 'Paul von Hindenburg',
+            'Erich Ludendorff': 'Erich Ludendorff',
+            'Ferdinand Foch': 'Ferdinand Foch',
+            'John J. Pershing': 'John J. Pershing',
+            'Mustafa Kemal Atatürk': 'Mustafa Kemal Atatürk',
+            'Vladimir Lenin': 'Vladimir Lenin',
+            'León Trotski': 'Leon Trotsky',
+            'Iósif Stalin': 'Joseph Stalin',
+            'Grigori Zinóviev': 'Grigory Zinoviev',
+            'Nikolái Bujarin': 'Nikolai Bukharin',
+            'Aleksandr Kérenski': 'Alexander Kerensky',
+            'Adolf Hitler': 'Adolf Hitler',
+            'Hermann Göring': 'Hermann Göring',
+            'Heinrich Himmler': 'Heinrich Himmler',
+            'Joseph Goebbels': 'Joseph Goebbels',
+            'Rudolf Hess': 'Rudolf Hess',
+            'Ernst Röhm': 'Ernst Röhm',
+            'Albert Speer': 'Albert Speer',
+            'Reinhard Heydrich': 'Reinhard Heydrich',
+            'Erwin Rommel': 'Erwin Rommel',
+            'Benito Mussolini': 'Benito Mussolini',
+            'Víctor Manuel III': 'Victor Emmanuel III of Italy',
+            'Galeazzo Ciano': 'Galeazzo Ciano',
+            'Francisco Franco': 'Francisco Franco',
+            'José Antonio Primo de Rivera': 'José Antonio Primo de Rivera',
+            'Manuel Azaña': 'Manuel Azaña',
+            'Dolores Ibárruri': 'Dolores Ibárruri',
+            'Buenaventura Durruti': 'Buenaventura Durruti',
+            'Emilio Mola': 'Emilio Mola',
+            'Franklin D. Roosevelt': 'Franklin D. Roosevelt',
+            'Winston Churchill': 'Winston Churchill',
+            'Neville Chamberlain': 'Neville Chamberlain',
+            'Mao Zedong': 'Mao Zedong',
+            'Chiang Kai-shek': 'Chiang Kai-shek',
+            'Hideki Tōjō': 'Hideki Tojo',
+            'Hirohito': 'Hirohito',
+            'Charles de Gaulle': 'Charles de Gaulle',
+            'Joachim von Ribbentrop': 'Joachim von Ribbentrop',
+            'Karl Dönitz': 'Karl Dönitz',
+            'Gerd von Rundstedt': 'Gerd von Rundstedt',
+            'Albert Kesselring': 'Albert Kesselring',
+            'Isoroku Yamamoto': 'Isoroku Yamamoto',
+            'Tomoyuki Yamashita': 'Tomoyuki Yamashita',
+            'Harry S. Truman': 'Harry S. Truman',
+            'Georgui Zhúkov': 'Georgy Zhukov',
+            'Konstantín Rokossovski': 'Konstantin Rokossovsky',
+            'Dwight D. Eisenhower': 'Dwight D. Eisenhower',
+            'George S. Patton': 'George S. Patton',
+            'Bernard Montgomery': 'Bernard Montgomery',
+            'Alan Turing': 'Alan Turing',
+            'Chester W. Nimitz': 'Chester W. Nimitz',
+            'Douglas MacArthur': 'Douglas MacArthur',
+            'Albert Einstein': 'Albert Einstein',
+            'Nikola Tesla': 'Nikola Tesla',
+            'Thomas Edison': 'Thomas Edison',
+            'Marie Curie': 'Marie Curie',
+            'Max Planck': 'Max Planck',
+            'Sigmund Freud': 'Sigmund Freud',
+            'Friedrich Nietzsche': 'Friedrich Nietzsche',
+            'Arthur Schopenhauer': 'Arthur Schopenhauer',
+            'Charles Darwin': 'Charles Darwin',
+            'Louis Pasteur': 'Louis Pasteur',
+            'Alexander Graham Bell': 'Alexander Graham Bell',
+            'Orville Wright': 'Wright brothers',
+            'Wilbur Wright': 'Wright brothers',
+            'Robert Oppenheimer': 'J. Robert Oppenheimer',
+            'Enrico Fermi': 'Enrico Fermi',
+            'Werner Heisenberg': 'Werner Heisenberg',
+            'Niels Bohr': 'Niels Bohr',
+            'Ludwig van Beethoven': 'Ludwig van Beethoven',
+            'Richard Wagner': 'Richard Wagner',
+            'Wolfgang Amadeus Mozart': 'Wolfgang Amadeus Mozart',
+            'Vincent van Gogh': 'Vincent van Gogh',
+            'Pablo Picasso': 'Pablo Picasso',
+            'Salvador Dalí': 'Salvador Dalí',
+            'Ernest Hemingway': 'Ernest Hemingway',
+            'George Orwell': 'George Orwell',
+            'Franz Kafka': 'Franz Kafka',
+            'H. G. Wells': 'H. G. Wells',
+            'Oscar Wilde': 'Oscar Wilde',
+            'Charles Dickens': 'Charles Dickens',
+            'Federico García Lorca': 'Federico García Lorca',
+            'Thomas Mann': 'Thomas Mann',
+            'Charlie Chaplin': 'Charlie Chaplin'
+        };
+
+        const PORTRAIT_CACHE = {};
+
+        function getInitials(name) {
+            return name
+                .split(/[\s,]+/)
+                .filter(w => w.length > 2 || w === w.toUpperCase())
+                .slice(0, 2)
+                .map(w => w[0])
+                .join('')
+                .toUpperCase();
+        }
+
+        async function fetchCharacterPortrait(name) {
+            if (PORTRAIT_CACHE[name] !== undefined) return PORTRAIT_CACHE[name];
+            const wikiTitle = WIKI_TITLES[name] || name;
+            try {
+                const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`;
+                const res = await fetch(url);
+                if (!res.ok) {
+                    PORTRAIT_CACHE[name] = null;
+                    return null;
+                }
+                const data = await res.json();
+                const imgUrl = data?.thumbnail?.source || null;
+                PORTRAIT_CACHE[name] = imgUrl;
+                return imgUrl;
+            } catch (err) {
+                PORTRAIT_CACHE[name] = null;
+                return null;
+            }
+        }
+
+        function renderEraSelector() {
+            const grid = document.getElementById('era-grid');
+            if (!grid) return;
+
+            grid.innerHTML = ERAS_DB.map(era => `
+                <button type="button" onclick="startEraGame('${era.id}')"
+                    class="group text-left bg-white/95 hover:bg-parchment-100 border-2 border-parchment-300 hover:border-crimson-700 rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2.5">
+                            <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded bg-slatearchive-900 text-gold-400">
+                                ${era.period}
+                            </span>
+                            <span class="text-[11px] font-bold text-parchment-800 bg-parchment-200 px-2 py-0.5 rounded-full">
+                                ${era.characters.length} fichas
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-slatearchive-900 group-hover:text-crimson-700 transition-colors leading-snug">
+                            ${era.title}
+                        </h3>
+                        <p class="text-xs text-parchment-800 mt-2 leading-relaxed">
+                            ${era.desc}
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-parchment-200 flex items-center justify-between text-xs font-bold text-crimson-700">
+                        <span>Iniciar investigación</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function showEraSelector() {
+            toggleAccuseMode(false);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('era-screen').classList.remove('hidden');
+            const backBtn = document.getElementById('btn-back-eras');
+            backBtn.classList.add('hidden');
+            backBtn.classList.remove('flex');
+        }
+
+        function startEraGame(eraId) {
+            const era = ERAS_DB.find(e => e.id === eraId);
+            if (!era) return;
+
+            currentEraId = eraId;
+            currentEra = era;
+            askedQuestionIds.clear();
+            questionsCount = 0;
+            hintsRemaining = 2;
+            accuseMode = false;
+            hostPeekVisible = false;
+
+            suspects = era.characters.map((c, idx) => ({
+                ...c,
+                id: idx + 1,
+                eliminated: false
+            }));
+
+            secretCharacter = suspects[Math.floor(Math.random() * suspects.length)];
+
+            // Cambiar visibilidad de pantallas
+            document.getElementById('era-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            const backBtn = document.getElementById('btn-back-eras');
+            backBtn.classList.remove('hidden');
+            backBtn.classList.add('flex');
+
+            // Resetear UI
+            document.getElementById('era-title-label').textContent = `${era.title} (${era.period})`;
+            document.getElementById('hints-left').textContent = hintsRemaining;
+            const hintBtn = document.getElementById('btn-hint');
+            hintBtn.disabled = false;
+            hintBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('accuse-banner').classList.add('hidden');
+            toggleHostPeek(false);
+            document.getElementById('log-container').innerHTML = `
+                <p class="text-xs italic text-parchment-800 py-3 text-center">
+                    Formula tu primera pregunta para obtener una respuesta SÍ / NO sobre el personaje secreto.
+                </p>
+            `;
+
+            updateCounters();
+            renderSuspects();
+            renderQuestions();
+        }
+
+        function updateCounters() {
+            const remaining = suspects.filter(s => !s.eliminated).length;
+            const remEl = document.getElementById('stat-remaining');
+            const qEl = document.getElementById('stat-questions');
+            if (remEl) remEl.textContent = `${remaining} / ${suspects.length}`;
+            if (qEl) {
+                qEl.textContent = `${questionsCount} / ${MAX_QUESTIONS}`;
+                qEl.classList.toggle('text-crimson-700', questionsCount >= MAX_QUESTIONS);
+            }
+        }
+
+        function toggleAccuseMode(forceState) {
+            accuseMode = typeof forceState === 'boolean' ? forceState : !accuseMode;
+            const banner = document.getElementById('accuse-banner');
+            const btn = document.getElementById('btn-accuse-mode');
+            if (banner) banner.classList.toggle('hidden', !accuseMode);
+            if (btn) {
+                btn.textContent = accuseMode ? 'Eligiendo...' : 'Acusar';
+                btn.classList.toggle('ring-2', accuseMode);
+                btn.classList.toggle('ring-gold-400', accuseMode);
+            }
+            renderSuspects();
+        }
+
+        function toggleHostPeek(forceState) {
+            hostPeekVisible = typeof forceState === 'boolean' ? forceState : !hostPeekVisible;
+            const panel = document.getElementById('host-peek-panel');
+            const label = document.getElementById('host-peek-label');
+            const eyeOpen = document.getElementById('icon-eye-open');
+            const eyeClosed = document.getElementById('icon-eye-closed');
+
+            if (!panel) return;
+
+            if (hostPeekVisible && secretCharacter) {
+                document.getElementById('host-peek-name').textContent = `${secretCharacter.name} (${secretCharacter.sub})`;
+                document.getElementById('host-peek-bio').textContent = secretCharacter.bio;
+
+                const portraitSlot = document.getElementById('host-peek-portrait');
+                const cached = PORTRAIT_CACHE[secretCharacter.name];
+                if (cached) {
+                    portraitSlot.innerHTML = `<img src="${cached}" alt="${secretCharacter.name}" class="w-full h-full object-cover object-top">`;
+                } else {
+                    portraitSlot.innerHTML = `<span class="font-serif font-bold text-sm text-gold-400">${getInitials(secretCharacter.name)}</span>`;
+                    fetchCharacterPortrait(secretCharacter.name).then(url => {
+                        if (url && hostPeekVisible) {
+                            portraitSlot.innerHTML = `<img src="${url}" alt="${secretCharacter.name}" class="w-full h-full object-cover object-top">`;
+                        }
+                    });
+                }
+
+                panel.classList.remove('hidden');
+                if (label) label.textContent = 'Ocultar Indiciado';
+                if (eyeOpen) eyeOpen.classList.add('hidden');
+                if (eyeClosed) eyeClosed.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+                if (label) label.textContent = 'Ver Indiciado';
+                if (eyeOpen) eyeOpen.classList.remove('hidden');
+                if (eyeClosed) eyeClosed.classList.add('hidden');
+            }
+        }
+
+        function restoreAllSuspects() {
+            suspects.forEach(s => { s.eliminated = false; });
+            updateCounters();
+            renderSuspects();
+        }
+
+        function renderSuspects() {
+            const grid = document.getElementById('suspects-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            suspects.forEach(person => {
+                const card = document.createElement('div');
+                const borderClass = accuseMode && !person.eliminated
+                    ? 'border-crimson-700 ring-2 ring-crimson-700/30 hover:scale-[1.02] cursor-pointer'
+                    : 'border-parchment-300 hover:border-slatearchive-800 cursor-pointer';
+
+                card.className = `suspect-card relative bg-white/95 border-2 ${borderClass} rounded-xl p-2.5 shadow-sm flex flex-col justify-between select-none ${person.eliminated ? 'eliminated' : ''}`;
+
+                const cachedImg = PORTRAIT_CACHE[person.name];
+                const portraitHtml = cachedImg
+                    ? `<img src="${cachedImg}" alt="${person.name}" loading="lazy" class="w-full h-full object-cover object-top" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <span style="display:none" class="w-full h-full items-center justify-center font-serif font-bold text-xl text-gold-400">${getInitials(person.name)}</span>`
+                    : `<span data-portrait-slot="${person.id}" class="w-full h-full flex items-center justify-center font-serif font-bold text-xl text-gold-400">${getInitials(person.name)}</span>`;
+
+                card.innerHTML = `
+                    <div class="eliminated-stamp absolute inset-0 z-20 flex items-center justify-center">
+                        <span class="px-2.5 py-0.5 rounded border-2 border-crimson-700 bg-parchment-50/95 text-crimson-700 font-bold text-[10px] uppercase tracking-widest shadow">
+                            Descartado
+                        </span>
+                    </div>
+                    <div>
+                        <div class="w-full aspect-[4/4.3] rounded-lg bg-gradient-to-br from-slatearchive-800 to-slatearchive-950 border border-parchment-300 overflow-hidden mb-2 relative">
+                            ${portraitHtml}
+                        </div>
+                        <h4 class="font-serif font-bold text-sm sm:text-base text-slatearchive-950 leading-tight line-clamp-2">
+                            ${person.name}
+                        </h4>
+                    </div>
+                    <p class="text-[11px] font-medium text-parchment-800 mt-1 line-clamp-1">
+                        ${person.sub}
+                    </p>
+                `;
+
+                card.addEventListener('click', () => handleSuspectClick(person));
+                grid.appendChild(card);
+
+                if (cachedImg === undefined) {
+                    fetchCharacterPortrait(person.name).then(imgUrl => {
+                        if (imgUrl) {
+                            const slot = grid.querySelector(`[data-portrait-slot="${person.id}"]`);
+                            if (slot && slot.parentElement) {
+                                slot.parentElement.innerHTML = `<img src="${imgUrl}" alt="${person.name}" loading="lazy" class="w-full h-full object-cover object-top">`;
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function handleSuspectClick(person) {
+            if (accuseMode) {
+                evaluateAccusation(person);
+                return;
+            }
+            person.eliminated = !person.eliminated;
+            updateCounters();
+            renderSuspects();
+        }
+
+        function requestHint() {
+            if (hintsRemaining <= 0 || questionsCount >= MAX_QUESTIONS) return;
+
+            // Buscar una pregunta aún no formulada que elimine al menos 1 sospechoso activo
+            const activeSuspects = suspects.filter(s => !s.eliminated);
+            const usefulQuestion = QUESTIONS_BANK.find(q => {
+                if (askedQuestionIds.has(q.id)) return false;
+                const secretHas = q.test(secretCharacter);
+                return activeSuspects.some(s => q.test(s) !== secretHas);
+            });
+
+            hintsRemaining--;
+            document.getElementById('hints-left').textContent = hintsRemaining;
+            if (hintsRemaining === 0) {
+                const btn = document.getElementById('btn-hint');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            if (usefulQuestion) {
+                askQuestion(usefulQuestion.id);
+            } else {
+                questionsCount++;
+                appendLogEntry(`Pista genérica: el personaje pertenece al bloque "${currentEra.title}".`, true, 0);
+                updateCounters();
+                renderQuestions();
+            }
+        }
+
+        function appendLogEntry(questionText, isYes, discardedCount) {
+            const log = document.getElementById('log-container');
+            if (questionsCount === 1 && log.querySelector('p.italic')) {
+                log.innerHTML = '';
+            }
+
+            const badge = isYes
+                ? '<span class="px-2 py-0.5 rounded bg-emerald-800 text-white text-[10px] font-bold uppercase">SÍ</span>'
+                : '<span class="px-2 py-0.5 rounded bg-crimson-700 text-white text-[10px] font-bold uppercase">NO</span>';
+
+            const entry = document.createElement('div');
+            entry.className = 'bg-white border border-parchment-300 rounded-xl p-2.5 text-xs animate-fade-up';
+            entry.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <span class="font-medium text-slatearchive-900 leading-snug">${questionText}</span>
+                    ${badge}
+                </div>
+                <span class="block text-[10px] text-parchment-800 mt-1">
+                    ${discardedCount > 0 ? `Descartados automáticamente: ${discardedCount}` : 'Sin nuevos descartes'}
+                </span>
+            `;
+            log.prepend(entry);
+        }
+
+        // =========================================================================
+        // SISTEMA DE PREGUNTAS Y DESCARTE AUTOMÁTICO
+        // =========================================================================
+        function renderQuestions() {
+            const container = document.getElementById('questions-list');
+            const limitReached = questionsCount >= MAX_QUESTIONS;
+
+            if (limitReached) {
+                container.innerHTML = `
+                    <div class="bg-crimson-700/10 border border-crimson-700/30 rounded-xl p-4 text-center space-y-2">
+                        <p class="font-serif font-bold text-base text-crimson-800">Límite de ${MAX_QUESTIONS} preguntas alcanzado</p>
+                        <p class="text-xs text-parchment-900 leading-relaxed">
+                            Has agotado tus preguntas de interrogatorio. Revisa las fichas que quedan en pie y pulsa <strong>Acusar</strong> para señalar al personaje secreto.
+                        </p>
+                        <button type="button" onclick="toggleAccuseMode(true)" class="mt-1 px-4 py-2 rounded-lg bg-crimson-700 hover:bg-crimson-800 text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                            Pasar a Acusar ahora
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Mostrar solo preguntas históricas diferenciadoras para la colección activa
+            const relevantQuestions = QUESTIONS_BANK.filter(q => {
+                const matchCount = suspects.filter(s => q.test(s)).length;
+                return matchCount > 0 && matchCount < suspects.length;
+            });
+
+            if (relevantQuestions.length === 0) {
+                container.innerHTML = `<p class="text-xs text-parchment-800 italic py-3 text-center">No quedan más preguntas diferenciadoras para esta colección.</p>`;
+                return;
+            }
+
+            container.innerHTML = relevantQuestions.map(q => {
+                const alreadyAsked = askedQuestionIds.has(q.id);
+                return `
+                    <button type="button" ${alreadyAsked ? 'disabled' : ''} onclick="askQuestion('${q.id}')"
+                        class="w-full text-left px-3 py-2 rounded-xl border text-xs transition flex items-center justify-between gap-2 ${
+                            alreadyAsked
+                                ? 'bg-parchment-100 border-parchment-200 text-parchment-800/50 cursor-not-allowed line-through'
+                                : 'bg-white hover:bg-parchment-100 border-parchment-300 hover:border-crimson-700 text-slatearchive-900 font-medium shadow-xs'
+                        }">
+                        <span>${q.text}</span>
+                        ${alreadyAsked ? '' : '<span class="text-[10px] font-bold text-crimson-700 shrink-0">Preguntar</span>'}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function askQuestion(questionId) {
+            if (questionsCount >= MAX_QUESTIONS) return;
+            const q = QUESTIONS_BANK.find(item => item.id === questionId);
+            if (!q || askedQuestionIds.has(questionId)) return;
+
+            askedQuestionIds.add(questionId);
+            questionsCount++;
+
+            const answerIsYes = q.test(secretCharacter);
+
+            let newlyEliminated = 0;
+            suspects.forEach(person => {
+                if (!person.eliminated) {
+                    const personMatches = q.test(person);
+                    if (personMatches !== answerIsYes) {
+                        person.eliminated = true;
+                        newlyEliminated++;
+                    }
+                }
+            });
+
+            appendLogEntry(q.text, answerIsYes, newlyEliminated);
+            updateCounters();
+            renderSuspects();
+            renderQuestions();
+        }
+
+        function evaluateAccusation(chosenPerson) {
+            toggleAccuseMode(false);
+            const won = chosenPerson.id === secretCharacter.id;
+
+            const iconWrap = document.getElementById('result-icon-wrap');
+            const stamp = document.getElementById('result-stamp');
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+
+            if (won) {
+                iconWrap.className = 'w-14 h-14 mx-auto mb-3 rounded-full bg-emerald-800/10 border border-emerald-700/30 flex items-center justify-center text-emerald-800';
+                iconWrap.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+                stamp.textContent = 'Identificación Exitosa';
+                title.textContent = '¡Has acertado el personaje!';
+                subtitle.textContent = `Resuelto tras formular ${questionsCount} pregunta${questionsCount === 1 ? '' : 's'}.`;
+            } else {
+                iconWrap.className = 'w-14 h-14 mx-auto mb-3 rounded-full bg-crimson-700/10 border border-crimson-700/30 flex items-center justify-center text-crimson-700';
+                iconWrap.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+                stamp.textContent = 'Acusación Errónea';
+                title.textContent = 'No era ese personaje';
+                subtitle.textContent = `Señalaste a ${chosenPerson.name}, pero el expediente secreto pertenecía a:`;
+            }
+
+            document.getElementById('secret-reveal-name').textContent = secretCharacter.name;
+            document.getElementById('secret-reveal-meta').textContent = `${secretCharacter.sub} · ${currentEra.title}`;
+            document.getElementById('secret-reveal-bio').textContent = secretCharacter.bio;
+
+            const revealPortrait = document.getElementById('secret-reveal-portrait');
+            const secretImg = PORTRAIT_CACHE[secretCharacter.name];
+            if (secretImg) {
+                revealPortrait.innerHTML = `<img src="${secretImg}" alt="${secretCharacter.name}" class="w-full h-full object-cover object-top">`;
+            } else {
+                revealPortrait.innerHTML = `<span class="font-serif font-bold text-lg text-gold-400">${getInitials(secretCharacter.name)}</span>`;
+                fetchCharacterPortrait(secretCharacter.name).then(url => {
+                    if (url) revealPortrait.innerHTML = `<img src="${url}" alt="${secretCharacter.name}" class="w-full h-full object-cover object-top">`;
+                });
+            }
+
+            const modal = document.getElementById('result-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeResultModal() {
+            const modal = document.getElementById('result-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('result-modal')) closeResultModal();
+            if (e.target === document.getElementById('help-modal')) closeHelpModal();
+        });
+
+        // Inicializar menú de épocas al cargar
+        renderEraSelector();
+    </script>
+</body>
+</html>

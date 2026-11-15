@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sospechosos Inusuales - Juego Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2c3e50;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2334495e' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #ecf0f1;
+        }
+        .title-font {
+            font-family: 'Special Elite', cursive;
+        }
+        
+        .suspect-card {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .suspect-card:hover:not(.eliminated) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .eliminated {
+            filter: grayscale(100%) opacity(0.6);
+            pointer-events: none;
+        }
+
+        .eliminated::after {
+            content: '❌';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            opacity: 0.8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .final-highlight {
+            border-color: #facc15 !important;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+            animation: pulse-gold 1.5s infinite;
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(250, 204, 21, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+        }
+
+        /* Modal Styles */
+        #modal {
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        #modal.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-8">
+
+    <!-- Header -->
+    <header class="text-center mb-6">
+        <h1 class="text-4xl md:text-5xl font-bold title-font text-yellow-400 drop-shadow-lg mb-2">🕵️‍♂️ Sospechosos Inusuales 🕵️‍♀️</h1>
+        <p class="text-gray-300 max-w-2xl mx-auto mb-4">
+            El juego ha elegido un Culpable en secreto. El Testigo responderá a preguntas basándose <strong class="text-white">solo</strong> en su apariencia. Elimina a los inocentes, ¡pero cuidado con eliminar al culpable!
+        </p>
+        <button onclick="showCulprit()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-colors border border-purple-400">
+            👁️ Ver Culpable (Solo Testigo)
+        </button>
+    </header>
+
+    <!-- Game Controls & Question Area -->
+    <section class="max-w-4xl mx-auto w-full bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-6 mb-8 flex flex-col gap-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex-1 text-center md:text-left">
+                <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                    <h2 class="text-sm uppercase tracking-widest text-gray-400 font-semibold">Ronda de Preguntas:</h2>
+                    <span id="questionCounter" class="bg-gray-700 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-600">1 / 10</span>
+                </div>
+                <div id="questionDisplay" class="text-2xl font-bold text-white mb-4 min-h-[3.5rem] flex items-center justify-center md:justify-start">
+                    ¿Cargando pregunta...?
+                </div>
+                <div id="answerControls" class="flex items-center justify-center md:justify-start gap-4">
+                    <span class="text-gray-400 font-medium">Respuesta del Testigo:</span> 
+                    <button id="btnYes" onclick="answerQuestion(true)" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 px-7 rounded-lg shadow-lg transition-all border-2 border-green-400">👍 SÍ</button>
+                    <button id="btnNo" onclick="answerQuestion(false)" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-7 rounded-lg shadow-lg transition-all border-2 border-red-400">👎 NO</button>
+                </div>
+                <p id="phaseHint" class="text-xs text-gray-400 mt-3">
+                    Haz clic en los sospechosos inocentes para tacharlos. Al responder la pregunta 10, ¡deberás señalar directamente al culpable!
+                </p>
+            </div>
+            
+            <div class="flex flex-col gap-3 shrink-0">
+                <button onclick="initGame()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg transition-colors border border-yellow-300">
+                    Nueva Partida 🔄
+                </button>
+            </div>
+        </div>
+
+        <!-- Clues History -->
+        <div id="cluesContainer" class="border-t border-gray-700 pt-4 hidden">
+            <h3 class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">📋 Pistas dadas en esta partida (<span id="cluesCount">0</span>/10):</h3>
+            <div id="cluesList" class="flex flex-wrap gap-2"></div>
+        </div>
+    </section>
+
+    <!-- Board -->
+    <main class="flex-1 max-w-5xl mx-auto w-full">
+        <div id="board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 pb-12">
+            <!-- Suspects will be generated here -->
+        </div>
+    </main>
+
+    <!-- Game Over Modal -->
+    <div id="modal" class="fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
+        <div class="bg-gray-800 border-2 border-gray-600 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative">
+            <h2 id="modalTitle" class="text-3xl font-bold title-font mb-4">¡Juego Terminado!</h2>
+            <p id="modalMessage" class="text-lg text-gray-300 mb-6">Mensaje</p>
+            
+            <div class="bg-gray-900 rounded-xl p-4 mb-6 inline-block">
+                <p class="text-sm text-gray-400 uppercase mb-2">El Culpable era:</p>
+                <div id="guiltyReveal" class="text-6xl mb-2">👤</div>
+                <p id="guiltyNameReveal" class="font-bold text-xl text-white">Nombre</p>
+                <p id="guiltyJobReveal" class="text-sm text-yellow-400 mt-1">Profesión</p>
+            </div>
+
+            <div>
+                <button onclick="initGame(); closeModal()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg transition-colors text-lg">
+                    Jugar de Nuevo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Culprit Modal -->
+    <div id="culpritModal" class="fixed inset-0 z-50 hidden bg-black/80 items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-800 border-2 border-purple-500 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center relative">
+            <h2 class="text-2xl font-bold title-font text-purple-400 mb-2">🤫 El Culpable Es...</h2>
+            <p class="text-sm text-gray-400 mb-6">Asegúrate de que los detectives no estén mirando.</p>
+            
+            <div class="bg-gray-900 rounded-xl p-6 mb-6 inline-block border border-gray-700">
+                <div id="secretEmoji" class="text-7xl mb-4 drop-shadow-lg">👤</div>
+                <p id="secretName" class="font-bold text-2xl text-white">Nombre</p>
+                <p id="secretJob" class="text-sm text-purple-300 mt-1 font-semibold">Profesión</p>
+            </div>
+
+            <button onclick="hideCulprit()" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-colors text-lg border border-gray-500">
+                Ocultar y Volver
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de 100 personajes únicos con skins distintas, edades, géneros, estilos y profesiones
+        const SUSPECT_POOL = [
+            { name: 'Mateo', job: 'Barista Hipster', emoji: '🧔🏻‍♂️' },
+            { name: 'Zara', job: 'Ingeniera Aeroespacial', emoji: '👩🏾‍💻' },
+            { name: 'Kenji', job: 'Chef de Sushi', emoji: '👨🏻‍🍳' },
+            { name: 'Abuela Rosa', job: 'Jubilada Ex-Espía', emoji: '👵🏽' },
+            { name: 'Malik', job: 'DJ de Música Electrónica', emoji: '🧑🏿‍🎤' },
+            { name: 'Sofía', job: 'Abogada Penalista', emoji: '👩🏻‍💼' },
+            { name: 'Don Héctor', job: 'Profesor de Historia', emoji: '👴🏿' },
+            { name: 'Mei-Ling', job: 'Cirujana Plástica', emoji: '👩🏻‍⚕️' },
+            { name: 'Tariq', job: 'Arquitecto Minimalista', emoji: '🧔🏽‍♂️' },
+            { name: 'Chloe', job: 'Artista Urbana', emoji: '👩🏼‍🎨' },
+            { name: 'Dante', job: 'Mecánico de Motos', emoji: '👨🏽‍🔧' },
+            { name: 'Amina', job: 'Atleta Olímpica', emoji: '🧕🏾' },
+            { name: 'Liam', job: 'Piloto de Aerolínea', emoji: '👨🏼‍✈️' },
+            { name: 'Valeria', job: 'Investigadora Privada', emoji: '🕵🏽‍♀️' },
+            { name: 'Kwame', job: 'Biólogo Marino', emoji: '👨🏿‍🔬' },
+            { name: 'Yuki', job: 'Desarrolladora de Videojuegos', emoji: '🧑🏻‍💻' },
+            { name: 'Carlos', job: 'Bombero Voluntario', emoji: '👨🏽‍🚒' },
+            { name: 'Nadia', job: 'Jueza del Tribunal', emoji: '👩🏾‍⚖️' },
+            { name: 'Sven', job: 'Entrenador Personal', emoji: '👱🏻‍♂️' },
+            { name: 'Priya', job: 'Astrónoma', emoji: '👩🏽‍🚀' },
+            { name: 'Don Arturo', job: 'Coleccionista de Arte', emoji: '👴🏻' },
+            { name: 'Kofi', job: 'Músico de Jazz', emoji: '👨🏿‍🎤' },
+            { name: 'Elena', job: 'Agricultora Ecológica', emoji: '👩🏻‍🌾' },
+            { name: 'Hao', job: 'Maestro de Artes Marciales', emoji: '👲🏻' },
+            { name: 'Fátima', job: 'Estrella de Rock', emoji: '👩🏽‍🎤' },
+            { name: 'Abuela Carmen', job: 'Escritora de Misterio', emoji: '👵🏿' },
+            { name: 'Hugo', job: 'Catedrático de Física', emoji: '👨🏼‍🏫' },
+            { name: 'Jamal', job: 'Apicultor Urbano', emoji: '👨🏾‍🌾' },
+            { name: 'Astrid', job: 'Guardabosques Polar', emoji: '👩🏼‍🚒' },
+            { name: 'Diego', job: 'Crítico Gastronómico', emoji: '🧑🏽‍🍳' },
+            { name: 'Amara', job: 'Neurocirujana', emoji: '👩🏿‍⚕️' },
+            { name: 'Min-Jun', job: 'Violinista Clásico', emoji: '👨🏻‍🎤' },
+            { name: 'Beatriz', job: 'Restauradora de Antigüedades', emoji: '👵🏻' },
+            { name: 'Rashid', job: 'Piloto de Rally', emoji: '👳🏽‍♂️' },
+            { name: 'Freya', job: 'Escultora en Hielo', emoji: '👱🏻‍♀️' },
+            { name: 'Omar', job: 'Ilusionista y Mago', emoji: '🧔🏾‍♂️' },
+            { name: 'Camila', job: 'Entrenadora de Delfines', emoji: '👩🏽‍🔬' },
+            { name: 'Toshiro', job: 'Maestro de Origami', emoji: '👴🏻' },
+            { name: 'Zuri', job: 'Diseñadora de Moda', emoji: '👩🏿‍🎨' },
+            { name: 'Iker', job: 'Rescatista de Montaña', emoji: '🧔🏻' },
+            { name: 'Leila', job: 'Diplomática Internacional', emoji: '🧕🏽' },
+            { name: 'Gael', job: 'Sommelier de Vinos', emoji: '👨🏻‍💼' },
+            { name: 'Noor', job: 'Astrofísica', emoji: '👩🏾‍🚀' },
+            { name: 'Bautista', job: 'Constructor de Guitarras', emoji: '👨🏽‍🏭' },
+            { name: 'Sora', job: 'Campeona de eSports', emoji: '👩🏻‍🎤' },
+            { name: 'Ezequiel', job: 'Taxidermista', emoji: '👴🏾' },
+            { name: 'Mireia', job: 'Directora de Cine Indie', emoji: '👩🏼‍💼' },
+            { name: 'Darius', job: 'Guardia Real', emoji: '💂🏿‍♂️' },
+            { name: 'Alba', job: 'Botánica Tropical', emoji: '👩🏻‍🔬' },
+            { name: 'Samir', job: 'Ingeniero de Robótica', emoji: '👨🏽‍💻' },
+            { name: 'Caleb', job: 'Crucero de Lujo (Capitán)', emoji: '👨🏿‍✈️' },
+            { name: 'Ingrid', job: 'Maestra Quesera', emoji: '👩🏼‍🍳' },
+            { name: 'Ramiro', job: 'Relojero Suizo', emoji: '👴🏽' },
+            { name: 'Nia', job: 'Coreógrafa de Danza', emoji: '💃🏾' },
+            { name: 'Lucas', job: 'Acuario y Buzo', emoji: '🏊🏻‍♂️' },
+            { name: 'Hana', job: 'Ceramista Artesanal', emoji: '👩🏻‍🎨' },
+            { name: 'Idris', job: 'Fiscal Anticorrupción', emoji: '👨🏿‍⚖️' },
+            { name: 'Catalina', job: 'Domadora de Circo', emoji: '👩🏽‍🎤' },
+            { name: 'Bjorn', job: 'Carpintero Naval', emoji: '🧔🏼‍♂️' },
+            { name: 'Sonia', job: 'Controladora Aérea', emoji: '👩🏾‍💼' },
+            { name: 'Akira', job: 'Piloto de Drones', emoji: '🧑🏻‍🚀' },
+            { name: 'Doña Pilar', job: 'Directora de Orquesta', emoji: '👵🏼' },
+            { name: 'Jabari', job: 'Profesor de Literatura', emoji: '👨🏾‍🏫' },
+            { name: 'Clara', job: 'Veterinaria de Exóticos', emoji: '👩🏼‍⚕️' },
+            { name: 'Félix', job: 'Soldador Submarino', emoji: '👨🏻‍🏭' },
+            { name: 'Yasmine', job: 'Arquitecta Paisajista', emoji: '🧕🏿' },
+            { name: 'Bruno', job: 'Detective de Seguros', emoji: '🕵🏻‍♂️' },
+            { name: 'Talia', job: 'Especialista en Efectos Especiales', emoji: '👩🏽‍💻' },
+            { name: 'Koji', job: 'Guardabosques de Bambú', emoji: '👨🏻‍🌾' },
+            { name: 'Makeda', job: 'Embajadora Cultural', emoji: '👩🏿‍💼' },
+            { name: 'Óscar', job: 'Patinador Artístico', emoji: '⛸️' },
+            { name: 'Vanesa', job: 'Ingeniera de Sonido', emoji: '👩🏼‍🎤' },
+            { name: 'Hamza', job: 'Pastelero de Alta Cocina', emoji: '👨🏾‍🍳' },
+            { name: 'Noemí', job: 'Topógrafa de Volcanes', emoji: '👩🏽‍🚒' },
+            { name: 'Don Gregorio', job: 'Bibliotecario Nocturno', emoji: '👴🏿' },
+            { name: 'Lina', job: 'Programadora de IA', emoji: '👩🏻‍💻' },
+            { name: 'Thiago', job: 'Surfista Profesional', emoji: '🏄🏽‍♂️' },
+            { name: 'Imani', job: 'Cardióloga Pediátrica', emoji: '👩🏿‍⚕️' },
+            { name: 'Anton', job: 'Acróbata Aéreo', emoji: '🤸🏻‍♂️' },
+            { name: 'Salma', job: 'Periodista de Guerra', emoji: '🧕🏼' },
+            { name: 'Renzo', job: 'Maestro Heladero', emoji: '👨🏼‍🍳' },
+            { name: 'Keiko', job: 'Diseñadora de Kimonos', emoji: '👘' },
+            { name: 'sekou', job: 'Guía de Safari', emoji: '👨🏿‍🌾' },
+            { name: 'Paula', job: 'Astronauta Análoga', emoji: '👩🏻‍🚀' },
+            { name: 'Nabil', job: 'Orfebre y Joyero', emoji: '🧔🏽' },
+            { name: 'Greta', job: 'Activista Climática', emoji: '👧🏼' },
+            { name: 'Jairo', job: 'Mecánico de Aviación', emoji: '👨🏾‍🔧' },
+            { name: 'Mei', job: 'Acupunturista', emoji: '👩🏻‍⚕️' },
+            { name: 'Don Ernesto', job: 'Afinador de Pianos', emoji: '👴🏼' },
+            { name: 'Aisha', job: 'Entrenadora de Esgrima', emoji: '🤺' },
+            { name: 'Julián', job: 'Catador de Chocolates', emoji: '🧑🏻‍🍳' },
+            { name: 'Zainab', job: 'Ingeniera Civil', emoji: '👩🏾‍🔧' },
+            { name: 'Tobías', job: 'Ilustrador de Cómics', emoji: '👨🏼‍🎨' },
+            { name: 'Nadia B.', job: 'Jinete de Doma Clásica', emoji: '🏇🏽' },
+            { name: 'Kwesi', job: 'Químico Perfumista', emoji: '👨🏿‍🔬' },
+            { name: 'Aiko', job: 'Directora de Museo', emoji: '👩🏻‍💼' },
+            { name: 'Simón', job: 'Alpinista Extremo', emoji: '🧗🏽‍♂️' },
+            { name: 'Mirella', job: 'Criminóloga Forense', emoji: '🕵🏾‍♀️' },
+            { name: 'Bastian', job: 'Maestro Cervecero', emoji: '🧔🏼' },
+            { name: 'Soraya', job: 'Cartógrafa Marina', emoji: '👩🏽‍✈️' }
+        ];
+
+        // Base de datos de 150 preguntas subjetivas y divertidas
+        const ALL_QUESTIONS = [
+            "¿Le gusta ver o jugar al fútbol?",
+            "¿Le pone piña a la pizza?",
+            "¿Llora viendo películas de Disney?",
+            "¿Colecciona sellos, monedas o cosas raras?",
+            "¿Sabe hacer malabares?",
+            "¿Tiene suscripción a Netflix?",
+            "¿Se baña todos los días?",
+            "¿Le gusta escuchar reggaetón?",
+            "¿Ha robado alguna vez en una tienda?",
+            "¿Es vegano o vegetariano?",
+            "¿Cree en los fantasmas o espíritus?",
+            "¿Duerme con los calcetines puestos?",
+            "¿Sabe cambiar la rueda de un coche?",
+            "¿Tiene tatuajes ocultos?",
+            "¿Ronca mucho por las noches?",
+            "¿Sabe algún tipo de artes marciales?",
+            "¿Habla solo en voz alta?",
+            "¿Prefiere a los gatos antes que a los perros?",
+            "¿Se salta los semáforos en rojo cuando nadie mira?",
+            "¿Ha mentido en su currículum?",
+            "¿Se queda dormido en el cine?",
+            "¿Cree que la Tierra es plana?",
+            "¿Canta a pleno pulmón en la ducha?",
+            "¿Tiene miedo a volar en avión?",
+            "¿Sabe tocar algún instrumento musical?",
+            "¿Lee el horóscopo todos los días?",
+            "¿Come la pizza con tenedor y cuchillo?",
+            "¿Usa crocs o chanclas con calcetines?",
+            "¿Es adicto al café?",
+            "¿Sabe cocinar algo más que pasta y arroz?",
+            "¿Ha hecho puenting o paracaidismo?",
+            "¿Le gusta la música heavy metal?",
+            "¿Tiene alguna multa de tráfico sin pagar?",
+            "¿Se le mueren hasta los cactus?",
+            "¿Es de los que aplauden cuando aterriza el avión?",
+            "¿Usa todavía despertador analógico?",
+            "¿Le tiene fobia a los payasos?",
+            "¿Se sabe todos los diálogos de alguna película?",
+            "¿Ha participado alguna vez en un reality show?",
+            "¿Le gusta ir de acampada al bosque?",
+            "¿Toma el té con el dedo meñique levantado?",
+            "¿Reutiliza las bolsas de plástico del supermercado?",
+            "¿Sabe bailar salsa o bachata?",
+            "¿Ha tenido algún amigo imaginario de pequeño?",
+            "¿Es el típico que siempre llega tarde a todos lados?",
+            "¿Le gusta el picante extremo?",
+            "¿Cree en los extraterrestres y los ovnis?",
+            "¿Se ha colado alguna vez en el metro o autobús?",
+            "¿Tiene una colección de patitos de goma?",
+            "¿Sabe hablar más de dos idiomas?",
+            "¿Le gusta hacer crucigramas o sudokus?",
+            "¿Es fanático de los videojuegos?",
+            "¿Se mira mucho en el espejo al pasar por los escaparates?",
+            "¿Le tiene miedo a la oscuridad?",
+            "¿Ha enviado alguna vez un mensaje al ex por error?",
+            "¿Le gusta el karaoke?",
+            "¿Guarda los botes de cristal vacíos 'por si acaso'?",
+            "¿Sabe hacer trucos de magia con cartas?",
+            "¿Le da miedo ir al dentista?",
+            "¿Es de los que ponen el árbol de Navidad en noviembre?",
+            "¿Sabe nadar estilo mariposa?",
+            "¿Le gusta madrugar los domingos para hacer deporte?",
+            "¿Ha robado toallas o albornoces de un hotel?",
+            "¿Se come las uñas cuando está nervioso?",
+            "¿Le gustan las películas de terror?",
+            "¿Sabe hacer origami (papiroflexia)?",
+            "¿Tiene cuenta en TikTok y sube bailes?",
+            "¿Le gusta el queso azul muy fuerte?",
+            "¿Ha escrito alguna vez un diario personal?",
+            "¿Sabe coser un botón?",
+            "¿Es de los que dejan los platos en remojo tres días?",
+            "¿Le gusta la ópera o la música clásica?",
+            "¿Se ha teñido el pelo de un color llamativo alguna vez?",
+            "¿Tiene supersticiones como no pasar por debajo de una escalera?",
+            "¿Le gusta hacer bricolaje en casa?",
+            "¿Ha ganado alguna vez un concurso o sorteo?",
+            "¿Se sabe de memoria su número de DNI?",
+            "¿Le gusta el ajedrez?",
+            "¿Ha tenido alguna vez un corte de pelo desastroso?",
+            "¿Es de los que hablan con las plantas?",
+            "¿Le gusta ir a museos de arte moderno?",
+            "¿Se come la corteza del queso?",
+            "¿Ha hecho alguna vez autostop?",
+            "¿Le gusta el golf?",
+            "¿Tiene el móvil siempre con menos del 10% de batería?",
+            "¿Sabe silbar muy fuerte con los dedos?",
+            "¿Le gusta el sushi?",
+            "¿Ha fingido estar enfermo para no ir a trabajar o estudiar?",
+            "¿Le tiene pánico a las arañas o cucarachas?",
+            "¿Usa paraguas incluso cuando caen cuatro gotas?",
+            "¿Le gusta coleccionar imanes de nevera de sus viajes?",
+            "¿Sabe montar en monopatín o patines?",
+            "¿Es de los que cuenta el final de las películas (spoilers)?",
+            "¿Le gusta tomar el sol durante horas en la playa?",
+            "¿Tiene algún amuleto de la suerte?",
+            "¿Sabe hacer el pino o la voltereta lateral?",
+            "¿Le gusta el brócoli?",
+            "¿Ha tenido alguna vez una mascota exótica?",
+            "¿Se queda mirando las obras en la calle?",
+            "¿Cree que tiene buena suerte en la vida?",
+            "¿Deja los mensajes de WhatsApp en 'visto' y responde tres días después?",
+            "¿Manda audios de WhatsApp de más de cuatro minutos?",
+            "¿Se iría sin pagar de un restaurante si se olvidan de cobrarle?",
+            "¿Hace trampas jugando al Monopoly o al Uno?",
+            "¿Pone diez alarmas seguidas cada cinco minutos para despertarse?",
+            "¿Se pelea con desconocidos en los comentarios de internet?",
+            "¿Tiene la galería del móvil llena de memes?",
+            "¿Le da miedo montar en montaña rusa?",
+            "¿Es de los que revisan el teléfono de su pareja?",
+            "¿Se queja de la comida en los restaurantes para que le inviten?",
+            "¿Tiene una risa muy contagiosa y escandalosa?",
+            "¿Es muy tacaño a la hora de dividir la cuenta entre amigos?",
+            "¿Habla con los animales como si fueran personas?",
+            "¿Se quema al sol a los cinco minutos de llegar a la playa?",
+            "¿Siempre pide exactamente lo mismo en los restaurantes?",
+            "¿Ha escrito poesía romántica alguna vez?",
+            "¿Le gusta el chocolate negro con más del 85% de cacao?",
+            "¿Es muy despistado y pierde las llaves a menudo?",
+            "¿Ha estado alguna vez de vacaciones en un crucero?",
+            "¿Ve las series con subtítulos aunque estén en su idioma?",
+            "¿Se pone muy nervioso cuando tiene que hablar en público?",
+            "¿Desayuna algo dulce todos los días?",
+            "¿Es muy buen negociador regateando en los mercadillos?",
+            "¿Saluda a los desconocidos cuando se cruza con ellos por la calle?",
+            "¿Sabe montar a caballo?",
+            "¿Siempre lleva un libro encima por si tiene que esperar?",
+            "¿Fue el delegado de clase en el colegio o instituto?",
+            "¿Llora cuando corta cebolla en la cocina?",
+            "¿Ha suspendido el examen práctico de conducir más de dos veces?",
+            "¿Da muy buenos consejos amorosos a sus amigos?",
+            "¿Prefiere el invierno y el frío antes que el verano?",
+            "¿Es extremadamente ordenado y maniático de la limpieza?",
+            "¿Se colaría en la fila del supermercado si nadie se diera cuenta?",
+            "¿Siempre olvida los cumpleaños de sus amigos cercanos?",
+            "¿Lloró de alegría alguna vez en su vida?",
+            "¿Es muy competitivo en los deportes y juegos de mesa?",
+            "¿Guarda cartas o regalos de sus ex parejas en una caja?",
+            "¿Sabe hacer primeros auxilios básicos?",
+            "¿Le encantan los parques de atracciones y ferias?",
+            "¿Tiene pinta de haber tenido una época emo o gótica de adolescente?",
+            "¿Gasta mucho dinero en ropa y zapatillas de marca?",
+            "¿Prefiere ir a un hotel de cinco estrellas antes que de camping?",
+            "¿Cuenta chistes malos y es el único que se ríe?",
+            "¿Hace yoga o meditación todas las mañanas?",
+            "¿Le gusta ver documentales sobre crímenes reales?",
+            "¿Es siempre el alma de la fiesta?",
+            "¿Lee libros de autoayuda?",
+            "¿Tiene miedo a las alturas?",
+            "¿Sabe hacer una paella espectacular?",
+            "¿Tiene más de tres gatos viviendo en su casa?"
+        ];
+
+        // Estado de la partida
+        const MAX_ROUNDS = 10;
+        let suspects = [];
+        let guiltySuspect = null;
+        let matchQuestions = [];
+        let currentRound = 0; // 0 a 9
+        let remainingSuspects = 12;
+        let isFinalDecisionPhase = false;
+        let gameOver = false;
+        let cluesHistory = [];
+
+        // Elementos del DOM
+        const boardEl = document.getElementById('board');
+        const questionDisplay = document.getElementById('questionDisplay');
+        const questionCounter = document.getElementById('questionCounter');
+        const cluesContainer = document.getElementById('cluesContainer');
+        const cluesCount = document.getElementById('cluesCount');
+        const cluesList = document.getElementById('cluesList');
+        const btnYes = document.getElementById('btnYes');
+        const btnNo = document.getElementById('btnNo');
+        const phaseHint = document.getElementById('phaseHint');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const guiltyReveal = document.getElementById('guiltyReveal');
+        const guiltyNameReveal = document.getElementById('guiltyNameReveal');
+        const guiltyJobReveal = document.getElementById('guiltyJobReveal');
+        const culpritModal = document.getElementById('culpritModal');
+        const secretEmoji = document.getElementById('secretEmoji');
+        const secretName = document.getElementById('secretName');
+        const secretJob = document.getElementById('secretJob');
+
+        // Utilidad: Barajar array (Fisher-Yates)
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            gameOver = false;
+            isFinalDecisionPhase = false;
+            currentRound = 0;
+            remainingSuspects = 12;
+            cluesHistory = [];
+
+            // Extraer exactamente 10 preguntas aleatorias de las 100
+            matchQuestions = shuffle(ALL_QUESTIONS).slice(0, MAX_ROUNDS);
+
+            // Resetear controles UI
+            btnYes.disabled = false;
+            btnNo.disabled = false;
+            btnYes.classList.remove('opacity-40', 'cursor-not-allowed');
+            btnNo.classList.remove('opacity-40', 'cursor-not-allowed');
+            questionDisplay.classList.remove('text-yellow-400');
+            phaseHint.innerHTML = 'Haz clic en los sospechosos inocentes para tacharlos. Al responder la pregunta 10, <strong class="text-yellow-400">¡deberás señalar directamente al culpable!</strong>';
+
+            renderClues();
+            closeModal();
+            hideCulprit();
+
+            // Seleccionar 12 sospechosos diversos al azar
+            const selectedSuspects = shuffle(SUSPECT_POOL).slice(0, 12);
+            suspects = selectedSuspects.map((s, index) => ({
+                id: index,
+                name: s.name,
+                job: s.job,
+                emoji: s.emoji,
+                eliminated: false
+            }));
+
+            // Elegir al culpable en secreto
+            guiltySuspect = suspects[Math.floor(Math.random() * suspects.length)];
+
+            drawBoard();
+            updateQuestionUI();
+        }
+
+        function drawBoard() {
+            boardEl.innerHTML = '';
+            suspects.forEach(suspect => {
+                const card = document.createElement('div');
+                const highlightClass = (isFinalDecisionPhase && !suspect.eliminated && !gameOver) ? 'final-highlight' : '';
+                card.className = `suspect-card bg-gray-100 rounded-xl p-4 flex flex-col items-center justify-between border-4 border-gray-300 shadow-md ${suspect.eliminated ? 'eliminated' : ''} ${highlightClass}`;
+                card.onclick = () => handleCardClick(suspect.id);
+
+                card.innerHTML = `
+                    <div class="text-6xl md:text-7xl my-2 drop-shadow-md">${suspect.emoji}</div>
+                    <div class="w-full text-center">
+                        <div class="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-bold truncate">
+                            ${suspect.name}
+                        </div>
+                        <div class="text-xs text-gray-600 font-semibold mt-1 truncate">
+                            ${suspect.job}
+                        </div>
+                    </div>
+                `;
+                boardEl.appendChild(card);
+            });
+        }
+
+        function updateQuestionUI() {
+            if (!isFinalDecisionPhase) {
+                questionCounter.textContent = `${currentRound + 1} / ${MAX_ROUNDS}`;
+                questionDisplay.textContent = matchQuestions[currentRound];
+            } else {
+                questionCounter.textContent = `${MAX_ROUNDS} / ${MAX_ROUNDS} (DECISIÓN FINAL)`;
+                questionDisplay.classList.add('text-yellow-400');
+                questionDisplay.textContent = "🚨 ¡10 preguntas completadas! Haz clic sobre el sospechoso que creas que es el CULPABLE.";
+            }
+        }
+
+        function answerQuestion(isYes) {
+            if (gameOver || isFinalDecisionPhase) return;
+
+            const currentQ = matchQuestions[currentRound];
+            cluesHistory.push({
+                round: currentRound + 1,
+                question: currentQ,
+                answer: isYes
+            });
+            renderClues();
+
+            currentRound++;
+
+            // Si ya se respondieron las 10 preguntas, activar fase de acusación final
+            if (currentRound >= MAX_ROUNDS) {
+                isFinalDecisionPhase = true;
+                btnYes.disabled = true;
+                btnNo.disabled = true;
+                btnYes.classList.add('opacity-40', 'cursor-not-allowed');
+                btnNo.classList.add('opacity-40', 'cursor-not-allowed');
+                phaseHint.innerHTML = '<strong class="text-yellow-400">⚖️ JUICIO FINAL:</strong> Ya no quedan más preguntas. Haz clic en el sospechoso iluminado que creas que es el culpable para acusarlo.';
+                drawBoard();
+            }
+
+            updateQuestionUI();
+        }
+
+        function renderClues() {
+            cluesCount.textContent = cluesHistory.length;
+            if (cluesHistory.length === 0) {
+                cluesContainer.classList.add('hidden');
+                cluesList.innerHTML = '';
+                return;
+            }
+            cluesContainer.classList.remove('hidden');
+            cluesList.innerHTML = cluesHistory.map(clue => `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${clue.answer ? 'bg-green-900/70 text-green-300 border border-green-600' : 'bg-red-900/70 text-red-300 border border-red-600'}">
+                    <span>#${clue.round} ${clue.answer ? '✅ SÍ:' : '❌ NO:'}</span>
+                    <span>${clue.question.replace(/^¿|\?$/g, '')}</span>
+                </span>
+            `).join('');
+        }
+
+        function showCulprit() {
+            if (!guiltySuspect) return;
+            secretEmoji.textContent = guiltySuspect.emoji;
+            secretName.textContent = guiltySuspect.name;
+            secretJob.textContent = guiltySuspect.job;
+            culpritModal.classList.remove('hidden');
+            culpritModal.classList.add('flex');
+        }
+
+        function hideCulprit() {
+            culpritModal.classList.add('hidden');
+            culpritModal.classList.remove('flex');
+        }
+
+        function handleCardClick(id) {
+            if (gameOver) return;
+
+            const suspect = suspects.find(s => s.id === id);
+            if (!suspect || suspect.eliminated) return;
+
+            // En la fase final (tras la 10ª pregunta), el clic acusa directamente al sospechoso
+            if (isFinalDecisionPhase) {
+                gameOver = true;
+                drawBoard(); // Quita el brillo de selección
+                if (suspect.id === guiltySuspect.id) {
+                    showModal(
+                        "¡Victoria en el Juicio Final!",
+                        `¡Acusación certera! Atrapaste a ${guiltySuspect.name} tras las 10 preguntas.`,
+                        "text-green-400"
+                    );
+                } else {
+                    showModal(
+                        "¡Acusación Fallida!",
+                        `Acusaste a ${suspect.name}, pero era inocente. ¡El verdadero culpable escapó!`,
+                        "text-red-500"
+                    );
+                }
+                return;
+            }
+
+            // En rondas normales (1 a 10), el clic descarta/tacha al sospechoso
+            suspect.eliminated = true;
+            remainingSuspects--;
+            drawBoard();
+
+            checkWinLoss(id);
+        }
+
+        function checkWinLoss(eliminatedId) {
+            if (eliminatedId === guiltySuspect.id) {
+                // DERROTA por descartar al culpable
+                gameOver = true;
+                btnYes.disabled = true;
+                btnNo.disabled = true;
+                btnYes.classList.add('opacity-40', 'cursor-not-allowed');
+                btnNo.classList.add('opacity-40', 'cursor-not-allowed');
+                showModal(
+                    "¡Derrota!", 
+                    `¡Has descartado al culpable por error! Dejaste escapar a ${guiltySuspect.name}.`, 
+                    "text-red-500"
+                );
+            } else if (remainingSuspects === 1) {
+                // VICTORIA anticipada al descartar a los 11 inocentes
+                gameOver = true;
+                btnYes.disabled = true;
+                btnNo.disabled = true;
+                btnYes.classList.add('opacity-40', 'cursor-not-allowed');
+                btnNo.classList.add('opacity-40', 'cursor-not-allowed');
+                showModal(
+                    "¡Victoria Brillante!", 
+                    `¡Felicidades! Eliminaste a los 11 inocentes antes de agotar las 10 preguntas y atrapaste a ${guiltySuspect.name}.`, 
+                    "text-green-400"
+                );
+            }
+        }
+
+        function showModal(title, message, titleColorClass) {
+            modalTitle.textContent = title;
+            modalTitle.className = `text-3xl font-bold title-font mb-4 ${titleColorClass}`;
+            modalMessage.textContent = message;
+            
+            guiltyReveal.textContent = guiltySuspect.emoji;
+            guiltyNameReveal.textContent = guiltySuspect.name;
+            guiltyJobReveal.textContent = guiltySuspect.job;
+            
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+
+        // Start game on load
+        window.onload = initGame;
+    </script>
+</body>
+</html>

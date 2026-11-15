@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivo Histórico: Memory de Vocabulario Alemán (1933–1945)</title>
+    <!-- Fuentes Google: Crimson Pro (editorial/histórica) e Inter (legibilidad UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#fcfaf4',
+                            100: '#f5efe0',
+                            200: '#e9dec4',
+                            300: '#d7c49e',
+                            400: '#bfa372',
+                            800: '#5a4932',
+                            900: '#3c3020',
+                        },
+                        slatearchive: {
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        },
+                        crimson: {
+                            600: '#991b1b',
+                            700: '#7f1d1d',
+                            800: '#651616',
+                        },
+                        gold: {
+                            400: '#d4af37',
+                            500: '#b89428',
+                            600: '#96761b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Textura sutil de archivo histórico */
+        body {
+            background-color: #f3ecdc;
+            background-image:
+                radial-gradient(at 15% 15%, rgba(212, 175, 55, 0.12) 0px, transparent 50%),
+                radial-gradient(at 85% 85%, rgba(127, 29, 29, 0.08) 0px, transparent 50%),
+                linear-gradient(180deg, rgba(255, 252, 245, 0.65) 0%, rgba(233, 222, 196, 0.5) 100%);
+            min-height: 100vh;
+        }
+
+        /* Perspectiva 3D para las tarjetas */
+        .card-scene {
+            perspective: 1100px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-inner.is-matched {
+            transform: rotateY(180deg) scale(0.985);
+            cursor: default;
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        /* Reverso estilo expediente archivístico */
+        .card-back {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+            box-shadow: 0 6px 14px -3px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card-inner:not(.is-flipped):not(.is-matched):hover .card-back {
+            border-color: #d4af37;
+            box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.38), 0 0 0 1px rgba(212, 175, 55, 0.35);
+        }
+
+        .card-back-pattern {
+            background-image: radial-gradient(#d4af37 0.75px, transparent 0.75px);
+            background-size: 11px 11px;
+            opacity: 0.14;
+        }
+
+        /* Anverso estilo ficha mecanografiada */
+        .card-front {
+            background: linear-gradient(180deg, #fffdf8 0%, #f7f1e3 100%);
+            border: 1.5px solid #d7c49e;
+            transform: rotateY(180deg);
+            box-shadow: 0 6px 16px -4px rgba(60, 48, 32, 0.14), inset 0 0 0 3px rgba(255, 255, 255, 0.7);
+        }
+
+        .card-front.card-de {
+            border-top: 4px solid #7f1d1d;
+        }
+
+        .card-front.card-es {
+            border-top: 4px solid #1e293b;
+        }
+
+        .card-inner.is-matched .card-front {
+            background: linear-gradient(180deg, #f2fbf6 0%, #e4f4ec 100%);
+            border-color: #15803d;
+            border-top-color: #15803d;
+            box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.22), 0 4px 12px rgba(21, 128, 61, 0.12);
+        }
+
+        /* Animaciones suaves */
+        @keyframes shakeCard {
+            0%, 100% { transform: rotateY(180deg) translateX(0); }
+            25% { transform: rotateY(180deg) translateX(-5px); }
+            50% { transform: rotateY(180deg) translateX(5px); }
+            75% { transform: rotateY(180deg) translateX(-3px); }
+        }
+
+        .animate-shake {
+            animation: shakeCard 0.38s ease-in-out;
+        }
+
+        @keyframes pulseMatch {
+            0% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.045); }
+            100% { transform: rotateY(180deg) scale(0.985); }
+        }
+
+        .animate-match {
+            animation: pulseMatch 0.42s ease-out forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.35s ease-out forwards;
+        }
+
+        /* Sello decorativo */
+        .archive-stamp {
+            border: 1.5px solid rgba(127, 29, 29, 0.35);
+            color: #7f1d1d;
+            letter-spacing: 0.16em;
+            transform: rotate(-2deg);
+        }
+
+        /* Barra de desplazamiento elegante para modales */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #efe6d2;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #bfa372;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slatearchive-900 antialiased selection:bg-gold-400 selection:text-slatearchive-900">
+
+    <!-- Cabecera Editorial Superior -->
+    <header class="bg-slatearchive-900 text-parchment-50 border-b-2 border-gold-500 shadow-lg sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-crimson-700 to-crimson-800 border border-gold-400/70 flex items-center justify-center shrink-0 shadow-inner">
+                    <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-gold-400">Archivo Histórico · 1933–1945</span>
+                    </div>
+                    <h1 class="font-serif text-lg sm:text-2xl font-bold tracking-tight leading-tight text-parchment-50">
+                        Léxico de la Alemania Nazi
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Controles globales -->
+            <div class="flex items-center gap-2">
+                <button id="btn-change-category" type="button" onclick="showCategoryScreen()" class="hidden items-center gap-1.5 px-3 py-2 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-medium transition shadow-sm">
+                    <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                    <span>Categorías</span>
+                </button>
+                <button type="button" onclick="openGlossaryModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-medium transition shadow-sm">
+                    <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="hidden sm:inline">Glosario</span>
+                </button>
+                <button id="btn-sound" type="button" onclick="toggleSound()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-medium transition shadow-sm" title="Activar o desactivar sonido">
+                    <svg id="icon-sound-on" class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                    </svg>
+                    <svg id="icon-sound-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANTALLA 1: SELECTOR DE CATEGORÍAS -->
+    <section id="category-screen" class="max-w-5xl mx-auto px-4 py-8 sm:py-12 animate-fade-up">
+        <div class="bg-parchment-50/95 border border-parchment-300 rounded-2xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <!-- Borde interior decorativo -->
+            <div class="absolute inset-2 border border-parchment-200/80 rounded-xl pointer-events-none"></div>
+
+            <div class="relative z-10 text-center max-w-2xl mx-auto mb-8">
+                <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-3 py-1 rounded mb-3">
+                    Expediente Educativo · Selección de Archivo
+                </span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-slatearchive-900 mb-3">
+                    Elige una categoría temática
+                </h2>
+                <p class="text-sm sm:text-base text-parchment-800 leading-relaxed">
+                    Empareja cada término original en alemán con su significado en español. Selecciona un bloque específico o pon a prueba tus conocimientos en la modalidad mixta.
+                </p>
+            </div>
+
+            <!-- Tarjetas de Categorías -->
+            <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <!-- Categoría: Ejército -->
+                <button type="button" onclick="selectCategory('ejercito')" class="group text-left bg-white/90 hover:bg-parchment-100 border-2 border-parchment-300 hover:border-crimson-700 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-11 h-11 rounded-xl bg-crimson-700/10 text-crimson-700 group-hover:bg-crimson-700 group-hover:text-white flex items-center justify-center transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-parchment-200 text-parchment-900">
+                                20 términos
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900 group-hover:text-crimson-700 transition-colors">
+                            Ejército y Terminología Militar
+                        </h3>
+                        <p class="text-xs sm:text-sm text-parchment-800 mt-1.5 leading-relaxed">
+                            Ramas armadas, tácticas, blindados y rangos: <em>Wehrmacht, Luftwaffe, Panzer, Blitzkrieg, U-Boot</em>...
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-parchment-200 flex items-center justify-between text-xs font-bold text-crimson-700">
+                        <span>Abrir expediente militar</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </button>
+
+                <!-- Categoría: Política -->
+                <button type="button" onclick="selectCategory('politica')" class="group text-left bg-white/90 hover:bg-parchment-100 border-2 border-parchment-300 hover:border-slatearchive-800 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-11 h-11 rounded-xl bg-slatearchive-800/10 text-slatearchive-800 group-hover:bg-slatearchive-800 group-hover:text-gold-400 flex items-center justify-center transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-parchment-200 text-parchment-900">
+                                16 términos
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900 group-hover:text-slatearchive-800 transition-colors">
+                            Política, Estado e Ideología
+                        </h3>
+                        <p class="text-xs sm:text-sm text-parchment-800 mt-1.5 leading-relaxed">
+                            Conceptos políticos, territoriales y lemas del régimen: <em>Anschluss, Führer, Lebensraum, Reichstag</em>...
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-parchment-200 flex items-center justify-between text-xs font-bold text-slatearchive-800">
+                        <span>Abrir expediente político</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </button>
+
+                <!-- Categoría: Organizaciones -->
+                <button type="button" onclick="selectCategory('organizaciones')" class="group text-left bg-white/90 hover:bg-parchment-100 border-2 border-parchment-300 hover:border-amber-700 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-11 h-11 rounded-xl bg-amber-700/10 text-amber-800 group-hover:bg-amber-800 group-hover:text-white flex items-center justify-center transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-parchment-200 text-parchment-900">
+                                12 términos
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900 group-hover:text-amber-800 transition-colors">
+                            Organizaciones y Aparato del Régimen
+                        </h3>
+                        <p class="text-xs sm:text-sm text-parchment-800 mt-1.5 leading-relaxed">
+                            Cuerpos paramilitares, policía, inteligencia y agrupaciones: <em>SS, SA, Gestapo, Hitlerjugend, NSDAP</em>...
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-parchment-200 flex items-center justify-between text-xs font-bold text-amber-800">
+                        <span>Abrir expediente institucional</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </button>
+
+                <!-- Categoría: Mixta -->
+                <button type="button" onclick="selectCategory('mixta')" class="group text-left bg-gradient-to-br from-slatearchive-900 to-slatearchive-800 hover:from-slatearchive-800 hover:to-slatearchive-700 border-2 border-gold-500 rounded-2xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between text-parchment-50">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-11 h-11 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-400/40 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                            </span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-gold-500/20 text-gold-400 border border-gold-400/30">
+                                49 términos · Global
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl sm:text-2xl font-bold text-white group-hover:text-gold-400 transition-colors">
+                            Modalidad Mixta (Archivo Completo)
+                        </h3>
+                        <p class="text-xs sm:text-sm text-parchment-200 mt-1.5 leading-relaxed">
+                            Combina aleatoriamente términos de Ejército, Política, Organizaciones y vocabulario general (<em>Bunker → Refugio</em>).
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slatearchive-700 flex items-center justify-between text-xs font-bold text-gold-400">
+                        <span>Iniciar desafío completo</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: TABLERO DE JUEGO -->
+    <main id="game-screen" class="hidden max-w-6xl mx-auto px-4 py-5 sm:py-7 animate-fade-up">
+        <!-- Barra de Estado, Categoría Activa y Dificultad -->
+        <section class="bg-parchment-50/95 border border-parchment-300 rounded-2xl p-4 sm:p-5 mb-6 shadow-md flex flex-col lg:flex-row items-center justify-between gap-4">
+            <!-- Selector de Dificultad y Categoría Actual -->
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                <div class="flex items-center gap-2 bg-parchment-200/80 border border-parchment-300 px-3 py-1.5 rounded-xl">
+                    <span class="w-2 h-2 rounded-full bg-crimson-700"></span>
+                    <span id="active-category-label" class="text-xs font-bold uppercase tracking-wider text-slatearchive-900">Ejército</span>
+                </div>
+
+                <div class="inline-flex rounded-xl bg-parchment-200 p-1 border border-parchment-300" role="group">
+                    <button type="button" onclick="setDifficulty('facil')" id="diff-facil" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                        Fácil (6)
+                    </button>
+                    <button type="button" onclick="setDifficulty('medio')" id="diff-medio" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                        Medio (8)
+                    </button>
+                    <button type="button" onclick="setDifficulty('dificil')" id="diff-dificil" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                        Difícil (10)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Marcadores y Reinicio -->
+            <div class="flex items-center justify-center gap-4 sm:gap-6">
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">Parejas</span>
+                    <span id="stat-pairs" class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900">0 / 6</span>
+                </div>
+                <div class="h-8 w-px bg-parchment-300"></div>
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">Intentos</span>
+                    <span id="stat-moves" class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900">0</span>
+                </div>
+                <div class="h-8 w-px bg-parchment-300"></div>
+                <div class="text-center">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider text-parchment-800">Tiempo</span>
+                    <span id="stat-timer" class="font-serif text-xl sm:text-2xl font-bold text-slatearchive-900 tabular-nums">00:00</span>
+                </div>
+                <button type="button" onclick="initGame()" class="ml-1 flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-crimson-700 hover:bg-crimson-800 active:scale-95 text-white text-xs font-semibold shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>Barajar</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Área de Juego: Tablero + Panel de Ficha Histórica -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Tablero de Cartas -->
+            <div class="lg:col-span-8">
+                <div id="game-board" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-3.5"></div>
+            </div>
+
+            <!-- Panel Lateral: Ficha de Archivo Histórico -->
+            <aside class="lg:col-span-4 bg-parchment-50/95 border border-parchment-300 rounded-2xl p-5 sm:p-6 shadow-md lg:sticky lg:top-24">
+                <div class="flex items-center justify-between border-b border-parchment-300 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-gold-500"></span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-parchment-900">Ficha de Archivo</span>
+                    </div>
+                    <button type="button" onclick="openGlossaryModal()" class="text-xs font-semibold text-crimson-700 hover:text-crimson-800 hover:underline">
+                        Ver Glosario
+                    </button>
+                </div>
+
+                <!-- Estado inicial antes de encontrar una pareja -->
+                <div id="note-placeholder" class="py-8 px-2 text-center text-parchment-800/85">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-parchment-200/80 border border-parchment-300 flex items-center justify-center text-parchment-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <p class="font-serif italic text-lg text-slatearchive-900 mb-1">Expediente clasificado</p>
+                    <p class="text-xs leading-relaxed">
+                        Levanta dos fichas que correspondan al mismo término alemán y su traducción al español para desclasificar su nota histórica.
+                    </p>
+                </div>
+
+                <!-- Contenido cuando se acierta una pareja -->
+                <div id="note-content" class="hidden animate-fade-up">
+                    <div class="mb-2">
+                        <div class="flex flex-wrap items-center gap-1.5 mb-2.5">
+                            <span id="note-badge" class="inline-block text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-md bg-emerald-800 text-white">Pareja Confirmada</span>
+                            <span id="note-category-tag" class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-parchment-200 text-parchment-900 border border-parchment-300">Ejército</span>
+                        </div>
+                        <h3 id="note-german" class="font-serif text-2xl sm:text-3xl font-bold text-slatearchive-900 leading-tight">Luftwaffe</h3>
+                        <p id="note-spanish" class="text-sm font-semibold text-crimson-700 mt-1">Fuerza aérea alemana</p>
+                    </div>
+                    <div class="w-14 h-0.5 bg-gold-500 my-3.5"></div>
+                    <p id="note-description" class="text-sm text-parchment-900 leading-relaxed">
+                        Descripción histórica del término...
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- MODAL DE VICTORIA -->
+    <div id="victory-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/75 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 border-gold-500 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center animate-fade-up">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-800/10 border border-emerald-700/30 flex items-center justify-center text-emerald-800">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-2.5 py-0.5 rounded mb-2">
+                Expediente Completado
+            </span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slatearchive-900 mb-2">
+                ¡Archivo Desclasificado!
+            </h2>
+            <p class="text-xs sm:text-sm text-parchment-800 mb-5">
+                Has emparejado correctamente todos los términos de la sesión en <strong id="victory-category" class="text-slatearchive-900">Ejército</strong>.
+            </p>
+
+            <div class="grid grid-cols-3 gap-2.5 bg-parchment-100 border border-parchment-300 rounded-xl p-3.5 mb-6">
+                <div>
+                    <span class="block text-[10px] font-bold uppercase text-parchment-800">Tiempo</span>
+                    <span id="victory-time" class="font-serif text-xl font-bold text-slatearchive-900">00:00</span>
+                </div>
+                <div class="border-x border-parchment-300">
+                    <span class="block text-[10px] font-bold uppercase text-parchment-800">Intentos</span>
+                    <span id="victory-moves" class="font-serif text-xl font-bold text-slatearchive-900">0</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold uppercase text-parchment-800">Precisión</span>
+                    <span id="victory-accuracy" class="font-serif text-xl font-bold text-emerald-800">100%</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button type="button" onclick="closeVictoryModal(); initGame();" class="flex-1 py-2.5 px-4 rounded-xl bg-crimson-700 hover:bg-crimson-800 text-white text-xs font-bold uppercase tracking-wider transition shadow-sm">
+                    Jugar otra partida
+                </button>
+                <button type="button" onclick="closeVictoryModal(); showCategoryScreen();" class="flex-1 py-2.5 px-4 rounded-xl bg-slatearchive-800 hover:bg-slatearchive-700 text-parchment-50 text-xs font-bold uppercase tracking-wider transition">
+                    Cambiar categoría
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE GLOSARIO COMPLETO -->
+    <div id="glossary-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/75 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 border-parchment-400 rounded-2xl max-w-3xl w-full max-h-[86vh] flex flex-col shadow-2xl animate-fade-up">
+            <!-- Cabecera Modal -->
+            <div class="p-5 border-b border-parchment-300 flex items-center justify-between gap-3">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-crimson-700">Índice de Consulta</span>
+                    <h2 class="font-serif text-2xl font-bold text-slatearchive-900">Glosario Completo (49 Términos)</h2>
+                </div>
+                <button type="button" onclick="closeGlossaryModal()" class="w-9 h-9 rounded-xl bg-parchment-200 hover:bg-parchment-300 flex items-center justify-center text-slatearchive-900 font-bold transition" aria-label="Cerrar glosario">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Filtro rápido en el glosario -->
+            <div class="px-5 py-3 bg-parchment-100 border-b border-parchment-300 flex flex-wrap items-center gap-2">
+                <button type="button" onclick="filterGlossary('todas')" data-gfilter="todas" class="gfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slatearchive-900 text-white">Todas (49)</button>
+                <button type="button" onclick="filterGlossary('ejercito')" data-gfilter="ejercito" class="gfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-parchment-200 text-parchment-900 hover:bg-parchment-300">Ejército (20)</button>
+                <button type="button" onclick="filterGlossary('politica')" data-gfilter="politica" class="gfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-parchment-200 text-parchment-900 hover:bg-parchment-300">Política (16)</button>
+                <button type="button" onclick="filterGlossary('organizaciones')" data-gfilter="organizaciones" class="gfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-parchment-200 text-parchment-900 hover:bg-parchment-300">Organizaciones (12)</button>
+            </div>
+
+            <!-- Lista desplazable -->
+            <div id="glossary-list" class="p-5 overflow-y-auto custom-scroll space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // BANCO COMPLETO DE TÉRMINOS HISTÓRICOS POR CATEGORÍA
+        // =========================================================================
+        const VOCABULARY_DB = [
+            // --- EJÉRCITO Y TERMINOLOGÍA MILITAR (20) ---
+            { id: 'ej-1', category: 'ejercito', catLabel: 'Ejército', de: 'Wehrmacht', es: 'Fuerzas armadas alemanas', note: 'Nombre unificado de las fuerzas armadas de Alemania entre 1935 y 1945, compuestas por el Heer (ejército), la Kriegsmarine (armada) y la Luftwaffe (fuerza aérea).' },
+            { id: 'ej-2', category: 'ejercito', catLabel: 'Ejército', de: 'Luftwaffe', es: 'Fuerza aérea alemana', note: 'Rama aérea de la Wehrmacht reorganizada oficialmente en 1935. Desempeñó un papel clave en las campañas iniciales de la Segunda Guerra Mundial.' },
+            { id: 'ej-3', category: 'ejercito', catLabel: 'Ejército', de: 'Kriegsmarine', es: 'Marina de guerra', note: 'Armada de guerra alemana entre 1935 y 1945, conocida especialmente por la guerra submarina en el Atlántico y sus grandes acorazados.' },
+            { id: 'ej-4', category: 'ejercito', catLabel: 'Ejército', de: 'Heer', es: 'Ejército de tierra', note: 'Componente terrestre y mayor rama de las fuerzas armadas alemanas (Wehrmacht) durante la Segunda Guerra Mundial.' },
+            { id: 'ej-5', category: 'ejercito', catLabel: 'Ejército', de: 'Waffen-SS', es: 'Rama militar de las SS', note: 'Ala armada y de combate de las Schutzstaffel (SS) que luchó junto al ejército regular alemán en los distintos frentes.' },
+            { id: 'ej-6', category: 'ejercito', catLabel: 'Ejército', de: 'Panzer', es: 'Carro de combate', note: 'Abreviatura de Panzerkampfwagen («vehículo blindado de combate»), término con el que se designaba a los tanques alemanes.' },
+            { id: 'ej-7', category: 'ejercito', catLabel: 'Ejército', de: 'Panzergrenadier', es: 'Infantería mecanizada', note: 'Unidades de infantería motorizada o blindada diseñadas para acompañar y apoyar directamente a las divisiones de carros de combate.' },
+            { id: 'ej-8', category: 'ejercito', catLabel: 'Ejército', de: 'Fallschirmjäger', es: 'Paracaidistas', note: 'Tropas aerotransportadas de élite pertenecientes a la Luftwaffe, célebres por operaciones como la toma del fuerte Eben-Emael y Creta.' },
+            { id: 'ej-9', category: 'ejercito', catLabel: 'Ejército', de: 'Sturmpioniere', es: 'Ingenieros de asalto', note: 'Zapadores especializados en combate cercano encargados de despejar campos de minas, demoler fortificaciones y tender puentes bajo fuego.' },
+            { id: 'ej-10', category: 'ejercito', catLabel: 'Ejército', de: 'U-Boot', es: 'Submarino', note: 'Abreviatura de Unterseeboot («buque submarino»), pilar de la estrategia naval alemana para bloquear las rutas de suministro aliadas.' },
+            { id: 'ej-11', category: 'ejercito', catLabel: 'Ejército', de: 'Flak', es: 'Artillería antiaérea', note: 'Acrónimo de Flugzeugabwehrkanone («cañón de defensa contra aviones»), empleada tanto contra aeronaves como en funciones antitanque.' },
+            { id: 'ej-12', category: 'ejercito', catLabel: 'Ejército', de: 'Stuka', es: 'Bombardero en picado', note: 'Contracción de Sturzkampfflugzeug, asociada especialmente al avión Junkers Ju 87 y su característica sirena durante el descenso.' },
+            { id: 'ej-13', category: 'ejercito', catLabel: 'Ejército', de: 'Tiger', es: 'Tanque pesado Tiger', note: 'Carro de combate pesado (Panzerkampfwagen VI) introducido en 1942, famoso por su blindaje frontal y su cañón de 88 mm.' },
+            { id: 'ej-14', category: 'ejercito', catLabel: 'Ejército', de: 'Panther', es: 'Tanque Panther', note: 'Carro de combate medio (Panzerkampfwagen V) desplegado desde 1943 con blindaje inclinado y alta movilidad.' },
+            { id: 'ej-15', category: 'ejercito', catLabel: 'Ejército', de: 'Jagdpanzer', es: 'Cazacarros', note: 'Vehículo blindado sin torreta giratoria equipado con un cañón antitanque de gran potencia en casamata.' },
+            { id: 'ej-16', category: 'ejercito', catLabel: 'Ejército', de: 'Blitzkrieg', es: 'Guerra relámpago', note: 'Doctrina operacional basada en ataques rápidos y coordinados de aviación, tanques e infantería mecanizada para romper el frente enemigo.' },
+            { id: 'ej-17', category: 'ejercito', catLabel: 'Ejército', de: 'Kampfgruppe', es: 'Grupo de combate', note: 'Formación táctica flexible y temporal creada combinando unidades de distintas armas para cumplir una misión específica.' },
+            { id: 'ej-18', category: 'ejercito', catLabel: 'Ejército', de: 'Oberkommando', es: 'Alto mando', note: 'Estructura suprema de dirección militar, como el OKW (Alto Mando de las Fuerzas Armadas) o el OKH (Alto Mando del Ejército).' },
+            { id: 'ej-19', category: 'ejercito', catLabel: 'Ejército', de: 'Feldmarschall', es: 'Mariscal de campo', note: 'El rango militar más alto dentro de la jerarquía del ejército alemán y la Luftwaffe.' },
+            { id: 'ej-20', category: 'ejercito', catLabel: 'Ejército', de: 'Sturmgeschütz', es: 'Cañón de asalto', note: 'Vehículo blindado de apoyo directo a la infantería (como el StuG III), producido en grandes cantidades durante la guerra.' },
+
+            // --- POLÍTICA, ESTADO E IDEOLOGÍA (16) ---
+            { id: 'pol-1', category: 'politica', catLabel: 'Política', de: 'Anschluss', es: 'Anexión de Austria por Alemania en 1938', note: 'Incorporación política y territorial de Austria al Tercer Reich en marzo de 1938, contraviniendo el Tratado de Versalles.' },
+            { id: 'pol-2', category: 'politica', catLabel: 'Política', de: 'Führer', es: 'Líder; título de Hitler', note: 'Título adoptado por Adolf Hitler en 1934 al fusionar la cancillería y la presidencia, concentrando todo el poder estatal.' },
+            { id: 'pol-3', category: 'politica', catLabel: 'Política', de: 'Reich', es: 'Imperio o Estado', note: 'Término histórico alemán utilizado para designar al Estado o imperio alemán en distintas etapas de su historia.' },
+            { id: 'pol-4', category: 'politica', catLabel: 'Política', de: 'Drittes Reich', es: 'Tercer Reich', note: 'Denominación propagandística con la que el régimen nazi designó a Alemania entre 1933 y 1945.' },
+            { id: 'pol-5', category: 'politica', catLabel: 'Política', de: 'Volksgemeinschaft', es: 'Comunidad nacional del pueblo', note: 'Concepto ideológico nazi que promovía una sociedad cohesionada bajo criterios raciales y supeditada al Estado.' },
+            { id: 'pol-6', category: 'politica', catLabel: 'Política', de: 'Lebensraum', es: 'Espacio vital', note: 'Doctrina expansionista que justificaba la conquista de territorios en Europa Oriental para el asentamiento alemán.' },
+            { id: 'pol-7', category: 'politica', catLabel: 'Política', de: 'Gleichschaltung', es: 'Coordinación y sometimiento de instituciones al régimen', note: 'Proceso mediante el cual el partido nazi controló y alineó todas las instituciones políticas, sociales y culturales.' },
+            { id: 'pol-8', category: 'politica', catLabel: 'Política', de: 'Nationalsozialismus', es: 'Nacionalsocialismo', note: 'Ideología totalitaria, ultranacionalista y antisemita encabezada por Adolf Hitler y el NSDAP.' },
+            { id: 'pol-9', category: 'politica', catLabel: 'Política', de: 'Parteigenosse', es: 'Camarada de partido', note: 'Tratamiento oficial utilizado entre los miembros afiliados al Partido Nacionalsocialista (abreviado Pg.).' },
+            { id: 'pol-10', category: 'politica', catLabel: 'Política', de: 'Reichsführer-SS', es: 'Máximo jefe de las SS', note: 'Título especial creado para el comandante supremo de las Schutzstaffel, cargo ocupado por Heinrich Himmler desde 1929.' },
+            { id: 'pol-11', category: 'politica', catLabel: 'Política', de: 'Reichstag', es: 'Parlamento alemán', note: 'Asamblea legislativa de Alemania cuyo edificio en Berlín sufrió un célebre incendio en febrero de 1933.' },
+            { id: 'pol-12', category: 'politica', catLabel: 'Política', de: 'Gauleiter', es: 'Dirigente regional del partido nazi', note: 'Líder político de una demarcación territorial del partido (Gau), con amplios poderes administrativos.' },
+            { id: 'pol-13', category: 'politica', catLabel: 'Política', de: 'Reichsleiter', es: 'Alto dirigente del partido', note: 'Segundo rango político más alto del NSDAP, solo por debajo del propio Führer, con responsabilidad nacional.' },
+            { id: 'pol-14', category: 'politica', catLabel: 'Política', de: 'Volksdeutsche', es: 'Personas de origen alemán fuera de Alemania', note: 'Minorías étnicas de lengua y ascendencia alemana residentes fuera de las fronteras del Reich de 1937.' },
+            { id: 'pol-15', category: 'politica', catLabel: 'Política', de: 'Blut und Boden', es: 'Sangre y suelo; lema ideológico nazi', note: 'Consigna agraria y racial que vinculaba la ascendencia étnica («sangre») con el territorio cultivado («suelo»).' },
+            { id: 'pol-16', category: 'politica', catLabel: 'Política', de: 'Ein Volk, ein Reich, ein Führer', es: 'Un pueblo, un imperio, un líder', note: 'Lema propagandístico central del régimen que sintetizaba el principio de autoridad absoluta y unidad nacional.' },
+
+            // --- ORGANIZACIONES Y APARATO DEL RÉGIMEN (12) ---
+            { id: 'org-1', category: 'organizaciones', catLabel: 'Organizaciones', de: 'SS (Schutzstaffel)', es: 'Organización paramilitar y represiva nazi', note: '«Escuadras de Protección» dirigidas por Heinrich Himmler; controlaron el aparato policial, los campos y las unidades Waffen-SS.' },
+            { id: 'org-2', category: 'organizaciones', catLabel: 'Organizaciones', de: 'SA (Sturmabteilung)', es: 'Organización paramilitar del partido nazi', note: '«Sección de Asalto» o «Camisas Pardas», fuerza de choque inicial del NSDAP purgada tras la Noche de los Cuchillos Largos en 1934.' },
+            { id: 'org-3', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Gestapo', es: 'Policía secreta del Estado', note: 'Contracción de Geheime Staatspolizei, encargada de perseguir cualquier oposición política sin control judicial.' },
+            { id: 'org-4', category: 'organizaciones', catLabel: 'Organizaciones', de: 'SD (Sicherheitsdienst)', es: 'Servicio de inteligencia de las SS', note: 'Agencia de espionaje e información interna de las SS y del partido nazi fundada por Reinhard Heydrich.' },
+            { id: 'org-5', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Abwehr', es: 'Servicio de inteligencia militar', note: 'Organismo de inteligencia y contraespionaje de la Wehrmacht dirigido durante gran parte de la guerra por el almirante Wilhelm Canaris.' },
+            { id: 'org-6', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Hitlerjugend', es: 'Juventudes Hitlerianas', note: 'Organización juvenil del partido nazi destinada al adoctrinamiento ideológico y premilitar de los varones jóvenes.' },
+            { id: 'org-7', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Bund Deutscher Mädel', es: 'Liga de Muchachas Alemanas', note: 'Sección femenina de las Juventudes Hitlerianas, orientada a formar a las jóvenes en los valores domésticos e ideológicos del régimen.' },
+            { id: 'org-8', category: 'organizaciones', catLabel: 'Organizaciones', de: 'NSDAP', es: 'Partido Nazi', note: 'Siglas de Nationalsozialistische Deutsche Arbeiterpartei (Partido Nacionalsocialista Obrero Alemán), único partido legal desde 1933.' },
+            { id: 'org-9', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Einsatzgruppen', es: 'Unidades responsables de asesinatos masivos', note: 'Escuadrones móviles de exterminio de las SS que actuaron tras el avance alemán en Europa Oriental.' },
+            { id: 'org-10', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Ordnungspolizei', es: 'Policía uniformada', note: 'Cuerpo regular de policía uniformada del Tercer Reich (abreviado Orpo), subordinado también a Heinrich Himmler.' },
+            { id: 'org-11', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Volkssturm', es: 'Milicia popular creada en 1944', note: 'Fuerza de defensa territorial formada en los últimos meses de la guerra con varones de entre 16 y 60 años no movilizados.' },
+            { id: 'org-12', category: 'organizaciones', catLabel: 'Organizaciones', de: 'Todt-Organisation', es: 'Organización de construcción e ingeniería militar', note: 'Grupo de ingeniería civil y militar encargado de grandes obras estratégicas como la Línea Sigfrido y el Muro Atlántico.' },
+
+            // --- TÉRMINO ADICIONAL PARA MODALIDAD MIXTA (1) ---
+            { id: 'gen-1', category: 'general', catLabel: 'Archivo General', de: 'Bunker', es: 'Refugio', note: 'Construcción fortificada subterránea de hormigón armado diseñada para proteger a tropas, población o mandos frente a bombardeos.' }
+        ];
+
+        const CATEGORY_NAMES = {
+            ejercito: 'Ejército y Terminología Militar',
+            politica: 'Política, Estado e Ideología',
+            organizaciones: 'Organizaciones y Aparato',
+            mixta: 'Modalidad Mixta (Global)'
+        };
+
+        const DIFFICULTIES = {
+            facil: { pairs: 6, cols: 'grid-cols-3 sm:grid-cols-4' },
+            medio: { pairs: 8, cols: 'grid-cols-4' },
+            dificil: { pairs: 10, cols: 'grid-cols-4 sm:grid-cols-5' }
+        };
+
+        // =========================================================================
+        // ESTADO DEL JUEGO
+        // =========================================================================
+        let currentCategory = 'ejercito';
+        let currentDifficulty = 'facil';
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let totalPairs = 6;
+        let moves = 0;
+        let lockBoard = false;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let gameStarted = false;
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        // =========================================================================
+        // SINTETIZADOR DE EFECTOS DE SONIDO (WEB AUDIO API)
+        // =========================================================================
+        function playTone(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'flip') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(340, now);
+                    osc.frequency.exponentialRampToValueAtTime(520, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                } else if (type === 'match') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // Do5
+                    osc.frequency.setValueAtTime(659.25, now + 0.09); // Mi5
+                    osc.frequency.setValueAtTime(783.99, now + 0.18); // Sol5
+                    gain.gain.setValueAtTime(0.11, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(190, now);
+                    osc.frequency.linearRampToValueAtTime(145, now + 0.18);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'victory') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'triangle';
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.11);
+                        g.gain.setValueAtTime(0.11, now + idx * 0.11);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.35);
+                        o.start(now + idx * 0.11);
+                        o.stop(now + idx * 0.11 + 0.35);
+                    });
+                }
+            } catch (e) {
+                // Silenciar si el navegador bloquea el contexto de audio
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('icon-sound-on').classList.toggle('hidden', !soundEnabled);
+            document.getElementById('icon-sound-off').classList.toggle('hidden', soundEnabled);
+        }
+
+        // =========================================================================
+        // NAVEGACIÓN ENTRE PANTALLAS Y CONFIGURACIÓN
+        // =========================================================================
+        function showCategoryScreen() {
+            stopTimer();
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('category-screen').classList.remove('hidden');
+            const btnCat = document.getElementById('btn-change-category');
+            btnCat.classList.add('hidden');
+            btnCat.classList.remove('flex');
+        }
+
+        function selectCategory(category) {
+            currentCategory = category;
+            document.getElementById('category-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            const btnCat = document.getElementById('btn-change-category');
+            btnCat.classList.remove('hidden');
+            btnCat.classList.add('flex');
+
+            document.getElementById('active-category-label').textContent = CATEGORY_NAMES[category];
+            setDifficulty(currentDifficulty);
+        }
+
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.classList.remove('bg-slatearchive-900', 'text-parchment-50', 'shadow-sm');
+                btn.classList.add('text-parchment-900', 'hover:bg-parchment-300/60');
+            });
+            const activeBtn = document.getElementById(`diff-${level}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-parchment-900', 'hover:bg-parchment-300/60');
+                activeBtn.classList.add('bg-slatearchive-900', 'text-parchment-50', 'shadow-sm');
+            }
+            initGame();
+        }
+
+        // =========================================================================
+        // INICIALIZACIÓN Y LÓGICA DEL TABLERO MEMORY
+        // =========================================================================
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function getAdaptiveTextSize(text, lang) {
+            const len = text.length;
+            if (lang === 'de') {
+                if (len <= 10) return 'text-xl sm:text-2xl font-bold leading-tight';
+                if (len <= 18) return 'text-lg sm:text-xl font-bold leading-tight';
+                return 'text-base sm:text-lg font-bold leading-snug';
+            } else {
+                if (len <= 14) return 'text-lg sm:text-xl font-semibold leading-tight';
+                if (len <= 28) return 'text-base sm:text-lg font-semibold leading-snug';
+                return 'text-sm sm:text-base font-semibold leading-snug';
+            }
+        }
+
+        function initGame() {
+            stopTimer();
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            secondsElapsed = 0;
+            gameStarted = false;
+            lockBoard = false;
+
+            const config = DIFFICULTIES[currentDifficulty];
+            totalPairs = config.pairs;
+
+            // Actualizar contadores
+            document.getElementById('stat-pairs').textContent = `0 / ${totalPairs}`;
+            document.getElementById('stat-moves').textContent = '0';
+            document.getElementById('stat-timer').textContent = '00:00';
+
+            // Resetear panel lateral de forma segura
+            const notePlaceholder = document.getElementById('note-placeholder');
+            const noteContent = document.getElementById('note-content');
+            if (notePlaceholder) notePlaceholder.classList.remove('hidden');
+            if (noteContent) noteContent.classList.add('hidden');
+
+            // Filtrar banco de términos por categoría
+            const pool = currentCategory === 'mixta'
+                ? VOCABULARY_DB
+                : VOCABULARY_DB.filter(item => item.category === currentCategory);
+
+            const selectedTerms = shuffleArray(pool).slice(0, totalPairs);
+
+            // Crear mazo duplicado (1 tarjeta Alemán + 1 tarjeta Español por término)
+            const deck = [];
+            selectedTerms.forEach(term => {
+                deck.push({
+                    pairId: term.id,
+                    lang: 'de',
+                    label: 'Alemán',
+                    text: term.de,
+                    termData: term
+                });
+                deck.push({
+                    pairId: term.id,
+                    lang: 'es',
+                    label: 'Español',
+                    text: term.es,
+                    termData: term
+                });
+            });
+
+            const shuffledDeck = shuffleArray(deck);
+            const board = document.getElementById('game-board');
+            board.className = `grid ${config.cols} gap-2.5 sm:gap-3.5`;
+            board.innerHTML = '';
+
+            shuffledDeck.forEach((cardData, index) => {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'card-scene aspect-[5/4] sm:aspect-[4/3] min-h-[120px] sm:min-h-[140px]';
+
+                const cardInner = document.createElement('div');
+                cardInner.className = 'card-inner';
+                cardInner.dataset.pairId = cardData.pairId;
+                cardInner.dataset.lang = cardData.lang;
+                cardInner.dataset.index = index;
+
+                // Reverso de la tarjeta
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-face card-back p-2';
+                cardBack.innerHTML = `
+                    <div class="card-back-pattern absolute inset-0"></div>
+                    <div class="relative z-10 w-9 h-9 sm:w-11 sm:h-11 rounded-full border border-gold-500/45 bg-slatearchive-900/70 flex items-center justify-center">
+                        <span class="font-serif text-gold-400 text-xs sm:text-sm font-bold tracking-widest">§</span>
+                    </div>
+                    <span class="relative z-10 mt-1.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-parchment-300/60">Archivo</span>
+                `;
+
+                // Anverso de la tarjeta
+                const cardFront = document.createElement('div');
+                const isGerman = cardData.lang === 'de';
+                cardFront.className = `card-face card-front ${isGerman ? 'card-de' : 'card-es'} p-2.5 sm:p-3 text-center justify-between`;
+
+                const badgeClass = isGerman
+                    ? 'bg-crimson-700/10 text-crimson-700 border-crimson-700/20'
+                    : 'bg-slatearchive-800/10 text-slatearchive-800 border-slatearchive-800/20';
+
+                const textStyle = getAdaptiveTextSize(cardData.text, cardData.lang);
+                const fontFamilyClass = isGerman ? 'font-serif text-slatearchive-950' : 'font-sans text-slatearchive-900';
+
+                cardFront.innerHTML = `
+                    <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${badgeClass}">
+                        ${cardData.label}
+                    </span>
+                    <div class="flex-1 flex items-center justify-center px-1.5 my-1 overflow-y-auto">
+                        <p class="${fontFamilyClass} ${textStyle} break-words">
+                            ${cardData.text}
+                        </p>
+                    </div>
+                    <span class="w-6 h-0.5 rounded-full ${isGerman ? 'bg-crimson-700/35' : 'bg-slatearchive-800/30'}"></span>
+                `;
+
+                cardInner.appendChild(cardBack);
+                cardInner.appendChild(cardFront);
+                cardWrapper.appendChild(cardInner);
+
+                cardInner.addEventListener('click', () => handleCardFlip(cardInner, cardData.termData));
+                board.appendChild(cardWrapper);
+            });
+        }
+
+        function handleCardFlip(cardElement, termData) {
+            if (lockBoard) return;
+            if (cardElement.classList.contains('is-flipped') || cardElement.classList.contains('is-matched')) return;
+
+            if (!gameStarted) {
+                gameStarted = true;
+                startTimer();
+            }
+
+            playTone('flip');
+            cardElement.classList.add('is-flipped');
+            flippedCards.push({ element: cardElement, termData });
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('stat-moves').textContent = moves;
+                checkForMatch();
+            }
+        }
+
+        function checkForMatch() {
+            const [first, second] = flippedCards;
+            const isMatch = first.element.dataset.pairId === second.element.dataset.pairId;
+
+            if (isMatch) {
+                lockBoard = true;
+                setTimeout(() => {
+                    playTone('match');
+                    first.element.classList.add('is-matched', 'animate-match');
+                    second.element.classList.add('is-matched', 'animate-match');
+
+                    matchedPairs++;
+                    document.getElementById('stat-pairs').textContent = `${matchedPairs} / ${totalPairs}`;
+
+                    revealHistoricalNote(first.termData);
+
+                    flippedCards = [];
+                    lockBoard = false;
+
+                    if (matchedPairs === totalPairs) {
+                        handleVictory();
+                    }
+                }, 260);
+            } else {
+                lockBoard = true;
+                setTimeout(() => {
+                    playTone('wrong');
+                    first.element.classList.add('animate-shake');
+                    second.element.classList.add('animate-shake');
+                }, 380);
+
+                setTimeout(() => {
+                    first.element.classList.remove('is-flipped', 'animate-shake');
+                    second.element.classList.remove('is-flipped', 'animate-shake');
+                    flippedCards = [];
+                    lockBoard = false;
+                }, 950);
+            }
+        }
+
+        function revealHistoricalNote(termData) {
+            const placeholder = document.getElementById('note-placeholder');
+            const content = document.getElementById('note-content');
+            if (!placeholder || !content) return;
+
+            placeholder.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            // Reiniciar animación de entrada
+            content.classList.remove('animate-fade-up');
+            void content.offsetWidth;
+            content.classList.add('animate-fade-up');
+
+            document.getElementById('note-category-tag').textContent = termData.catLabel;
+            document.getElementById('note-german').textContent = termData.de;
+            document.getElementById('note-spanish').textContent = termData.es;
+            document.getElementById('note-description').textContent = termData.note;
+        }
+
+        // =========================================================================
+        // TEMPORIZADOR Y VICTORIA
+        // =========================================================================
+        function formatTime(secs) {
+            const m = String(Math.floor(secs / 60)).padStart(2, '0');
+            const s = String(secs % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            stopTimer();
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('stat-timer').textContent = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function handleVictory() {
+            stopTimer();
+            setTimeout(() => {
+                playTone('victory');
+                const accuracy = moves > 0 ? Math.min(100, Math.round((totalPairs / moves) * 100)) : 100;
+
+                document.getElementById('victory-category').textContent = CATEGORY_NAMES[currentCategory];
+                document.getElementById('victory-time').textContent = formatTime(secondsElapsed);
+                document.getElementById('victory-moves').textContent = moves;
+                document.getElementById('victory-accuracy').textContent = `${accuracy}%`;
+
+                const modal = document.getElementById('victory-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }, 450);
+        }
+
+        function closeVictoryModal() {
+            const modal = document.getElementById('victory-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // =========================================================================
+        // GLOSARIO COMPLETO CON FILTROS
+        // =========================================================================
+        function openGlossaryModal() {
+            filterGlossary('todas');
+            const modal = document.getElementById('glossary-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeGlossaryModal() {
+            const modal = document.getElementById('glossary-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function filterGlossary(filter) {
+            document.querySelectorAll('.gfilter-btn').forEach(btn => {
+                const isSelected = btn.dataset.gfilter === filter;
+                btn.classList.toggle('bg-slatearchive-900', isSelected);
+                btn.classList.toggle('text-white', isSelected);
+                btn.classList.toggle('bg-parchment-200', !isSelected);
+                btn.classList.toggle('text-parchment-900', !isSelected);
+            });
+
+            const listContainer = document.getElementById('glossary-list');
+            const items = filter === 'todas'
+                ? VOCABULARY_DB
+                : VOCABULARY_DB.filter(item => item.category === filter);
+
+            listContainer.innerHTML = items.map(item => `
+                <div class="bg-white/90 border border-parchment-300 rounded-xl p-4 shadow-sm">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+                        <h4 class="font-serif text-lg font-bold text-slatearchive-900">${item.de}</h4>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-parchment-200 text-parchment-900">
+                            ${item.catLabel}
+                        </span>
+                    </div>
+                    <p class="text-xs font-bold text-crimson-700 mb-1.5">${item.es}</p>
+                    <p class="text-xs text-parchment-800 leading-relaxed">${item.note}</p>
+                </div>
+            `).join('');
+        }
+
+        // Cerrar modales al hacer clic fuera del contenido
+        window.addEventListener('click', (e) => {
+            const victoryModal = document.getElementById('victory-modal');
+            const glossaryModal = document.getElementById('glossary-modal');
+            if (e.target === victoryModal) closeVictoryModal();
+            if (e.target === glossaryModal) closeGlossaryModal();
+        });
+    </script>
+</body>
+</html>

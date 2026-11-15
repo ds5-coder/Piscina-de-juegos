@@ -976,6 +976,70 @@ const games = [
     image: "",
     previewUrl: "games/kosmopolis/index.html",
     playUrl: "games/kosmopolis/index.html"
+  },
+  {
+    id: 50,
+    title: "Código Secreto: Archivo Histórico",
+    category: "Estrategia",
+    collection: "Personajes históricos",
+    mode: "Equipos",
+    duration: "15-30 min",
+    description:
+      "Un juego de equipos y pistas con 106 personajes históricos entre 1789 y 1945. Da una palabra y un número para guiar a tu equipo y evita al Asesino.",
+    longDescription:
+      "Un juego de palabras y deducción por equipos en el que los personajes de la Revolución Francesa, las guerras mundiales y la ciencia de la época forman el tablero.",
+    gradient: "linear-gradient(135deg, rgba(31,58,147,0.9), rgba(220,38,38,0.85))",
+    image: "assets/game-covers/codigo_secreto.png",
+    previewUrl: "games/codigo_secreto_historico_1789_1945.html",
+    playUrl: "games/codigo_secreto_historico_1789_1945.html"
+  },
+  {
+    id: 51,
+    title: "¿Quién es Quién? Archivo Histórico",
+    category: "Educativo",
+    collection: "Personajes históricos",
+    mode: "2 jugadores",
+    duration: "10 min",
+    description:
+      "Adivina el personaje histórico antes que tu rival haciendo preguntas de sí o no, desde la Revolución Francesa hasta la Segunda Guerra Mundial.",
+    longDescription:
+      "Un juego de preguntas y eliminación en el que cada jugador elige un personaje secreto del tablero y debe descubrir el del rival.",
+    gradient: "linear-gradient(135deg, rgba(220,38,38,0.9), rgba(37,99,235,0.85))",
+    image: "assets/game-covers/quien_es_quien.png",
+    previewUrl: "games/quien_es_quien_historico_1789_1945.html",
+    playUrl: "games/quien_es_quien_historico_1789_1945.html"
+  },
+  {
+    id: 52,
+    title: "Memory de Vocabulario Alemán (1933–1945)",
+    category: "Educativo",
+    collection: "Segunda Guerra Mundial",
+    mode: "Memoria",
+    duration: "5 min",
+    description:
+      "Encuentra las parejas de vocabulario alemán relacionado con el periodo 1933–1945 y repasa palabras clave de la historia mientras juegas.",
+    longDescription:
+      "Un juego de memoria para aprender vocabulario alemán con términos de la época nazi y la Segunda Guerra Mundial, emparejando cada palabra con su significado.",
+    gradient: "linear-gradient(135deg, rgba(30,41,59,0.92), rgba(212,175,55,0.85))",
+    image: "assets/game-covers/memory_historia.png",
+    previewUrl: "games/memory_vocabulario_aleman_1933_1945.html",
+    playUrl: "games/memory_vocabulario_aleman_1933_1945.html"
+  },
+  {
+    id: 53,
+    title: "Sospechosos Inusuales",
+    category: "Lógica",
+    collection: "Filosofía",
+    mode: "Misterio",
+    duration: "15 min",
+    description:
+      "Descubre al culpable en secreto entre 12 sospechosos con preguntas sobre su apariencia. Elimina a los inocentes sin descartar al culpable.",
+    longDescription:
+      "Un juego de deducción en el que el testigo responde solo según la apariencia de los sospechosos, y tienes 10 preguntas para acusar al culpable.",
+    gradient: "linear-gradient(135deg, rgba(234,179,8,0.9), rgba(88,28,135,0.85))",
+    image: "assets/game-covers/sospechosos.jpg",
+    previewUrl: "games/sospechosos_inusuales.html",
+    playUrl: "games/sospechosos_inusuales.html"
   }
 ];
 
@@ -1039,7 +1103,11 @@ const gameTranslations = {
     46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." },
     47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." },
     48: { title: "Socrates: the Path of Wisdom", description: "A platform adventure through classical Greece: Socrates recovers the Scrolls of Truth stolen by the sophists, by asking questions.", longDescription: "A platformer where you run, jump and dodge traps through the Athenian Agora and other worlds, defeat sophists with questions and unlock a gallery of philosophical characters and inscriptions." },
-    49: { title: "Kosmopolis", description: "Nico, a 2026 student, gets stranded in ancient Greece with his grandfather's time car and meets the first philosophers.", longDescription: "A 3D browser adventure: travel through Athens, the Aegean and Miletus in 13 chapters, talk to philosophers such as Thales and Anaximander (the apeiron, the gnomon), play in the taverns, drive the time car and sail between cities." }
+    49: { title: "Kosmopolis", description: "Nico, a 2026 student, gets stranded in ancient Greece with his grandfather's time car and meets the first philosophers.", longDescription: "A 3D browser adventure: travel through Athens, the Aegean and Miletus in 13 chapters, talk to philosophers such as Thales and Anaximander (the apeiron, the gnomon), play in the taverns, drive the time car and sail between cities." },
+    50: { title: "Secret Code: Historical Archive", description: "A team word-and-clue game with 106 historical figures from 1789 to 1945. Give one word and a number to guide your team and avoid the Assassin.", longDescription: "A team deduction and word game where figures from the French Revolution, the world wars and the science of the era make up the board." },
+    51: { title: "Who Is Who? Historical Archive", description: "Guess the historical figure before your rival by asking yes-or-no questions, from the French Revolution to World War II.", longDescription: "A question-and-elimination game in which each player picks a secret figure from the board and must work out the rival's." },
+    52: { title: "German Vocabulary Memory (1933–1945)", description: "Find the pairs of German vocabulary from the 1933–1945 period and review key words from history as you play.", longDescription: "A memory game for learning German vocabulary with terms from the Nazi era and World War II, matching each word with its meaning." },
+    53: { title: "Unusual Suspects", description: "Uncover the culprit hidden among 12 suspects by asking about their appearance. Eliminate the innocent without ruling out the guilty one.", longDescription: "A deduction game in which the witness answers only from the suspects' appearance, and you have 10 questions to accuse the culprit." }
   }
 };
 
