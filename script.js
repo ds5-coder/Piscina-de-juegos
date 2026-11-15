@@ -981,7 +981,8 @@ const games = [
     id: 50,
     title: "Código Secreto: Archivo Histórico",
     category: "Estrategia",
-    collection: "Personajes históricos",
+    collection: "Revolución Francesa",
+    alsoIn: ["Revolución Industrial", "Revolución Rusa", "Revolución Americana", "Ilustración", "Primera Guerra Mundial", "Segunda Guerra Mundial", "Franquismo"],
     mode: "Equipos",
     duration: "15-30 min",
     description:
@@ -997,7 +998,8 @@ const games = [
     id: 51,
     title: "¿Quién es Quién? Archivo Histórico",
     category: "Educativo",
-    collection: "Personajes históricos",
+    collection: "Revolución Francesa",
+    alsoIn: ["Revolución Industrial", "Revolución Rusa", "Revolución Americana", "Ilustración", "Primera Guerra Mundial", "Segunda Guerra Mundial", "Franquismo"],
     mode: "2 jugadores",
     duration: "10 min",
     description:
@@ -1027,7 +1029,7 @@ const games = [
   },
   {
     id: 53,
-    title: "Sospechosos Inusuales",
+    title: "Doxa y Episteme",
     category: "Lógica",
     collection: "Filosofía",
     mode: "Misterio",
@@ -1038,8 +1040,8 @@ const games = [
       "Un juego de deducción en el que el testigo responde solo según la apariencia de los sospechosos, y tienes 10 preguntas para acusar al culpable.",
     gradient: "linear-gradient(135deg, rgba(234,179,8,0.9), rgba(88,28,135,0.85))",
     image: "assets/game-covers/sospechosos.jpg",
-    previewUrl: "games/sospechosos_inusuales.html",
-    playUrl: "games/sospechosos_inusuales.html"
+    previewUrl: "games/doxa_episteme.html",
+    playUrl: "games/doxa_episteme.html"
   }
 ];
 
@@ -1107,7 +1109,7 @@ const gameTranslations = {
     50: { title: "Secret Code: Historical Archive", description: "A team word-and-clue game with 106 historical figures from 1789 to 1945. Give one word and a number to guide your team and avoid the Assassin.", longDescription: "A team deduction and word game where figures from the French Revolution, the world wars and the science of the era make up the board." },
     51: { title: "Who Is Who? Historical Archive", description: "Guess the historical figure before your rival by asking yes-or-no questions, from the French Revolution to World War II.", longDescription: "A question-and-elimination game in which each player picks a secret figure from the board and must work out the rival's." },
     52: { title: "German Vocabulary Memory (1933–1945)", description: "Find the pairs of German vocabulary from the 1933–1945 period and review key words from history as you play.", longDescription: "A memory game for learning German vocabulary with terms from the Nazi era and World War II, matching each word with its meaning." },
-    53: { title: "Unusual Suspects", description: "Uncover the culprit hidden among 12 suspects by asking about their appearance. Eliminate the innocent without ruling out the guilty one.", longDescription: "A deduction game in which the witness answers only from the suspects' appearance, and you have 10 questions to accuse the culprit." }
+    53: { title: "Doxa and Episteme", description: "Uncover the culprit hidden among 12 suspects by asking about their appearance. Eliminate the innocent without ruling out the guilty one.", longDescription: "A deduction game in which the witness answers only from the suspects' appearance, and you have 10 questions to accuse the culprit." }
   }
 };
 
