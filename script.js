@@ -945,20 +945,20 @@ const games = [
   },
   {
     id: 48,
-    title: "Sócrates: el camino de la sabiduría",
+    title: "El camino de la filosofía",
     category: "Educativo",
     collection: "Filosofía",
     subcollection: "Filosofía antigua",
     mode: "Plataformas",
     duration: "15 min",
     description:
-      "Una aventura de plataformas por la Grecia clásica: Sócrates recupera los Pergaminos de la Verdad que los sofistas han robado, haciendo preguntas.",
+      "Un juego de plataformas por la historia de la filosofía, desde Mileto hasta Nietzsche: salta, esquiva y descubre las ideas de los grandes pensadores.",
     longDescription:
-      "Un juego de plataformas en el que corres, saltas y esquivas trampas por el Ágora de Atenas y otros mundos, derrotas sofistas con preguntas y desbloqueas una galería de personajes e inscripciones filosóficas.",
+      "Corre y salta por los mundos de cada época filosófica, esquiva trampas, reúne ideas y citas de los grandes filósofos y aprende qué defendía cada escuela. «La filosofía es un deporte de riesgo».",
     gradient: "linear-gradient(135deg, rgba(60,140,210,0.92), rgba(230,180,70,0.85))",
     image: "assets/game-covers/socrates_agora.png",
-    previewUrl: "games/socrates_camino_sabiduria.html",
-    playUrl: "games/socrates_camino_sabiduria.html"
+    previewUrl: "games/el_camino_de_la_filosofia.html",
+    playUrl: "games/el_camino_de_la_filosofia.html"
   },
   {
     id: 49,
@@ -1104,7 +1104,7 @@ const gameTranslations = {
     45: { title: "Strolling along the Seashore", description: "Explore Joaquín Sorolla's painting point by point: the Mediterranean light, the white dresses and the loose brushwork (the page itself is in Spanish).", longDescription: "An interactive page with the keys to 'Strolling along the Seashore' (1909), a work of Luminism with Impressionist influence." },
     46: { title: "Franco, in Order (1934-1975)", description: "Put the 16 events of Franco's life in order, from oldest to most recent, from 1934 to his death in 1975, with 5 tries and 4 minutes.", longDescription: "An event-ordering game: drag or select each event of Franco's life (1934-1975) into place; the ones you get right are locked with a padlock." },
     47: { title: "Match 3D: football", description: "5-a-side football in a 3D stadium: when you are about to shoot, time freezes and you draw the curve of the ball. Quick match or 8-team tournament.", longDescription: "A 3D football game where you pass, shoot by drawing the ball's trajectory and stop the power and accuracy bars in the green; when the CPU shoots, you are the goalkeeper." },
-    48: { title: "Socrates: the Path of Wisdom", description: "A platform adventure through classical Greece: Socrates recovers the Scrolls of Truth stolen by the sophists, by asking questions.", longDescription: "A platformer where you run, jump and dodge traps through the Athenian Agora and other worlds, defeat sophists with questions and unlock a gallery of philosophical characters and inscriptions." },
+    48: { title: "The Path of Philosophy", description: "A platformer through the history of philosophy, from Miletus to Nietzsche: jump, dodge and discover the ideas of the great thinkers.", longDescription: "Run and jump through the worlds of each philosophical era, dodge traps, collect ideas and quotes from the great philosophers and learn what each school defended. “Philosophy is a risk sport”." },
     49: { title: "Kosmopolis", description: "Nico, a 2026 student, gets stranded in ancient Greece with his grandfather's time car and meets the first philosophers.", longDescription: "A 3D browser adventure: travel through Athens, the Aegean and Miletus in 13 chapters, talk to philosophers such as Thales and Anaximander (the apeiron, the gnomon), play in the taverns, drive the time car and sail between cities." },
     50: { title: "Secret Code: Historical Archive", description: "A team word-and-clue game with 106 historical figures from 1789 to 1945. Give one word and a number to guide your team and avoid the Assassin.", longDescription: "A team deduction and word game where figures from the French Revolution, the world wars and the science of the era make up the board." },
     51: { title: "Who Is Who? Historical Archive", description: "Guess the historical figure before your rival by asking yes-or-no questions, from the French Revolution to World War II.", longDescription: "A question-and-elimination game in which each player picks a secret figure from the board and must work out the rival's." },
