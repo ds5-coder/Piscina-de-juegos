@@ -3,437 +3,943 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doxa y Episteme - Juego Web</title>
+    <title id="pageTitle">Sospechosos Inusuales - Edición Bilingüe (ES / EN)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #2c3e50;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2334495e' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-color: #161d27;
+            background-image: radial-gradient(#263244 1px, transparent 1px);
+            background-size: 24px 24px;
             color: #ecf0f1;
         }
         .title-font {
             font-family: 'Special Elite', cursive;
         }
-        
         .suspect-card {
-            transition: all 0.3s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            user-select: none;
         }
-        
         .suspect-card:hover:not(.eliminated) {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.6);
+            border-color: #facc15;
             cursor: pointer;
         }
-
         .eliminated {
-            filter: grayscale(100%) opacity(0.6);
-            pointer-events: none;
+            filter: grayscale(100%) opacity(0.35);
+            transform: scale(0.96);
         }
-
         .eliminated::after {
             content: '❌';
             position: absolute;
-            top: 50%;
+            top: 45%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
-            opacity: 0.8;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 4.5rem;
+            opacity: 0.9;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            pointer-events: none;
         }
-
         .final-highlight {
             border-color: #facc15 !important;
-            box-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+            box-shadow: 0 0 22px rgba(250, 204, 21, 0.65);
             animation: pulse-gold 1.5s infinite;
         }
-
         @keyframes pulse-gold {
             0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
             70% { box-shadow: 0 0 0 12px rgba(250, 204, 21, 0); }
             100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
         }
-
-        /* Modal Styles */
-        #modal {
-            display: none;
-            backdrop-filter: blur(5px);
+        /* Scrollbar personalizado para historial */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        #modal.show {
-            display: flex;
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-8">
+<body class="min-h-screen flex flex-col p-3 sm:p-6 md:p-8">
 
-    <!-- Header -->
-    <header class="text-center mb-6">
-        <h1 class="text-4xl md:text-5xl font-bold title-font text-yellow-400 drop-shadow-lg mb-2">🕵️‍♂️ Doxa y Episteme 🕵️‍♀️</h1>
-        <p class="text-gray-300 max-w-2xl mx-auto mb-4">
-            El juego ha elegido un Culpable en secreto. El Testigo responderá a preguntas basándose <strong class="text-white">solo</strong> en su apariencia. Elimina a los inocentes, ¡pero cuidado con eliminar al culpable!
-        </p>
-        <button onclick="showCulprit()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-colors border border-purple-400">
-            👁️ Ver Culpable (Solo Testigo)
-        </button>
+    <!-- Cabecera -->
+    <header class="max-w-6xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-700/80">
+        <div class="text-center md:text-left">
+            <h1 id="mainTitle" class="text-3xl sm:text-4xl md:text-5xl font-bold title-font text-yellow-400 drop-shadow-md">
+                🕵️‍♂️ Sospechosos Inusuales
+            </h1>
+            <p id="subTitle" class="text-xs sm:text-sm text-gray-400 mt-1">
+                Base de datos: <span class="text-yellow-300 font-semibold">300 Personajes</span> • <span class="text-yellow-300 font-semibold">350 Preguntas</span> • <span class="text-yellow-300 font-semibold">10 Rondas por partida</span>
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <!-- Selector de Idioma ES / EN -->
+            <div class="bg-gray-900 p-1 rounded-xl border border-gray-700 flex items-center shadow-inner" role="group" aria-label="Language selector">
+                <button id="langBtnEs" onclick="setLanguage('es')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-yellow-500 text-gray-900 shadow">
+                    🇪🇸 ES
+                </button>
+                <button id="langBtnEn" onclick="setLanguage('en')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-gray-400 hover:text-white">
+                    🇬🇧 EN
+                </button>
+            </div>
+            <button id="btnSecret" onclick="showCulprit()" class="bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all border border-purple-400 text-sm sm:text-base flex items-center gap-2">
+                <span>👁️</span> <span id="btnSecretText">Ver Culpable (Testigo)</span>
+            </button>
+            <button id="btnRestart" onclick="initGame()" class="bg-yellow-500 hover:bg-yellow-400 active:scale-95 text-gray-900 font-bold py-2.5 px-5 rounded-xl shadow-lg transition-all border border-yellow-300 text-sm sm:text-base flex items-center gap-2">
+                <span>🔄</span> <span id="btnRestartText">Nueva Partida</span>
+            </button>
+        </div>
     </header>
 
-    <!-- Game Controls & Question Area -->
-    <section class="max-w-4xl mx-auto w-full bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-6 mb-8 flex flex-col gap-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex-1 text-center md:text-left">
-                <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
-                    <h2 class="text-sm uppercase tracking-widest text-gray-400 font-semibold">Ronda de Preguntas:</h2>
-                    <span id="questionCounter" class="bg-gray-700 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full border border-gray-600">1 / 10</span>
+    <!-- Panel de Preguntas y Control del Testigo -->
+    <section class="max-w-6xl mx-auto w-full bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-700 p-4 sm:p-6 mb-6 flex flex-col gap-4">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-5">
+            <div class="flex-1 w-full text-center lg:text-left">
+                <div class="flex items-center justify-center lg:justify-start gap-3 mb-2">
+                    <span id="roundLabel" class="text-xs uppercase tracking-widest text-gray-400 font-bold">Ronda de Preguntas:</span>
+                    <span id="questionCounter" class="bg-gray-900 text-yellow-400 text-xs sm:text-sm font-bold px-3.5 py-1 rounded-full border border-yellow-500/40">1 / 10</span>
+                    <span id="remainingBadge" class="bg-gray-900 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full border border-gray-700">12 sospechosos en pie</span>
                 </div>
-                <div id="questionDisplay" class="text-2xl font-bold text-white mb-4 min-h-[3.5rem] flex items-center justify-center md:justify-start">
-                    ¿Cargando pregunta...?
+                <div id="questionDisplay" class="text-xl sm:text-2xl md:text-3xl font-bold text-white my-3 min-h-[3.5rem] flex items-center justify-center lg:justify-start leading-snug">
+                    Cargando pregunta...
                 </div>
-                <div id="answerControls" class="flex items-center justify-center md:justify-start gap-4">
-                    <span class="text-gray-400 font-medium">Respuesta del Testigo:</span> 
-                    <button id="btnYes" onclick="answerQuestion(true)" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 px-7 rounded-lg shadow-lg transition-all border-2 border-green-400">👍 SÍ</button>
-                    <button id="btnNo" onclick="answerQuestion(false)" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-7 rounded-lg shadow-lg transition-all border-2 border-red-400">👎 NO</button>
-                </div>
-                <p id="phaseHint" class="text-xs text-gray-400 mt-3">
-                    Haz clic en los sospechosos inocentes para tacharlos. Al responder la pregunta 10, ¡deberás señalar directamente al culpable!
+                <p id="phaseHint" class="text-xs sm:text-sm text-gray-400">
+                    <strong>Cómo jugar:</strong> 1. Mira el culpable en secreto. 2. Responde <b>SÍ</b> o <b>NO</b> según su pinta. 3. Haz clic en los inocentes para tacharlos (o volver a marcarlos).
                 </p>
             </div>
-            
-            <div class="flex flex-col gap-3 shrink-0">
-                <button onclick="initGame()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg transition-colors border border-yellow-300">
-                    Nueva Partida 🔄
+
+            <!-- Botones de respuesta -->
+            <div id="answerControls" class="flex items-center justify-center gap-4 shrink-0 w-full lg:w-auto">
+                <button id="btnYes" onclick="answerQuestion(true)" class="flex-1 lg:flex-initial bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg transition-all border-2 border-emerald-400 text-lg">
+                    👍 SÍ
+                </button>
+                <button id="btnNo" onclick="answerQuestion(false)" class="flex-1 lg:flex-initial bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg transition-all border-2 border-rose-400 text-lg">
+                    👎 NO
                 </button>
             </div>
         </div>
 
-        <!-- Clues History -->
-        <div id="cluesContainer" class="border-t border-gray-700 pt-4 hidden">
-            <h3 class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-2">📋 Pistas dadas en esta partida (<span id="cluesCount">0</span>/10):</h3>
-            <div id="cluesList" class="flex flex-wrap gap-2"></div>
+        <!-- Historial Visual de Pistas -->
+        <div id="cluesContainer" class="border-t border-gray-700 pt-3 hidden">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs uppercase tracking-widest text-gray-400 font-bold">📋 <span id="cluesTitleText">Historial de Pistas</span> (<span id="cluesCount">0</span>/10):</h3>
+            </div>
+            <div id="cluesList" class="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1"></div>
         </div>
     </section>
 
-    <!-- Board -->
-    <main class="flex-1 max-w-5xl mx-auto w-full">
-        <div id="board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 pb-12">
-            <!-- Suspects will be generated here -->
+    <!-- Tablero de 12 Sospechosos -->
+    <main class="flex-1 max-w-6xl mx-auto w-full">
+        <div id="board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5 pb-10">
+            <!-- Tarjetas generadas dinámicamente -->
         </div>
     </main>
 
-    <!-- Game Over Modal -->
-    <div id="modal" class="fixed inset-0 z-50 bg-black/70 items-center justify-center p-4">
-        <div class="bg-gray-800 border-2 border-gray-600 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center relative">
-            <h2 id="modalTitle" class="text-3xl font-bold title-font mb-4">¡Juego Terminado!</h2>
-            <p id="modalMessage" class="text-lg text-gray-300 mb-6">Mensaje</p>
+    <!-- Modal de Fin de Partida -->
+    <div id="modal" class="fixed inset-0 z-50 hidden bg-black/80 items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-800 border-2 border-gray-600 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center">
+            <h2 id="modalTitle" class="text-2xl sm:text-3xl font-bold title-font mb-3">¡Fin de la Partida!</h2>
+            <p id="modalMessage" class="text-base sm:text-lg text-gray-300 mb-5">Mensaje</p>
             
-            <div class="bg-gray-900 rounded-xl p-4 mb-6 inline-block">
-                <p class="text-sm text-gray-400 uppercase mb-2">El Culpable era:</p>
-                <div id="guiltyReveal" class="text-6xl mb-2">👤</div>
+            <div class="bg-gray-900 rounded-xl p-5 mb-6 border border-gray-700">
+                <p id="culpritWasLabel" class="text-xs text-gray-400 uppercase tracking-wider mb-2">El Culpable era:</p>
+                <div id="guiltyReveal" class="text-6xl sm:text-7xl mb-2">👤</div>
                 <p id="guiltyNameReveal" class="font-bold text-xl text-white">Nombre</p>
-                <p id="guiltyJobReveal" class="text-sm text-yellow-400 mt-1">Profesión</p>
+                <p id="guiltyJobReveal" class="text-sm text-yellow-400 mt-1 font-medium">Profesión</p>
             </div>
 
-            <div>
-                <button onclick="initGame(); closeModal()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg transition-colors text-lg">
-                    Jugar de Nuevo
-                </button>
-            </div>
+            <button id="btnPlayAgain" onclick="initGame()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3.5 px-6 rounded-xl shadow-lg transition-colors text-lg">
+                🔄 Jugar Otra Partida
+            </button>
         </div>
     </div>
 
-    <!-- View Culprit Modal -->
-    <div id="culpritModal" class="fixed inset-0 z-50 hidden bg-black/80 items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-gray-800 border-2 border-purple-500 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center relative">
-            <h2 class="text-2xl font-bold title-font text-purple-400 mb-2">🤫 El Culpable Es...</h2>
-            <p class="text-sm text-gray-400 mb-6">Asegúrate de que los detectives no estén mirando.</p>
+    <!-- Modal Secreto para el Testigo -->
+    <div id="culpritModal" class="fixed inset-0 z-50 hidden bg-black/85 items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-gray-800 border-2 border-purple-500 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-sm w-full text-center">
+            <h2 id="secretModalTitle" class="text-2xl font-bold title-font text-purple-400 mb-1">🤫 SOLO PARA EL TESTIGO</h2>
+            <p id="secretModalDesc" class="text-xs sm:text-sm text-gray-400 mb-5">Asegúrate de que los detectives aparten la mirada.</p>
             
-            <div class="bg-gray-900 rounded-xl p-6 mb-6 inline-block border border-gray-700">
-                <div id="secretEmoji" class="text-7xl mb-4 drop-shadow-lg">👤</div>
+            <div class="bg-gray-900 rounded-xl p-6 mb-6 border border-gray-700">
+                <div id="secretEmoji" class="text-7xl sm:text-8xl mb-3 drop-shadow-lg">👤</div>
                 <p id="secretName" class="font-bold text-2xl text-white">Nombre</p>
                 <p id="secretJob" class="text-sm text-purple-300 mt-1 font-semibold">Profesión</p>
             </div>
 
-            <button onclick="hideCulprit()" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-colors text-lg border border-gray-500">
-                Ocultar y Volver
+            <button id="btnHideSecret" onclick="hideCulprit()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors text-base border border-purple-400">
+                Entendido, ocultar
             </button>
         </div>
     </div>
 
     <script>
-        // Base de datos de 100 personajes únicos con skins distintas, edades, géneros, estilos y profesiones
+        // =========================================================================
+        // DICCIONARIO DE INTERFAZ BILINGÜE (ESPAÑOL / INGLÉS)
+        // =========================================================================
+        const UI_TEXTS = {
+            es: {
+                pageTitle: "Sospechosos Inusuales - Edición Bilingüe (ES / EN)",
+                mainTitle: "🕵️‍♂️ Sospechosos Inusuales",
+                subTitle: 'Base de datos: <span class="text-yellow-300 font-semibold">300 Personajes</span> • <span class="text-yellow-300 font-semibold">350 Preguntas</span> • <span class="text-yellow-300 font-semibold">10 Rondas por partida</span>',
+                btnSecret: "Ver Culpable (Testigo)",
+                btnRestart: "Nueva Partida",
+                roundLabel: "Ronda de Preguntas:",
+                finalRoundBadge: "10 / 10 (FINAL)",
+                remainingOne: "1 sospechoso en pie",
+                remainingMany: "{n} sospechosos en pie",
+                howToPlay: "<strong>Cómo jugar:</strong> 1. Mira el culpable en secreto. 2. Responde <b>SÍ</b> o <b>NO</b> según su pinta. 3. Haz clic en los inocentes para tacharlos (o volver a marcarlos).",
+                finalHint: '<strong class="text-yellow-400">⚖️ ACUSACIÓN FINAL OBLIGATORIA:</strong> Ya no quedan preguntas. Haz clic sobre el sospechoso iluminado que creas que es el culpable.',
+                finalAlert: "🚨 ¡ÚLTIMA RONDA COMPLETADA! Elimina a los inocentes que queden o haz clic directamente sobre el CULPABLE para acusarlo.",
+                btnYes: "👍 SÍ",
+                btnNo: "👎 NO",
+                yesTag: "✅ SÍ:",
+                noTag: "❌ NO:",
+                cluesTitle: "Historial de Pistas",
+                secretTitle: "🤫 SOLO PARA EL TESTIGO",
+                secretDesc: "Asegúrate de que los detectives aparten la mirada.",
+                btnHideSecret: "Entendido, ocultar",
+                culpritWas: "El Culpable era:",
+                btnPlayAgain: "🔄 Jugar Otra Partida",
+                winFinalTitle: "🎉 ¡CULPABLE ATRAPADO!",
+                winFinalMsg: "¡Excelente deducción! Acusaste correctamente a {name} en el juicio final.",
+                loseFinalTitle: "🚨 ¡EL CULPABLE ESCAPÓ!",
+                loseFinalMsg: "Señalaste a {accused}, pero era inocente. ¡El verdadero culpable escapó!",
+                loseEliminatedTitle: "💥 ¡DESCARTASTE AL CULPABLE!",
+                loseEliminatedMsg: "Eliminaste por error a {name}. ¡Ha quedado libre!",
+                winEarlyTitle: "🏆 ¡CULPABLE ATRAPADO!",
+                winEarlyMsg: "¡Descartaste a los 11 inocentes antes de llegar a la ronda 10 y atrapaste a {name}!"
+            },
+            en: {
+                pageTitle: "Unusual Suspects - Bilingual Edition (ES / EN)",
+                mainTitle: "🕵️‍♂️ Unusual Suspects",
+                subTitle: 'Database: <span class="text-yellow-300 font-semibold">300 Characters</span> • <span class="text-yellow-300 font-semibold">350 Questions</span> • <span class="text-yellow-300 font-semibold">10 Rounds per game</span>',
+                btnSecret: "See Culprit (Witness)",
+                btnRestart: "New Game",
+                roundLabel: "Question Round:",
+                finalRoundBadge: "10 / 10 (FINAL)",
+                remainingOne: "1 suspect remaining",
+                remainingMany: "{n} suspects remaining",
+                howToPlay: "<strong>How to play:</strong> 1. Secretly check the culprit. 2. Answer <b>YES</b> or <b>NO</b> based on their look. 3. Click innocent suspects to cross them out (or unmark them).",
+                finalHint: '<strong class="text-yellow-400">⚖️ MANDATORY FINAL ACCUSATION:</strong> No questions left. Click on the highlighted suspect you believe is the culprit.',
+                finalAlert: "🚨 FINAL ROUND COMPLETED! Eliminate any remaining innocent suspects or click directly on the CULPRIT to accuse them.",
+                btnYes: "👍 YES",
+                btnNo: "👎 NO",
+                yesTag: "✅ YES:",
+                noTag: "❌ NO:",
+                cluesTitle: "Clue History",
+                secretTitle: "🤫 WITNESS ONLY",
+                secretDesc: "Make sure the detectives look away from the screen.",
+                btnHideSecret: "Got it, hide",
+                culpritWas: "The Culprit was:",
+                btnPlayAgain: "🔄 Play Again",
+                winFinalTitle: "🎉 CULPRIT CAUGHT!",
+                winFinalMsg: "Brilliant deduction! You accurately accused {name} in the final judgment.",
+                loseFinalTitle: "🚨 THE CULPRIT ESCAPED!",
+                loseFinalMsg: "You pointed at {accused}, who was innocent. The real culprit got away!",
+                loseEliminatedTitle: "💥 YOU CROSSED OUT THE CULPRIT!",
+                loseEliminatedMsg: "You mistakenly eliminated {name}. They walked free!",
+                winEarlyTitle: "🏆 CULPRIT CAUGHT!",
+                winEarlyMsg: "You ruled out all 11 innocent suspects before round 10 and caught {name}!"
+            }
+        };
+
+        // =========================================================================
+        // BASE DE DATOS DE 300 PERSONAJES ÚNICOS BILINGÜES (ES / EN)
+        // =========================================================================
         const SUSPECT_POOL = [
-            { name: 'Mateo', job: 'Barista Hipster', emoji: '🧔🏻‍♂️' },
-            { name: 'Zara', job: 'Ingeniera Aeroespacial', emoji: '👩🏾‍💻' },
-            { name: 'Kenji', job: 'Chef de Sushi', emoji: '👨🏻‍🍳' },
-            { name: 'Abuela Rosa', job: 'Jubilada Ex-Espía', emoji: '👵🏽' },
-            { name: 'Malik', job: 'DJ de Música Electrónica', emoji: '🧑🏿‍🎤' },
-            { name: 'Sofía', job: 'Abogada Penalista', emoji: '👩🏻‍💼' },
-            { name: 'Don Héctor', job: 'Profesor de Historia', emoji: '👴🏿' },
-            { name: 'Mei-Ling', job: 'Cirujana Plástica', emoji: '👩🏻‍⚕️' },
-            { name: 'Tariq', job: 'Arquitecto Minimalista', emoji: '🧔🏽‍♂️' },
-            { name: 'Chloe', job: 'Artista Urbana', emoji: '👩🏼‍🎨' },
-            { name: 'Dante', job: 'Mecánico de Motos', emoji: '👨🏽‍🔧' },
-            { name: 'Amina', job: 'Atleta Olímpica', emoji: '🧕🏾' },
-            { name: 'Liam', job: 'Piloto de Aerolínea', emoji: '👨🏼‍✈️' },
-            { name: 'Valeria', job: 'Investigadora Privada', emoji: '🕵🏽‍♀️' },
-            { name: 'Kwame', job: 'Biólogo Marino', emoji: '👨🏿‍🔬' },
-            { name: 'Yuki', job: 'Desarrolladora de Videojuegos', emoji: '🧑🏻‍💻' },
-            { name: 'Carlos', job: 'Bombero Voluntario', emoji: '👨🏽‍🚒' },
-            { name: 'Nadia', job: 'Jueza del Tribunal', emoji: '👩🏾‍⚖️' },
-            { name: 'Sven', job: 'Entrenador Personal', emoji: '👱🏻‍♂️' },
-            { name: 'Priya', job: 'Astrónoma', emoji: '👩🏽‍🚀' },
-            { name: 'Don Arturo', job: 'Coleccionista de Arte', emoji: '👴🏻' },
-            { name: 'Kofi', job: 'Músico de Jazz', emoji: '👨🏿‍🎤' },
-            { name: 'Elena', job: 'Agricultora Ecológica', emoji: '👩🏻‍🌾' },
-            { name: 'Hao', job: 'Maestro de Artes Marciales', emoji: '👲🏻' },
-            { name: 'Fátima', job: 'Estrella de Rock', emoji: '👩🏽‍🎤' },
-            { name: 'Abuela Carmen', job: 'Escritora de Misterio', emoji: '👵🏿' },
-            { name: 'Hugo', job: 'Catedrático de Física', emoji: '👨🏼‍🏫' },
-            { name: 'Jamal', job: 'Apicultor Urbano', emoji: '👨🏾‍🌾' },
-            { name: 'Astrid', job: 'Guardabosques Polar', emoji: '👩🏼‍🚒' },
-            { name: 'Diego', job: 'Crítico Gastronómico', emoji: '🧑🏽‍🍳' },
-            { name: 'Amara', job: 'Neurocirujana', emoji: '👩🏿‍⚕️' },
-            { name: 'Min-Jun', job: 'Violinista Clásico', emoji: '👨🏻‍🎤' },
-            { name: 'Beatriz', job: 'Restauradora de Antigüedades', emoji: '👵🏻' },
-            { name: 'Rashid', job: 'Piloto de Rally', emoji: '👳🏽‍♂️' },
-            { name: 'Freya', job: 'Escultora en Hielo', emoji: '👱🏻‍♀️' },
-            { name: 'Omar', job: 'Ilusionista y Mago', emoji: '🧔🏾‍♂️' },
-            { name: 'Camila', job: 'Entrenadora de Delfines', emoji: '👩🏽‍🔬' },
-            { name: 'Toshiro', job: 'Maestro de Origami', emoji: '👴🏻' },
-            { name: 'Zuri', job: 'Diseñadora de Moda', emoji: '👩🏿‍🎨' },
-            { name: 'Iker', job: 'Rescatista de Montaña', emoji: '🧔🏻' },
-            { name: 'Leila', job: 'Diplomática Internacional', emoji: '🧕🏽' },
-            { name: 'Gael', job: 'Sommelier de Vinos', emoji: '👨🏻‍💼' },
-            { name: 'Noor', job: 'Astrofísica', emoji: '👩🏾‍🚀' },
-            { name: 'Bautista', job: 'Constructor de Guitarras', emoji: '👨🏽‍🏭' },
-            { name: 'Sora', job: 'Campeona de eSports', emoji: '👩🏻‍🎤' },
-            { name: 'Ezequiel', job: 'Taxidermista', emoji: '👴🏾' },
-            { name: 'Mireia', job: 'Directora de Cine Indie', emoji: '👩🏼‍💼' },
-            { name: 'Darius', job: 'Guardia Real', emoji: '💂🏿‍♂️' },
-            { name: 'Alba', job: 'Botánica Tropical', emoji: '👩🏻‍🔬' },
-            { name: 'Samir', job: 'Ingeniero de Robótica', emoji: '👨🏽‍💻' },
-            { name: 'Caleb', job: 'Crucero de Lujo (Capitán)', emoji: '👨🏿‍✈️' },
-            { name: 'Ingrid', job: 'Maestra Quesera', emoji: '👩🏼‍🍳' },
-            { name: 'Ramiro', job: 'Relojero Suizo', emoji: '👴🏽' },
-            { name: 'Nia', job: 'Coreógrafa de Danza', emoji: '💃🏾' },
-            { name: 'Lucas', job: 'Acuario y Buzo', emoji: '🏊🏻‍♂️' },
-            { name: 'Hana', job: 'Ceramista Artesanal', emoji: '👩🏻‍🎨' },
-            { name: 'Idris', job: 'Fiscal Anticorrupción', emoji: '👨🏿‍⚖️' },
-            { name: 'Catalina', job: 'Domadora de Circo', emoji: '👩🏽‍🎤' },
-            { name: 'Bjorn', job: 'Carpintero Naval', emoji: '🧔🏼‍♂️' },
-            { name: 'Sonia', job: 'Controladora Aérea', emoji: '👩🏾‍💼' },
-            { name: 'Akira', job: 'Piloto de Drones', emoji: '🧑🏻‍🚀' },
-            { name: 'Doña Pilar', job: 'Directora de Orquesta', emoji: '👵🏼' },
-            { name: 'Jabari', job: 'Profesor de Literatura', emoji: '👨🏾‍🏫' },
-            { name: 'Clara', job: 'Veterinaria de Exóticos', emoji: '👩🏼‍⚕️' },
-            { name: 'Félix', job: 'Soldador Submarino', emoji: '👨🏻‍🏭' },
-            { name: 'Yasmine', job: 'Arquitecta Paisajista', emoji: '🧕🏿' },
-            { name: 'Bruno', job: 'Detective de Seguros', emoji: '🕵🏻‍♂️' },
-            { name: 'Talia', job: 'Especialista en Efectos Especiales', emoji: '👩🏽‍💻' },
-            { name: 'Koji', job: 'Guardabosques de Bambú', emoji: '👨🏻‍🌾' },
-            { name: 'Makeda', job: 'Embajadora Cultural', emoji: '👩🏿‍💼' },
-            { name: 'Óscar', job: 'Patinador Artístico', emoji: '⛸️' },
-            { name: 'Vanesa', job: 'Ingeniera de Sonido', emoji: '👩🏼‍🎤' },
-            { name: 'Hamza', job: 'Pastelero de Alta Cocina', emoji: '👨🏾‍🍳' },
-            { name: 'Noemí', job: 'Topógrafa de Volcanes', emoji: '👩🏽‍🚒' },
-            { name: 'Don Gregorio', job: 'Bibliotecario Nocturno', emoji: '👴🏿' },
-            { name: 'Lina', job: 'Programadora de IA', emoji: '👩🏻‍💻' },
-            { name: 'Thiago', job: 'Surfista Profesional', emoji: '🏄🏽‍♂️' },
-            { name: 'Imani', job: 'Cardióloga Pediátrica', emoji: '👩🏿‍⚕️' },
-            { name: 'Anton', job: 'Acróbata Aéreo', emoji: '🤸🏻‍♂️' },
-            { name: 'Salma', job: 'Periodista de Guerra', emoji: '🧕🏼' },
-            { name: 'Renzo', job: 'Maestro Heladero', emoji: '👨🏼‍🍳' },
-            { name: 'Keiko', job: 'Diseñadora de Kimonos', emoji: '👘' },
-            { name: 'sekou', job: 'Guía de Safari', emoji: '👨🏿‍🌾' },
-            { name: 'Paula', job: 'Astronauta Análoga', emoji: '👩🏻‍🚀' },
-            { name: 'Nabil', job: 'Orfebre y Joyero', emoji: '🧔🏽' },
-            { name: 'Greta', job: 'Activista Climática', emoji: '👧🏼' },
-            { name: 'Jairo', job: 'Mecánico de Aviación', emoji: '👨🏾‍🔧' },
-            { name: 'Mei', job: 'Acupunturista', emoji: '👩🏻‍⚕️' },
-            { name: 'Don Ernesto', job: 'Afinador de Pianos', emoji: '👴🏼' },
-            { name: 'Aisha', job: 'Entrenadora de Esgrima', emoji: '🤺' },
-            { name: 'Julián', job: 'Catador de Chocolates', emoji: '🧑🏻‍🍳' },
-            { name: 'Zainab', job: 'Ingeniera Civil', emoji: '👩🏾‍🔧' },
-            { name: 'Tobías', job: 'Ilustrador de Cómics', emoji: '👨🏼‍🎨' },
-            { name: 'Nadia B.', job: 'Jinete de Doma Clásica', emoji: '🏇🏽' },
-            { name: 'Kwesi', job: 'Químico Perfumista', emoji: '👨🏿‍🔬' },
-            { name: 'Aiko', job: 'Directora de Museo', emoji: '👩🏻‍💼' },
-            { name: 'Simón', job: 'Alpinista Extremo', emoji: '🧗🏽‍♂️' },
-            { name: 'Mirella', job: 'Criminóloga Forense', emoji: '🕵🏾‍♀️' },
-            { name: 'Bastian', job: 'Maestro Cervecero', emoji: '🧔🏼' },
-            { name: 'Soraya', job: 'Cartógrafa Marina', emoji: '👩🏽‍✈️' }
+            // Bloque 1 (1 - 100)
+            { name: 'Mateo', job: { es: 'Barista Hipster', en: 'Hipster Barista' }, emoji: '🧔🏻‍♂️' },
+            { name: 'Zara', job: { es: 'Ingeniera Aeroespacial', en: 'Aerospace Engineer' }, emoji: '👩🏾‍💻' },
+            { name: 'Kenji', job: { es: 'Chef de Sushi', en: 'Sushi Chef' }, emoji: '👨🏻‍🍳' },
+            { name: 'Rosa', job: { es: 'Jubilada Ex-Espía', en: 'Retired Ex-Spy' }, emoji: '👵🏽' },
+            { name: 'Malik', job: { es: 'DJ de Música Electrónica', en: 'Electronic Music DJ' }, emoji: '🧑🏿‍🎤' },
+            { name: 'Sofía', job: { es: 'Abogada Penalista', en: 'Criminal Defense Lawyer' }, emoji: '👩🏻‍💼' },
+            { name: 'Héctor', job: { es: 'Profesor de Historia', en: 'History Professor' }, emoji: '👴🏿' },
+            { name: 'Mei-Ling', job: { es: 'Cirujana Plástica', en: 'Plastic Surgeon' }, emoji: '👩🏻‍⚕️' },
+            { name: 'Tariq', job: { es: 'Arquitecto Minimalista', en: 'Minimalist Architect' }, emoji: '🧔🏽‍♂️' },
+            { name: 'Chloe', job: { es: 'Artista Urbana', en: 'Street Artist' }, emoji: '👩🏼‍🎨' },
+            { name: 'Dante', job: { es: 'Mecánico de Motos', en: 'Motorcycle Mechanic' }, emoji: '👨🏽‍🔧' },
+            { name: 'Amina', job: { es: 'Atleta Olímpica', en: 'Olympic Athlete' }, emoji: '🧕🏾' },
+            { name: 'Liam', job: { es: 'Piloto de Aerolínea', en: 'Airline Pilot' }, emoji: '👨🏼‍✈️' },
+            { name: 'Valeria', job: { es: 'Investigadora Privada', en: 'Private Investigator' }, emoji: '🕵🏽‍♀️' },
+            { name: 'Kwame', job: { es: 'Biólogo Marino', en: 'Marine Biologist' }, emoji: '👨🏿‍🔬' },
+            { name: 'Yuki', job: { es: 'Desarrolladora de Videojuegos', en: 'Game Developer' }, emoji: '🧑🏻‍💻' },
+            { name: 'Carlos', job: { es: 'Bombero Voluntario', en: 'Volunteer Firefighter' }, emoji: '👨🏽‍🚒' },
+            { name: 'Nadia', job: { es: 'Jueza del Tribunal', en: 'Court Judge' }, emoji: '👩🏾‍⚖️' },
+            { name: 'Sven', job: { es: 'Entrenador Personal', en: 'Personal Trainer' }, emoji: '👱🏻‍♂️' },
+            { name: 'Priya', job: { es: 'Astrónoma', en: 'Astronomer' }, emoji: '👩🏽‍🚀' },
+            { name: 'Arturo', job: { es: 'Coleccionista de Arte', en: 'Art Collector' }, emoji: '👴🏻' },
+            { name: 'Kofi', job: { es: 'Músico de Jazz', en: 'Jazz Musician' }, emoji: '👨🏿‍🎤' },
+            { name: 'Elena', job: { es: 'Agricultora Ecológica', en: 'Organic Farmer' }, emoji: '👩🏻‍🌾' },
+            { name: 'Hao', job: { es: 'Maestro de Artes Marciales', en: 'Martial Arts Master' }, emoji: '👲🏻' },
+            { name: 'Fátima', job: { es: 'Estrella de Rock', en: 'Rock Star' }, emoji: '👩🏽‍🎤' },
+            { name: 'Carmen', job: { es: 'Escritora de Misterio', en: 'Mystery Novelist' }, emoji: '👵🏿' },
+            { name: 'Hugo', job: { es: 'Catedrático de Física', en: 'Physics Professor' }, emoji: '👨🏼‍🏫' },
+            { name: 'Jamal', job: { es: 'Apicultor Urbano', en: 'Urban Beekeeper' }, emoji: '👨🏾‍🌾' },
+            { name: 'Astrid', job: { es: 'Guardabosques Polar', en: 'Polar Park Ranger' }, emoji: '👩🏼‍🚒' },
+            { name: 'Diego', job: { es: 'Crítico Gastronómico', en: 'Food Critic' }, emoji: '🧑🏽‍🍳' },
+            { name: 'Amara', job: { es: 'Neurocirujana', en: 'Neurosurgeon' }, emoji: '👩🏿‍⚕️' },
+            { name: 'Min-Jun', job: { es: 'Violinista Clásico', en: 'Classical Violinist' }, emoji: '👨🏻‍🎤' },
+            { name: 'Beatriz', job: { es: 'Restauradora de Antigüedades', en: 'Antique Restorer' }, emoji: '👵🏻' },
+            { name: 'Rashid', job: { es: 'Piloto de Rally', en: 'Rally Driver' }, emoji: '👳🏽‍♂️' },
+            { name: 'Freya', job: { es: 'Escultora en Hielo', en: 'Ice Sculptor' }, emoji: '👱🏻‍♀️' },
+            { name: 'Omar', job: { es: 'Ilusionista y Mago', en: 'Stage Magician' }, emoji: '🧔🏾‍♂️' },
+            { name: 'Camila', job: { es: 'Entrenadora de Delfines', en: 'Dolphin Trainer' }, emoji: '👩🏽‍🔬' },
+            { name: 'Toshiro', job: { es: 'Maestro de Origami', en: 'Origami Master' }, emoji: '👴🏻' },
+            { name: 'Zuri', job: { es: 'Diseñadora de Moda', en: 'Fashion Designer' }, emoji: '👩🏿‍🎨' },
+            { name: 'Iker', job: { es: 'Rescatista de Montaña', en: 'Mountain Rescuer' }, emoji: '🧔🏻' },
+            { name: 'Leila', job: { es: 'Diplomática Internacional', en: 'International Diplomat' }, emoji: '🧕🏽' },
+            { name: 'Gael', job: { es: 'Sommelier de Vinos', en: 'Wine Sommelier' }, emoji: '👨🏻‍💼' },
+            { name: 'Noor', job: { es: 'Astrofísica', en: 'Astrophysicist' }, emoji: '👩🏾‍🚀' },
+            { name: 'Bautista', job: { es: 'Constructor de Guitarras', en: 'Guitar Luthier' }, emoji: '👨🏽‍🏭' },
+            { name: 'Sora', job: { es: 'Campeona de eSports', en: 'eSports Champion' }, emoji: '👩🏻‍🎤' },
+            { name: 'Ezequiel', job: { es: 'Taxidermista', en: 'Taxidermist' }, emoji: '👴🏾' },
+            { name: 'Mireia', job: { es: 'Directora de Cine Indie', en: 'Indie Film Director' }, emoji: '👩🏼‍💼' },
+            { name: 'Darius', job: { es: 'Guardia Real', en: 'Royal Guard' }, emoji: '💂🏿‍♂️' },
+            { name: 'Alba', job: { es: 'Botánica Tropical', en: 'Tropical Botanist' }, emoji: '👩🏻‍🔬' },
+            { name: 'Samir', job: { es: 'Ingeniero de Robótica', en: 'Robotics Engineer' }, emoji: '👨🏽‍💻' },
+            { name: 'Caleb', job: { es: 'Capitán de Crucero', en: 'Cruise Ship Captain' }, emoji: '👨🏿‍✈️' },
+            { name: 'Ingrid', job: { es: 'Maestra Quesera', en: 'Master Cheesemaker' }, emoji: '👩🏼‍🍳' },
+            { name: 'Ramiro', job: { es: 'Relojero Suizo', en: 'Swiss Watchmaker' }, emoji: '👴🏽' },
+            { name: 'Nia', job: { es: 'Coreógrafa de Danza', en: 'Dance Choreographer' }, emoji: '💃🏾' },
+            { name: 'Lucas', job: { es: 'Buzo de Profundidad', en: 'Deep-Sea Diver' }, emoji: '🏊🏻‍♂️' },
+            { name: 'Hana', job: { es: 'Ceramista Artesanal', en: 'Artisan Ceramicist' }, emoji: '👩🏻‍🎨' },
+            { name: 'Idris', job: { es: 'Fiscal Anticorrupción', en: 'Anti-Corruption Prosecutor' }, emoji: '👨🏿‍⚖️' },
+            { name: 'Catalina', job: { es: 'Acróbata de Circo', en: 'Circus Acrobat' }, emoji: '👩🏽‍🎤' },
+            { name: 'Bjorn', job: { es: 'Carpintero Naval', en: 'Shipwright' }, emoji: '🧔🏼‍♂️' },
+            { name: 'Sonia', job: { es: 'Controladora Aérea', en: 'Air Traffic Controller' }, emoji: '👩🏾‍💼' },
+            { name: 'Akira', job: { es: 'Piloto de Drones', en: 'Drone Pilot' }, emoji: '🧑🏻‍🚀' },
+            { name: 'Pilar', job: { es: 'Directora de Orquesta', en: 'Orchestra Conductor' }, emoji: '👵🏼' },
+            { name: 'Jabari', job: { es: 'Profesor de Literatura', en: 'Literature Professor' }, emoji: '👨🏾‍🏫' },
+            { name: 'Clara', job: { es: 'Veterinaria de Exóticos', en: 'Exotic Animal Vet' }, emoji: '👩🏼‍⚕️' },
+            { name: 'Félix', job: { es: 'Soldador Submarino', en: 'Underwater Welder' }, emoji: '👨🏻‍🏭' },
+            { name: 'Yasmine', job: { es: 'Arquitecta Paisajista', en: 'Landscape Architect' }, emoji: '🧕🏿' },
+            { name: 'Bruno', job: { es: 'Detective de Seguros', en: 'Insurance Detective' }, emoji: '🕵🏻‍♂️' },
+            { name: 'Talia', job: { es: 'Especialista en Efectos Visuales', en: 'VFX Specialist' }, emoji: '👩🏽‍💻' },
+            { name: 'Koji', job: { es: 'Guardabosques de Bambú', en: 'Bamboo Forest Ranger' }, emoji: '👨🏻‍🌾' },
+            { name: 'Makeda', job: { es: 'Embajadora Cultural', en: 'Cultural Ambassador' }, emoji: '👩🏿‍💼' },
+            { name: 'Óscar', job: { es: 'Patinador Artístico', en: 'Figure Skater' }, emoji: '⛸️' },
+            { name: 'Vanesa', job: { es: 'Ingeniera de Sonido', en: 'Sound Engineer' }, emoji: '👩🏼‍🎤' },
+            { name: 'Hamza', job: { es: 'Pastelero de Alta Cocina', en: 'Haute Pastry Chef' }, emoji: '👨🏾‍🍳' },
+            { name: 'Noemí', job: { es: 'Vulcanóloga', en: 'Volcanologist' }, emoji: '👩🏽‍🚒' },
+            { name: 'Gregorio', job: { es: 'Bibliotecario Nocturno', en: 'Night Librarian' }, emoji: '👴🏿' },
+            { name: 'Lina', job: { es: 'Programadora de IA', en: 'AI Programmer' }, emoji: '👩🏻‍💻' },
+            { name: 'Thiago', job: { es: 'Surfista Profesional', en: 'Pro Surfer' }, emoji: '🏄🏽‍♂️' },
+            { name: 'Imani', job: { es: 'Cardióloga Pediátrica', en: 'Pediatric Cardiologist' }, emoji: '👩🏿‍⚕️' },
+            { name: 'Anton', job: { es: 'Gimnasta Olímpico', en: 'Olympic Gymnast' }, emoji: '🤸🏻‍♂️' },
+            { name: 'Salma', job: { es: 'Corresponsal de Prensa', en: 'Press Correspondent' }, emoji: '🧕🏼' },
+            { name: 'Renzo', job: { es: 'Maestro Heladero', en: 'Master Gelato Maker' }, emoji: '👨🏼‍🍳' },
+            { name: 'Keiko', job: { es: 'Diseñadora de Kimonos', en: 'Kimono Designer' }, emoji: '👘' },
+            { name: 'Sekou', job: { es: 'Guía de Safari', en: 'Safari Guide' }, emoji: '👨🏿‍🌾' },
+            { name: 'Paula', job: { es: 'Astronauta Análoga', en: 'Analog Astronaut' }, emoji: '👩🏻‍🚀' },
+            { name: 'Nabil', job: { es: 'Orfebre y Joyero', en: 'Goldsmith & Jeweler' }, emoji: '🧔🏽' },
+            { name: 'Greta', job: { es: 'Activista Climática', en: 'Climate Activist' }, emoji: '👧🏼' },
+            { name: 'Jairo', job: { es: 'Mecánico de Aviación', en: 'Aircraft Mechanic' }, emoji: '👨🏾‍🔧' },
+            { name: 'Mei', job: { es: 'Acupunturista', en: 'Acupuncturist' }, emoji: '👩🏻‍⚕️' },
+            { name: 'Ernesto', job: { es: 'Afinador de Pianos', en: 'Piano Tuner' }, emoji: '👴🏼' },
+            { name: 'Aisha', job: { es: 'Entrenadora de Esgrima', en: 'Fencing Coach' }, emoji: '🤺' },
+            { name: 'Julián', job: { es: 'Catador de Chocolates', en: 'Chocolate Taster' }, emoji: '🧑🏻‍🍳' },
+            { name: 'Zainab', job: { es: 'Ingeniera Civil', en: 'Civil Engineer' }, emoji: '👩🏾‍🔧' },
+            { name: 'Tobías', job: { es: 'Ilustrador de Cómics', en: 'Comic Book Illustrator' }, emoji: '👨🏼‍🎨' },
+            { name: 'Nadia B.', job: { es: 'Jinete de Doma Clásica', en: 'Dressage Rider' }, emoji: '🏇🏽' },
+            { name: 'Kwesi', job: { es: 'Químico Perfumista', en: 'Perfume Chemist' }, emoji: '👨🏿‍🔬' },
+            { name: 'Aiko', job: { es: 'Directora de Museo', en: 'Museum Director' }, emoji: '👩🏻‍💼' },
+            { name: 'Simón', job: { es: 'Alpinista Extremo', en: 'Extreme Alpinist' }, emoji: '🧗🏽‍♂️' },
+            { name: 'Mirella', job: { es: 'Criminóloga Forense', en: 'Forensic Criminologist' }, emoji: '🕵🏾‍♀️' },
+            { name: 'Bastian', job: { es: 'Maestro Cervecero', en: 'Master Brewer' }, emoji: '🧔🏼' },
+            { name: 'Soraya', job: { es: 'Cartógrafa Marina', en: 'Marine Cartographer' }, emoji: '👩🏽‍✈️' },
+
+            // Bloque 2 (101 - 200)
+            { name: 'Zhen', job: { es: 'Calígrafo Imperial', en: 'Imperial Calligrapher' }, emoji: '👨🏻‍🎨' },
+            { name: 'Aaliyah', job: { es: 'Productora Musical', en: 'Music Producer' }, emoji: '👩🏿‍🎤' },
+            { name: 'Anselmo', job: { es: 'Coleccionista de Sellos', en: 'Stamp Collector' }, emoji: '👴🏽' },
+            { name: 'Kira', job: { es: 'Analista de Ciberseguridad', en: 'Cybersecurity Analyst' }, emoji: '👩🏼‍💻' },
+            { name: 'Ousmane', job: { es: 'Entrenador de Atletismo', en: 'Track & Field Coach' }, emoji: '🏃🏿‍♂️' },
+            { name: 'Yuna', job: { es: 'Florista Ikebana', en: 'Ikebana Florist' }, emoji: '👩🏻‍🌾' },
+            { name: 'Lorenzo', job: { es: 'Barbero Clásico', en: 'Classic Barber' }, emoji: '🧔🏻‍♂️' },
+            { name: 'Fatou', job: { es: 'Abogada de Derechos Humanos', en: 'Human Rights Lawyer' }, emoji: '🧕🏿' },
+            { name: 'Callum', job: { es: 'Guía de Castillos', en: 'Castle Tour Guide' }, emoji: '👨🏼‍💼' },
+            { name: 'Esmeralda', job: { es: 'Tarotista y Astróloga', en: 'Tarot Reader & Astrologer' }, emoji: '🔮' },
+            { name: 'Daiki', job: { es: 'Ingeniero Ferroviario', en: 'Railway Engineer' }, emoji: '👨🏻‍🔧' },
+            { name: 'Thabo', job: { es: 'Fotógrafo de Vida Salvaje', en: 'Wildlife Photographer' }, emoji: '📸' },
+            { name: 'Marisol', job: { es: 'Panadera Artesanal', en: 'Artisan Baker' }, emoji: '👩🏽‍🍳' },
+            { name: 'Vasilis', job: { es: 'Capitán de Yate', en: 'Yacht Captain' }, emoji: '👨🏼‍✈️' },
+            { name: 'Naledi', job: { es: 'Pediatra', en: 'Pediatrician' }, emoji: '👩🏿‍⚕️' },
+            { name: 'Ryu', job: { es: 'Creador de Anime', en: 'Anime Creator' }, emoji: '🧑🏻‍🎨' },
+            { name: 'Consuelo', job: { es: 'Modista de Alta Costura', en: 'Haute Couture Seamstress' }, emoji: '👵🏻' },
+            { name: 'Karim', job: { es: 'Profesor de Matemáticas', en: 'Math Professor' }, emoji: '👨🏽‍🏫' },
+            { name: 'Sigrid', job: { es: 'Bióloga Ártica', en: 'Arctic Biologist' }, emoji: '👩🏼‍🔬' },
+            { name: 'Tendai', job: { es: 'Escultor en Madera', en: 'Wood Sculptor' }, emoji: '👨🏿‍🎨' },
+            { name: 'Haruka', job: { es: 'Maestra de Ceremonia del Té', en: 'Tea Ceremony Master' }, emoji: '👩🏻‍💼' },
+            { name: 'Esteban', job: { es: 'Electricista Industrial', en: 'Industrial Electrician' }, emoji: '👨🏽‍🔧' },
+            { name: 'Khadija', job: { es: 'Arquitecta Sostenible', en: 'Sustainable Architect' }, emoji: '🧕🏾' },
+            { name: 'Lukas', job: { es: 'Ciclista Profesional', en: 'Pro Cyclist' }, emoji: '🚴🏻‍♂️' },
+            { name: 'Chidinma', job: { es: 'Directora de Teatro', en: 'Theater Director' }, emoji: '👩🏿‍💼' },
+            { name: 'Joon-Ho', job: { es: 'Cirujano Cardiovascular', en: 'Cardiovascular Surgeon' }, emoji: '👨🏻‍⚕️' },
+            { name: 'Paloma', job: { es: 'Periodista de Investigación', en: 'Investigative Journalist' }, emoji: '👩🏼‍💻' },
+            { name: 'Zuberi', job: { es: 'Guardaparques', en: 'Park Ranger' }, emoji: '👨🏿‍🚒' },
+            { name: 'Ananya', job: { es: 'Ingeniera de Software', en: 'Software Engineer' }, emoji: '👩🏽‍💻' },
+            { name: 'Teodoro', job: { es: 'Relojero de Campanarios', en: 'Clocktower Keeper' }, emoji: '👴🏾' },
+            { name: 'Soraia', job: { es: 'Bióloga Genética', en: 'Genetic Biologist' }, emoji: '👩🏽‍🔬' },
+            { name: 'Nikolai', job: { es: 'Jugador de Ajedrez', en: 'Chess Grandmaster' }, emoji: '🧔🏻' },
+            { name: 'Amina K.', job: { es: 'Chef de Cocina Fusión', en: 'Fusion Cuisine Chef' }, emoji: '👩🏾‍🍳' },
+            { name: 'Hiroshi', job: { es: 'Arquitecto Naval', en: 'Naval Architect' }, emoji: '👨🏻‍💼' },
+            { name: 'Mía', job: { es: 'Instructora de Yoga', en: 'Yoga Instructor' }, emoji: '🧘🏼‍♀️' },
+            { name: 'Bamba', job: { es: 'Percusionista', en: 'Percussionist' }, emoji: '🥁' },
+            { name: 'Rania', job: { es: 'Traductora Simultánea', en: 'Simultaneous Interpreter' }, emoji: '🧕🏽' },
+            { name: 'Gorka', job: { es: 'Leñador Deportivo', en: 'Competitive Lumberjack' }, emoji: '🪓' },
+            { name: 'Linh', job: { es: 'Diseñadora Gráfica', en: 'Graphic Designer' }, emoji: '👩🏻‍🎨' },
+            { name: 'Derrick', job: { es: 'Entrenador de Baloncesto', en: 'Basketball Coach' }, emoji: '⛹🏿‍♂️' },
+            { name: 'Eulalia', job: { es: 'Cronista Local', en: 'Local Chronicler' }, emoji: '👵🏽' },
+            { name: 'Farid', job: { es: 'Químico Farmacéutico', en: 'Pharmaceutical Chemist' }, emoji: '👨🏽‍🔬' },
+            { name: 'Tessa', job: { es: 'Restauradora de Libros', en: 'Book Restorer' }, emoji: '👩🏼‍🏫' },
+            { name: 'Kofi M.', job: { es: 'Economista', en: 'Economist' }, emoji: '👨🏿‍💼' },
+            { name: 'Sakura', job: { es: 'Patinadora sobre Hielo', en: 'Ice Skater' }, emoji: '👩🏻‍🎤' },
+            { name: 'Humberto', job: { es: 'Sastre a Medida', en: 'Bespoke Tailor' }, emoji: '🧔🏽‍♂️' },
+            { name: 'Zoya', job: { es: 'Piloto de Helicóptero', en: 'Helicopter Pilot' }, emoji: '👩🏾‍✈️' },
+            { name: 'César', job: { es: 'Arqueólogo', en: 'Archaeologist' }, emoji: '🕵🏽‍♂️' },
+            { name: 'Mina', job: { es: 'Desarrolladora Web', en: 'Web Developer' }, emoji: '👩🏻‍💻' },
+            { name: 'Tomás', job: { es: 'Pescador Jubilado', en: 'Retired Fisherman' }, emoji: '👴🏻' },
+            { name: 'Lamin', job: { es: 'Ingeniero Agrónomo', en: 'Agricultural Engineer' }, emoji: '👨🏿‍🌾' },
+            { name: 'Cloe', job: { es: 'Pastelera Vegana', en: 'Vegan Pastry Chef' }, emoji: '👩🏼‍🍳' },
+            { name: 'Yusuf', job: { es: 'Juez Deportivo', en: 'Sports Referee' }, emoji: '👨🏽‍⚖️' },
+            { name: 'Natsuki', job: { es: 'Bióloga Marina', en: 'Marine Biologist' }, emoji: '👩🏻‍🔬' },
+            { name: 'Patricio', job: { es: 'Locutor de Radio', en: 'Radio Broadcaster' }, emoji: '🎙️' },
+            { name: 'Makena', job: { es: 'Diseñadora de Joyas', en: 'Jewelry Designer' }, emoji: '👩🏿‍🎨' },
+            { name: 'Soren', job: { es: 'Ingeniero Eólico', en: 'Wind Energy Engineer' }, emoji: '👨🏼‍🔧' },
+            { name: 'Aziza', job: { es: 'Oftalmóloga', en: 'Ophthalmologist' }, emoji: '🧕🏾' },
+            { name: 'Jin', job: { es: 'Maestro de Taekwondo', en: 'Taekwondo Master' }, emoji: '🥋' },
+            { name: 'Fernanda', job: { es: 'Guionista de Series', en: 'TV Screenwriter' }, emoji: '👩🏽‍💻' },
+            { name: 'Oluwaseun', job: { es: 'Auditor Financiero', en: 'Financial Auditor' }, emoji: '👨🏿‍💼' },
+            { name: 'Heidi', job: { es: 'Veterinaria Rural', en: 'Rural Veterinarian' }, emoji: '👩🏼‍⚕️' },
+            { name: 'Tariq B.', job: { es: 'Restaurador de Alfombras', en: 'Rug Restorer' }, emoji: '👳🏾‍♂️' },
+            { name: 'Aoi', job: { es: 'Compositora Musical', en: 'Music Composer' }, emoji: '👩🏻‍🎤' },
+            { name: 'Severino', job: { es: 'Zapatero Artesano', en: 'Artisan Shoemaker' }, emoji: '👴🏿' },
+            { name: 'Marwa', job: { es: 'Geóloga', en: 'Geologist' }, emoji: '🧕🏼' },
+            { name: 'Bautista R.', job: { es: 'Carpintero Ebanista', en: 'Cabinetmaker' }, emoji: '👨🏻‍🔧' },
+            { name: 'Eshe', job: { es: 'Directora de ONG', en: 'NGO Director' }, emoji: '👩🏿‍💼' },
+            { name: 'Kenta', job: { es: 'Piloto de Pruebas', en: 'Test Pilot' }, emoji: '👨🏻‍✈️' },
+            { name: 'Luna', job: { es: 'Astrónoma Aficionada', en: 'Amateur Astronomer' }, emoji: '🔭' },
+            { name: 'Malikah', job: { es: 'Profesora de Danza', en: 'Dance Teacher' }, emoji: '👩🏾‍🎤' },
+            { name: 'Iñaki', job: { es: 'Socorrista Acuático', en: 'Lifeguard' }, emoji: '🏊🏽‍♂️' },
+            { name: 'Mei-Hua', job: { es: 'Contable', en: 'Accountant' }, emoji: '👩🏻‍💼' },
+            { name: 'Isidro', job: { es: 'Apicultor Veterano', en: 'Veteran Beekeeper' }, emoji: '👴🏼' },
+            { name: 'Kobe', job: { es: 'Diseñador de Zapatillas', en: 'Sneaker Designer' }, emoji: '🧑🏿‍🎨' },
+            { name: 'Samira', job: { es: 'Ingeniera Química', en: 'Chemical Engineer' }, emoji: '👩🏽‍🔬' },
+            { name: 'Axel', job: { es: 'Mecánico de Competición', en: 'Race Car Mechanic' }, emoji: '👨🏼‍🔧' },
+            { name: 'Chika', job: { es: 'Enfermera de Urgencias', en: 'ER Nurse' }, emoji: '👩🏿‍⚕️' },
+            { name: 'Ren', job: { es: 'Barista Especialista', en: 'Specialty Barista' }, emoji: '🧑🏻‍🍳' },
+            { name: 'Matilde', job: { es: 'Profesora de Piano', en: 'Piano Teacher' }, emoji: '👵🏾' },
+            { name: 'Zayd', job: { es: 'Fotógrafo de Moda', en: 'Fashion Photographer' }, emoji: '🧔🏽' },
+            { name: 'Katrin', job: { es: 'Investigadora Polar', en: 'Polar Researcher' }, emoji: '👩🏼‍🚀' },
+            { name: 'Moussa', job: { es: 'Conductor de Tren', en: 'Train Driver' }, emoji: '👨🏿‍✈️' },
+            { name: 'Hye-Jin', job: { es: 'Curadora de Arte', en: 'Art Curator' }, emoji: '👩🏻‍🎨' },
+            { name: 'Gonzalo', job: { es: 'Catador de Aceites', en: 'Olive Oil Sommelier' }, emoji: '👨🏽‍🍳' },
+            { name: 'Naima', job: { es: 'Socióloga', en: 'Sociologist' }, emoji: '🧕🏿' },
+            { name: 'Viggo', job: { es: 'Constructor de Barcos', en: 'Boatbuilder' }, emoji: '🧔🏼‍♂️' },
+            { name: 'Tania', job: { es: 'Controladora de Calidad', en: 'Quality Inspector' }, emoji: '👩🏾‍🔬' },
+            { name: 'Sho', job: { es: 'Diseñador Industrial', en: 'Industrial Designer' }, emoji: '👨🏻‍💻' },
+            { name: 'Leonor', job: { es: 'Herbolaria', en: 'Herbalist' }, emoji: '👵🏻' },
+            { name: 'Juma', job: { es: 'Entrenador de Fútbol', en: 'Soccer Coach' }, emoji: '⚽' },
+            { name: 'Yasmin', job: { es: 'Chef Pastelera', en: 'Pastry Chef' }, emoji: '👩🏽‍🍳' },
+            { name: 'Marek', job: { es: 'Técnico de Sonido', en: 'Audio Technician' }, emoji: '🎧' },
+            { name: 'Adaeze', job: { es: 'Ingeniera de Telecomunicaciones', en: 'Telecom Engineer' }, emoji: '👩🏿‍💻' },
+            { name: 'Bo', job: { es: 'Acupuntor Tradicional', en: 'Traditional Acupuncturist' }, emoji: '👴🏻' },
+            { name: 'Camille', job: { es: 'Enóloga', en: 'Oenologist' }, emoji: '🍷' },
+            { name: 'Rashida', job: { es: 'Jueza de Paz', en: 'Justice of the Peace' }, emoji: '👩🏾‍⚖️' },
+            { name: 'Elias', job: { es: 'Bombero Forestal', en: 'Wildland Firefighter' }, emoji: '👨🏼‍🚒' },
+            { name: 'Soraida', job: { es: 'Escenógrafa', en: 'Set Designer' }, emoji: '👩🏽‍🎨' },
+            { name: 'Kofi A.', job: { es: 'Profesor de Filosofía', en: 'Philosophy Professor' }, emoji: '👨🏿‍🏫' },
+
+            // Bloque 3 (201 - 300)
+            { name: 'Ling', job: { es: 'Ingeniera Biomédica', en: 'Biomedical Engineer' }, emoji: '👩🏻‍🔬' },
+            { name: 'Dante M.', job: { es: 'Tatuador Artístico', en: 'Tattoo Artist' }, emoji: '🧔🏽‍♂️' },
+            { name: 'Berta', job: { es: 'Coleccionista de Porcelana', en: 'Porcelain Collector' }, emoji: '👵🏼' },
+            { name: 'Kareem', job: { es: 'Cirujano Ortopédico', en: 'Orthopedic Surgeon' }, emoji: '👨🏾‍⚕️' },
+            { name: 'Freja N.', job: { es: 'Diseñadora de Muebles', en: 'Furniture Designer' }, emoji: '👩🏼‍🎨' },
+            { name: 'Kwame O.', job: { es: 'Director de Cine Documental', en: 'Documentary Filmmaker' }, emoji: '🎬' },
+            { name: 'Haruto', job: { es: 'Programador de Seguridad', en: 'Security Programmer' }, emoji: '👨🏻‍💻' },
+            { name: 'Ximena', job: { es: 'Antropóloga', en: 'Anthropologist' }, emoji: '👩🏽‍🏫' },
+            { name: 'Soraya K.', job: { es: 'Piloto Comercial', en: 'Commercial Pilot' }, emoji: '🧕🏾' },
+            { name: 'Beltrán', job: { es: 'Anticuario', en: 'Antiquarian' }, emoji: '👴🏽' },
+            { name: 'Zuri M.', job: { es: 'Biotecnóloga', en: 'Biotechnologist' }, emoji: '👩🏿‍🔬' },
+            { name: 'Luka', job: { es: 'Tenista Profesional', en: 'Pro Tennis Player' }, emoji: '🎾' },
+            { name: 'Mei-Xiu', job: { es: 'Maestra de Tai Chi', en: 'Tai Chi Master' }, emoji: '👩🏻‍🌾' },
+            { name: 'Adnan', job: { es: 'Ingeniero Civil', en: 'Civil Engineer' }, emoji: '👨🏽‍🔧' },
+            { name: 'Beatriz L.', job: { es: 'Notaria Pública', en: 'Notary Public' }, emoji: '👩🏻‍💼' },
+            { name: 'Sekou T.', job: { es: 'Escultor en Bronce', en: 'Bronze Sculptor' }, emoji: '👨🏿‍🎨' },
+            { name: 'Yoko', job: { es: 'Editora Literaria', en: 'Literary Editor' }, emoji: '👩🏻‍🏫' },
+            { name: 'Ramiro S.', job: { es: 'Guardabosques', en: 'Forest Warden' }, emoji: '👨🏽‍🚒' },
+            { name: 'Amira', job: { es: 'Dermatóloga', en: 'Dermatologist' }, emoji: '🧕🏽' },
+            { name: 'Henrik', job: { es: 'Meteorólogo', en: 'Meteorologist' }, emoji: '👨🏼‍🔬' },
+            { name: 'Jacinta', job: { es: 'Tejedora Artesanal', en: 'Artisan Weaver' }, emoji: '👵🏿' },
+            { name: 'Jun', job: { es: 'Chef de Ramen', en: 'Ramen Chef' }, emoji: '👨🏻‍🍳' },
+            { name: 'Tamara', job: { es: 'Abogada Mercantil', en: 'Corporate Lawyer' }, emoji: '👩🏾‍💼' },
+            { name: 'Bastian K.', job: { es: 'Panadero Alemán', en: 'German Baker' }, emoji: '👨🏼‍🍳' },
+            { name: 'Nia O.', job: { es: 'Corredora de Maratón', en: 'Marathon Runner' }, emoji: '🏃🏿‍♀️' },
+            { name: 'Teo', job: { es: 'Diseñador de Sonido', en: 'Sound Designer' }, emoji: '🧑🏻‍🎤' },
+            { name: 'Salma H.', job: { es: 'Historiadora del Arte', en: 'Art Historian' }, emoji: '🧕🏼' },
+            { name: 'Rufino', job: { es: 'Relojero Antiguo', en: 'Antique Clockmaker' }, emoji: '👴🏾' },
+            { name: 'Kira N.', job: { es: 'Ingeniera Mecánica', en: 'Mechanical Engineer' }, emoji: '👩🏻‍🔧' },
+            { name: 'Jabari K.', job: { es: 'Biólogo Conservacionista', en: 'Conservation Biologist' }, emoji: '👨🏿‍🔬' },
+            { name: 'Inés', job: { es: 'Farmacéutica', en: 'Pharmacist' }, emoji: '👩🏼‍⚕️' },
+            { name: 'Tariq Z.', job: { es: 'Chef de Cocina Árabe', en: 'Middle Eastern Chef' }, emoji: '👨🏽‍🍳' },
+            { name: 'Mina P.', job: { es: 'Ilustradora Infantil', en: 'Children Book Illustrator' }, emoji: '👩🏻‍🎨' },
+            { name: 'Fulgencio', job: { es: 'Carpintero Jubilado', en: 'Retired Carpenter' }, emoji: '👴🏻' },
+            { name: 'Abena', job: { es: 'Jueza Suprema', en: 'Supreme Judge' }, emoji: '👩🏿‍⚖️' },
+            { name: 'Svenja', job: { es: 'Entrenadora de Natación', en: 'Swimming Coach' }, emoji: '🏊🏼‍♀️' },
+            { name: 'Kenjiro', job: { es: 'Maestro Espadero', en: 'Master Swordsmith' }, emoji: '👨🏻‍🏭' },
+            { name: 'Valeria R.', job: { es: 'Psicóloga Clínica', en: 'Clinical Psychologist' }, emoji: '👩🏽‍⚕️' },
+            { name: 'Omar F.', job: { es: 'Ingeniero Petrolero', en: 'Petroleum Engineer' }, emoji: '👨🏾‍🔧' },
+            { name: 'Chloe M.', job: { es: 'Bailarina de Ballet', en: 'Ballet Dancer' }, emoji: '🩰' },
+            { name: 'Darius W.', job: { es: 'Piloto de Carga', en: 'Cargo Pilot' }, emoji: '👨🏿‍✈️' },
+            { name: 'Hana K.', job: { es: 'Arquitecta de Interiores', en: 'Interior Architect' }, emoji: '👩🏻‍💼' },
+            { name: 'Casimiro', job: { es: 'Astrónomo Retirado', en: 'Retired Astronomer' }, emoji: '👴🏿' },
+            { name: 'Leila M.', job: { es: 'Periodista Cultural', en: 'Cultural Journalist' }, emoji: '🧕🏿' },
+            { name: 'Gael V.', job: { es: 'Escalador Profesional', en: 'Pro Rock Climber' }, emoji: '🧗🏻‍♂️' },
+            { name: 'Zainab A.', job: { es: 'Ingeniera Eléctrica', en: 'Electrical Engineer' }, emoji: '👩🏾‍🔧' },
+            { name: 'Toshi', job: { es: 'Desarrollador de IA', en: 'AI Developer' }, emoji: '🧑🏻‍💻' },
+            { name: 'Camila P.', job: { es: 'Veterinaria Equina', en: 'Equine Veterinarian' }, emoji: '👩🏽‍⚕️' },
+            { name: 'Bjorn S.', job: { es: 'Pescador de Altura', en: 'Deep-Sea Fisherman' }, emoji: '🧔🏼' },
+            { name: 'Imani D.', job: { es: 'Directora de Orquesta', en: 'Symphony Conductor' }, emoji: '👩🏿‍🎤' },
+            { name: 'Ryuji', job: { es: 'Ceramista Raku', en: 'Raku Potter' }, emoji: '👨🏻‍🎨' },
+            { name: 'Remedios', job: { es: 'Botánica Aficionada', en: 'Amateur Botanist' }, emoji: '👵🏽' },
+            { name: 'Kareem B.', job: { es: 'Abogado Internacional', en: 'International Lawyer' }, emoji: '👨🏾‍💼' },
+            { name: 'Astrid L.', job: { es: 'Ingeniera Ambiental', en: 'Environmental Engineer' }, emoji: '👩🏼‍🔬' },
+            { name: 'Kwesi M.', job: { es: 'Músico de Saxofón', en: 'Saxophonist' }, emoji: '🎷' },
+            { name: 'Mei-Ling C.', job: { es: 'Especialista en Robótica', en: 'Robotics Specialist' }, emoji: '👩🏻‍💻' },
+            { name: 'Mateo G.', job: { es: 'Arquitecto Restaurador', en: 'Restoration Architect' }, emoji: '🧔🏻‍♂️' },
+            { name: 'Fatima Z.', job: { es: 'Médica Sin Fronteras', en: 'Field Physician' }, emoji: '🧕🏾' },
+            { name: 'Hugo T.', job: { es: 'Profesor de Química', en: 'Chemistry Professor' }, emoji: '👨🏼‍🏫' },
+            { name: 'Nadia K.', job: { es: 'Coreógrafa Contemporánea', en: 'Contemporary Choreographer' }, emoji: '💃🏽' },
+            { name: 'Sabino', job: { es: 'Hortelano', en: 'Orchardist' }, emoji: '👴🏼' },
+            { name: 'Yuki T.', job: { es: 'Diseñadora de Videojuegos', en: 'Video Game Designer' }, emoji: '👩🏻‍💻' },
+            { name: 'Idris M.', job: { es: 'Capitán de Bomberos', en: 'Fire Captain' }, emoji: '👨🏿‍🚒' },
+            { name: 'Sofía M.', job: { es: 'Crítica de Cine', en: 'Film Critic' }, emoji: '👩🏻‍💼' },
+            { name: 'Rashid A.', job: { es: 'Ingeniero Aeronáutico', en: 'Aeronautical Engineer' }, emoji: '👳🏽‍♂️' },
+            { name: 'Clara B.', job: { es: 'Oceanógrafa', en: 'Oceanographer' }, emoji: '👩🏼‍🔬' },
+            { name: 'Dante V.', job: { es: 'Luthier de Violines', en: 'Violin Luthier' }, emoji: '🎻' },
+            { name: 'Amara N.', job: { es: 'Economista Jefe', en: 'Chief Economist' }, emoji: '👩🏿‍💼' },
+            { name: 'Koji S.', job: { es: 'Maestro Jardinero', en: 'Master Gardener' }, emoji: '👨🏻‍🌾' },
+            { name: 'Virtudes', job: { es: 'Encajera de Bolillos', en: 'Bobbin Lacemaker' }, emoji: '👵🏻' },
+            { name: 'Hamza R.', job: { es: 'Cirujano General', en: 'General Surgeon' }, emoji: '👨🏾‍⚕️' },
+            { name: 'Freya M.', job: { es: 'Fotógrafa Documental', en: 'Documentary Photographer' }, emoji: '👩🏼‍🎨' },
+            { name: 'Thabo K.', job: { es: 'Ingeniero de Minas', en: 'Mining Engineer' }, emoji: '👨🏿‍🔧' },
+            { name: 'Aiko M.', job: { es: 'Traductora Literaria', en: 'Literary Translator' }, emoji: '👩🏻‍🏫' },
+            { name: 'Carlos E.', job: { es: 'Chef de Cocina Peruana', en: 'Peruvian Cuisine Chef' }, emoji: '👨🏽‍🍳' },
+            { name: 'Yasmine B.', job: { es: 'Urbanista', en: 'Urban Planner' }, emoji: '🧕🏽' },
+            { name: 'Liam O.', job: { es: 'Guía de Montaña', en: 'Mountain Guide' }, emoji: '🧔🏼‍♂️' },
+            { name: 'Zuri K.', job: { es: 'Artista Digital', en: 'Digital Artist' }, emoji: '👩🏿‍🎨' },
+            { name: 'Min-Jun K.', job: { es: 'Ingeniero de Sonido', en: 'Sound Engineer' }, emoji: '👨🏻‍🎤' },
+            { name: 'Anselmo G.', job: { es: 'Coleccionista de Monedas', en: 'Coin Collector' }, emoji: '👴🏽' },
+            { name: 'Priya S.', job: { es: 'Astrofísica Teórica', en: 'Theoretical Astrophysicist' }, emoji: '👩🏽‍🚀' },
+            { name: 'Soren K.', job: { es: 'Carpintero Arquitectónico', en: 'Architectural Woodworker' }, emoji: '👨🏼‍🏭' },
+            { name: 'Chidinma O.', job: { es: 'Investigadora Médica', en: 'Medical Researcher' }, emoji: '👩🏿‍🔬' },
+            { name: 'Hao L.', job: { es: 'Chef de Dim Sum', en: 'Dim Sum Chef' }, emoji: '👨🏻‍🍳' },
+            { name: 'Elena R.', job: { es: 'Jueza de Instrucción', en: 'Examining Magistrate' }, emoji: '👩🏻‍⚖️' },
+            { name: 'Samir H.', job: { es: 'Analista de Datos', en: 'Data Analyst' }, emoji: '👨🏽‍💻' },
+            { name: 'Ingrid H.', job: { es: 'Maestra Chocolatera', en: 'Master Chocolatier' }, emoji: '👩🏼‍🍳' },
+            { name: 'Ousmane D.', job: { es: 'Profesor de Historia', en: 'History Teacher' }, emoji: '👨🏿‍🏫' },
+            { name: 'Sakura M.', job: { es: 'Florista Profesional', en: 'Professional Florist' }, emoji: '👩🏻‍🌾' },
+            { name: 'Dolores', job: { es: 'Escritora de Novelas', en: 'Romance Novelist' }, emoji: '👵🏾' },
+            { name: 'Tariq M.', job: { es: 'Piloto de Helicópteros', en: 'Helicopter Pilot' }, emoji: '👨🏽‍✈️' },
+            { name: 'Kira V.', job: { es: 'Especialista en Seguridad', en: 'Security Specialist' }, emoji: '🕵🏼‍♀️' },
+            { name: 'Bamba S.', job: { es: 'Maestro de Capoeira', en: 'Capoeira Master' }, emoji: '🤸🏿‍♂️' },
+            { name: 'Yuna K.', job: { es: 'Violinista Principal', en: 'Concertmaster Violinist' }, emoji: '👩🏻‍🎤' },
+            { name: 'Gonzalo M.', job: { es: 'Biólogo Forestal', en: 'Forest Biologist' }, emoji: '👨🏽‍🔬' },
+            { name: 'Amina H.', job: { es: 'Cirujana Pediátrica', en: 'Pediatric Surgeon' }, emoji: '🧕🏿' },
+            { name: 'Lucas B.', job: { es: 'Ingeniero Naval', en: 'Naval Engineer' }, emoji: '👨🏻‍🔧' },
+            { name: 'Makeda T.', job: { es: 'Curadora de Museo', en: 'Museum Curator' }, emoji: '👩🏿‍💼' },
+            { name: 'Horacio', job: { es: 'Director de Teatro Retirado', en: 'Retired Theater Director' }, emoji: '👴🏻' },
+            { name: 'Soraya M.', job: { es: 'Exploradora Submarina', en: 'Underwater Explorer' }, emoji: '🤿' }
         ];
 
-        // Base de datos de 150 preguntas subjetivas y divertidas
+        // =========================================================================
+        // BASE DE DATOS DE 350 PREGUNTAS SUBJETIVAS BILINGÜES (ES / EN)
+        // =========================================================================
         const ALL_QUESTIONS = [
-            "¿Le gusta ver o jugar al fútbol?",
-            "¿Le pone piña a la pizza?",
-            "¿Llora viendo películas de Disney?",
-            "¿Colecciona sellos, monedas o cosas raras?",
-            "¿Sabe hacer malabares?",
-            "¿Tiene suscripción a Netflix?",
-            "¿Se baña todos los días?",
-            "¿Le gusta escuchar reggaetón?",
-            "¿Ha robado alguna vez en una tienda?",
-            "¿Es vegano o vegetariano?",
-            "¿Cree en los fantasmas o espíritus?",
-            "¿Duerme con los calcetines puestos?",
-            "¿Sabe cambiar la rueda de un coche?",
-            "¿Tiene tatuajes ocultos?",
-            "¿Ronca mucho por las noches?",
-            "¿Sabe algún tipo de artes marciales?",
-            "¿Habla solo en voz alta?",
-            "¿Prefiere a los gatos antes que a los perros?",
-            "¿Se salta los semáforos en rojo cuando nadie mira?",
-            "¿Ha mentido en su currículum?",
-            "¿Se queda dormido en el cine?",
-            "¿Cree que la Tierra es plana?",
-            "¿Canta a pleno pulmón en la ducha?",
-            "¿Tiene miedo a volar en avión?",
-            "¿Sabe tocar algún instrumento musical?",
-            "¿Lee el horóscopo todos los días?",
-            "¿Come la pizza con tenedor y cuchillo?",
-            "¿Usa crocs o chanclas con calcetines?",
-            "¿Es adicto al café?",
-            "¿Sabe cocinar algo más que pasta y arroz?",
-            "¿Ha hecho puenting o paracaidismo?",
-            "¿Le gusta la música heavy metal?",
-            "¿Tiene alguna multa de tráfico sin pagar?",
-            "¿Se le mueren hasta los cactus?",
-            "¿Es de los que aplauden cuando aterriza el avión?",
-            "¿Usa todavía despertador analógico?",
-            "¿Le tiene fobia a los payasos?",
-            "¿Se sabe todos los diálogos de alguna película?",
-            "¿Ha participado alguna vez en un reality show?",
-            "¿Le gusta ir de acampada al bosque?",
-            "¿Toma el té con el dedo meñique levantado?",
-            "¿Reutiliza las bolsas de plástico del supermercado?",
-            "¿Sabe bailar salsa o bachata?",
-            "¿Ha tenido algún amigo imaginario de pequeño?",
-            "¿Es el típico que siempre llega tarde a todos lados?",
-            "¿Le gusta el picante extremo?",
-            "¿Cree en los extraterrestres y los ovnis?",
-            "¿Se ha colado alguna vez en el metro o autobús?",
-            "¿Tiene una colección de patitos de goma?",
-            "¿Sabe hablar más de dos idiomas?",
-            "¿Le gusta hacer crucigramas o sudokus?",
-            "¿Es fanático de los videojuegos?",
-            "¿Se mira mucho en el espejo al pasar por los escaparates?",
-            "¿Le tiene miedo a la oscuridad?",
-            "¿Ha enviado alguna vez un mensaje al ex por error?",
-            "¿Le gusta el karaoke?",
-            "¿Guarda los botes de cristal vacíos 'por si acaso'?",
-            "¿Sabe hacer trucos de magia con cartas?",
-            "¿Le da miedo ir al dentista?",
-            "¿Es de los que ponen el árbol de Navidad en noviembre?",
-            "¿Sabe nadar estilo mariposa?",
-            "¿Le gusta madrugar los domingos para hacer deporte?",
-            "¿Ha robado toallas o albornoces de un hotel?",
-            "¿Se come las uñas cuando está nervioso?",
-            "¿Le gustan las películas de terror?",
-            "¿Sabe hacer origami (papiroflexia)?",
-            "¿Tiene cuenta en TikTok y sube bailes?",
-            "¿Le gusta el queso azul muy fuerte?",
-            "¿Ha escrito alguna vez un diario personal?",
-            "¿Sabe coser un botón?",
-            "¿Es de los que dejan los platos en remojo tres días?",
-            "¿Le gusta la ópera o la música clásica?",
-            "¿Se ha teñido el pelo de un color llamativo alguna vez?",
-            "¿Tiene supersticiones como no pasar por debajo de una escalera?",
-            "¿Le gusta hacer bricolaje en casa?",
-            "¿Ha ganado alguna vez un concurso o sorteo?",
-            "¿Se sabe de memoria su número de DNI?",
-            "¿Le gusta el ajedrez?",
-            "¿Ha tenido alguna vez un corte de pelo desastroso?",
-            "¿Es de los que hablan con las plantas?",
-            "¿Le gusta ir a museos de arte moderno?",
-            "¿Se come la corteza del queso?",
-            "¿Ha hecho alguna vez autostop?",
-            "¿Le gusta el golf?",
-            "¿Tiene el móvil siempre con menos del 10% de batería?",
-            "¿Sabe silbar muy fuerte con los dedos?",
-            "¿Le gusta el sushi?",
-            "¿Ha fingido estar enfermo para no ir a trabajar o estudiar?",
-            "¿Le tiene pánico a las arañas o cucarachas?",
-            "¿Usa paraguas incluso cuando caen cuatro gotas?",
-            "¿Le gusta coleccionar imanes de nevera de sus viajes?",
-            "¿Sabe montar en monopatín o patines?",
-            "¿Es de los que cuenta el final de las películas (spoilers)?",
-            "¿Le gusta tomar el sol durante horas en la playa?",
-            "¿Tiene algún amuleto de la suerte?",
-            "¿Sabe hacer el pino o la voltereta lateral?",
-            "¿Le gusta el brócoli?",
-            "¿Ha tenido alguna vez una mascota exótica?",
-            "¿Se queda mirando las obras en la calle?",
-            "¿Cree que tiene buena suerte en la vida?",
-            "¿Deja los mensajes de WhatsApp en 'visto' y responde tres días después?",
-            "¿Manda audios de WhatsApp de más de cuatro minutos?",
-            "¿Se iría sin pagar de un restaurante si se olvidan de cobrarle?",
-            "¿Hace trampas jugando al Monopoly o al Uno?",
-            "¿Pone diez alarmas seguidas cada cinco minutos para despertarse?",
-            "¿Se pelea con desconocidos en los comentarios de internet?",
-            "¿Tiene la galería del móvil llena de memes?",
-            "¿Le da miedo montar en montaña rusa?",
-            "¿Es de los que revisan el teléfono de su pareja?",
-            "¿Se queja de la comida en los restaurantes para que le inviten?",
-            "¿Tiene una risa muy contagiosa y escandalosa?",
-            "¿Es muy tacaño a la hora de dividir la cuenta entre amigos?",
-            "¿Habla con los animales como si fueran personas?",
-            "¿Se quema al sol a los cinco minutos de llegar a la playa?",
-            "¿Siempre pide exactamente lo mismo en los restaurantes?",
-            "¿Ha escrito poesía romántica alguna vez?",
-            "¿Le gusta el chocolate negro con más del 85% de cacao?",
-            "¿Es muy despistado y pierde las llaves a menudo?",
-            "¿Ha estado alguna vez de vacaciones en un crucero?",
-            "¿Ve las series con subtítulos aunque estén en su idioma?",
-            "¿Se pone muy nervioso cuando tiene que hablar en público?",
-            "¿Desayuna algo dulce todos los días?",
-            "¿Es muy buen negociador regateando en los mercadillos?",
-            "¿Saluda a los desconocidos cuando se cruza con ellos por la calle?",
-            "¿Sabe montar a caballo?",
-            "¿Siempre lleva un libro encima por si tiene que esperar?",
-            "¿Fue el delegado de clase en el colegio o instituto?",
-            "¿Llora cuando corta cebolla en la cocina?",
-            "¿Ha suspendido el examen práctico de conducir más de dos veces?",
-            "¿Da muy buenos consejos amorosos a sus amigos?",
-            "¿Prefiere el invierno y el frío antes que el verano?",
-            "¿Es extremadamente ordenado y maniático de la limpieza?",
-            "¿Se colaría en la fila del supermercado si nadie se diera cuenta?",
-            "¿Siempre olvida los cumpleaños de sus amigos cercanos?",
-            "¿Lloró de alegría alguna vez en su vida?",
-            "¿Es muy competitivo en los deportes y juegos de mesa?",
-            "¿Guarda cartas o regalos de sus ex parejas en una caja?",
-            "¿Sabe hacer primeros auxilios básicos?",
-            "¿Le encantan los parques de atracciones y ferias?",
-            "¿Tiene pinta de haber tenido una época emo o gótica de adolescente?",
-            "¿Gasta mucho dinero en ropa y zapatillas de marca?",
-            "¿Prefiere ir a un hotel de cinco estrellas antes que de camping?",
-            "¿Cuenta chistes malos y es el único que se ríe?",
-            "¿Hace yoga o meditación todas las mañanas?",
-            "¿Le gusta ver documentales sobre crímenes reales?",
-            "¿Es siempre el alma de la fiesta?",
-            "¿Lee libros de autoayuda?",
-            "¿Tiene miedo a las alturas?",
-            "¿Sabe hacer una paella espectacular?",
-            "¿Tiene más de tres gatos viviendo en su casa?"
+            // Bloque 1 (1 - 150)
+            { es: "¿Le gusta ver o jugar al fútbol?", en: "Do they like watching or playing soccer?" },
+            { es: "¿Le pone piña a la pizza?", en: "Do they put pineapple on pizza?" },
+            { es: "¿Llora viendo películas de Disney?", en: "Do they cry watching Disney movies?" },
+            { es: "¿Colecciona sellos, monedas o cosas raras?", en: "Do they collect stamps, coins, or weird items?" },
+            { es: "¿Sabe hacer malabares?", en: "Do they know how to juggle?" },
+            { es: "¿Tiene suscripción a Netflix?", en: "Do they have a Netflix subscription?" },
+            { es: "¿Se baña todos los días?", en: "Do they shower every single day?" },
+            { es: "¿Le gusta escuchar reggaetón?", en: "Do they enjoy listening to reggaeton?" },
+            { es: "¿Ha robado alguna vez en una tienda?", en: "Have they ever shoplifted from a store?" },
+            { es: "¿Es vegano o vegetariano?", en: "Are they vegan or vegetarian?" },
+            { es: "¿Cree en los fantasmas o espíritus?", en: "Do they believe in ghosts or spirits?" },
+            { es: "¿Duerme con los calcetines puestos?", en: "Do they sleep with their socks on?" },
+            { es: "¿Sabe cambiar la rueda de un coche?", en: "Do they know how to change a flat tire?" },
+            { es: "¿Tiene tatuajes ocultos?", en: "Do they have hidden tattoos?" },
+            { es: "¿Ronca mucho por las noches?", en: "Do they snore loudly at night?" },
+            { es: "¿Sabe algún tipo de artes marciales?", en: "Do they know any martial arts?" },
+            { es: "¿Habla solo en voz alta?", en: "Do they talk to themselves out loud?" },
+            { es: "¿Prefiere a los gatos antes que a los perros?", en: "Do they prefer cats over dogs?" },
+            { es: "¿Se salta los semáforos en rojo cuando nadie mira?", en: "Do they run red lights when nobody is watching?" },
+            { es: "¿Ha mentido en su currículum?", en: "Have they ever lied on their resume?" },
+            { es: "¿Se queda dormido en el cine?", en: "Do they fall asleep in movie theaters?" },
+            { es: "¿Cree que la Tierra es plana?", en: "Do they believe the Earth is flat?" },
+            { es: "¿Canta a pleno pulmón en la ducha?", en: "Do they sing at the top of their lungs in the shower?" },
+            { es: "¿Tiene miedo a volar en avión?", en: "Are they afraid of flying?" },
+            { es: "¿Sabe tocar algún instrumento musical?", en: "Can they play a musical instrument?" },
+            { es: "¿Lee el horóscopo todos los días?", en: "Do they read their horoscope every day?" },
+            { es: "¿Come la pizza con tenedor y cuchillo?", en: "Do they eat pizza with a fork and knife?" },
+            { es: "¿Usa crocs o chanclas con calcetines?", en: "Do they wear Crocs or sandals with socks?" },
+            { es: "¿Es adicto al café?", en: "Are they addicted to coffee?" },
+            { es: "¿Sabe cocinar algo más que pasta y arroz?", en: "Can they cook anything beyond pasta and rice?" },
+            { es: "¿Ha hecho puenting o paracaidismo?", en: "Have they ever gone bungee jumping or skydiving?" },
+            { es: "¿Le gusta la música heavy metal?", en: "Do they listen to heavy metal music?" },
+            { es: "¿Tiene alguna multa de tráfico sin pagar?", en: "Do they have unpaid parking tickets?" },
+            { es: "¿Se le mueren hasta los cactus?", en: "Do they manage to kill even cacti?" },
+            { es: "¿Es de los que aplauden cuando aterriza el avión?", en: "Are they the type to clap when the plane lands?" },
+            { es: "¿Usa todavía despertador analógico?", en: "Do they still use an analog alarm clock?" },
+            { es: "¿Le tiene fobia a los payasos?", en: "Are they afraid of clowns?" },
+            { es: "¿Se sabe todos los diálogos de alguna película?", en: "Have they memorized every line of a movie?" },
+            { es: "¿Ha participado alguna vez en un reality show?", en: "Have they ever been on a reality TV show?" },
+            { es: "¿Le gusta ir de acampada al bosque?", en: "Do they enjoy camping in the woods?" },
+            { es: "¿Toma el té con el dedo meñique levantado?", en: "Do they drink tea with their pinky raised?" },
+            { es: "¿Reutiliza las bolsas de plástico del supermercado?", en: "Do they reuse grocery plastic bags?" },
+            { es: "¿Sabe bailar salsa o bachata?", en: "Can they dance salsa or bachata?" },
+            { es: "¿Ha tenido algún amigo imaginario de pequeño?", en: "Did they have an imaginary friend as a kid?" },
+            { es: "¿Es el típico que siempre llega tarde a todos lados?", en: "Are they always 20 minutes late everywhere?" },
+            { es: "¿Le gusta el picante extremo?", en: "Do they love extremely spicy food?" },
+            { es: "¿Cree en los extraterrestres y los ovnis?", en: "Do they believe in aliens and UFOs?" },
+            { es: "¿Se ha colado alguna vez en el metro o autobús?", en: "Have they ever hopped a subway turnstile?" },
+            { es: "¿Tiene una colección de patitos de goma?", en: "Do they own a collection of rubber ducks?" },
+            { es: "¿Sabe hablar más de dos idiomas?", en: "Can they speak more than two languages?" },
+            { es: "¿Le gusta hacer crucigramas o sudokus?", en: "Do they enjoy crosswords or Sudoku?" },
+            { es: "¿Es fanático de los videojuegos?", en: "Are they a hardcore gamer?" },
+            { es: "¿Se mira mucho en el espejo al pasar por los escaparates?", en: "Do they check themselves out in shop windows?" },
+            { es: "¿Le tiene miedo a la oscuridad?", en: "Are they afraid of the dark?" },
+            { es: "¿Ha enviado alguna vez un mensaje al ex por error?", en: "Have they ever accidentally texted an ex?" },
+            { es: "¿Le gusta el karaoke?", en: "Do they love doing karaoke?" },
+            { es: "¿Guarda los botes de cristal vacíos 'por si acaso'?", en: "Do they save empty glass jars 'just in case'?" },
+            { es: "¿Sabe hacer trucos de magia con cartas?", en: "Can they do card magic tricks?" },
+            { es: "¿Le da miedo ir al dentista?", en: "Are they terrified of going to the dentist?" },
+            { es: "¿Es de los que ponen el árbol de Navidad en noviembre?", en: "Do they put up their Christmas tree in November?" },
+            { es: "¿Sabe nadar estilo mariposa?", en: "Can they swim the butterfly stroke?" },
+            { es: "¿Le gusta madrugar los domingos para hacer deporte?", en: "Do they wake up early on Sundays to work out?" },
+            { es: "¿Ha robado toallas o albornoces de un hotel?", en: "Have they ever taken bathrobes or towels from a hotel?" },
+            { es: "¿Se come las uñas cuando está nervioso?", en: "Do they bite their nails when nervous?" },
+            { es: "¿Le gustan las películas de terror?", en: "Do they enjoy horror movies?" },
+            { es: "¿Sabe hacer origami (papiroflexia)?", en: "Can they fold origami?" },
+            { es: "¿Tiene cuenta en TikTok y sube bailes?", en: "Do they post dance videos on TikTok?" },
+            { es: "¿Le gusta el queso azul muy fuerte?", en: "Do they like extra strong blue cheese?" },
+            { es: "¿Ha escrito alguna vez un diario personal?", en: "Have they ever kept a personal diary?" },
+            { es: "¿Sabe coser un botón?", en: "Do they know how to sew on a button?" },
+            { es: "¿Es de los que dejan los platos en remojo tres días?", en: "Do they leave dishes 'soaking' for three days?" },
+            { es: "¿Le gusta la ópera o la música clásica?", en: "Do they enjoy opera or classical music?" },
+            { es: "¿Se ha teñido el pelo de un color llamativo alguna vez?", en: "Have they ever dyed their hair a bright neon color?" },
+            { es: "¿Tiene supersticiones como no pasar por debajo de una escalera?", en: "Are they superstitious about walking under ladders?" },
+            { es: "¿Le gusta hacer bricolaje en casa?", en: "Do they enjoy DIY home repairs?" },
+            { es: "¿Ha ganado alguna vez un concurso o sorteo?", en: "Have they ever won a raffle or giveaway?" },
+            { es: "¿Se sabe de memoria su número de DNI?", en: "Do they know their ID or passport number by heart?" },
+            { es: "¿Le gusta el ajedrez?", en: "Do they play chess?" },
+            { es: "¿Ha tenido alguna vez un corte de pelo desastroso?", en: "Have they ever had a disastrous haircut?" },
+            { es: "¿Es de los que hablan con las plantas?", en: "Do they talk to their houseplants?" },
+            { es: "¿Le gusta ir a museos de arte moderno?", en: "Do they enjoy modern art museums?" },
+            { es: "¿Se come la corteza del queso?", en: "Do they eat the rind on cheese?" },
+            { es: "¿Ha hecho alguna vez autostop?", en: "Have they ever hitchhiked?" },
+            { es: "¿Le gusta el golf?", en: "Do they enjoy playing golf?" },
+            { es: "¿Tiene el móvil siempre con menos del 10% de batería?", en: "Is their phone battery always below 10%?" },
+            { es: "¿Sabe silbar muy fuerte con los dedos?", en: "Can they whistle loudly using their fingers?" },
+            { es: "¿Le gusta el sushi?", en: "Do they love eating sushi?" },
+            { es: "¿Ha fingido estar enfermo para no ir a trabajar o estudiar?", en: "Have they ever faked being sick to skip work or school?" },
+            { es: "¿Le tiene pánico a las arañas o cucarachas?", en: "Are they terrified of spiders or cockroaches?" },
+            { es: "¿Usa paraguas incluso cuando caen cuatro gotas?", en: "Do they use an umbrella for a tiny drizzle?" },
+            { es: "¿Le gusta coleccionar imanes de nevera de sus viajes?", en: "Do they collect fridge magnets from their trips?" },
+            { es: "¿Sabe montar en monopatín o patines?", en: "Can they ride a skateboard or rollerblades?" },
+            { es: "¿Es de los que cuenta el final de las películas (spoilers)?", en: "Are they the type to spoil movie endings?" },
+            { es: "¿Le gusta tomar el sol durante horas en la playa?", en: "Do they love sunbathing for hours at the beach?" },
+            { es: "¿Tiene algún amuleto de la suerte?", en: "Do they carry a lucky charm?" },
+            { es: "¿Sabe hacer el pino o la voltereta lateral?", en: "Can they do a handstand or a cartwheel?" },
+            { es: "¿Le gusta el brócoli?", en: "Do they genuinely like broccoli?" },
+            { es: "¿Ha tenido alguna vez una mascota exótica?", en: "Have they ever owned an exotic pet?" },
+            { es: "¿Se queda mirando las obras en la calle?", en: "Do they stop to watch street construction work?" },
+            { es: "¿Cree que tiene buena suerte en la vida?", en: "Do they consider themselves lucky in life?" },
+            { es: "¿Deja los mensajes de WhatsApp en 'visto' y responde tres días después?", en: "Do they leave texts on 'read' and reply three days later?" },
+            { es: "¿Manda audios de WhatsApp de más de cuatro minutos?", en: "Do they send voice notes longer than four minutes?" },
+            { es: "¿Se iría sin pagar de un restaurante si se olvidan de cobrarle?", en: "Would they dine and dash if the waiter forgot the bill?" },
+            { es: "¿Hace trampas jugando al Monopoly o al Uno?", en: "Do they cheat when playing Monopoly or Uno?" },
+            { es: "¿Pone diez alarmas seguidas cada cinco minutos para despertarse?", en: "Do they set ten alarms five minutes apart to wake up?" },
+            { es: "¿Se pelea con desconocidos en los comentarios de internet?", en: "Do they argue with strangers in internet comment sections?" },
+            { es: "¿Tiene la galería del móvil llena de memes?", en: "Is their phone gallery full of memes?" },
+            { es: "¿Le da miedo montar en montaña rusa?", en: "Are they scared of riding roller coasters?" },
+            { es: "¿Es de los que revisan el teléfono de su pareja?", en: "Are they the type to snoop through their partner's phone?" },
+            { es: "¿Se queja de la comida en los restaurantes para que le inviten?", en: "Do they complain about restaurant food to get a free meal?" },
+            { es: "¿Tiene una risa muy contagiosa y escandalosa?", en: "Do they have a loud, contagious laugh?" },
+            { es: "¿Es muy tacaño a la hora de dividir la cuenta entre amigos?", en: "Are they super stingy when splitting the dinner bill?" },
+            { es: "¿Habla con los animales como si fueran personas?", en: "Do they talk to animals as if they were humans?" },
+            { es: "¿Se quema al sol a los cinco minutos de llegar a la playa?", en: "Do they get sunburned within five minutes at the beach?" },
+            { es: "¿Siempre pide exactamente lo mismo en los restaurantes?", en: "Do they always order the exact same dish at restaurants?" },
+            { es: "¿Ha escrito poesía romántica alguna vez?", en: "Have they ever written romantic poetry?" },
+            { es: "¿Le gusta el chocolate negro con más del 85% de cacao?", en: "Do they enjoy dark chocolate over 85% cocoa?" },
+            { es: "¿Es muy despistado y pierde las llaves a menudo?", en: "Are they forgetful and always losing their keys?" },
+            { es: "¿Ha estado alguna vez de vacaciones en un crucero?", en: "Have they ever been on a cruise vacation?" },
+            { es: "¿Ve las series con subtítulos aunque estén en su idioma?", en: "Do they watch TV shows with subtitles in their own language?" },
+            { es: "¿Se pone muy nervioso cuando tiene que hablar en público?", en: "Do they get super nervous speaking in public?" },
+            { es: "¿Desayuna algo dulce todos los días?", en: "Do they eat something sweet for breakfast every day?" },
+            { es: "¿Es muy buen negociador regateando en los mercadillos?", en: "Are they great at haggling prices at flea markets?" },
+            { es: "¿Saluda a los desconocidos cuando se cruza con ellos por la calle?", en: "Do they say hello to strangers passing by on the street?" },
+            { es: "¿Sabe montar a caballo?", en: "Do they know how to ride a horse?" },
+            { es: "¿Siempre lleva un libro encima por si tiene que esperar?", en: "Do they always carry a book in case they have to wait?" },
+            { es: "¿Fue el delegado de clase en el colegio o instituto?", en: "Were they class president in high school?" },
+            { es: "¿Llora cuando corta cebolla en la cocina?", en: "Do they cry uncontrollably when chopping onions?" },
+            { es: "¿Ha suspendido el examen práctico de conducir más de dos veces?", en: "Did they fail their driving test more than twice?" },
+            { es: "¿Da muy buenos consejos amorosos a sus amigos?", en: "Do they give great relationship advice to friends?" },
+            { es: "¿Prefiere el invierno y el frío antes que el verano?", en: "Do they prefer cold winters over hot summers?" },
+            { es: "¿Es extremadamente ordenado y maniático de la limpieza?", en: "Are they an extreme neat freak?" },
+            { es: "¿Se colaría en la fila del supermercado si nadie se diera cuenta?", en: "Would they cut in line at the grocery store if nobody noticed?" },
+            { es: "¿Siempre olvida los cumpleaños de sus amigos cercanos?", en: "Do they always forget their close friends' birthdays?" },
+            { es: "¿Lloró de alegría alguna vez en su vida?", en: "Have they ever cried tears of joy?" },
+            { es: "¿Es muy competitivo en los deportes y juegos de mesa?", en: "Are they overly competitive at board games and sports?" },
+            { es: "¿Guarda cartas o regalos de sus ex parejas en una caja?", en: "Do they keep old letters or gifts from exes in a box?" },
+            { es: "¿Sabe hacer primeros auxilios básicos?", en: "Do they know basic first aid and CPR?" },
+            { es: "¿Le encantan los parques de atracciones y ferias?", en: "Do they love amusement parks and carnivals?" },
+            { es: "¿Tiene pinta de haber tenido una época emo o gótica de adolescente?", en: "Did they have an emo or goth phase as a teenager?" },
+            { es: "¿Gasta mucho dinero en ropa y zapatillas de marca?", en: "Do they spend lots of money on designer clothes and sneakers?" },
+            { es: "¿Prefiere ir a un hotel de cinco estrellas antes que de camping?", en: "Do they prefer five-star hotels over camping?" },
+            { es: "¿Cuenta chistes malos y es el único que se ríe?", en: "Do they tell bad dad jokes and laugh alone?" },
+            { es: "¿Hace yoga o meditación todas las mañanas?", en: "Do they do yoga or meditation every morning?" },
+            { es: "¿Le gusta ver documentales sobre crímenes reales?", en: "Do they binge-watch true crime documentaries?" },
+            { es: "¿Es siempre el alma de la fiesta?", en: "Are they always the life of the party?" },
+            { es: "¿Lee libros de autoayuda?", en: "Do they read self-help books?" },
+            { es: "¿Tiene miedo a las alturas?", en: "Are they afraid of heights?" },
+            { es: "¿Sabe hacer una paella espectacular?", en: "Can they cook an amazing paella?" },
+            { es: "¿Tiene más de tres gatos viviendo en su casa?", en: "Do they have more than three cats at home?" },
+
+            // Bloque 2 (151 - 350)
+            { es: "¿Bebe la leche directamente del cartón cuando nadie mira?", en: "Do they drink milk straight from the carton when alone?" },
+            { es: "¿Se sabe alguna coreografía completa de los años 90?", en: "Do they know a full 90s pop dance choreography?" },
+            { es: "¿Le da miedo la sangre o las agujas?", en: "Do they faint at the sight of blood or needles?" },
+            { es: "¿Tiene una carpeta secreta de memes en el ordenador?", en: "Do they have a secret meme folder on their computer?" },
+            { es: "¿Pide siempre el plato más caro cuando invitan otros?", en: "Do they always order the priciest dish when someone else pays?" },
+            { es: "¿Se ha quedado encerrado fuera de casa sin llaves alguna vez?", en: "Have they ever locked themselves out without keys?" },
+            { es: "¿Le gusta escuchar podcasts de misterio antes de dormir?", en: "Do they listen to mystery podcasts before bed?" },
+            { es: "¿Guarda las cajas de los móviles viejos durante años?", en: "Do they keep empty smartphone boxes for years?" },
+            { es: "¿Sabe encender una hoguera sin mechero ni cerillas?", en: "Can they start a campfire without matches or a lighter?" },
+            { es: "¿Le pone kétchup a absolutamente toda la comida?", en: "Do they put ketchup on almost every meal?" },
+            { es: "¿Se ha caído en público y ha fingido que no pasó nada?", en: "Have they tripped in public and pretended nothing happened?" },
+            { es: "¿Tiene más de 50 pestañas abiertas en el navegador del móvil?", en: "Do they have over 50 open tabs on their phone browser?" },
+            { es: "¿Le gusta hacer puzzles de más de 2.000 piezas?", en: "Do they enjoy 2,000-piece jigsaw puzzles?" },
+            { es: "¿Es de los que leen el final del libro antes de terminarlo?", en: "Do they read the last page of a book first?" },
+            { es: "¿Sabe distinguir el vino caro del barato?", en: "Can they tell expensive wine apart from cheap wine?" },
+            { es: "¿Le tiene miedo a los perros pequeños pero ladradores?", en: "Are they scared of tiny barking dogs?" },
+            { es: "¿Ha comprado alguna vez algo inútil en la teletienda de madrugada?", en: "Have they bought useless infomercial gadgets at 3 AM?" },
+            { es: "¿Se sabe el abecedario al revés?", en: "Can they recite the alphabet backwards?" },
+            { es: "¿Usa el mismo pijama durante toda la semana?", en: "Do they wear the exact same pajamas all week?" },
+            { es: "¿Le gusta el regaliz negro?", en: "Do they actually enjoy black licorice?" },
+            { es: "¿Ha llorado alguna vez por perder en un videojuego?", en: "Have they ever cried over losing a video game?" },
+            { es: "¿Es de los que corrigen la ortografía de los demás en chats?", en: "Do they correct other people's grammar in group chats?" },
+            { es: "¿Sabe hacer burbujas gigantes con chicle?", en: "Can they blow giant bubblegum bubbles?" },
+            { es: "¿Le da pereza contestar llamadas y prefiere escribir?", en: "Do they ignore phone calls and reply by text instead?" },
+            { es: "¿Tiene algún talento oculto totalmente inútil?", en: "Do they have a completely useless hidden talent?" },
+            { es: "¿Ha dormido alguna vez en un aeropuerto?", en: "Have they ever slept overnight in an airport?" },
+            { es: "¿Le gusta el olor a gasolina o a pintura fresca?", en: "Do they secretly like the smell of gasoline or fresh paint?" },
+            { es: "¿Es de los que llegan dos horas antes al aeropuerto?", en: "Do they arrive at the airport three hours early?" },
+            { es: "¿Sabe cocinar sin mirar ninguna receta?", en: "Can they cook great meals without using recipes?" },
+            { es: "¿Le tiene fobia a los espacios muy cerrados (claustrofobia)?", en: "Are they claustrophobic in tight spaces?" },
+            { es: "¿Ha ganado alguna vez una discusión en internet?", en: "Have they ever won an online argument?" },
+            { es: "¿Usa agendas de papel en lugar del calendario del móvil?", en: "Do they use a paper planner instead of a digital calendar?" },
+            { es: "¿Le gusta ver concursos de televisión y responder desde el sofá?", en: "Do they yell answers at TV game shows from the couch?" },
+            { es: "¿Se ha quedado dormido en el transporte público y pasado su parada?", en: "Have they fallen asleep on a bus or train and missed their stop?" },
+            { es: "¿Es de los que guardan servilletas de papel de cafeterías en el coche?", en: "Do they hoard fast-food napkins in their car glovebox?" },
+            { es: "¿Sabe jugar al póker sin poner cara de nervios?", en: "Do they have a great poker face?" },
+            { es: "¿Le gusta el helado de menta con chocolate?", en: "Do they love mint chocolate chip ice cream?" },
+            { es: "¿Ha tenido alguna vez un diario con candado?", en: "Did they ever own a lock-and-key diary?" },
+            { es: "¿Se cambia de acera si ve a alguien conocido para no saludar?", en: "Do they cross the street to avoid saying hi to acquaintances?" },
+            { es: "¿Le gusta coleccionar monedas extranjeras de sus viajes?", en: "Do they collect foreign coins from their travels?" },
+            { es: "¿Es muy malo contando chistes y se olvida del final?", en: "Are they terrible at telling jokes and forget the punchline?" },
+            { es: "¿Sabe coser a máquina?", en: "Do they know how to use a sewing machine?" },
+            { es: "¿Le gusta el agua con gas?", en: "Do they prefer sparkling water over still water?" },
+            { es: "¿Ha hecho alguna vez una maratón de películas de más de 10 horas?", en: "Have they ever done a 10-hour movie marathon?" },
+            { es: "¿Se pone calcetines desparejados a propósito?", en: "Do they wear mismatched socks on purpose?" },
+            { es: "¿Le tiene miedo a las tormentas eléctricas?", en: "Are they scared of loud thunderstorms?" },
+            { es: "¿Es de los que sacan fotos a todos los platos antes de comer?", en: "Do they take photos of every meal before eating?" },
+            { es: "¿Sabe tocar la armónica o el ukelele?", en: "Can they play the harmonica or ukulele?" },
+            { es: "¿Le gusta resolver acertijos matemáticos?", en: "Do they enjoy solving math riddles?" },
+            { es: "¿Ha perdido alguna vez el equipaje en un viaje?", en: "Has an airline ever lost their luggage?" },
+            { es: "¿Es de los que dejan el depósito de gasolina en reserva siempre?", en: "Do they always drive with the fuel light on?" },
+            { es: "¿Le gusta el café descafeinado?", en: "Do they drink decaf coffee?" },
+            { es: "¿Sabe hacer el cubo de Rubik en menos de dos minutos?", en: "Can they solve a Rubik's cube in under two minutes?" },
+            { es: "¿Tiene una colección de tazas originales?", en: "Do they collect quirky coffee mugs?" },
+            { es: "¿Le da miedo hablar por teléfono para pedir cita médica?", en: "Do they get anxious calling to book a doctor's appointment?" },
+            { es: "¿Ha trabajado alguna vez de camarero o dependiente?", en: "Have they ever worked as a waiter or retail clerk?" },
+            { es: "¿Le gusta el karaoke en solitario en el coche?", en: "Do they belt out songs solo while driving?" },
+            { es: "¿Es de los que siempre llevan paraguas incluso en días soleados?", en: "Do they carry an umbrella even on sunny days?" },
+            { es: "¿Sabe nadar debajo del agua sin taparse la nariz?", en: "Can they swim underwater without plugging their nose?" },
+            { es: "¿Le gustan las aceitunas negras?", en: "Do they love black olives?" },
+            { es: "¿Ha tenido alguna vez brackets (aparato dental)?", en: "Did they ever wear dental braces?" },
+            { es: "¿Se sabe la letra completa de alguna canción en otro idioma sin entenderla?", en: "Can they sing a foreign song fluently without knowing what it means?" },
+            { es: "¿Es de los que ordenan la ropa por colores en el armario?", en: "Do they color-code the clothes in their closet?" },
+            { es: "¿Le gusta ver documentales de naturaleza sobre insectos?", en: "Do they enjoy nature documentaries about bugs?" },
+            { es: "¿Ha hecho alguna vez voluntariado?", en: "Have they ever done volunteer work?" },
+            { es: "¿Se ríe en momentos serios por puro nerviosismo?", en: "Do they nervously giggle during serious moments?" },
+            { es: "¿Le gusta el pan quemado en las tostadas?", en: "Do they like their toast slightly burnt?" },
+            { es: "¿Sabe jugar al billar o a los dardos?", en: "Are they good at pool or darts?" },
+            { es: "¿Tiene más de 5.000 correos sin leer en su bandeja de entrada?", en: "Do they have over 5,000 unread emails in their inbox?" },
+            { es: "¿Le da miedo el mar abierto donde no se ve el fondo?", en: "Are they scared of deep ocean water where you can't see the bottom?" },
+            { es: "¿Ha sido alguna vez miembro de un club de lectura?", en: "Have they ever belonged to a book club?" },
+            { es: "¿Es de los que nunca usan funda protectora en el móvil?", en: "Do they use their smartphone without a protective case?" },
+            { es: "¿Le gusta el té frío con limón?", en: "Do they love iced lemon tea?" },
+            { es: "¿Sabe hacer nudos marineros?", en: "Do they know how to tie sailor knots?" },
+            { es: "¿Se ha quedado alguna vez sin voz de tanto gritar en un concierto?", en: "Have they ever lost their voice screaming at a concert?" },
+            { es: "¿Le gusta el arte callejero y los grafitis?", en: "Do they appreciate street art and graffiti?" },
+            { es: "¿Es de los que revisan tres veces si cerraron la puerta con llave?", en: "Do they check three times to make sure the front door is locked?" },
+            { es: "¿Sabe distinguir distintos tipos de aves por su canto?", en: "Can they identify birds by their chirping?" },
+            { es: "¿Le gusta el puré de patatas con muchos grumos?", en: "Do they like lumpy mashed potatoes?" },
+            { es: "¿Ha ganado alguna vez un trofeo deportivo?", en: "Have they ever won a sports trophy?" },
+            { es: "¿Se duerme en menos de dos minutos al apoyar la cabeza en la almohada?", en: "Do they fall asleep within two minutes of hitting the pillow?" },
+            { es: "¿Le tiene miedo a los ascensores antiguos?", en: "Are they scared of old creaky elevators?" },
+            { es: "¿Es de los que compran libros y nunca los leen?", en: "Do they buy books and never actually read them?" },
+            { es: "¿Sabe hacer pan casero desde cero?", en: "Can they bake homemade bread from scratch?" },
+            { es: "¿Le gusta la música electrónica de los años 80?", en: "Do they love 80s synth-pop music?" },
+            { es: "¿Ha participado alguna vez en una obra de teatro escolar?", en: "Did they ever act in a school play?" },
+            { es: "¿Se sabe de memoria los cumpleaños de toda su familia?", en: "Do they remember every family member's birthday without reminders?" },
+            { es: "¿Le gusta el aguacate en el desayuno?", en: "Do they eat avocado toast for breakfast?" },
+            { es: "¿Es muy bueno orientándose sin usar Google Maps?", en: "Do they have a great sense of direction without GPS?" },
+            { es: "¿Le da grima el sonido de las uñas en una pizarra?", en: "Do they cringe at fingernails scratching a chalkboard?" },
+            { es: "¿Ha tenido alguna vez un hámster o cobaya?", en: "Have they ever owned a hamster or guinea pig?" },
+            { es: "¿Se pone gafas de sol incluso cuando está nublado?", en: "Do they wear sunglasses even on cloudy days?" },
+            { es: "¿Le gusta ir de compras en las rebajas del primer día?", en: "Do they love Black Friday shopping crowds?" },
+            { es: "¿Sabe jugar al mus o al tute?", en: "Do they know how to play traditional card games?" },
+            { es: "¿Es de los que siempre piden postre aunque estén llenos?", en: "Do they always order dessert even when completely full?" },
+            { es: "¿Le tiene miedo a los payasos de circo?", en: "Are they creeped out by circus clowns?" },
+            { es: "¿Ha escrito alguna vez una carta de amor a mano?", en: "Have they ever handwritten a love letter?" },
+            { es: "¿Sabe hacer café espresso perfecto?", en: "Can they pull a barista-level espresso shot?" },
+            { es: "¿Le gusta el olor a libro nuevo?", en: "Do they love the smell of brand-new books?" },
+            { es: "¿Es de los que apagan todas las luces de la casa para ahorrar?", en: "Do they turn off every single light in the house to save power?" },
+            { es: "¿Sabe montar muebles de IKEA sin mirar las instrucciones?", en: "Can they assemble IKEA furniture without reading the manual?" },
+            { es: "¿Le gusta el picante de los restaurantes mexicanos?", en: "Do they love spicy Mexican salsa?" },
+            { es: "¿Ha viajado solo a otro país alguna vez?", en: "Have they ever traveled solo to another country?" },
+            { es: "¿Se muerde el labio cuando está muy concentrado?", en: "Do they bite their lip when deeply focused?" },
+            { es: "¿Le gusta el jazz instrumental para trabajar?", en: "Do they listen to instrumental jazz while working?" },
+            { es: "¿Es de los que siempre pierden el bolígrafo cuando lo necesitan?", en: "Do they always lose their pen right when they need it?" },
+            { es: "¿Sabe patinar sobre hielo sin caerse?", en: "Can they ice skate without falling?" },
+            { es: "¿Le gusta la tortilla de patatas con cebolla?", en: "Do they like caramelized onions in their omelet?" },
+            { es: "¿Ha tenido alguna vez una planta carnívora?", en: "Have they ever owned a Venus flytrap?" },
+            { es: "¿Se sabe los nombres de casi todos los actores de Hollywood?", en: "Do they know almost every Hollywood actor's name?" },
+            { es: "¿Le da miedo volar cuando hay turbulencias?", en: "Do they panic during airplane turbulence?" },
+            { es: "¿Es de los que siempre llevan monedas sueltas en el bolsillo?", en: "Do they always carry loose change in their pockets?" },
+            { es: "¿Sabe hacer papiroflexia avanzada (grullas, dragones)?", en: "Can they fold complex origami cranes or dragons?" },
+            { es: "¿Le gusta el chocolate blanco?", en: "Do they love white chocolate?" },
+            { es: "¿Ha sido alguna vez jurado en un concurso?", en: "Have they ever served as a contest judge?" },
+            { es: "¿Se levanta de buen humor nada más sonar el despertador?", en: "Do they wake up cheerful the second the alarm rings?" },
+            { es: "¿Le gusta ver partidos de tenis completos?", en: "Do they watch full five-set tennis matches?" },
+            { es: "¿Es de los que guardan tickets de compra en la cartera durante meses?", en: "Do they keep old receipts in their wallet for months?" },
+            { es: "¿Sabe tocar la batería o el cajón flamenco?", en: "Can they play the drums?" },
+            { es: "¿Le gusta el verano más que cualquier otra estación?", en: "Is summer their favorite season of the year?" },
+            { es: "¿Ha tenido alguna vez un corte de luz y disfrutado cenando a la luz de las velas?", en: "Have they enjoyed a candlelight dinner during a power outage?" },
+            { es: "¿Se sabe algún trabalenguas muy difícil sin equivocarse?", en: "Can they say difficult tongue twisters without stumbling?" },
+            { es: "¿Le gusta el queso de cabra?", en: "Do they enjoy tangy goat cheese?" },
+            { es: "¿Es muy bueno imitando acentos de otros lugares?", en: "Are they great at imitating foreign accents?" },
+            { es: "¿Le da miedo caminar solo por el bosque de noche?", en: "Are they scared of walking alone in the woods at night?" },
+            { es: "¿Ha coleccionado cromos o cartas de pequeño?", en: "Did they collect trading cards as a kid?" },
+            { es: "¿Se pone nervioso cuando le sacan fotos?", en: "Do they feel awkward posing for photos?" },
+            { es: "¿Le gusta la comida agridulce?", en: "Do they enjoy sweet and sour dishes?" },
+            { es: "¿Es de los que siempre dejan propina en los restaurantes?", en: "Do they always leave a generous tip at restaurants?" },
+            { es: "¿Sabe hacer el puente o abrirse de piernas?", en: "Can they do the splits or a backbend?" },
+            { es: "¿Le gusta el cine en blanco y negro?", en: "Do they enjoy classic black-and-white movies?" },
+            { es: "¿Ha tenido alguna vez una bicicleta con ruedines hasta muy mayor?", en: "Did they use training wheels on their bike longer than usual?" },
+            { es: "¿Se sabe de memoria el número de teléfono de su infancia?", en: "Do they still remember their childhood home phone number?" },
+            { es: "¿Le gusta el gazpacho o salmorejo bien frío?", en: "Do they enjoy chilled gazpacho soup?" },
+            { es: "¿Es de los que hablan moviendo mucho las manos?", en: "Do they gesture wildly with their hands while talking?" },
+            { es: "¿Le tiene miedo a los dentistas?", en: "Do they dread dental checkups?" },
+            { es: "¿Ha hecho alguna vez una ruta de senderismo de más de 20 kilómetros?", en: "Have they ever hiked more than 12 miles in a day?" },
+            { es: "¿Se queda mirando las estrellas en verano?", en: "Do they love stargazing on summer nights?" },
+            { es: "¿Le gusta el té verde matcha?", en: "Do they drink matcha green tea?" },
+            { es: "¿Es muy malo guardando secretos?", en: "Are they terrible at keeping secrets?" },
+            { es: "¿Sabe jugar al ping-pong con efecto?", en: "Can they put heavy spin on a ping-pong ball?" },
+            { es: "¿Le gusta la ropa vintage de segunda mano?", en: "Do they love thrifting vintage clothes?" },
+            { es: "¿Ha perdido alguna vez el móvil y lo ha recuperado?", en: "Have they ever lost their phone and actually got it back?" },
+            { es: "¿Se ducha con agua muy caliente incluso en verano?", en: "Do they take scalding hot showers even in summer?" },
+            { es: "¿Le gusta el rock clásico de los años 70?", en: "Do they listen to 70s classic rock?" },
+            { es: "¿Es de los que siempre tienen frío en los pies?", en: "Do they always have cold feet?" },
+            { es: "¿Sabe distinguir entre distintas marcas de coches por los faros?", en: "Can they identify car brands at night just by their headlights?" },
+            { es: "¿Le gusta el yogur natural sin azúcar?", en: "Do they eat plain unsweetened yogurt?" },
+            { es: "¿Ha sido alguna vez el último en irse de una fiesta?", en: "Are they always the very last person to leave a party?" },
+            { es: "¿Se sabe todas las capitales de Europa?", en: "Do they know all European capital cities?" },
+            { es: "¿Le gusta hacer fotografía analógica con carrete?", en: "Do they shoot analog film photography?" },
+            { es: "¿Es de los que subrayan los libros que leen?", en: "Do they highlight passages in the books they read?" },
+            { es: "¿Le tiene miedo a los insectos voladores grandes?", en: "Do they panic around large flying beetles?" },
+            { es: "¿Ha cocinado alguna vez sushi casero?", en: "Have they ever rolled homemade sushi?" },
+            { es: "¿Se duerme viendo documentales en el sofá?", en: "Do they fall asleep on the couch watching documentaries?" },
+            { es: "¿Le gusta el café con leche de avena o soja?", en: "Do they order oat milk or soy milk lattes?" },
+            { es: "¿Es muy bueno resolviendo adivinanzas?", en: "Are they great at solving riddles?" },
+            { es: "¿Sabe hacer malabares con tres naranjas?", en: "Can they juggle three oranges?" },
+            { es: "¿Le gusta ir a mercadillos de antigüedades los domingos?", en: "Do they browse antique flea markets on Sundays?" },
+            { es: "¿Ha tenido alguna vez un diario de sueños?", en: "Have they ever kept a dream journal?" },
+            { es: "¿Se sabe la tabla periódica de los elementos?", en: "Do they know the periodic table of elements?" },
+            { es: "¿Le gusta el helado de pistacho?", en: "Do they love pistachio ice cream?" },
+            { es: "¿Es de los que siempre llevan gafas de repuesto?", en: "Do they always carry a spare pair of glasses?" },
+            { es: "¿Le da miedo subirse a una escalera alta?", en: "Are they afraid of climbing tall ladders?" },
+            { es: "¿Ha ganado alguna vez un bingo?", en: "Have they ever won a game of Bingo?" },
+            { es: "¿Se ríe viendo vídeos de caídas graciosas?", en: "Do they laugh at fail compilation videos?" },
+            { es: "¿Le gusta el curry picante?", en: "Do they love spicy curry?" },
+            { es: "¿Es de los que siempre tienen la mesa de trabajo impecable?", en: "Is their work desk always spotless?" },
+            { es: "¿Sabe silbar melodías enteras?", en: "Can they whistle entire songs in tune?" },
+            { es: "¿Le gusta el ciclismo de montaña?", en: "Do they enjoy mountain biking?" },
+            { es: "¿Ha estado alguna vez en un concierto de música clásica?", en: "Have they ever attended a symphony orchestra concert?" },
+            { es: "¿Se pone muy serio cuando juega a juegos de mesa?", en: "Do they take board games way too seriously?" },
+            { es: "¿Le gusta la fruta escarchada del roscón?", en: "Do they like candied fruit on holiday cakes?" },
+            { es: "¿Es muy bueno recordando caras pero malo con los nombres?", en: "Are they great with faces but terrible with names?" },
+            { es: "¿Sabe hacer una fogata en la playa?", en: "Do they know how to build a beach bonfire?" },
+            { es: "¿Le gusta el invierno para llevar abrigos y bufandas?", en: "Do they love winter just to wear coats and scarves?" },
+            { es: "¿Ha tenido alguna vez un pez de colores?", en: "Have they ever owned a pet goldfish?" },
+            { es: "¿Se sabe algún truco mental para multiplicar rápido?", en: "Do they know mental math shortcuts?" },
+            { es: "¿Le gusta el hummus con palitos de zanahoria?", en: "Do they snack on hummus and carrot sticks?" },
+            { es: "¿Es de los que siempre llegan 10 minutos antes a las citas?", en: "Do they always show up 10 minutes early to appointments?" },
+            { es: "¿Le tiene miedo a la oscuridad total?", en: "Are they scared of pitch-black rooms?" },
+            { es: "¿Ha participado alguna vez en una carrera popular?", en: "Have they ever run a 5K charity race?" },
+            { es: "¿Se canta canciones inventadas a sí mismo mientras cocina?", en: "Do they sing made-up songs while cooking?" },
+            { es: "¿Le gusta el arte abstracto?", en: "Do they enjoy abstract art?" },
+            { es: "¿Es muy bueno negociando precios?", en: "Are they skilled at negotiating deals?" },
+            { es: "¿Sabe hacer volteretas dentro de la piscina?", en: "Can they do underwater somersaults in a pool?" },
+            { es: "¿Le gusta el pan de ajo?", en: "Do they love garlic bread?" },
+            { es: "¿Ha tenido alguna vez un reloj de bolsillo?", en: "Have they ever owned a pocket watch?" },
+            { es: "¿Se acuerda de lo que soñó anoche?", en: "Do they remember what they dreamed about last night?" },
+            { es: "¿Le gusta el senderismo por la nieve?", en: "Do they enjoy snowshoeing or winter hiking?" },
+            { es: "¿Es de los que siempre llevan caramelos o chicles en el bolso?", en: "Do they always carry mints or gum in their bag?" },
+            { es: "¿Sabe tocar la flauta dulce?", en: "Can they still play the recorder from elementary school?" },
+            { es: "¿Le gusta el chocolate con almendras enteras?", en: "Do they love whole-almond chocolate bars?" },
+            { es: "¿Ha visto todas las películas de El Señor de los Anillos?", en: "Have they watched the extended Lord of the Rings trilogy?" },
+            { es: "¿Se pone muy contento cuando llueve en fin de semana?", en: "Do they get excited when it rains on the weekend?" },
+            { es: "¿Le gusta la comida japonesa más que la italiana?", en: "Do they prefer Japanese food over Italian food?" },
+            { es: "¿Es de los que saludan a los perros por la calle?", en: "Do they say hi to every dog they pass on the sidewalk?" },
+            { es: "¿Sabe hacer el pino contra la pared?", en: "Can they hold a handstand against a wall?" },
+            { es: "¿Le gusta el café irlandés?", en: "Do they enjoy Irish coffee?" },
+            { es: "¿Ha sido alguna vez capitán de un equipo deportivo?", en: "Were they ever captain of a sports team?" }
         ];
 
-        // Estado de la partida
+        // =========================================================================
+        // ESTADO Y LÓGICA DEL JUEGO (CON SOPORTE BILINGÜE EN VIVO)
+        // =========================================================================
         const MAX_ROUNDS = 10;
+        let currentLang = 'es';
         let suspects = [];
         let guiltySuspect = null;
-        let matchQuestions = [];
+        let matchQuestions = []; // Almacena objetos { es, en }
         let currentRound = 0; // 0 a 9
-        let remainingSuspects = 12;
         let isFinalDecisionPhase = false;
         let gameOver = false;
-        let cluesHistory = [];
+        let cluesHistory = []; // Almacena { round, questionObj, answer }
+        let endGameState = null; // Almacena { type, accusedName } para traducir el modal final en vivo
 
-        // Elementos del DOM
+        // Referencias DOM
         const boardEl = document.getElementById('board');
         const questionDisplay = document.getElementById('questionDisplay');
         const questionCounter = document.getElementById('questionCounter');
+        const remainingBadge = document.getElementById('remainingBadge');
         const cluesContainer = document.getElementById('cluesContainer');
         const cluesCount = document.getElementById('cluesCount');
         const cluesList = document.getElementById('cluesList');
@@ -451,7 +957,68 @@
         const secretName = document.getElementById('secretName');
         const secretJob = document.getElementById('secretJob');
 
-        // Utilidad: Barajar array (Fisher-Yates)
+        // Cambiar idioma en cualquier momento sin perder la partida
+        function setLanguage(lang) {
+            if (lang !== 'es' && lang !== 'en') return;
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            // Actualizar estilos visuales del selector ES | EN
+            const btnEs = document.getElementById('langBtnEs');
+            const btnEn = document.getElementById('langBtnEn');
+            if (lang === 'es') {
+                btnEs.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-yellow-500 text-gray-900 shadow";
+                btnEn.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-gray-400 hover:text-white";
+            } else {
+                btnEn.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-yellow-500 text-gray-900 shadow";
+                btnEs.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-gray-400 hover:text-white";
+            }
+
+            applyTranslations();
+        }
+
+        // Aplicar todas las traducciones activas a la UI, tablero, historial y modales
+        function applyTranslations() {
+            const t = UI_TEXTS[currentLang];
+
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('subTitle').innerHTML = t.subTitle;
+            document.getElementById('btnSecretText').textContent = t.btnSecret;
+            document.getElementById('btnRestartText').textContent = t.btnRestart;
+            document.getElementById('roundLabel').textContent = t.roundLabel;
+            document.getElementById('cluesTitleText').textContent = t.cluesTitle;
+            document.getElementById('secretModalTitle').textContent = t.secretTitle;
+            document.getElementById('secretModalDesc').textContent = t.secretDesc;
+            document.getElementById('btnHideSecret').textContent = t.btnHideSecret;
+            document.getElementById('culpritWasLabel').textContent = t.culpritWas;
+            document.getElementById('btnPlayAgain').textContent = t.btnPlayAgain;
+            btnYes.textContent = t.btnYes;
+            btnNo.textContent = t.btnNo;
+
+            if (isFinalDecisionPhase) {
+                phaseHint.innerHTML = t.finalHint;
+            } else {
+                phaseHint.innerHTML = t.howToPlay;
+            }
+
+            // Re-renderizar dinámicos con el idioma activo
+            renderClues();
+            drawBoard();
+            updateQuestionUI();
+
+            // Si el modal secreto está abierto, actualizar profesión
+            if (!culpritModal.classList.contains('hidden') && guiltySuspect) {
+                secretJob.textContent = guiltySuspect.job[currentLang];
+            }
+
+            // Si el modal de fin de partida está abierto, actualizar textos
+            if (!modal.classList.contains('hidden') && endGameState) {
+                renderEndModal();
+            }
+        }
+
+        // Algoritmo Fisher-Yates para barajar aleatoriamente sin sesgo
         function shuffle(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -461,29 +1028,18 @@
             return arr;
         }
 
+        // Inicializar o reiniciar una partida nueva
         function initGame() {
             gameOver = false;
             isFinalDecisionPhase = false;
             currentRound = 0;
-            remainingSuspects = 12;
             cluesHistory = [];
+            endGameState = null;
 
-            // Extraer exactamente 10 preguntas aleatorias de las 100
+            // Seleccionar 10 preguntas aleatorias de las 350 disponibles
             matchQuestions = shuffle(ALL_QUESTIONS).slice(0, MAX_ROUNDS);
 
-            // Resetear controles UI
-            btnYes.disabled = false;
-            btnNo.disabled = false;
-            btnYes.classList.remove('opacity-40', 'cursor-not-allowed');
-            btnNo.classList.remove('opacity-40', 'cursor-not-allowed');
-            questionDisplay.classList.remove('text-yellow-400');
-            phaseHint.innerHTML = 'Haz clic en los sospechosos inocentes para tacharlos. Al responder la pregunta 10, <strong class="text-yellow-400">¡deberás señalar directamente al culpable!</strong>';
-
-            renderClues();
-            closeModal();
-            hideCulprit();
-
-            // Seleccionar 12 sospechosos diversos al azar
+            // Seleccionar 12 personajes aleatorios de los 300 disponibles
             const selectedSuspects = shuffle(SUSPECT_POOL).slice(0, 12);
             suspects = selectedSuspects.map((s, index) => ({
                 id: index,
@@ -493,29 +1049,44 @@
                 eliminated: false
             }));
 
-            // Elegir al culpable en secreto
+            // Elegir 1 culpable en secreto entre los 12
             guiltySuspect = suspects[Math.floor(Math.random() * suspects.length)];
 
-            drawBoard();
-            updateQuestionUI();
+            // Restaurar interfaz
+            btnYes.disabled = false;
+            btnNo.disabled = false;
+            btnYes.classList.remove('opacity-40', 'cursor-not-allowed');
+            btnNo.classList.remove('opacity-40', 'cursor-not-allowed');
+            questionDisplay.classList.remove('text-yellow-400');
+
+            closeModal();
+            hideCulprit();
+            applyTranslations();
         }
 
+        // Dibujar tablero de 12 sospechosos
         function drawBoard() {
+            const t = UI_TEXTS[currentLang];
             boardEl.innerHTML = '';
+            const activeCount = suspects.filter(s => !s.eliminated).length;
+            remainingBadge.textContent = activeCount === 1
+                ? t.remainingOne
+                : t.remainingMany.replace('{n}', activeCount);
+
             suspects.forEach(suspect => {
                 const card = document.createElement('div');
                 const highlightClass = (isFinalDecisionPhase && !suspect.eliminated && !gameOver) ? 'final-highlight' : '';
-                card.className = `suspect-card bg-gray-100 rounded-xl p-4 flex flex-col items-center justify-between border-4 border-gray-300 shadow-md ${suspect.eliminated ? 'eliminated' : ''} ${highlightClass}`;
+                card.className = `suspect-card bg-gray-100 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-between border-4 border-gray-300 shadow-lg ${suspect.eliminated ? 'eliminated' : ''} ${highlightClass}`;
                 card.onclick = () => handleCardClick(suspect.id);
 
                 card.innerHTML = `
-                    <div class="text-6xl md:text-7xl my-2 drop-shadow-md">${suspect.emoji}</div>
-                    <div class="w-full text-center">
-                        <div class="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-bold truncate">
+                    <div class="text-5xl sm:text-6xl md:text-7xl my-2 drop-shadow-md">${suspect.emoji}</div>
+                    <div class="w-full text-center mt-1">
+                        <div class="bg-gray-900 text-white px-2.5 py-1 rounded-full text-xs sm:text-sm font-bold truncate shadow-inner">
                             ${suspect.name}
                         </div>
-                        <div class="text-xs text-gray-600 font-semibold mt-1 truncate">
-                            ${suspect.job}
+                        <div class="text-[11px] sm:text-xs text-gray-700 font-semibold mt-1.5 truncate px-1">
+                            ${suspect.job[currentLang]}
                         </div>
                     </div>
                 `;
@@ -523,45 +1094,52 @@
             });
         }
 
+        // Actualizar pregunta y contador de ronda
         function updateQuestionUI() {
+            const t = UI_TEXTS[currentLang];
+            if (!matchQuestions.length) return;
+
             if (!isFinalDecisionPhase) {
                 questionCounter.textContent = `${currentRound + 1} / ${MAX_ROUNDS}`;
-                questionDisplay.textContent = matchQuestions[currentRound];
+                questionDisplay.textContent = matchQuestions[currentRound][currentLang];
             } else {
-                questionCounter.textContent = `${MAX_ROUNDS} / ${MAX_ROUNDS} (DECISIÓN FINAL)`;
+                questionCounter.textContent = t.finalRoundBadge;
                 questionDisplay.classList.add('text-yellow-400');
-                questionDisplay.textContent = "🚨 ¡10 preguntas completadas! Haz clic sobre el sospechoso que creas que es el CULPABLE.";
+                questionDisplay.textContent = t.finalAlert;
             }
         }
 
+        // Registrar respuesta SÍ / NO del Testigo
         function answerQuestion(isYes) {
             if (gameOver || isFinalDecisionPhase) return;
 
-            const currentQ = matchQuestions[currentRound];
+            const currentQObj = matchQuestions[currentRound];
             cluesHistory.push({
                 round: currentRound + 1,
-                question: currentQ,
+                questionObj: currentQObj,
                 answer: isYes
             });
             renderClues();
 
             currentRound++;
 
-            // Si ya se respondieron las 10 preguntas, activar fase de acusación final
+            // Activar acusación obligatoria tras responder la 10ª pregunta
             if (currentRound >= MAX_ROUNDS) {
                 isFinalDecisionPhase = true;
                 btnYes.disabled = true;
                 btnNo.disabled = true;
                 btnYes.classList.add('opacity-40', 'cursor-not-allowed');
                 btnNo.classList.add('opacity-40', 'cursor-not-allowed');
-                phaseHint.innerHTML = '<strong class="text-yellow-400">⚖️ JUICIO FINAL:</strong> Ya no quedan más preguntas. Haz clic en el sospechoso iluminado que creas que es el culpable para acusarlo.';
+                phaseHint.innerHTML = UI_TEXTS[currentLang].finalHint;
                 drawBoard();
             }
 
             updateQuestionUI();
         }
 
+        // Renderizar historial visual de pistas en el idioma actual
         function renderClues() {
+            const t = UI_TEXTS[currentLang];
             cluesCount.textContent = cluesHistory.length;
             if (cluesHistory.length === 0) {
                 cluesContainer.classList.add('hidden');
@@ -569,19 +1147,23 @@
                 return;
             }
             cluesContainer.classList.remove('hidden');
-            cluesList.innerHTML = cluesHistory.map(clue => `
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${clue.answer ? 'bg-green-900/70 text-green-300 border border-green-600' : 'bg-red-900/70 text-red-300 border border-red-600'}">
-                    <span>#${clue.round} ${clue.answer ? '✅ SÍ:' : '❌ NO:'}</span>
-                    <span>${clue.question.replace(/^¿|\?$/g, '')}</span>
-                </span>
-            `).join('');
+            cluesList.innerHTML = cluesHistory.map(clue => {
+                const qText = clue.questionObj[currentLang].replace(/^¿|\?$/g, '');
+                return `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${clue.answer ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/60' : 'bg-rose-950/90 text-rose-300 border border-rose-500/60'}">
+                        <span>#${clue.round} ${clue.answer ? t.yesTag : t.noTag}</span>
+                        <span>${qText}</span>
+                    </span>
+                `;
+            }).join('');
         }
 
+        // Mostrar modal secreto del culpable
         function showCulprit() {
             if (!guiltySuspect) return;
             secretEmoji.textContent = guiltySuspect.emoji;
             secretName.textContent = guiltySuspect.name;
-            secretJob.textContent = guiltySuspect.job;
+            secretJob.textContent = guiltySuspect.job[currentLang];
             culpritModal.classList.remove('hidden');
             culpritModal.classList.add('flex');
         }
@@ -591,85 +1173,103 @@
             culpritModal.classList.remove('flex');
         }
 
+        // Manejar clic en tarjetas del tablero
         function handleCardClick(id) {
             if (gameOver) return;
-
             const suspect = suspects.find(s => s.id === id);
-            if (!suspect || suspect.eliminated) return;
+            if (!suspect) return;
 
-            // En la fase final (tras la 10ª pregunta), el clic acusa directamente al sospechoso
+            // Fase final: el clic acusa directamente al sospechoso activo seleccionado
             if (isFinalDecisionPhase) {
+                if (suspect.eliminated) return;
                 gameOver = true;
-                drawBoard(); // Quita el brillo de selección
+                drawBoard();
                 if (suspect.id === guiltySuspect.id) {
-                    showModal(
-                        "¡Victoria en el Juicio Final!",
-                        `¡Acusación certera! Atrapaste a ${guiltySuspect.name} tras las 10 preguntas.`,
-                        "text-green-400"
-                    );
+                    endGameState = { type: 'winFinal' };
                 } else {
-                    showModal(
-                        "¡Acusación Fallida!",
-                        `Acusaste a ${suspect.name}, pero era inocente. ¡El verdadero culpable escapó!`,
-                        "text-red-500"
-                    );
+                    endGameState = { type: 'loseFinal', accusedName: suspect.name };
                 }
+                showModal();
                 return;
             }
 
-            // En rondas normales (1 a 10), el clic descarta/tacha al sospechoso
-            suspect.eliminated = true;
-            remainingSuspects--;
+            // Rondas 1 a 10: alternar estado tachado / destachado
+            suspect.eliminated = !suspect.eliminated;
             drawBoard();
 
-            checkWinLoss(id);
-        }
-
-        function checkWinLoss(eliminatedId) {
-            if (eliminatedId === guiltySuspect.id) {
-                // DERROTA por descartar al culpable
-                gameOver = true;
-                btnYes.disabled = true;
-                btnNo.disabled = true;
-                btnYes.classList.add('opacity-40', 'cursor-not-allowed');
-                btnNo.classList.add('opacity-40', 'cursor-not-allowed');
-                showModal(
-                    "¡Derrota!", 
-                    `¡Has descartado al culpable por error! Dejaste escapar a ${guiltySuspect.name}.`, 
-                    "text-red-500"
-                );
-            } else if (remainingSuspects === 1) {
-                // VICTORIA anticipada al descartar a los 11 inocentes
-                gameOver = true;
-                btnYes.disabled = true;
-                btnNo.disabled = true;
-                btnYes.classList.add('opacity-40', 'cursor-not-allowed');
-                btnNo.classList.add('opacity-40', 'cursor-not-allowed');
-                showModal(
-                    "¡Victoria Brillante!", 
-                    `¡Felicidades! Eliminaste a los 11 inocentes antes de agotar las 10 preguntas y atrapaste a ${guiltySuspect.name}.`, 
-                    "text-green-400"
-                );
+            // Verificar si se tachó al culpable o si solo queda él en pie
+            if (suspect.eliminated && suspect.id === guiltySuspect.id) {
+                endGameState = { type: 'loseEliminated' };
+                endGameEarly();
+            } else {
+                const remaining = suspects.filter(s => !s.eliminated);
+                if (remaining.length === 1 && remaining[0].id === guiltySuspect.id) {
+                    endGameState = { type: 'winEarly' };
+                    endGameEarly();
+                }
             }
         }
 
-        function showModal(title, message, titleColorClass) {
+        function endGameEarly() {
+            gameOver = true;
+            btnYes.disabled = true;
+            btnNo.disabled = true;
+            btnYes.classList.add('opacity-40', 'cursor-not-allowed');
+            btnNo.classList.add('opacity-40', 'cursor-not-allowed');
+            showModal();
+        }
+
+        function renderEndModal() {
+            if (!endGameState || !guiltySuspect) return;
+            const t = UI_TEXTS[currentLang];
+            let title = '';
+            let message = '';
+            let colorClass = '';
+
+            switch (endGameState.type) {
+                case 'winFinal':
+                    title = t.winFinalTitle;
+                    message = t.winFinalMsg.replace('{name}', guiltySuspect.name);
+                    colorClass = 'text-emerald-400';
+                    break;
+                case 'loseFinal':
+                    title = t.loseFinalTitle;
+                    message = t.loseFinalMsg.replace('{accused}', endGameState.accusedName);
+                    colorClass = 'text-rose-500';
+                    break;
+                case 'loseEliminated':
+                    title = t.loseEliminatedTitle;
+                    message = t.loseEliminatedMsg.replace('{name}', guiltySuspect.name);
+                    colorClass = 'text-rose-500';
+                    break;
+                case 'winEarly':
+                    title = t.winEarlyTitle;
+                    message = t.winEarlyMsg.replace('{name}', guiltySuspect.name);
+                    colorClass = 'text-emerald-400';
+                    break;
+            }
+
             modalTitle.textContent = title;
-            modalTitle.className = `text-3xl font-bold title-font mb-4 ${titleColorClass}`;
+            modalTitle.className = `text-2xl sm:text-3xl font-bold title-font mb-3 ${colorClass}`;
             modalMessage.textContent = message;
-            
+
             guiltyReveal.textContent = guiltySuspect.emoji;
             guiltyNameReveal.textContent = guiltySuspect.name;
-            guiltyJobReveal.textContent = guiltySuspect.job;
-            
-            modal.classList.add('show');
+            guiltyJobReveal.textContent = guiltySuspect.job[currentLang];
+        }
+
+        function showModal() {
+            renderEndModal();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeModal() {
-            modal.classList.remove('show');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
-        // Start game on load
+        // Arrancar al cargar la ventana
         window.onload = initGame;
     </script>
 </body>
