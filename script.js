@@ -1023,8 +1023,8 @@ const games = [
       "Un juego de deducción en el que el testigo responde solo según la apariencia de los sospechosos, y tienes 10 preguntas para acusar al culpable.",
     gradient: "linear-gradient(135deg, rgba(234,179,8,0.9), rgba(88,28,135,0.85))",
     image: "assets/game-covers/sospechosos.jpg",
-    previewUrl: "games/doxa_episteme.html",
-    playUrl: "games/doxa_episteme.html"
+    previewUrl: "games/doxa_episteme.html?v=2",
+    playUrl: "games/doxa_episteme.html?v=2"
   },
   {
     id: 54,
@@ -1039,8 +1039,8 @@ const games = [
       "Corre y salta por los mundos de cada época filosófica, esquiva trampas, reúne ideas y citas de los grandes filósofos y aprende qué defendía cada escuela.",
     gradient: "linear-gradient(135deg, rgba(60,140,210,0.92), rgba(230,180,70,0.85))",
     image: "assets/game-covers/socrates_agora.png",
-    previewUrl: "games/el_camino_de_la_filosofia.html",
-    playUrl: "games/el_camino_de_la_filosofia.html"
+    previewUrl: "games/el_camino_de_la_filosofia.html?v=2",
+    playUrl: "games/el_camino_de_la_filosofia.html?v=2"
   }
 ];
 
