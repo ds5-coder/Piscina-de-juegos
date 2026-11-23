@@ -974,8 +974,8 @@ const games = [
       "Un juego de palabras y deducción por equipos en el que los personajes de la Revolución Francesa, las guerras mundiales y la ciencia de la época forman el tablero.",
     gradient: "linear-gradient(135deg, rgba(31,58,147,0.9), rgba(220,38,38,0.85))",
     image: "assets/game-covers/codigo_secreto.png",
-    previewUrl: "games/codigo_secreto_historico_1789_1945.html",
-    playUrl: "games/codigo_secreto_historico_1789_1945.html"
+    previewUrl: "games/codigo_secreto_historico_1789_1945.html?v=2",
+    playUrl: "games/codigo_secreto_historico_1789_1945.html?v=2"
   },
   {
     id: 51,
