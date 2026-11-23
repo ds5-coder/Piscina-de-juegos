@@ -1054,7 +1054,7 @@ const games = [
     longDescription:
       "Un desafío sobre las Líneas 1–12, el Ramal y Metro Ligero (ML1, ML2 y ML3): elige línea, transbordo y destino para hallar la ruta más corta, reconoce estaciones por su arquitectura o escribe todas las paradas de una línea en orden.",
     gradient: "linear-gradient(135deg, rgba(0,85,165,0.95), rgba(227,6,19,0.85))",
-    image: "",
+    image: "assets/game-covers/metro_madrid.png",
     previewUrl: "games/metro_de_madrid_el_desafio.html",
     playUrl: "games/metro_de_madrid_el_desafio.html"
   },
@@ -1071,7 +1071,7 @@ const games = [
     longDescription:
       "Hasta 40 participantes escriben a la vez sobre un tema de historia o geografía (Revolución Francesa, Revolución Industrial, guerras mundiales, sectores económicos...). Al acabar el tiempo se ponen las listas en común y cada palabra repetida por N personas suma N puntos.",
     gradient: "linear-gradient(135deg, rgba(31,58,147,0.9), rgba(212,175,55,0.85))",
-    image: "",
+    image: "assets/game-covers/unanimo.png",
     previewUrl: "games/unanimo.html",
     playUrl: "games/unanimo.html"
   }
