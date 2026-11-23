@@ -974,8 +974,8 @@ const games = [
       "Un juego de palabras y deducción por equipos en el que los personajes de la Revolución Francesa, las guerras mundiales y la ciencia de la época forman el tablero.",
     gradient: "linear-gradient(135deg, rgba(31,58,147,0.9), rgba(220,38,38,0.85))",
     image: "assets/game-covers/codigo_secreto.png",
-    previewUrl: "games/codigo_secreto_historico_1789_1945.html?v=2",
-    playUrl: "games/codigo_secreto_historico_1789_1945.html?v=2"
+    previewUrl: "games/codigo_secreto_historico_1789_1945.html?v=3",
+    playUrl: "games/codigo_secreto_historico_1789_1945.html?v=3"
   },
   {
     id: 51,
@@ -1041,6 +1041,39 @@ const games = [
     image: "assets/game-covers/socrates_agora.png",
     previewUrl: "games/el_camino_de_la_filosofia.html?v=2",
     playUrl: "games/el_camino_de_la_filosofia.html?v=2"
+  },
+  {
+    id: 55,
+    title: "Metro de Madrid: el desafío ferroviario",
+    category: "Educativo",
+    collection: "Geografía",
+    mode: "Quiz",
+    duration: "10 min",
+    description:
+      "Pon a prueba tu memoria de la red del Metro de Madrid: calcula trayectos, adivina estaciones por su foto y ordena las paradas de cada línea.",
+    longDescription:
+      "Un desafío sobre las Líneas 1–12, el Ramal y Metro Ligero (ML1, ML2 y ML3): elige línea, transbordo y destino para hallar la ruta más corta, reconoce estaciones por su arquitectura o escribe todas las paradas de una línea en orden.",
+    gradient: "linear-gradient(135deg, rgba(0,85,165,0.95), rgba(227,6,19,0.85))",
+    image: "",
+    previewUrl: "games/metro_de_madrid_el_desafio.html",
+    playUrl: "games/metro_de_madrid_el_desafio.html"
+  },
+  {
+    id: 56,
+    title: "Unanimo",
+    category: "Educativo",
+    collection: "Geografía",
+    alsoIn: ["Revolución Francesa", "Revolución Industrial", "Revolución Rusa", "Primera Guerra Mundial", "Segunda Guerra Mundial"],
+    mode: "Clase / grupo",
+    duration: "15-30 min",
+    description:
+      "Un juego de papel y boli para clase: se proyecta una palabra y todos escriben 8 asociaciones. Cuantos más coincidan con tus palabras, más puntos.",
+    longDescription:
+      "Hasta 40 participantes escriben a la vez sobre un tema de historia o geografía (Revolución Francesa, Revolución Industrial, guerras mundiales, sectores económicos...). Al acabar el tiempo se ponen las listas en común y cada palabra repetida por N personas suma N puntos.",
+    gradient: "linear-gradient(135deg, rgba(31,58,147,0.9), rgba(212,175,55,0.85))",
+    image: "",
+    previewUrl: "games/unanimo.html",
+    playUrl: "games/unanimo.html"
   }
 ];
 
@@ -1108,7 +1141,9 @@ const gameTranslations = {
     51: { title: "Who Is Who? Historical Archive", description: "Guess the historical figure before your rival by asking yes-or-no questions, from the French Revolution to World War II.", longDescription: "A question-and-elimination game in which each player picks a secret figure from the board and must work out the rival's." },
     52: { title: "German Vocabulary Memory (1933–1945)", description: "Find the pairs of German vocabulary from the 1933–1945 period and review key words from history as you play.", longDescription: "A memory game for learning German vocabulary with terms from the Nazi era and World War II, matching each word with its meaning." },
     53: { title: "Doxa and Episteme", description: "Uncover the culprit hidden among 12 suspects by asking about their appearance. Eliminate the innocent without ruling out the guilty one.", longDescription: "A deduction game in which the witness answers only from the suspects' appearance, and you have 10 questions to accuse the culprit." },
-    54: { title: "Path of Philosophy", description: "A platformer through the history of philosophy, from Miletus to Nietzsche: jump, dodge and discover the ideas of the great thinkers.", longDescription: "Run and jump through the worlds of each philosophical era, dodge traps, collect ideas and quotes from the great philosophers and learn what each school defended." }
+    54: { title: "Path of Philosophy", description: "A platformer through the history of philosophy, from Miletus to Nietzsche: jump, dodge and discover the ideas of the great thinkers.", longDescription: "Run and jump through the worlds of each philosophical era, dodge traps, collect ideas and quotes from the great philosophers and learn what each school defended." },
+    55: { title: "Madrid Metro: the Railway Challenge", description: "Test your memory of the Madrid Metro network: plan routes, guess stations from photos and put each line's stops in order.", longDescription: "A challenge on Lines 1–12, the Ramal and Metro Ligero (ML1, ML2, ML3): pick lines, a transfer and a destination to find the shortest route, recognise stations by their architecture or type every stop of a line in order." },
+    56: { title: "Unanimo", description: "A pen-and-paper classroom game: a word is projected and everyone writes 8 associations. The more people match your words, the more points you score.", longDescription: "Up to 40 players write at once about a history or geography topic (French Revolution, Industrial Revolution, world wars, economic sectors...). When time is up, lists are compared and each word repeated by N people scores N points." }
   }
 };
 

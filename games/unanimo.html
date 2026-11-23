@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unanimo · Presentación Historia y Geografía</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Crimson Pro"', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        parchment: {
+                            50: '#fdfbf7',
+                            100: '#f7f1e3',
+                            200: '#ede2cb',
+                            300: '#dccaa6',
+                            400: '#c3a877',
+                            800: '#5c4b34',
+                            900: '#3b2f1f',
+                        },
+                        slatearchive: {
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#070b14',
+                        },
+                        crimson: {
+                            600: '#a31d1d',
+                            700: '#821717',
+                            800: '#631111',
+                        },
+                        gold: {
+                            300: '#f0d77d',
+                            400: '#d8b442',
+                            500: '#b89225',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --theme-primary: #b91c1c;
+            --theme-dark: #7f1d1d;
+            --theme-soft: rgba(185, 28, 28, 0.10);
+            --theme-border: rgba(185, 28, 28, 0.35);
+            --theme-glow: rgba(185, 28, 28, 0.25);
+        }
+
+        body {
+            background-color: #f2ead8;
+            background-image:
+                radial-gradient(at 10% 10%, var(--theme-soft) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(216, 180, 66, 0.14) 0px, transparent 50%),
+                radial-gradient(rgba(92, 75, 52, 0.08) 1px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 24px 24px;
+            min-height: 100vh;
+            transition: background-image 0.4s ease;
+        }
+
+        .glass-card {
+            background: rgba(253, 251, 247, 0.94);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(60, 48, 32, 0.06);
+        }
+
+        .projection-board {
+            background: radial-gradient(circle at 50% 20%, var(--theme-dark) 0%, #0f172a 68%, #070b14 100%);
+            border-color: var(--theme-primary);
+            box-shadow:
+                0 30px 60px -15px rgba(7, 11, 20, 0.55),
+                inset 0 0 0 1px var(--theme-border),
+                inset 0 0 60px rgba(0, 0, 0, 0.45);
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+
+        .archive-stamp {
+            border: 1.5px solid var(--theme-border);
+            color: var(--theme-primary);
+            background-color: var(--theme-soft);
+            letter-spacing: 0.16em;
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn-primary {
+            background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-dark) 100%);
+            box-shadow: 0 10px 24px -6px var(--theme-glow);
+            transition: all 0.25s ease;
+        }
+
+        .theme-btn-primary:hover {
+            filter: brightness(1.08);
+        }
+
+        .theme-text {
+            color: var(--theme-primary);
+        }
+
+        .theme-top-bar {
+            background: linear-gradient(90deg, var(--theme-primary) 0%, #d8b442 50%, var(--theme-dark) 100%);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes wordReveal {
+            0% { opacity: 0; transform: scale(0.94) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .animate-word {
+            animation: wordReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #efe6d2;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #c3a877;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slatearchive-900 antialiased selection:bg-gold-400 selection:text-slatearchive-950">
+
+    <!-- Cabecera Editorial -->
+    <header id="app-header" class="bg-slatearchive-950 text-parchment-50 border-b-2 shadow-xl sticky top-0 z-30 transition-colors duration-300" style="border-color: var(--theme-primary);">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl theme-btn-primary border border-gold-400/70 flex items-center justify-center shrink-0 shadow-md">
+                    <span class="font-serif text-2xl font-extrabold text-white">U</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold uppercase tracking-[0.24em] text-gold-400">Presentación Interactiva · Papel y Boli</span>
+                    <h1 class="font-serif text-xl sm:text-2xl font-extrabold tracking-tight leading-tight text-parchment-50">
+                        Unanimo
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <button id="btn-home" type="button" onclick="returnToSetup()" class="hidden items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slatearchive-900 hover:bg-slatearchive-800 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-semibold transition">
+                    <span>⚙ Configurar Sala</span>
+                </button>
+                <button type="button" onclick="openRulesModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slatearchive-900 hover:bg-slatearchive-800 text-parchment-100 border border-slatearchive-700 hover:border-gold-400/60 text-xs font-semibold transition">
+                    <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Cómo Jugar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PANTALLA 1: CONFIGURACIÓN DE PRESENTACIÓN Y PARTICIPANTES -->
+    <section id="setup-screen" class="max-w-6xl mx-auto px-4 py-7 sm:py-10 animate-fade-up">
+        <div class="glass-card border border-parchment-300 rounded-3xl p-6 sm:p-9 space-y-8 relative overflow-hidden">
+            <!-- Detalle superior dinámico -->
+            <div class="absolute top-0 inset-x-0 h-1.5 theme-top-bar"></div>
+
+            <div class="text-center max-w-2xl mx-auto pt-1">
+                <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-3.5 py-1 rounded-full mb-3">
+                    Modo Proyector / Pizarra · Hasta 40 Participantes
+                </span>
+                <h2 class="font-serif text-3xl sm:text-5xl font-extrabold text-slatearchive-900 tracking-tight mb-2.5">
+                    Unanimo · Papel y Boli
+                </h2>
+                <p class="text-xs sm:text-sm text-parchment-800 leading-relaxed">
+                    Asigna el nombre a cada participante, elige el evento histórico o sector geográfico y proyecta la palabra clave para escribir <strong>8 asociaciones</strong> en el cuaderno.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-parchment-100/75 border border-parchment-300/90 rounded-2xl p-5 sm:p-6">
+                <!-- Columna Izquierda: Registro de hasta 40 Participantes (7 cols) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg theme-btn-primary text-white text-xs font-bold flex items-center justify-center">1</span>
+                            <label class="text-xs font-extrabold uppercase tracking-wider text-slatearchive-900">
+                                Nombres de Participantes (<span id="participant-count-badge" class="theme-text">4</span> / 40)
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="toggleBulkImport()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-parchment-200 border border-parchment-300 text-[11px] font-bold text-slatearchive-900 shadow-2xs transition">
+                                📋 Pegar lista
+                            </button>
+                            <button type="button" onclick="clearParticipants()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-red-50 border border-parchment-300 text-[11px] font-bold theme-text shadow-2xs transition">
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Añadir participante rápido -->
+                    <form onsubmit="addParticipantFromInput(event)" class="flex gap-2">
+                        <input id="new-participant-input" type="text" maxlength="26" placeholder="Escribe un nombre para añadir..."
+                            class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-parchment-300 text-xs font-semibold text-slatearchive-900 shadow-2xs focus:outline-none">
+                        <button type="submit" class="px-5 py-2.5 rounded-xl theme-btn-primary text-white text-xs font-bold uppercase tracking-wider shrink-0">
+                            + Añadir
+                        </button>
+                    </form>
+
+                    <!-- Caja desplegable para pegar lista masiva de clase -->
+                    <div id="bulk-import-box" class="hidden bg-white border border-parchment-300 rounded-2xl p-3.5 space-y-2.5 shadow-sm">
+                        <label for="bulk-names-textarea" class="block text-[11px] font-bold text-parchment-800">
+                            Pega hasta 40 nombres (uno por línea o separados por comas):
+                        </label>
+                        <textarea id="bulk-names-textarea" rows="3" placeholder="Ana&#10;Carlos&#10;Lucía&#10;Mateo..."
+                            class="w-full p-2.5 rounded-xl border border-parchment-300 text-xs font-medium text-slatearchive-900 focus:outline-none"></textarea>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" onclick="toggleBulkImport(false)" class="px-3 py-1.5 rounded-xl bg-parchment-200 text-xs font-semibold">Cancelar</button>
+                            <button type="button" onclick="applyBulkParticipants()" class="px-3.5 py-1.5 rounded-xl theme-btn-primary text-white text-xs font-bold">Cargar lista</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista visual editable de participantes inscritos -->
+                    <div id="participants-chips-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto custom-scroll pr-1"></div>
+
+                    <!-- Configuración de Tiempo y Rondas -->
+                    <div class="pt-3.5 border-t border-parchment-300 grid grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="round-timer-select" class="block text-[11px] font-bold uppercase tracking-wider text-parchment-800 mb-1.5">⏱ Tiempo por ronda</label>
+                            <select id="round-timer-select" class="w-full px-3 py-2.5 rounded-xl bg-white border border-parchment-300 text-xs font-bold text-slatearchive-900 shadow-2xs">
+                                <option value="45">45 segundos</option>
+                                <option value="60" selected>60 segundos</option>
+                                <option value="90">90 segundos</option>
+                                <option value="120">2 minutos</option>
+                                <option value="0">Sin límite de tiempo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="total-rounds-select" class="block text-[11px] font-bold uppercase tracking-wider text-parchment-800 mb-1.5">🏛 Rondas de la sesión</label>
+                            <select id="total-rounds-select" class="w-full px-3 py-2.5 rounded-xl bg-white border border-parchment-300 text-xs font-bold text-slatearchive-900 shadow-2xs">
+                                <option value="3">3 rondas</option>
+                                <option value="5" selected>5 rondas</option>
+                                <option value="8">8 rondas</option>
+                                <option value="10">10 rondas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Selección de Tema (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg theme-btn-primary text-white text-xs font-bold flex items-center justify-center">2</span>
+                            <label class="text-xs font-extrabold uppercase tracking-wider text-slatearchive-900">
+                                Elige el Evento o Tema
+                            </label>
+                        </div>
+                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full archive-stamp">11 bloques</span>
+                    </div>
+                    <div id="topics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 max-h-80 overflow-y-auto custom-scroll pr-1"></div>
+                </div>
+            </div>
+
+            <!-- Botón de Inicio -->
+            <div class="flex justify-center pt-1">
+                <button type="button" onclick="startMatch()" class="w-full sm:w-auto px-11 py-4 rounded-2xl theme-btn-primary active:scale-[0.99] text-white font-extrabold text-sm uppercase tracking-[0.18em] flex items-center justify-center gap-3">
+                    <span>Iniciar Unanimo</span>
+                    <span class="text-lg">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: DIAPOSITIVA DE PROYECCIÓN (PAPEL Y BOLI) -->
+    <main id="play-screen" class="hidden max-w-6xl mx-auto px-4 py-6 sm:py-8 animate-fade-up space-y-6">
+        <!-- Barra Superior de Control del Presentador -->
+        <div class="glass-card border border-parchment-300 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+                <span class="px-4 py-2 rounded-xl theme-btn-primary text-white text-xs font-extrabold uppercase tracking-wider">
+                    Ronda <span id="play-round-num">1</span> / <span id="play-round-total">5</span>
+                </span>
+                <span id="play-topic-badge" class="text-xs font-bold text-parchment-900 bg-parchment-200/90 border border-parchment-300 px-3.5 py-2 rounded-xl">
+                    Tema
+                </span>
+                <button type="button" onclick="skipToAnotherWord()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-parchment-100 border border-parchment-300 text-xs font-bold text-slatearchive-900 transition" title="Cambiar por otra palabra del tema">
+                    Cambiar palabra ↻
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <button id="btn-toggle-timer" type="button" onclick="togglePauseTimer()" class="px-4 py-2 rounded-xl bg-parchment-200 hover:bg-parchment-300 text-slatearchive-900 text-xs font-bold uppercase tracking-wider transition">
+                    Pausar
+                </button>
+                <button type="button" onclick="openScoringPhase()" class="px-5 py-2.5 rounded-xl theme-btn-primary text-white text-xs font-extrabold uppercase tracking-wider">
+                    ¡Tiempo! Anotar Puntos →
+                </button>
+            </div>
+        </div>
+
+        <!-- Diapositiva Central Gigante con la Palabra Clave (SIN explicación ni sugerencias debajo) -->
+        <div class="projection-board text-parchment-50 border-4 rounded-3xl px-6 py-14 sm:py-20 text-center relative overflow-hidden">
+            <!-- Ornamentos de esquina -->
+            <div class="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-gold-400/50 rounded-tl-lg pointer-events-none"></div>
+            <div class="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-gold-400/50 rounded-tr-lg pointer-events-none"></div>
+            <div class="absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-gold-400/50 rounded-bl-lg pointer-events-none"></div>
+            <div class="absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-gold-400/50 rounded-br-lg pointer-events-none"></div>
+
+            <div class="flex items-center justify-center gap-3 mb-5">
+                <span class="h-px w-8 bg-gold-400/40"></span>
+                <span class="text-xs font-bold uppercase tracking-[0.28em] text-gold-300">
+                    Escribe 8 palabras en tu cuaderno
+                </span>
+                <span class="h-px w-8 bg-gold-400/40"></span>
+            </div>
+
+            <h2 id="stimulus-word" class="animate-word font-serif text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight uppercase leading-tight px-2 drop-shadow">
+                REVOLUCIÓN FRANCESA
+            </h2>
+
+            <!-- Cronómetro de Proyección con Barra de Progreso -->
+            <div id="timer-box" class="mt-10 inline-flex flex-col items-center px-8 py-3.5 rounded-2xl bg-slatearchive-950/90 border-2 shadow-lg min-w-[210px]" style="border-color: var(--theme-primary);">
+                <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-gold-400">Tiempo restante</span>
+                <span id="play-timer" class="font-serif text-4xl sm:text-5xl font-extrabold text-white tabular-nums mt-0.5">60s</span>
+                <div class="w-full h-1.5 bg-slatearchive-800 rounded-full overflow-hidden mt-2.5">
+                    <div id="timer-progress-bar" class="h-full transition-all duration-700" style="width: 100%; background-color: var(--theme-primary);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cinta Inferior de Participantes Activos -->
+        <div class="glass-card border border-parchment-300 rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-2.5">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slatearchive-900">
+                    Participantes en sala (<span id="active-players-count" class="theme-text">0</span>)
+                </span>
+                <span class="text-[11px] font-medium text-parchment-800">Todos escriben a la vez en papel y boli</span>
+            </div>
+            <div id="stage-participants-bar" class="flex flex-wrap gap-2"></div>
+        </div>
+    </main>
+
+    <!-- PANTALLA 3: PUESTA EN COMÚN Y ANOTACIÓN DE PUNTOS DE LA RONDA -->
+    <section id="results-screen" class="hidden max-w-6xl mx-auto px-4 py-6 animate-fade-up space-y-5">
+        <!-- Cabecera de Puesta en Común -->
+        <div class="glass-card border-2 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4" style="border-color: var(--theme-primary);">
+            <div>
+                <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-2.5 py-0.5 rounded mb-1.5">
+                    Puesta en Común · Ronda <span id="res-round-num">1</span>
+                </span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-extrabold text-slatearchive-900">
+                    Palabra: <span id="res-stimulus-word" class="theme-text">Palabra</span>
+                </h2>
+                <p class="text-xs text-parchment-800 mt-1">
+                    Leed en voz alta vuestras listas. Cada palabra repetida por <strong>N participantes</strong> suma <strong>N puntos</strong> a quienes la hayan escrito.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                <button id="btn-next-round" type="button" onclick="confirmRoundAndNext()" class="px-6 py-3.5 rounded-xl theme-btn-primary text-white font-extrabold text-xs uppercase tracking-widest">
+                    Guardar y Siguiente Ronda →
+                </button>
+            </div>
+        </div>
+
+        <!-- Cuadrícula de Anotación Rápida para hasta 40 Participantes -->
+        <div class="glass-card border border-parchment-300 rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-parchment-300 pb-3">
+                <h3 class="font-serif text-xl font-bold text-slatearchive-900">
+                    Anotar puntos obtenidos en esta ronda
+                </h3>
+                <span class="text-xs font-semibold text-parchment-800">
+                    Usa los botones rápidos o escribe el total de puntos de la ronda
+                </span>
+            </div>
+
+            <div id="scoring-participants-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
+        </div>
+    </section>
+
+    <!-- MODAL DE PODIO FINAL -->
+    <div id="final-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/80 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-center animate-fade-up relative overflow-hidden" style="border-color: var(--theme-primary);">
+            <div class="absolute top-0 inset-x-0 h-1.5 theme-top-bar"></div>
+            <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gold-500/20 border-2 border-gold-500 flex items-center justify-center text-3xl shadow-inner">
+                🏆
+            </div>
+            <span class="inline-block archive-stamp text-[10px] font-bold uppercase px-3 py-0.5 rounded mb-2">
+                Sesión Completada
+            </span>
+            <h2 class="font-serif text-3xl font-extrabold text-slatearchive-900 mb-1">
+                ¡Podio Final de Unanimo!
+            </h2>
+            <p id="winner-announcement" class="text-xs sm:text-sm text-parchment-800 mb-5">
+                Ganador de la sesión
+            </p>
+
+            <div id="final-podium-list" class="space-y-2 text-left mb-6 max-h-64 overflow-y-auto custom-scroll pr-1"></div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button type="button" onclick="closeFinalModal(); startMatch();" class="flex-1 py-3 px-4 rounded-xl theme-btn-primary text-white text-xs font-bold uppercase tracking-wider">
+                    Repetir (mismo tema)
+                </button>
+                <button type="button" onclick="closeFinalModal(); returnToSetup();" class="flex-1 py-3 px-4 rounded-xl bg-slatearchive-900 hover:bg-slatearchive-800 text-parchment-50 text-xs font-bold uppercase tracking-wider transition">
+                    Cambiar tema o lista
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE REGLAS -->
+    <div id="rules-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slatearchive-950/75 backdrop-blur-sm p-4">
+        <div class="bg-parchment-50 border-2 border-parchment-400 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl animate-fade-up">
+            <div class="flex items-center justify-between border-b border-parchment-300 pb-3 mb-4">
+                <h2 class="font-serif text-2xl font-bold text-slatearchive-900">Cómo jugar en clase / grupo</h2>
+                <button type="button" onclick="closeRulesModal()" class="w-8 h-8 rounded-xl bg-parchment-200 hover:bg-parchment-300 font-bold">✕</button>
+            </div>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-parchment-900 leading-relaxed">
+                <li><strong>1. Papel y Boli:</strong> Cada participante (hasta 40) necesita una hoja y un bolígrafo.</li>
+                <li><strong>2. Proyección de la Palabra Clave:</strong> Aparece un concepto histórico o geográfico en grande. Sin hablar ni mirar al compañero, todos escriben <strong>8 palabras</strong> asociadas antes de que acabe el tiempo.</li>
+                <li><strong>3. Puesta en Común:</strong> Al pulsar <em>«¡Tiempo! Anotar Puntos»</em>, leéis vuestras palabras. Si <strong>4 personas</strong> coincidieron en la misma palabra (p. ej., <em>«Guillotina»</em> o <em>«Trincheras»</em>), cada una suma <strong>4 puntos</strong>.</li>
+                <li><strong>4. Palabras únicas = 0 puntos:</strong> Si nadie más escribió esa palabra, no suma puntos. ¡Gana quien mejor sintonice con el grupo!</li>
+            </ul>
+            <button type="button" onclick="closeRulesModal()" class="mt-5 w-full py-3 rounded-xl bg-slatearchive-900 text-gold-300 text-xs font-bold uppercase tracking-wider">
+                ¡Entendido!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // BANCO DE DATOS DE TEMAS, PALABRAS ESTÍMULO Y PALETA DINÁMICA POR EVENTO
+        // (POR DEFECTO ROJO EN EL TEMA BASE)
+        // =========================================================================
+        const TOPICS_DB = [
+            {
+                id: 'mixto',
+                title: 'Mixto (Todos los temas)',
+                badge: 'Global',
+                palette: { primary: '#b91c1c', dark: '#7f1d1d', soft: 'rgba(185, 28, 28, 0.11)', border: 'rgba(185, 28, 28, 0.38)', glow: 'rgba(185, 28, 28, 0.28)' }
+            },
+            {
+                id: 'primario',
+                title: 'Sector Primario',
+                badge: 'Geografía',
+                palette: { primary: '#15803d', dark: '#14532d', soft: 'rgba(21, 128, 61, 0.11)', border: 'rgba(21, 128, 61, 0.38)', glow: 'rgba(21, 128, 61, 0.28)' },
+                prompts: [
+                    { word: 'AGRICULTURA' }, { word: 'GANADERÍA' }, { word: 'PESCA' }, { word: 'SILVICULTURA' }, { word: 'MINERÍA' },
+                    { word: 'REGADÍO' }, { word: 'SECANO' }, { word: 'MONOCULTIVO' }, { word: 'POLICULTIVO' }, { word: 'LATIFUNDIO' },
+                    { word: 'MINIFUNDIO' }, { word: 'BARBECHO' }, { word: 'INVERNADERO' }, { word: 'COSECHA' }, { word: 'TRACTOR' },
+                    { word: 'FERTILIZANTES' }, { word: 'ROTACIÓN DE CULTIVOS' }, { word: 'TRASHUMANCIA' }, { word: 'GANADERÍA EXTENSIVA' }, { word: 'GANADERÍA INTENSIVA' },
+                    { word: 'ESTABULACIÓN' }, { word: 'PASTOREO' }, { word: 'ACUICULTURA' }, { word: 'PISCIFACTORÍA' }, { word: 'PESCA DE BAJURA' },
+                    { word: 'PESCA DE ALTURA' }, { word: 'CALADERO' }, { word: 'ARRASTRE' }, { word: 'FLOTA PESQUERA' }, { word: 'LONJA' },
+                    { word: 'TALA DE ÁRBOLES' }, { word: 'REFORESTACIÓN' }, { word: 'DEFORESTACIÓN' }, { word: 'MADERA' }, { word: 'CORCHO' },
+                    { word: 'RESINA' }, { word: 'CANTERA' }, { word: 'YACIMIENTO' }, { word: 'CARBÓN' }, { word: 'HIERRO' },
+                    { word: 'COBRE' }, { word: 'PETRÓLEO' }, { word: 'GAS NATURAL' }, { word: 'MATERIAS PRIMAS' }, { word: 'PAISAJE AGRARIO' },
+                    { word: 'PARCELA' }, { word: 'ÉXODO RURAL' }, { word: 'SUBSISTENCIA' }, { word: 'PLANTACIÓN' }, { word: 'POLÍTICA AGRARIA COMÚN' }
+                ]
+            },
+            {
+                id: 'secundario',
+                title: 'Sector Secundario',
+                badge: 'Geografía',
+                palette: { primary: '#c2410c', dark: '#7c2d12', soft: 'rgba(194, 65, 12, 0.11)', border: 'rgba(194, 65, 12, 0.38)', glow: 'rgba(194, 65, 12, 0.28)' },
+                prompts: [
+                    { word: 'INDUSTRIA' }, { word: 'FÁBRICA' }, { word: 'CONSTRUCCIÓN' }, { word: 'ARTESANÍA' }, { word: 'ENERGÍA SOLAR' },
+                    { word: 'ENERGÍA EÓLICA' }, { word: 'ENERGÍA NUCLEAR' }, { word: 'CENTRAL HIDROELÉCTRICA' }, { word: 'CENTRAL TÉRMICA' }, { word: 'COMBUSTIBLES FÓSILES' },
+                    { word: 'ENERGÍAS RENOVABLES' }, { word: 'SIDERURGIA' }, { word: 'METALURGIA' }, { word: 'PETROQUÍMICA' }, { word: 'INDUSTRIA TEXTIL' },
+                    { word: 'AUTOMOCIÓN' }, { word: 'AERONÁUTICA' }, { word: 'NAVAL' }, { word: 'AGROALIMENTARIA' }, { word: 'INDUSTRIA PESADA' },
+                    { word: 'INDUSTRIA LIGERA' }, { word: 'BIENES DE EQUIPO' }, { word: 'BIENES DE CONSUMO' }, { word: 'CADENA DE MONTAJE' }, { word: 'FORDISMO' },
+                    { word: 'TAYLORISMO' }, { word: 'DESLOCALIZACIÓN' }, { word: 'POLÍGONO INDUSTRIAL' }, { word: 'PARQUE TECNOLÓGICO' }, { word: 'ROBÓTICA' },
+                    { word: 'AUTOMATIZACIÓN' }, { word: 'MANUFACTURA' }, { word: 'ALTO HORNO' }, { word: 'ACERO' }, { word: 'CEMENTO' },
+                    { word: 'REFINERÍA' }, { word: 'OLEODUCTO' }, { word: 'GASODUCTO' }, { word: 'RED ELÉCTRICA' }, { word: 'OBRAS PÚBLICAS' },
+                    { word: 'INFRAESTRUCTURAS' }, { word: 'URBANISMO' }, { word: 'RECONVERSIÓN INDUSTRIAL' }, { word: 'MULTINACIONAL' }, { word: 'PRODUCTIVIDAD' },
+                    { word: 'CONTROL DE CALIDAD' }, { word: 'LOGÍSTICA INDUSTRIAL' }, { word: 'PATENTE' }, { word: 'I+D+I' }, { word: 'CONTAMINACIÓN INDUSTRIAL' }
+                ]
+            },
+            {
+                id: 'terciario',
+                title: 'Sector Terciario',
+                badge: 'Geografía',
+                palette: { primary: '#0369a1', dark: '#0c4a6e', soft: 'rgba(3, 105, 161, 0.11)', border: 'rgba(3, 105, 161, 0.38)', glow: 'rgba(3, 105, 161, 0.28)' },
+                prompts: [
+                    { word: 'TURISMO' }, { word: 'COMERCIO' }, { word: 'TRANSPORTE' }, { word: 'SANIDAD' }, { word: 'EDUCACIÓN' },
+                    { word: 'BANCA' }, { word: 'BOLSA DE VALORES' }, { word: 'SEGUROS' }, { word: 'HOSTELERÍA' }, { word: 'RESTAURACIÓN' },
+                    { word: 'TELECOMUNICACIONES' }, { word: 'INFORMÁTICA' }, { word: 'INTERNET' }, { word: 'COMERCIO ELECTRÓNICO' }, { word: 'EXPORTACIÓN' },
+                    { word: 'IMPORTACIÓN' }, { word: 'BALANZA COMERCIAL' }, { word: 'ARANCELES' }, { word: 'LIBRE CAMBIO' }, { word: 'FERROCARRIL' },
+                    { word: 'AVIACIÓN' }, { word: 'TRANSPORTE MARÍTIMO' }, { word: 'PUERTO' }, { word: 'AEROPUERTO' }, { word: 'AUTOPISTA' },
+                    { word: 'METRO' }, { word: 'LOGÍSTICA' }, { word: 'DISTRIBUCIÓN' }, { word: 'SUPERMERCADO' }, { word: 'CENTRO COMERCIAL' },
+                    { word: 'TURISMO DE SOL Y PLAYA' }, { word: 'TURISMO CULTURAL' }, { word: 'TURISMO RURAL' }, { word: 'HOTEL' }, { word: 'AGENCIA DE VIAJES' },
+                    { word: 'ADMINISTRACIÓN PÚBLICA' }, { word: 'JUSTICIA' }, { word: 'SEGURIDAD SOCIAL' }, { word: 'ESTADO DEL BIENESTAR' }, { word: 'CULTURA Y OCIO' },
+                    { word: 'MEDIOS DE COMUNICACIÓN' }, { word: 'PUBLICIDAD' }, { word: 'MARKETING' }, { word: 'CONSULTORÍA' }, { word: 'INVESTIGACIÓN' },
+                    { word: 'TERCIARIZACIÓN' }, { word: 'GLOBALIZACIÓN' }, { word: 'CONSUMO' }, { word: 'FRANQUICIA' }, { word: 'TRANSPORTE INTERMODAL' }
+                ]
+            },
+            {
+                id: 'rev-francesa',
+                title: 'Revolución Francesa',
+                badge: '1789–1799',
+                palette: { primary: '#1d4ed8', dark: '#1e3a8a', soft: 'rgba(29, 78, 216, 0.11)', border: 'rgba(29, 78, 216, 0.38)', glow: 'rgba(29, 78, 216, 0.28)' },
+                prompts: [
+                    { word: 'TOMA DE LA BASTILLA' }, { word: 'GUILLOTINA' }, { word: 'ROBESPIERRE' }, { word: 'LUIS XVI' }, { word: 'MARÍA ANTONIETA' },
+                    { word: 'ESTADOS GENERALES' }, { word: 'TERCER ESTADO' }, { word: 'ASAMBLEA NACIONAL' }, { word: 'JURAMENTO DEL JUEGO DE PELOTA' }, { word: 'ANTIGUO RÉGIMEN' },
+                    { word: 'ABSOLUTISMO' }, { word: 'DECLARACIÓN DE DERECHOS' }, { word: 'LIBERTAD, IGUALDAD, FRATERNIDAD' }, { word: 'JACOBINOS' }, { word: 'GIRONDINOS' },
+                    { word: 'SANS-CULOTTES' }, { word: 'EL TERROR' }, { word: 'DANTON' }, { word: 'MARAT' }, { word: 'CONVENCIÓN NACIONAL' },
+                    { word: 'COMITÉ DE SALVACIÓN PÚBLICA' }, { word: 'DIRECTORIO' }, { word: 'CONSULADO' }, { word: 'NAPOLEÓN BONAPARTE' }, { word: 'GOLPE DE BRUMARIO' },
+                    { word: 'VERSALLES' }, { word: 'PARÍS' }, { word: 'ESCARAPELA TRICOLOR' }, { word: 'LA MARSELLESA' }, { word: 'FEUDALISMO' },
+                    { word: 'DIEZMO' }, { word: 'CLERO' }, { word: 'NOBLEZA' }, { word: 'BURGUESÍA' }, { word: 'CONSTITUCIÓN DE 1791' },
+                    { word: 'SOBERANÍA NACIONAL' }, { word: 'SEPARACIÓN DE PODERES' }, { word: 'ILUSTRACIÓN' }, { word: 'ROUSSEAU' }, { word: 'MONTESQUIEU' },
+                    { word: 'VOLTAIRE' }, { word: 'CUADERNOS DE QUEJAS' }, { word: 'GRAN MIEDO' }, { word: 'FUGA DE VARENNES' }, { word: 'VALMY' },
+                    { word: 'VENDÉE' }, { word: 'TERMIDOR' }, { word: 'CÓDIGO CIVIL' }, { word: 'SUFRAGIO CENSITARIO' }, { word: 'REPÚBLICA FRANCESA' }
+                ]
+            },
+            {
+                id: 'rev-industrial',
+                title: 'Revolución Industrial',
+                badge: 'Siglos XVIII–XIX',
+                palette: { primary: '#b45309', dark: '#78350f', soft: 'rgba(180, 83, 9, 0.11)', border: 'rgba(180, 83, 9, 0.38)', glow: 'rgba(180, 83, 9, 0.28)' },
+                prompts: [
+                    { word: 'MÁQUINA DE VAPOR' }, { word: 'JAMES WATT' }, { word: 'FERROCARRIL' }, { word: 'LOCOMOTORA' }, { word: 'CARBÓN' },
+                    { word: 'FÁBRICA' }, { word: 'HILADORA MECÁNICA' }, { word: 'TELAR MECÁNICO' }, { word: 'INDUSTRIA TEXTIL' }, { word: 'SIDERURGIA' },
+                    { word: 'GRAN BRETAÑA' }, { word: 'MANCHESTER' }, { word: 'PROLETARIADO' }, { word: 'BURGUESÍA INDUSTRIAL' }, { word: 'CAPITALISMO' },
+                    { word: 'ADAM SMITH' }, { word: 'LIBERALISMO ECONÓMICO' }, { word: 'MOVIMIENTO OBRERO' }, { word: 'SINDICATOS' }, { word: 'HUELGA' },
+                    { word: 'LUDISMO' }, { word: 'CARTISMO' }, { word: 'KARL MARX' }, { word: 'FRIEDRICH ENGELS' }, { word: 'MANIFIESTO COMUNISTA' },
+                    { word: 'SOCIALISMO' }, { word: 'ANARQUISMO' }, { word: 'PRIMERA INTERNACIONAL' }, { word: 'TRABAJO INFANTIL' }, { word: 'JORNADA LABORAL' },
+                    { word: 'ÉXODO RURAL' }, { word: 'URBANIZACIÓN' }, { word: 'BARRIOS OBREROS' }, { word: 'BARCO DE VAPOR' }, { word: 'TELÉGRAFO' },
+                    { word: 'ELECTRICIDAD' }, { word: 'PETRÓLEO' }, { word: 'MOTOR DE EXPLOSIÓN' }, { word: 'THOMAS EDISON' }, { word: 'NIKOLA TESLA' },
+                    { word: 'HENRY FORD' }, { word: 'CADENA DE MONTAJE' }, { word: 'CONVERTIDOR BESSEMER' }, { word: 'REVOLUCIÓN AGRÍCOLA' }, { word: 'CERCAMIENTOS' },
+                    { word: 'EXPLOSIÓN DEMOGRÁFICA' }, { word: 'SOCIEDAD DE CLASES' }, { word: 'BANCA Y BOLSA' }, { word: 'SEGUNDA FASE INDUSTRIAL' }, { word: 'AUTOMÓVIL' }
+                ]
+            },
+            {
+                id: 'fascismo',
+                title: 'Fascismo',
+                badge: 'Entreguerras',
+                palette: { primary: '#334155', dark: '#0f172a', soft: 'rgba(51, 65, 85, 0.12)', border: 'rgba(51, 65, 85, 0.40)', glow: 'rgba(51, 65, 85, 0.28)' },
+                prompts: [
+                    { word: 'BENITO MUSSOLINI' }, { word: 'IL DUCE' }, { word: 'MARCHA SOBRE ROMA' }, { word: 'CAMISAS NEGRAS' }, { word: 'ITALIA' },
+                    { word: 'TOTALITARISMO' }, { word: 'DICTADURA' }, { word: 'PARTIDO ÚNICO' }, { word: 'ULTRANACIONALISMO' }, { word: 'ANTIPARLAMENTARISMO' },
+                    { word: 'ANTICOMUNISMO' }, { word: 'CORPORATIVISMO' }, { word: 'AUTARQUÍA' }, { word: 'PROPAGANDA' }, { word: 'CULTO AL LÍDER' },
+                    { word: 'MILITARISMO' }, { word: 'IMPERIALISMO' }, { word: 'IMPERIO ROMANO' }, { word: 'MARE NOSTRUM' }, { word: 'INVASIÓN DE ETIOPÍA' },
+                    { word: 'INVASIÓN DE ALBANIA' }, { word: 'PACTOS DE LETRÁN' }, { word: 'VÍCTOR MANUEL III' }, { word: 'OVRA' }, { word: 'SQUADRISMO' },
+                    { word: 'FASCIO LICTORIO' }, { word: 'SALUDO ROMANO' }, { word: 'CENSURA' }, { word: 'REPRESIÓN POLÍTICA' }, { word: 'GIACOMO MATTEOTTI' },
+                    { word: 'LEY ACERBO' }, { word: 'GRAN CONSEJO' }, { word: 'CARTA DEL LAVORO' }, { word: 'BALILLA' }, { word: 'EJE ROMA-BERLÍN' },
+                    { word: 'PACTO DE ACERO' }, { word: 'REPÚBLICA DE SALÓ' }, { word: 'GALEAZZO CIANO' }, { word: 'GABRIELE D’ANNUNZIO' }, { word: 'FIUME' },
+                    { word: 'BIENIO ROJO' }, { word: 'TRATADO DE VERSALLES' }, { word: 'VICTORIA MUTILADA' }, { word: 'EXPANSIONISMO' }, { word: 'ESTADO TOTALITARIO' },
+                    { word: 'BELICISMO' }, { word: 'ADOLF HITLER' }, { word: 'FRANCISCO FRANCO' }, { word: 'FALANGE ESPAÑOLA' }, { word: 'AUTORITARISMO' }
+                ]
+            },
+            {
+                id: 'nazismo',
+                title: 'Nazismo',
+                badge: '1933–1945',
+                palette: { primary: '#991b1b', dark: '#450a0a', soft: 'rgba(153, 27, 27, 0.12)', border: 'rgba(153, 27, 27, 0.42)', glow: 'rgba(153, 27, 27, 0.30)' },
+                prompts: [
+                    { word: 'ADOLF HITLER' }, { word: 'TERCER REICH' }, { word: 'FÜHRER' }, { word: 'ESVÁSTICA' }, { word: 'NSDAP' },
+                    { word: 'MEIN KAMPF' }, { word: 'GESTAPO' }, { word: 'SS' }, { word: 'SA' }, { word: 'HEINRICH HIMMLER' },
+                    { word: 'JOSEPH GOEBBELS' }, { word: 'HERMANN GÖRING' }, { word: 'ANTISEMITISMO' }, { word: 'RAZA ARIA' }, { word: 'LEYES DE NÚREMBERG' },
+                    { word: 'NOCHE DE LOS CRISTALES ROTOS' }, { word: 'NOCHE DE LOS CUCHILLOS LARGOS' }, { word: 'HOLOCAUSTO' }, { word: 'AUSCHWITZ' }, { word: 'CAMPOS DE CONCENTRACIÓN' },
+                    { word: 'GUETOS' }, { word: 'ESTRELLA DE DAVID' }, { word: 'SOLUCIÓN FINAL' }, { word: 'ESPACIO VITAL' }, { word: 'LEBENSRAUM' },
+                    { word: 'ANSCHLUSS' }, { word: 'SUDETES' }, { word: 'INCENDIO DEL REICHSTAG' }, { word: 'REPÚBLICA DE WEIMAR' }, { word: 'CRACK DEL 29' },
+                    { word: 'PUTSCH DE MÚNICH' }, { word: 'PROPAGANDA' }, { word: 'JUVENTUDES HITLERIANAS' }, { word: 'QUEMA DE LIBROS' }, { word: 'WEHRMACHT' },
+                    { word: 'LUFTWAFFE' }, { word: 'BLITZKRIEG' }, { word: 'BÚNKER DE BERLÍN' }, { word: 'JUICIOS DE NÚREMBERG' }, { word: 'REINHARD HEYDRICH' },
+                    { word: 'ALBERT SPEER' }, { word: 'RUDOLF HESS' }, { word: 'ERNST RÖHM' }, { word: 'EINSATZGRUPPEN' }, { word: 'AUTARQUÍA' },
+                    { word: 'TOTALITARISMO' }, { word: 'REARME ALEMÁN' }, { word: 'PACTO DE MÚNICH' }, { word: 'PACTO RIBBENTROP-MÓLOTOV' }, { word: 'SUPREMACISMO' }
+                ]
+            },
+            {
+                id: 'igm',
+                title: 'Primera Guerra Mundial',
+                badge: '1914–1918',
+                palette: { primary: '#4d7c0f', dark: '#365314', soft: 'rgba(77, 124, 15, 0.11)', border: 'rgba(77, 124, 15, 0.38)', glow: 'rgba(77, 124, 15, 0.28)' },
+                prompts: [
+                    { word: 'TRINCHERAS' }, { word: 'ATENTADO DE SARAJEVO' }, { word: 'FRANCISCO FERNANDO' }, { word: 'TRIPLE ENTENTE' }, { word: 'TRIPLE ALIANZA' },
+                    { word: 'POTENCIAS CENTRALES' }, { word: 'TRATADO DE VERSALLES' }, { word: 'BATALLA DE VERDÚN' }, { word: 'BATALLA DEL SOMME' }, { word: 'BATALLA DEL MARNE' },
+                    { word: 'GALÍPOLI' }, { word: 'JUTLANDIA' }, { word: 'TANNENBERG' }, { word: 'GAS MOSTAZA' }, { word: 'ARMAS QUÍMICAS' },
+                    { word: 'AMETRALLADORA' }, { word: 'TANQUES' }, { word: 'SUBMARINOS U-BOOT' }, { word: 'LUSITANIA' }, { word: 'ZEPELÍN' },
+                    { word: 'AVIACIÓN DE COMBATE' }, { word: 'BARÓN ROJO' }, { word: 'TIERRA DE NADIE' }, { word: 'ALAMBRADAS' }, { word: 'GUILLERMO II' },
+                    { word: 'NICOLÁS II' }, { word: 'FRANCISCO JOSÉ I' }, { word: 'WOODROW WILSON' }, { word: 'CLEMENCEAU' }, { word: 'LLOYD GEORGE' },
+                    { word: 'PLAN SCHLIEFFEN' }, { word: 'FRENTE OCCIDENTAL' }, { word: 'FRENTE ORIENTAL' }, { word: 'IMPERIO AUSTROHÚNGARO' }, { word: 'IMPERIO OTOMANO' },
+                    { word: 'IMPERIO ALEMÁN' }, { word: 'ARMISTICIO DE COMPIÈGNE' }, { word: '11 DE NOVIEMBRE' }, { word: 'SOCIEDAD DE NACIONES' }, { word: 'CATORCE PUNTOS' },
+                    { word: 'REPARACIONES DE GUERRA' }, { word: 'PAZ ARMADA' }, { word: 'BALCANES' }, { word: 'POLVORÍN BALCÁNICO' }, { word: 'TELEGRAMA ZIMMERMANN' },
+                    { word: 'ECONOMÍA DE GUERRA' }, { word: 'RETAGUARDIA' }, { word: 'TRATADO DE BREST-LITOVSK' }, { word: 'IMPERIALISMO' }, { word: 'ALEMANIA' }
+                ]
+            },
+            {
+                id: 'iigm',
+                title: 'Segunda Guerra Mundial',
+                badge: '1939–1945',
+                palette: { primary: '#0f766e', dark: '#134e4a', soft: 'rgba(15, 118, 110, 0.11)', border: 'rgba(15, 118, 110, 0.38)', glow: 'rgba(15, 118, 110, 0.28)' },
+                prompts: [
+                    { word: 'BLITZKRIEG' }, { word: 'INVASIÓN DE POLONIA' }, { word: 'PEARL HARBOR' }, { word: 'DESEMBARCO DE NORMANDÍA' }, { word: 'DÍA D' },
+                    { word: 'BATALLA DE STALINGRADO' }, { word: 'BATALLA DE INGLATERRA' }, { word: 'EL ALAMEIN' }, { word: 'BATALLA DE MIDWAY' }, { word: 'KURSK' },
+                    { word: 'OPERACIÓN BARBARROJA' }, { word: 'POTENCIAS DEL EJE' }, { word: 'ALIADOS' }, { word: 'WINSTON CHURCHILL' }, { word: 'FRANKLIN D. ROOSEVELT' },
+                    { word: 'IÓSIF STALIN' }, { word: 'ADOLF HITLER' }, { word: 'BENITO MUSSOLINI' }, { word: 'HIROHITO' }, { word: 'CHARLES DE GAULLE' },
+                    { word: 'DWIGHT D. EISENHOWER' }, { word: 'ERWIN ROMMEL' }, { word: 'GEORGUI ZHÚKOV' }, { word: 'BERNARD MONTGOMERY' }, { word: 'DOUGLAS MACARTHUR' },
+                    { word: 'HIROSHIMA' }, { word: 'NAGASAKI' }, { word: 'BOMBA ATÓMICA' }, { word: 'PROYECTO MANHATTAN' }, { word: 'HOLOCAUSTO' },
+                    { word: 'AUSCHWITZ' }, { word: 'KAMIKAZE' }, { word: 'MÁQUINA ENIGMA' }, { word: 'ALAN TURING' }, { word: 'RADAR' },
+                    { word: 'PORTAAVIONES' }, { word: 'CONFERENCIA DE YALTA' }, { word: 'CONFERENCIA DE POTSDAM' }, { word: 'CONFERENCIA DE TEHERÁN' }, { word: 'ONU' },
+                    { word: 'RESISTENCIA FRANCESA' }, { word: 'PARTISANOS' }, { word: 'DUNKERQUE' }, { word: 'SITIO DE LENINGRADO' }, { word: 'IWO JIMA' },
+                    { word: 'GUERRA DEL PACÍFICO' }, { word: 'RENDICIÓN DE ALEMANIA' }, { word: 'RENDICIÓN DE JAPÓN' }, { word: 'TELÓN DE ACERO' }, { word: 'DIVISIÓN DE ALEMANIA' }
+                ]
+            },
+            {
+                id: 'rev-rusa',
+                title: 'Revolución Rusa',
+                badge: '1917–1922',
+                palette: { primary: '#dc2626', dark: '#7f1d1d', soft: 'rgba(220, 38, 38, 0.12)', border: 'rgba(220, 38, 38, 0.42)', glow: 'rgba(220, 38, 38, 0.30)' },
+                prompts: [
+                    { word: 'VLADIMIR LENIN' }, { word: 'BOLCHEVIQUES' }, { word: 'MENCHEVIQUES' }, { word: 'ZAR NICOLÁS II' }, { word: 'DINASTÍA ROMÁNOV' },
+                    { word: 'SÓVIETS' }, { word: 'LEÓN TROTSKI' }, { word: 'EJÉRCITO ROJO' }, { word: 'EJÉRCITO BLANCO' }, { word: 'GUERRA CIVIL RUSA' },
+                    { word: 'REVOLUCIÓN DE FEBRERO' }, { word: 'REVOLUCIÓN DE OCTUBRE' }, { word: 'ASALTO AL PALACIO DE INVIERNO' }, { word: 'PETROGRADO' }, { word: 'DOMINGO SANGRIENTO' },
+                    { word: 'REVOLUCIÓN DE 1905' }, { word: 'RASPUTÍN' }, { word: 'DUMA' }, { word: 'GOBIERNO PROVISIONAL' }, { word: 'ALEKSANDR KÉRENSKI' },
+                    { word: 'TESIS DE ABRIL' }, { word: 'PAZ, PAN Y TIERRA' }, { word: 'TRATADO DE BREST-LITOVSK' }, { word: 'COMUNISMO DE GUERRA' }, { word: 'NEP' },
+                    { word: 'URSS' }, { word: 'UNIÓN SOVIÉTICA' }, { word: 'HOZ Y MARTILLO' }, { word: 'ESTALINISMO' }, { word: 'IÓSIF STALIN' },
+                    { word: 'PARTIDO COMUNISTA' }, { word: 'CHEKA' }, { word: 'KULAKS' }, { word: 'COLECTIVIZACIÓN' }, { word: 'PLANES QUINQUENALES' },
+                    { word: 'GULAG' }, { word: 'PURGAS ESTALINISTAS' }, { word: 'ACORAZADO POTEMKIN' }, { word: 'CRUCERO AURORA' }, { word: 'GUARDIA ROJA' },
+                    { word: 'INTERNACIONAL COMUNISTA' }, { word: 'KOMINTERN' }, { word: 'DICTADURA DEL PROLETARIADO' }, { word: 'AUTOCRACIA ZARISTA' }, { word: 'SIERVOS' },
+                    { word: 'MUJIKS' }, { word: 'EKATERIMBURGO' }, { word: 'MOSCÚ' }, { word: 'BANDERA ROJA' }, { word: 'KARL MARX' }
+                ]
+            }
+        ];
+
+        const MAX_PARTICIPANTS = 40;
+
+        // =========================================================================
+        // ESTADO GLOBAL DE LA PRESENTACIÓN
+        // =========================================================================
+        let selectedTopicId = 'mixto';
+        let participantNames = ['Participante 1', 'Participante 2', 'Participante 3', 'Participante 4'];
+        let players = [];
+        let roundDuration = 60;
+        let totalRounds = 5;
+        let currentRound = 1;
+        let currentPrompt = null;
+        let usedPrompts = new Set();
+        let timerInterval = null;
+        let secondsLeft = 60;
+        let isTimerPaused = false;
+
+        // =========================================================================
+        // INICIALIZACIÓN DE CONFIGURACIÓN, PALETA DINÁMICA Y PARTICIPANTES
+        // =========================================================================
+        function applyTopicTheme(topicId) {
+            const topic = TOPICS_DB.find(t => t.id === topicId) || TOPICS_DB[0];
+            const pal = topic.palette;
+            const root = document.documentElement;
+            root.style.setProperty('--theme-primary', pal.primary);
+            root.style.setProperty('--theme-dark', pal.dark);
+            root.style.setProperty('--theme-soft', pal.soft);
+            root.style.setProperty('--theme-border', pal.border);
+            root.style.setProperty('--theme-glow', pal.glow);
+        }
+
+        function initSetupUI() {
+            applyTopicTheme(selectedTopicId);
+            const topicsGrid = document.getElementById('topics-grid');
+            topicsGrid.innerHTML = TOPICS_DB.map(topic => {
+                const isSelected = topic.id === selectedTopicId;
+                return `
+                    <button type="button" onclick="selectTopic('${topic.id}')"
+                        style="${isSelected ? `border-color: ${topic.palette.primary}; box-shadow: 0 4px 14px -3px ${topic.palette.glow};` : ''}"
+                        class="text-left p-3 rounded-xl border-2 transition-all flex items-center justify-between gap-2 ${
+                            isSelected
+                                ? 'bg-white'
+                                : 'border-parchment-300 bg-white/75 hover:bg-white hover:border-parchment-400'
+                        }">
+                        <div class="min-w-0 flex items-center gap-2.5">
+                            <span style="background-color: ${topic.palette.primary};" class="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md text-white shrink-0">
+                                ${topic.badge}
+                            </span>
+                            <h4 class="font-serif font-bold text-base text-slatearchive-900 truncate">${topic.title}</h4>
+                        </div>
+                        ${isSelected ? `<span style="color: ${topic.palette.primary};" class="text-sm font-extrabold shrink-0">✓</span>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            renderParticipantChips();
+        }
+
+        function selectTopic(topicId) {
+            selectedTopicId = topicId;
+            initSetupUI();
+        }
+
+        function renderParticipantChips() {
+            const container = document.getElementById('participants-chips-grid');
+            const badge = document.getElementById('participant-count-badge');
+            badge.textContent = participantNames.length;
+
+            if (participantNames.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-5 text-xs italic text-parchment-800 bg-white/60 rounded-xl border border-dashed border-parchment-300">
+                        No hay participantes apuntados aún. Añade nombres arriba (hasta 40).
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = participantNames.map((name, index) => `
+                <div class="flex items-center justify-between gap-1.5 bg-white border border-parchment-300 focus-within:border-slatearchive-900 rounded-xl px-2.5 py-1.5 shadow-2xs transition">
+                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span class="w-5 h-5 rounded-md bg-parchment-200 text-[10px] font-extrabold text-slatearchive-900 flex items-center justify-center shrink-0">${index + 1}</span>
+                        <input type="text" maxlength="26" value="${name.replace(/"/g, '&quot;')}"
+                            onchange="renameParticipant(${index}, this.value)"
+                            aria-label="Nombre del participante ${index + 1}"
+                            class="w-full bg-transparent text-xs font-bold text-slatearchive-900 focus:outline-none truncate" />
+                    </div>
+                    <button type="button" onclick="removeParticipant(${index})" class="text-parchment-800 hover:theme-text font-bold text-xs px-1 shrink-0" title="Eliminar participante">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renameParticipant(index, newName) {
+            const clean = newName.trim();
+            if (clean) {
+                participantNames[index] = clean;
+            } else {
+                renderParticipantChips();
+            }
+        }
+
+        function addParticipantFromInput(e) {
+            e.preventDefault();
+            if (participantNames.length >= MAX_PARTICIPANTS) return;
+            const input = document.getElementById('new-participant-input');
+            const clean = input.value.trim();
+            if (!clean) return;
+
+            participantNames.push(clean);
+            input.value = '';
+            renderParticipantChips();
+            input.focus();
+        }
+
+        function removeParticipant(index) {
+            participantNames.splice(index, 1);
+            renderParticipantChips();
+        }
+
+        function clearParticipants() {
+            participantNames = [];
+            renderParticipantChips();
+        }
+
+        function toggleBulkImport(forceState) {
+            const box = document.getElementById('bulk-import-box');
+            const shouldShow = typeof forceState === 'boolean' ? forceState : box.classList.contains('hidden');
+            box.classList.toggle('hidden', !shouldShow);
+            if (shouldShow) {
+                document.getElementById('bulk-names-textarea').focus();
+            }
+        }
+
+        function applyBulkParticipants() {
+            const raw = document.getElementById('bulk-names-textarea').value;
+            const parsed = raw
+                .split(/[\n,;]+/)
+                .map(s => s.trim())
+                .filter(Boolean)
+                .slice(0, MAX_PARTICIPANTS);
+
+            if (parsed.length > 0) {
+                participantNames = parsed;
+                renderParticipantChips();
+            }
+            document.getElementById('bulk-names-textarea').value = '';
+            toggleBulkImport(false);
+        }
+
+        function returnToSetup() {
+            stopRoundTimer();
+            document.getElementById('play-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            const homeBtn = document.getElementById('btn-home');
+            homeBtn.classList.add('hidden');
+            homeBtn.classList.remove('flex');
+        }
+
+        // =========================================================================
+        // FLUJO DE PRESENTACIÓN EN PROYECTOR
+        // =========================================================================
+        function startMatch() {
+            roundDuration = parseInt(document.getElementById('round-timer-select').value, 10);
+            totalRounds = parseInt(document.getElementById('total-rounds-select').value, 10);
+            currentRound = 1;
+            usedPrompts.clear();
+
+            const activeList = participantNames.length > 0
+                ? participantNames.slice(0, MAX_PARTICIPANTS)
+                : ['Participante 1', 'Participante 2'];
+
+            players = activeList.map((name, idx) => ({
+                id: idx,
+                name,
+                score: 0,
+                roundDelta: 0
+            }));
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            const homeBtn = document.getElementById('btn-home');
+            homeBtn.classList.remove('hidden');
+            homeBtn.classList.add('flex');
+
+            showProjectionSlide();
+        }
+
+        function pickPromptForTopic() {
+            let candidatePrompts = [];
+            if (selectedTopicId === 'mixto') {
+                TOPICS_DB.filter(t => t.id !== 'mixto').forEach(t => {
+                    t.prompts.forEach(p => candidatePrompts.push({ ...p, topicTitle: t.title }));
+                });
+            } else {
+                const topic = TOPICS_DB.find(t => t.id === selectedTopicId);
+                candidatePrompts = topic.prompts.map(p => ({ ...p, topicTitle: topic.title }));
+            }
+
+            let available = candidatePrompts.filter(p => !usedPrompts.has(p.word));
+            if (available.length === 0) {
+                usedPrompts.clear();
+                available = candidatePrompts;
+            }
+
+            const chosen = available[Math.floor(Math.random() * available.length)];
+            usedPrompts.add(chosen.word);
+            return chosen;
+        }
+
+        function showProjectionSlide() {
+            currentPrompt = pickPromptForTopic();
+            players.forEach(p => { p.roundDelta = 0; });
+
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('play-screen').classList.remove('hidden');
+
+            document.getElementById('play-round-num').textContent = currentRound;
+            document.getElementById('play-round-total').textContent = totalRounds;
+            document.getElementById('play-topic-badge').textContent = currentPrompt.topicTitle;
+
+            const wordEl = document.getElementById('stimulus-word');
+            wordEl.classList.remove('animate-word');
+            void wordEl.offsetWidth;
+            wordEl.textContent = currentPrompt.word;
+            wordEl.classList.add('animate-word');
+
+            document.getElementById('active-players-count').textContent = players.length;
+            const bar = document.getElementById('stage-participants-bar');
+            bar.innerHTML = players.map(p => `
+                <span class="px-3 py-1.5 rounded-xl bg-white border border-parchment-300 text-xs font-bold text-slatearchive-900 shadow-2xs">
+                ${p.name} <strong class="theme-text ml-1.5">${p.score}</strong>
+            </span>
+        `).join('');
+
+        startRoundTimer();
+    }
+
+        function skipToAnotherWord() {
+            currentPrompt = pickPromptForTopic();
+            document.getElementById('play-topic-badge').textContent = currentPrompt.topicTitle;
+
+            const wordEl = document.getElementById('stimulus-word');
+            wordEl.classList.remove('animate-word');
+            void wordEl.offsetWidth;
+            wordEl.textContent = currentPrompt.word;
+            wordEl.classList.add('animate-word');
+
+            startRoundTimer();
+        }
+
+        function startRoundTimer() {
+            stopRoundTimer();
+            isTimerPaused = false;
+            const pauseBtn = document.getElementById('btn-toggle-timer');
+            const timerBox = document.getElementById('timer-box');
+            const timerEl = document.getElementById('play-timer');
+            const progressBar = document.getElementById('timer-progress-bar');
+
+            if (roundDuration === 0) {
+                timerEl.textContent = '∞';
+                timerBox.style.borderColor = 'var(--theme-primary)';
+                if (progressBar) progressBar.style.width = '100%';
+                pauseBtn.classList.add('hidden');
+                return;
+            }
+
+            pauseBtn.classList.remove('hidden');
+            pauseBtn.textContent = 'Pausar';
+            secondsLeft = roundDuration;
+            timerEl.textContent = `${secondsLeft}s`;
+            timerBox.style.borderColor = 'var(--theme-primary)';
+            if (progressBar) {
+                progressBar.style.width = '100%';
+                progressBar.style.backgroundColor = 'var(--theme-primary)';
+            }
+
+            timerInterval = setInterval(() => {
+                if (isTimerPaused) return;
+                secondsLeft--;
+                timerEl.textContent = `${secondsLeft}s`;
+                if (progressBar) {
+                    const pct = Math.max(0, Math.round((secondsLeft / roundDuration) * 100));
+                    progressBar.style.width = `${pct}%`;
+                }
+                if (secondsLeft <= 10) {
+                    timerBox.style.borderColor = '#ef4444';
+                    if (progressBar) {
+                        progressBar.style.backgroundColor = '#ef4444';
+                    }
+                }
+                if (secondsLeft <= 0) {
+                    stopRoundTimer();
+                    timerEl.textContent = '¡TIEMPO!';
+                }
+            }, 1000);
+        }
+
+        function togglePauseTimer() {
+            isTimerPaused = !isTimerPaused;
+            const pauseBtn = document.getElementById('btn-toggle-timer');
+            pauseBtn.textContent = isTimerPaused ? 'Reanudar' : 'Pausar';
+        }
+
+        function stopRoundTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // =========================================================================
+        // FASE DE ANOTACIÓN DE PUNTOS EN GRUPO (HASTA 40 PARTICIPANTES)
+        // =========================================================================
+        function openScoringPhase() {
+            stopRoundTimer();
+            document.getElementById('play-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            document.getElementById('res-round-num').textContent = currentRound;
+            document.getElementById('res-stimulus-word').textContent = currentPrompt.word;
+
+            const nextBtn = document.getElementById('btn-next-round');
+            if (currentRound >= totalRounds) {
+                nextBtn.textContent = 'Guardar y Ver Podio Final 🏆';
+            } else {
+                nextBtn.textContent = `Guardar y Ronda ${currentRound + 1}/${totalRounds} →`;
+            }
+
+            renderScoringCards();
+        }
+
+        function renderScoringCards() {
+            const grid = document.getElementById('scoring-participants-grid');
+            grid.innerHTML = players.map(p => `
+                <div class="bg-white border border-parchment-300 hover:border-gold-500 rounded-2xl p-3.5 shadow-2xs flex flex-col justify-between gap-2.5 transition">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="font-bold text-sm text-slatearchive-900 truncate" title="${p.name}">
+                            ${p.id + 1}. ${p.name}
+                        </span>
+                        <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-lg bg-slatearchive-900 text-gold-300 shrink-0">
+                            Total: ${p.score + p.roundDelta}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-1.5">
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="adjustPlayerRoundPoints(${p.id}, -1)" class="w-7 h-7 rounded-lg bg-parchment-200 hover:bg-parchment-300 font-bold text-xs">−1</button>
+                            <button type="button" onclick="adjustPlayerRoundPoints(${p.id}, 2)" class="px-2 h-7 rounded-lg bg-emerald-800/10 hover:bg-emerald-800/20 text-emerald-900 font-bold text-xs">+2</button>
+                            <button type="button" onclick="adjustPlayerRoundPoints(${p.id}, 3)" class="px-2 h-7 rounded-lg bg-emerald-800/10 hover:bg-emerald-800/20 text-emerald-900 font-bold text-xs">+3</button>
+                            <button type="button" onclick="adjustPlayerRoundPoints(${p.id}, 5)" class="px-2 h-7 rounded-lg bg-emerald-800/10 hover:bg-emerald-800/20 text-emerald-900 font-bold text-xs">+5</button>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] font-bold uppercase text-parchment-800">Ronda:</span>
+                            <input type="number" min="0" max="200" value="${p.roundDelta}"
+                                onchange="setPlayerRoundPoints(${p.id}, this.value)"
+                                class="w-14 px-1.5 py-1 rounded-lg border border-parchment-300 text-center font-serif text-base font-extrabold theme-text focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function adjustPlayerRoundPoints(playerId, delta) {
+            const p = players.find(item => item.id === playerId);
+            if (!p) return;
+            p.roundDelta = Math.max(0, p.roundDelta + delta);
+            renderScoringCards();
+        }
+
+        function setPlayerRoundPoints(playerId, rawVal) {
+            const p = players.find(item => item.id === playerId);
+            if (!p) return;
+            const parsed = parseInt(rawVal, 10);
+            p.roundDelta = isNaN(parsed) ? 0 : Math.max(0, parsed);
+            renderScoringCards();
+        }
+
+        function confirmRoundAndNext() {
+            players.forEach(p => {
+                p.score += p.roundDelta;
+                p.roundDelta = 0;
+            });
+
+            if (currentRound >= totalRounds) {
+                showFinalPodium();
+            } else {
+                currentRound++;
+                showProjectionSlide();
+            }
+        }
+
+        function showFinalPodium() {
+            const sorted = [...players].sort((a, b) => b.score - a.score);
+            const top = sorted[0];
+            document.getElementById('winner-announcement').textContent =
+                `¡${top.name} lidera la clasificación final con ${top.score} puntos!`;
+
+            const list = document.getElementById('final-podium-list');
+            list.innerHTML = sorted.map((p, i) => {
+                const icon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
+                return `
+                    <div class="flex items-center justify-between px-4 py-2.5 rounded-xl border ${i === 0 ? 'bg-amber-50 border-gold-500 shadow-xs' : 'bg-white border-parchment-300'}">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg font-bold">${icon}</span>
+                            <span class="font-bold text-sm text-slatearchive-900">${p.name}</span>
+                        </div>
+                        <span class="font-serif text-xl font-extrabold theme-text">${p.score} pts</span>
+                    </div>
+                `;
+            }).join('');
+
+            const modal = document.getElementById('final-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeFinalModal() {
+            const modal = document.getElementById('final-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openRulesModal() {
+            const modal = document.getElementById('rules-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeRulesModal() {
+            const modal = document.getElementById('rules-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('final-modal')) closeFinalModal();
+            if (e.target === document.getElementById('rules-modal')) closeRulesModal();
+        });
+
+        // Inicializar interfaz de configuración al cargar
+        initSetupUI();
+    </script>
+</body>
+</html>
