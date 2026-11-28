@@ -1,0 +1,5 @@
+# Nunca subir copias de seguridad personales
+*.tsk2
+*.tsk
+*.db
+*.sqlite

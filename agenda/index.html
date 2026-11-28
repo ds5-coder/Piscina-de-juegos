@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi Agenda</title>
+<meta name="description" content="Visor de copias de seguridad de Task Agenda. Todo se procesa en tu dispositivo.">
+<meta name="theme-color" content="#202124">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header id="top" hidden>
+  <div class="bar">
+    <button id="btnMenu" class="icon" aria-label="Menú">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-view="week">Semana</button>
+      <button role="tab" data-view="calendar">Calendario</button>
+      <button role="tab" data-view="notes">Notas</button>
+    </nav>
+    <button id="btnSearch" class="icon" aria-label="Buscar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div id="nav" class="nav"></div>
+</header>
+
+<main id="main"></main>
+
+<button id="pendBtn" hidden></button>
+
+<div id="sheet" class="sheet" hidden>
+  <div class="backdrop" data-close></div>
+  <section class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="panel-head">
+      <h2 id="sheetTitle"></h2>
+      <button class="icon" data-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="sheetBody" class="panel-body"></div>
+  </section>
+</div>
+
+<input id="file" type="file" hidden>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="vendor/sql-wasm.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
