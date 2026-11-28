@@ -1,4 +1,4 @@
-const CACHE = 'agenda-v1';
+const CACHE = 'agenda-v2';
 const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
   'vendor/sql-wasm.js', 'vendor/sql-wasm.wasm'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));

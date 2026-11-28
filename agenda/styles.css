@@ -195,3 +195,36 @@ main { padding: 0 12px calc(110px + env(safe-area-inset-bottom)); max-width: 720
   background: var(--surface-2); color: var(--text); padding: 10px 16px; border-radius: 10px; z-index: 30; font-size: .92rem;
   box-shadow: 0 4px 16px #0006;
 }
+
+/* ---- Edición ---- */
+.chk { padding: 0; background: transparent; color: inherit; position: relative; }
+.chk::after { content: ""; position: absolute; inset: -10px; }
+.icon.dot { position: relative; }
+.icon.dot::after { content: ""; position: absolute; top: 8px; right: 8px; width: 11px; height: 11px; border-radius: 50%; background: var(--sun); border: 2px solid var(--bar); }
+.fab {
+  position: fixed; right: 18px; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 4;
+  width: 58px; height: 58px; border-radius: 18px; border: 0; background: var(--surface-2); color: var(--text);
+  display: grid; place-items: center; box-shadow: 0 6px 20px #0006; border: 1px solid var(--line);
+}
+.fab svg { width: 28px; height: 28px; }
+.btn.add { display: block; width: 100%; margin: 0 0 12px; padding: 13px; background: var(--surface-2); color: var(--accent); }
+.btn.ghost { background: transparent; border: 1px solid var(--line); }
+.btn.ghost.danger { color: var(--late); }
+.f { display: block; margin-bottom: 14px; font-size: .85rem; color: var(--muted); font-weight: 600; }
+.f small { font-weight: 500; }
+.f input:not([type=checkbox]), .f textarea, .f select {
+  display: block; width: 100%; margin-top: 6px; padding: 12px 14px; font: inherit; font-size: 1rem; font-weight: 400;
+  color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-height: 48px;
+}
+.f textarea { resize: vertical; }
+.f input:focus, .f textarea:focus, .f select:focus { outline: 2px solid var(--accent); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.chips { display: flex; gap: 6px; margin-top: 6px; }
+.dchip { flex: 1; margin: 0; }
+.dchip input { position: absolute; opacity: 0; pointer-events: none; }
+.dchip span { display: grid; place-items: center; height: 44px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); color: var(--text); font-weight: 700; }
+.dchip input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+.dchip input:focus-visible + span { outline: 2px solid var(--text); }
+.actions { display: flex; gap: 10px; margin-top: 8px; }
+.actions .btn { flex: 1; margin: 0; padding: 15px 10px; }
+.actions .btn:first-child { flex: 2; }

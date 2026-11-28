@@ -35,7 +35,7 @@ const S = {
   view: 'calendar',
   cy: 0, cm: 0,          // mes visible
   week: 0,               // lunes de la semana visible
-  query: '',
+  query: '', db: null, dirty: 0, sel: null, sheetRefresh: null,
   _pending: null,
 };
 
@@ -78,65 +78,73 @@ function rows(db, sql) {
   return r.values.map(v => Object.fromEntries(r.columns.map((c, i) => [c, v[i]])));
 }
 
+function readData(db) {
+  const tables = rows(db, "select name from sqlite_master where type='table'").map(r => r.name);
+  if (!tables.includes('Evento')) throw new Error('El archivo es una base de datos, pero no tiene los datos de Task Agenda (falta la tabla de eventos).');
+
+  const types = {};
+  if (tables.includes('TipoEvento')) {
+    for (const t of rows(db, 'select * from TipoEvento')) {
+      types[t._id] = { id: t._id, nombre: t.TevNome, color: colorOf(t.TevCor), prio: t.TevPrioridade, activo: !!t.TevAtivo };
+    }
+  }
+
+  const virt = new Map();               // idRecurrencia -> Map(fecha -> {done, del})
+  if (tables.includes('EventoVirtualDados')) {
+    for (const v of rows(db, 'select * from EventoVirtualDados')) {
+      if (!virt.has(v.EvdIdEventoRecorrente)) virt.set(v.EvdIdEventoRecorrente, new Map());
+      virt.get(v.EvdIdEventoRecorrente).set(v.EvdDataReferencia.slice(0, 10), { done: v.EvdEventoConcluido == null ? null : !!v.EvdEventoConcluido, del: !!v.EvdEventoExcluido });
+    }
+  }
+  const recByEvent = new Map();
+  if (tables.includes('EventoRecorrente')) {
+    for (const r of rows(db, 'select * from EventoRecorrente')) {
+      recByEvent.set(r.RecIdEventoReferencia, {
+        id: r._id, tipo: r.RecTipo, seq: Math.max(1, r.RecSequencia || 1),
+        dias: r.RecDiasSemana ? new Set(String(r.RecDiasSemana).split(',').map(x => (Number(x) - 1 + 7) % 7)) : null,
+        fim: r.RecDataFim ? toDays(r.RecDataFim) : null,
+        occ: r.RecOcorrencias || null,
+        virt: virt.get(r._id) || new Map(),
+      });
+    }
+  }
+
+  const events = rows(db, 'select * from Evento').map(e => ({
+    id: e._id, tipo: e.EveTipo, date: e.EveData.slice(0, 10), d: toDays(e.EveData),
+    hora: e.EveHora || '', horaFim: e.EveHoraFim || '',
+    titulo: e.EveTitulo || '', desc: e.EveDescricao || '', done: !!e.EveEventoConcluido,
+    rec: recByEvent.get(e._id) || null,
+  }));
+
+  const notes = tables.includes('Note') ? rows(db, 'select * from Note').map(n => ({
+    id: n._id, titulo: n.NteTitle || '', lista: !!n.NteIsList, texto: n.NteText || '', items: n.NteItems || '',
+    fijada: !!n.NtePinned, color: n.NteColor != null && n.NteColor !== 0 ? colorOf(n.NteColor) : null, orden: n.NteOrder ?? 0,
+  })).sort((a, b) => (b.fijada - a.fijada) || (a.orden - b.orden)) : [];
+
+  return { types, events, notes };
+}
+
 async function parseBackup(bytes, name) {
   const head = new TextDecoder().decode(bytes.slice(0, 15));
   if (head !== 'SQLite format 3') throw new Error('Este archivo no es una copia de seguridad de Task Agenda (no es una base de datos SQLite).');
   const SQL = await getSQL();
   const db = new SQL.Database(bytes);
-  try {
-    const tables = rows(db, "select name from sqlite_master where type='table'").map(r => r.name);
-    if (!tables.includes('Evento')) throw new Error('El archivo es una base de datos, pero no tiene los datos de Task Agenda (falta la tabla de eventos).');
-
-    const types = {};
-    if (tables.includes('TipoEvento')) {
-      for (const t of rows(db, 'select * from TipoEvento')) {
-        types[t._id] = { id: t._id, nombre: t.TevNome, color: colorOf(t.TevCor), prio: t.TevPrioridade, activo: !!t.TevAtivo };
-      }
-    }
-
-    const virt = new Map();               // idRecurrencia -> Map(fecha -> {done, del})
-    if (tables.includes('EventoVirtualDados')) {
-      for (const v of rows(db, 'select * from EventoVirtualDados')) {
-        if (!virt.has(v.EvdIdEventoRecorrente)) virt.set(v.EvdIdEventoRecorrente, new Map());
-        virt.get(v.EvdIdEventoRecorrente).set(v.EvdDataReferencia.slice(0, 10), { done: v.EvdEventoConcluido == null ? null : !!v.EvdEventoConcluido, del: !!v.EvdEventoExcluido });
-      }
-    }
-    const recByEvent = new Map();
-    if (tables.includes('EventoRecorrente')) {
-      for (const r of rows(db, 'select * from EventoRecorrente')) {
-        recByEvent.set(r.RecIdEventoReferencia, {
-          id: r._id, tipo: r.RecTipo, seq: Math.max(1, r.RecSequencia || 1),
-          dias: r.RecDiasSemana ? new Set(String(r.RecDiasSemana).split(',').map(x => (Number(x) - 1 + 7) % 7)) : null,
-          fim: r.RecDataFim ? toDays(r.RecDataFim) : null,
-          occ: r.RecOcorrencias || null,
-          virt: virt.get(r._id) || new Map(),
-        });
-      }
-    }
-
-    const events = rows(db, 'select * from Evento').map(e => ({
-      id: e._id, tipo: e.EveTipo, date: e.EveData.slice(0, 10), d: toDays(e.EveData),
-      hora: e.EveHora || '', horaFim: e.EveHoraFim || '',
-      titulo: e.EveTitulo || '', desc: e.EveDescricao || '', done: !!e.EveEventoConcluido,
-      rec: recByEvent.get(e._id) || null,
-    }));
-
-    const notes = tables.includes('Note') ? rows(db, 'select * from Note').map(n => ({
-      id: n._id, titulo: n.NteTitle || '', lista: !!n.NteIsList, texto: n.NteText || '', items: n.NteItems || '',
-      fijada: !!n.NtePinned, color: n.NteColor != null && n.NteColor !== 0 ? colorOf(n.NteColor) : null, orden: n.NteOrder ?? 0,
-    })).sort((a, b) => (b.fijada - a.fijada) || (a.orden - b.orden)) : [];
-
-    return { types, events, notes, name };
-  } finally { db.close(); }
+  try { return { db, data: readData(db), name }; }
+  catch (err) { db.close(); throw err; }
 }
 
-function applyData(d, name, loadedAt) {
+function setData(d) {
   S.types = d.types; S.events = d.events; S.notes = d.notes;
   S.minD = d.events.reduce((m, e) => Math.min(m, e.d), Infinity);
   if (!isFinite(S.minD)) S.minD = todayDays();
-  S.fileName = name; S.loadedAt = loadedAt || Date.now(); S.loaded = true; S._pending = null;
+  S._pending = null;
+}
+function applyData(r, loadedAt, dirty) {
+  if (S.db) { try { S.db.close(); } catch { /* ya cerrada */ } }
+  S.db = r.db; setData(r.data);
+  S.fileName = r.name; S.loadedAt = loadedAt || Date.now(); S.dirty = dirty || 0; S.loaded = true;
   const [y, m] = ymd(todayDays());
-  S.cy = y; S.cm = m; S.week = monday(todayDays());
+  S.cy = y; S.cm = m; S.week = monday(todayDays()); S.sel = null;
 }
 
 /* ============================================================
@@ -245,8 +253,8 @@ function evRow(o, opts = {}) {
   const time = e.hora ? e.hora + (e.horaFim ? '–' + e.horaFim : '') : '';
   const today = todayDays();
   const late = !o.done && o.d < today ? `<span class="late">Atrasado ${today - o.d} d</span>` : '';
-  return `<li class="ev${o.done ? ' done' : ''}${opts.hit ? ' hit' : ''}" style="--c:${t.color}" ${opts.hit ? `data-d="${o.d}"` : ''}>
-    <span class="chk" aria-label="${o.done ? 'Hecho' : 'Pendiente'}">${o.done ? ICON_CHECK : ''}</span>
+  return `<li class="ev${o.done ? ' done' : ''}${opts.hit ? ' hit' : ''}" style="--c:${t.color}" ${opts.hit ? `data-d="${o.d}"` : `data-edit="${e.id}:${o.d}"`}>
+    <button class="chk" data-toggle="${e.id}:${o.d}" role="checkbox" aria-checked="${o.done}" aria-label="Marcar como ${o.done ? 'pendiente' : 'hecho'}">${o.done ? ICON_CHECK : ''}</button>
     <div class="ev-body">
       <div class="ev-title">${esc(e.titulo)}</div>
       ${e.desc ? `<div class="ev-desc">${esc(e.desc)}</div>` : ''}
@@ -324,11 +332,11 @@ function renderNotes() {
 }
 
 function renderWelcome(err) {
-  $('#top').hidden = true; $('#pendBtn').hidden = true;
+  $('#top').hidden = true; $('#pendBtn').hidden = true; $('#fab').hidden = true;
   $('#main').innerHTML = `<div class="welcome" id="drop">
     <img class="logo" src="icon.svg" alt="">
     <h1>Mi Agenda</h1>
-    <p>Abre tu copia de seguridad de Task Agenda para ver tu calendario, tus tareas y tus notas.</p>
+    <p>Abre tu copia de seguridad de Task Agenda para ver y editar tu calendario y tus tareas.</p>
     <button class="btn" id="pick">Cargar copia de seguridad</button>
     ${err ? `<p class="err" role="alert">${esc(err)}</p>` : ''}
     <ol class="steps">
@@ -338,7 +346,7 @@ function renderWelcome(err) {
     </ol></div>`;
 }
 
-function render() {
+function render(keep) {
   if (!S.loaded) return renderWelcome();
   $('#top').hidden = false;
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === S.view)));
@@ -351,39 +359,46 @@ function render() {
   b.hidden = !showPend;
   b.className = n ? '' : 'clear';
   b.textContent = n ? `${n} ${n === 1 ? 'evento pendiente' : 'eventos pendientes'}` : 'Todo al día';
-  window.scrollTo(0, 0);
+  $('#btnMenu').classList.toggle('dot', S.dirty > 0);
+  $('#fab').hidden = !showPend;
+  if (!keep) window.scrollTo(0, 0);
 }
 
 /* ============================================================
    Hojas (diálogos inferiores)
    ============================================================ */
 let lastFocus = null;
-function openSheet(title, html) {
-  lastFocus = document.activeElement;
+function openSheet(title, html, refresh) {
+  if ($('#sheet').hidden) lastFocus = document.activeElement;
   $('#sheetTitle').textContent = title;
   $('#sheetBody').innerHTML = html;
+  S.sheetRefresh = refresh || null;
   $('#sheet').hidden = false;
   document.body.style.overflow = 'hidden';
+  $('#sheetBody').scrollTop = 0;
   $('#sheet .panel-head button').focus();
 }
 function closeSheet() {
-  $('#sheet').hidden = true; document.body.style.overflow = '';
+  $('#sheet').hidden = true; document.body.style.overflow = ''; S.sheetRefresh = null;
   if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
 
+const dayHtml = d => {
+  const l = groupByDay(occurrences(d, d)).get(d) || [];
+  return `<button class="btn add" data-add="${d}">+ Añadir evento</button>` + (l.length ? evList(l) : '<div class="empty">Sin eventos este día.</div>');
+};
 function openDay(d) {
   S.sel = d;
-  const l = groupByDay(occurrences(d, d)).get(d) || [];
-  openSheet(cap(fmt(d, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })), l.length ? evList(l) : '<div class="empty">Sin eventos este día.</div>');
+  openSheet(cap(fmt(d, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })), dayHtml(d), () => { $('#sheetBody').innerHTML = dayHtml(d); });
   if (S.view === 'calendar') { const sc = scrollY; renderCalendar(); scrollTo(0, sc); }
 }
 
-function openPending() {
+function pendingHtml() {
   const p = pending();
   const sec = (t, l) => l.length ? `<div class="group-title">${t} · ${l.length}</div>${evList(l)}` : '';
-  const html = sec('Atrasados', p.late) + sec('Hoy', p.today) + sec('Próximos 30 días', p.soon);
-  openSheet('Pendientes', html || '<div class="empty">No tienes nada pendiente.</div>');
+  return sec('Atrasados', p.late) + sec('Hoy', p.today) + sec('Próximos 30 días', p.soon) || '<div class="empty">No tienes nada pendiente.</div>';
 }
+function openPending() { openSheet('Pendientes', pendingHtml(), () => { $('#sheetBody').innerHTML = pendingHtml(); }); }
 
 function openSearch() {
   openSheet('Buscar', `<div class="search"><input id="q" type="search" placeholder="Buscar en títulos y descripciones…" autocomplete="off" value="${esc(S.query)}"></div><div id="results"></div>`);
@@ -398,7 +413,160 @@ function openSearch() {
       : '<div class="empty">Sin resultados.</div>';
   };
   let t; input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(run, 150); });
+  S.sheetRefresh = run;
   run();
+}
+
+/* ============================================================
+   Edición: se modifica la propia base de datos de la copia
+   ============================================================ */
+function sql(q, params = []) { S.db.run(q, params); }
+
+async function persist() {
+  try { await store.set('db', { bytes: S.db.export(), name: S.fileName, loadedAt: S.loadedAt, dirty: S.dirty }); }
+  catch { toast('No se pudo guardar en el dispositivo. Descarga la copia para no perder los cambios.'); }
+}
+
+async function mutate(fn) {
+  S.db.run('begin');
+  try { fn(); S.db.run('commit'); }
+  catch (err) { try { S.db.run('rollback'); } catch { /* nada */ } console.error(err); toast('No se pudo guardar el cambio.'); return false; }
+  S.dirty++;
+  setData(readData(S.db));
+  render(true);
+  if (!$('#sheet').hidden && S.sheetRefresh) { const sb = $('#sheetBody'), top = sb.scrollTop; S.sheetRefresh(); sb.scrollTop = top; }
+  await persist();
+  return true;
+}
+
+const findEvent = id => S.events.find(e => e.id === id);
+const lastId = () => S.db.exec('select last_insert_rowid()')[0].values[0][0];
+
+function setDone(e, d, done) {
+  const date = fromDays(d), v = done ? 1 : 0;
+  if (!e.rec) { sql('update Evento set EveEventoConcluido=? where _id=?', [v, e.id]); return; }
+  if (d === e.d) {                       // la primera ocurrencia vive en el propio evento
+    sql('update Evento set EveEventoConcluido=? where _id=?', [v, e.id]);
+    sql('update EventoVirtualDados set EvdEventoConcluido=? where EvdIdEventoRecorrente=? and EvdDataReferencia=?', [v, e.rec.id, date]);
+  } else {
+    sql(`insert into EventoVirtualDados(EvdEventoConcluido,EvdDataReferencia,EvdIdEventoRecorrente,EvdEventoExcluido) values(?,?,?,0)
+         on conflict(EvdDataReferencia,EvdIdEventoRecorrente) do update set EvdEventoConcluido=excluded.EvdEventoConcluido`, [v, date, e.rec.id]);
+  }
+}
+
+const REPS = [['', 'No se repite'], ['1', 'Cada día'], ['2', 'Cada semana'], ['3', 'Cada mes'], ['4', 'Cada año'], ['6', 'Días concretos de la semana'], ['5', 'Varios días seguidos']];
+const DOW_CHIPS = [[1, 'L'], [2, 'M'], [3, 'X'], [4, 'J'], [5, 'V'], [6, 'S'], [0, 'D']];
+
+function openForm(eventId, d) {
+  const e = eventId ? findEvent(eventId) : null, r = e && e.rec;
+  const date = e ? e.date : fromDays(d);
+  const dias = r && r.dias ? r.dias : new Set([dow(toDays(date))]);
+  let defType = e ? e.tipo : null;
+  if (defType == null) {
+    const cnt = {}; for (const x of S.events) cnt[x.tipo] = (cnt[x.tipo] || 0) + 1;
+    defType = Number(Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0]) || Object.keys(S.types)[0];
+  }
+  const types = Object.values(S.types).filter(t => t.activo || (e && t.id === e.tipo)).sort((a, b) => a.prio - b.prio);
+  const repVal = r ? String(r.tipo) : '';
+  openSheet(e ? 'Editar evento' : 'Nuevo evento', `<form id="evForm" data-id="${e ? e.id : ''}" data-d="${d}" novalidate>
+    <label class="f">Título<input name="titulo" required maxlength="300" autocomplete="off" value="${esc(e ? e.titulo : '')}"></label>
+    <label class="f">Descripción<textarea name="desc" rows="3">${esc(e ? e.desc : '')}</textarea></label>
+    <label class="f">${r ? 'Inicio de la serie' : 'Fecha'}<input type="date" name="fecha" required value="${date}"></label>
+    <div class="row2">
+      <label class="f">Hora (opcional)<input type="time" name="hora" value="${esc(e ? e.hora : '')}"></label>
+      <label class="f">Hora fin<input type="time" name="horaFin" value="${esc(e ? e.horaFin : '')}"></label>
+    </div>
+    <label class="f">Tipo<select name="tipo">${types.map(t => `<option value="${t.id}" ${t.id == defType ? 'selected' : ''}>${esc(t.nombre)}</option>`).join('')}</select></label>
+    <label class="f">Repetición<select name="rep">${REPS.map(([v, n]) => `<option value="${v}" ${v === repVal ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <div class="f" id="diasBox"><span>Días</span><div class="chips">${DOW_CHIPS.map(([v, n]) => `<label class="dchip"><input type="checkbox" name="dia" value="${v}" ${dias.has(v) ? 'checked' : ''}><span>${n}</span></label>`).join('')}</div></div>
+    <label class="f" id="finBox">Hasta <small id="finHint">(opcional)</small><input type="date" name="fin" value="${r && r.fim != null ? fromDays(r.fim) : ''}"></label>
+    ${r ? '<p class="about">Los cambios afectan a toda la serie.</p>' : ''}
+    <p class="err" id="formErr" role="alert" hidden></p>
+    <div class="actions">
+      <button type="submit" class="btn">Guardar</button>
+      ${e ? '<button type="button" class="btn ghost danger" data-delete>Eliminar</button>' : ''}
+    </div></form>`);
+  syncRep();
+  if (!e) $('#evForm [name=titulo]').focus();
+}
+function syncRep() {
+  const f = $('#evForm'); if (!f) return;
+  const v = f.rep.value;
+  $('#diasBox').hidden = v !== '6';
+  $('#finBox').hidden = v === '';
+  $('#finHint').textContent = v === '5' ? '(obligatorio)' : '(opcional)';
+}
+
+async function submitForm(f) {
+  const q = new FormData(f), err = $('#formErr');
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  const titulo = String(q.get('titulo')).trim(), fecha = q.get('fecha'), rep = q.get('rep');
+  const hora = q.get('hora') || null, horaFin = hora ? (q.get('horaFin') || null) : null;
+  const fin = rep ? (q.get('fin') || null) : null;
+  const dias = q.getAll('dia').map(Number);
+  if (!titulo) return fail('Escribe un título.');
+  if (!fecha) return fail('Elige una fecha.');
+  if (rep === '5' && !fin) return fail('Indica hasta qué día dura.');
+  if (rep === '6' && !dias.length) return fail('Elige al menos un día de la semana.');
+  if (fin && toDays(fin) < toDays(fecha)) return fail('La fecha final no puede ser anterior al inicio.');
+  const diasTxt = rep === '6' ? dias.map(x => x + 1).join(',') : null;     // formato Java: 1 = domingo
+  const id = f.dataset.id ? Number(f.dataset.id) : null, e = id ? findEvent(id) : null;
+  const ok = await mutate(() => {
+    let eid = id;
+    if (!e) {
+      sql("insert into Evento(EveTipo,EveData,EveHora,EveTitulo,EveDescricao,EveEventoConcluido,EveIdRecorrenciaEvento,EveHoraFim) values(?,?,?,?,?,0,NULL,?)",
+        [Number(q.get('tipo')), fecha, hora, titulo, String(q.get('desc')), horaFin]);
+      eid = lastId();
+    } else {
+      sql('update Evento set EveTipo=?,EveData=?,EveHora=?,EveTitulo=?,EveDescricao=?,EveHoraFim=? where _id=?',
+        [Number(q.get('tipo')), fecha, hora, titulo, String(q.get('desc')), horaFin, id]);
+    }
+    const r = e && e.rec;
+    if (r && rep && Number(rep) === r.tipo) {
+      sql('update EventoRecorrente set RecDiasSemana=?, RecDataFim=? where _id=?', [diasTxt, fin, r.id]);
+    } else {
+      if (r) { sql('delete from EventoVirtualDados where EvdIdEventoRecorrente=?', [r.id]); sql('delete from EventoRecorrente where _id=?', [r.id]); }
+      if (rep) sql('insert into EventoRecorrente(RecTipo,RecSequencia,RecDiasSemana,RecDataFim,RecOcorrencias,RecIdEventoReferencia) values(?,1,?,?,NULL,?)', [Number(rep), diasTxt, fin, eid]);
+    }
+  });
+  if (ok) { closeSheet(); toast(e ? 'Cambios guardados' : 'Evento añadido'); }
+}
+
+function deleteEvent(e, d, mode) {
+  if (mode === 'one') {
+    sql(`insert into EventoVirtualDados(EvdEventoConcluido,EvdDataReferencia,EvdIdEventoRecorrente,EvdEventoExcluido) values(0,?,?,1)
+         on conflict(EvdDataReferencia,EvdIdEventoRecorrente) do update set EvdEventoExcluido=1`, [fromDays(d), e.rec.id]);
+    return;
+  }
+  if (e.rec) { sql('delete from EventoVirtualDados where EvdIdEventoRecorrente=?', [e.rec.id]); sql('delete from EventoRecorrente where _id=?', [e.rec.id]); }
+  try { sql('delete from Alarme where AlaIdEvento=?', [e.id]); } catch { /* sin alarmas */ }
+  sql('delete from Evento where _id=?', [e.id]);
+}
+
+async function askDelete(id, d) {
+  const e = findEvent(id); if (!e) return;
+  if (!e.rec) {
+    if (!confirm(`¿Eliminar «${e.titulo}»?`)) return;
+    if (await mutate(() => deleteEvent(e, d, 'all'))) { closeSheet(); toast('Evento eliminado'); }
+    return;
+  }
+  openSheet('Eliminar evento repetido', `<p class="about" style="padding-top:0"><b>${esc(e.titulo)}</b> se repite. ¿Qué quieres eliminar?</p>
+    <ul class="menu">
+      <li><button data-del="one:${id}:${d}">Solo el ${esc(fmt(d, { weekday: 'long', day: 'numeric', month: 'long' }))}</button></li>
+      <li><button class="danger" data-del="all:${id}:${d}">Toda la serie</button></li>
+    </ul>`);
+}
+
+function exportBackup() {
+  const bytes = S.db.export(), t = new Date();
+  const name = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}_${pad(t.getHours())}.${pad(t.getMinutes())}.${pad(t.getSeconds())}_Agenda.tsk2`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+  a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  S.dirty = 0; persist(); render(true);
+  if (!$('#sheet').hidden) closeSheet();
+  toast(`Copia descargada: ${name}`);
 }
 
 function openTypes() {
@@ -410,13 +578,15 @@ function openTypes() {
 
 function openMenu() {
   const when = new Date(S.loadedAt).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' });
+  const n = S.dirty;
   openSheet('Menú', `<ul class="menu">
+    <li><button data-m="export">Descargar copia de seguridad (.tsk2)<small>${n ? `⚠ ${n} ${n === 1 ? 'cambio' : 'cambios'} sin descargar` : 'Sin cambios pendientes de descargar'}</small></button></li>
     <li><button data-m="search">Buscar</button></li>
     <li><button data-m="types">Tipos de evento</button></li>
     <li><button data-m="load">Cargar otra copia de seguridad</button></li>
     <li><button class="danger" data-m="clear">Borrar mis datos de este dispositivo</button></li>
   </ul>
-  <p class="about">Copia cargada: <b>${esc(S.fileName)}</b><br>${S.events.length} eventos · ${S.notes.length} notas · abierta el ${esc(when)}.<br>Los datos solo existen en este dispositivo. Esta app es de solo lectura: no modifica tu copia.</p>`);
+  <p class="about">Copia cargada: <b>${esc(S.fileName)}</b><br>${S.events.length} eventos · ${S.notes.length} notas · abierta el ${esc(when)}.<br>Tus cambios se guardan en este dispositivo. Para llevarlos a otro sitio, descarga la copia.</p>`);
 }
 
 /* ============================================================
@@ -431,14 +601,14 @@ async function handleFile(file) {
   if (!file) return;
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const d = await parseBackup(bytes, file.name);
-    applyData(d, file.name);
+    if (S.loaded && S.dirty && !confirm(`Tienes ${S.dirty} cambios sin descargar. Si cargas otra copia se perderán. ¿Continuar?`)) return;
+    const r = await parseBackup(bytes, file.name);
+    applyData(r, Date.now(), 0);
     S.view = 'calendar';
-    try { await store.set('db', { bytes, name: file.name, loadedAt: S.loadedAt }); }
-    catch { toast('No se pudo guardar en el dispositivo: tendrás que cargarla otra vez.'); }
+    await persist();
     if (!$('#sheet').hidden) closeSheet();
     render();
-    toast(`Copia cargada: ${d.events.length} eventos`);
+    toast(`Copia cargada: ${r.data.events.length} eventos`);
   } catch (err) {
     console.error(err);
     if (S.loaded) toast(err.message); else renderWelcome(err.message);
@@ -461,10 +631,23 @@ function goDate(d) {
 }
 
 document.addEventListener('click', async ev => {
-  const el = ev.target.closest('button, .hit');
+  const el = ev.target.closest('button, .hit, [data-edit]');
   if (!el) return;
   if (el.hasAttribute('data-close')) return closeSheet();
   if (el.dataset.day) return openDay(Number(el.dataset.day));
+  if (el.dataset.toggle) {
+    const [id, d] = el.dataset.toggle.split(':').map(Number), e = findEvent(id);
+    const o = e && occurrences(d, d).find(x => x.e === e);
+    return o && mutate(() => setDone(e, d, !o.done));
+  }
+  if (el.dataset.edit) { const [id, d] = el.dataset.edit.split(':').map(Number); return openForm(id, d); }
+  if (el.dataset.add) return openForm(null, Number(el.dataset.add));
+  if (el.dataset.delete !== undefined) { const f = $('#evForm'); return askDelete(Number(f.dataset.id), Number(f.dataset.d)); }
+  if (el.dataset.del) {
+    const [mode, id, d] = el.dataset.del.split(':'), e = findEvent(Number(id));
+    if (e && await mutate(() => deleteEvent(e, Number(d), mode))) { closeSheet(); toast(mode === 'one' ? 'Día eliminado' : 'Serie eliminada'); }
+    return;
+  }
   if (el.classList.contains('hit')) return goDate(Number(el.dataset.d));
   if (el.dataset.view) { S.view = el.dataset.view; return render(); }
   if (el.dataset.act === 'prev') return shift(-1);
@@ -474,18 +657,23 @@ document.addEventListener('click', async ev => {
     case 'btnMenu': return openMenu();
     case 'btnSearch': return openSearch();
     case 'pendBtn': return openPending();
+    case 'fab': return openForm(null, S.view === 'calendar' && S.sel != null ? S.sel : todayDays());
     case 'pick': return $('#file').click();
   }
   switch (el.dataset.m) {
+    case 'export': return exportBackup();
     case 'search': return openSearch();
     case 'types': return openTypes();
     case 'load': closeSheet(); return $('#file').click();
     case 'clear':
-      if (!confirm('¿Borrar la copia guardada en este dispositivo? Tu archivo original no se toca.')) return;
+      if (!confirm(`¿Borrar los datos de este dispositivo?${S.dirty ? ` Perderás ${S.dirty} cambios que no has descargado.` : ''} Tu archivo original no se toca.`)) return;
       try { await store.del('db'); } catch { /* sin almacenamiento */ }
       S.loaded = false; closeSheet(); render(); return;
   }
 });
+document.addEventListener('submit', e => { if (e.target.id === 'evForm') { e.preventDefault(); submitForm(e.target); } });
+document.addEventListener('change', e => { if (e.target.name === 'rep') syncRep(); });
+addEventListener('beforeunload', e => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 $('#file').addEventListener('change', e => handleFile(e.target.files[0]));
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet(); });
 
@@ -508,7 +696,7 @@ addEventListener('touchend', e => {
   render();                                 // bienvenida mientras se comprueba si hay copia guardada
   try {
     const saved = await store.get('db');
-    if (saved && saved.bytes) { applyData(await parseBackup(saved.bytes, saved.name), saved.name, saved.loadedAt); render(); }
+    if (saved && saved.bytes) { applyData(await parseBackup(saved.bytes, saved.name), saved.loadedAt, saved.dirty); render(); }
   } catch (err) { console.warn('No se pudo restaurar la copia guardada', err); }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
 })();
