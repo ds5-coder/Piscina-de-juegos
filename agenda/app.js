@@ -30,7 +30,7 @@ const ICON_NEXT = '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" s
 
 /* ---- Estado ---- */
 const S = {
-  loaded: false, fileName: '', loadedAt: null,
+  persisted: null, loaded: false, fileName: '', loadedAt: null,
   types: {}, events: [], notes: [], minD: 0,
   view: 'calendar',
   cy: 0, cm: 0,          // mes visible
@@ -70,7 +70,9 @@ const store = {
    Lectura de la copia de seguridad
    ============================================================ */
 let SQLP = null;
-const getSQL = () => SQLP || (SQLP = initSqlJs({ locateFile: f => 'vendor/' + f }));
+const getSQL = () => SQLP || (SQLP = initSqlJs(window.__WASM_B64
+  ? { wasmBinary: Uint8Array.from(atob(window.__WASM_B64), c => c.charCodeAt(0)) }   // versión de un solo archivo
+  : { locateFile: f => 'vendor/' + f }));
 
 function rows(db, sql) {
   const r = db.exec(sql)[0];
@@ -576,6 +578,13 @@ function openTypes() {
     `<li class="ev" style="--c:${t.color}"><span class="chk"></span><div class="ev-body"><div class="ev-title">${esc(t.nombre)}</div><div class="ev-meta"><span>${counts[t.id] || 0} eventos</span></div></div></li>`).join('')}</ul>`);
 }
 
+function offlineStatus() {
+  if (!location.protocol.startsWith('http')) return '✅ Esta versión es un archivo único: no necesita internet nunca.';
+  return navigator.serviceWorker && navigator.serviceWorker.controller
+    ? '✅ Lista para usar sin conexión: puedes abrirla en modo avión.'
+    : 'ℹ️ Abre la app una vez con internet y quedará guardada para usarla sin conexión.';
+}
+
 function openMenu() {
   const when = new Date(S.loadedAt).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' });
   const n = S.dirty;
@@ -586,7 +595,8 @@ function openMenu() {
     <li><button data-m="load">Cargar otra copia de seguridad</button></li>
     <li><button class="danger" data-m="clear">Borrar mis datos de este dispositivo</button></li>
   </ul>
-  <p class="about">Copia cargada: <b>${esc(S.fileName)}</b><br>${S.events.length} eventos · ${S.notes.length} notas · abierta el ${esc(when)}.<br>Tus cambios se guardan en este dispositivo. Para llevarlos a otro sitio, descarga la copia.</p>`);
+  <p class="about">${offlineStatus()}</p>
+  <p class="about">Copia cargada: <b>${esc(S.fileName)}</b><br>${S.events.length} eventos · ${S.notes.length} notas · abierta el ${esc(when)}.<br>Tus cambios se guardan en este dispositivo${S.persisted === false ? ' (el navegador podría borrarlos si falta espacio: descarga copias a menudo)' : ''}. Para llevarlos a otro sitio, descarga la copia.</p>`);
 }
 
 /* ============================================================
@@ -698,5 +708,7 @@ addEventListener('touchend', e => {
     const saved = await store.get('db');
     if (saved && saved.bytes) { applyData(await parseBackup(saved.bytes, saved.name), saved.loadedAt, saved.dirty); render(); }
   } catch (err) { console.warn('No se pudo restaurar la copia guardada', err); }
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => { });
+  // Pide al navegador que no borre los datos si falta espacio
+  try { if (navigator.storage && navigator.storage.persist) S.persisted = await navigator.storage.persist(); } catch { /* no disponible */ }
 })();
